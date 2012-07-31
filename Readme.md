@@ -3,7 +3,6 @@
 
 ##*PipeWork* Component##
 
-[Reducer](/doc/ja/reducer.md)
+Reducer : doc/ja/reducer.md
 
-[Queue Arbiter](/doc/ja/queue_arbiter.md)
-
+Queue Arbiter : doc/ja/queue_arbiter.md
