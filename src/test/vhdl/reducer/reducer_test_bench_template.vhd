@@ -7,7 +7,8 @@
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-use     WORK.COMPONENTS.REDUCER;
+library PIPEWORK;
+use     PIPEWORK.COMPONENTS.REDUCER;
 use     WORK.COMPONENTS.REDUCER_TEST_MODEL;
 entity  REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J is
     generic(AUTO_FINISH:integer:=1);port(FINISH:out std_logic);

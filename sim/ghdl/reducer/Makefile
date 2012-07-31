@@ -44,10 +44,13 @@ all: $(TEST_BENCH)
 clean:
 	rm -f *.o *.cf tmp.vhd $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
 
-reducer.o : $(SRC_MAIN_PATH)/reducer.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
+components.o : $(SRC_MAIN_PATH)/components.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
-reducer_test_model.o : reducer.o
+reducer.o    : $(SRC_MAIN_PATH)/reducer.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+
+reducer_test_model.o : reducer.o components.o
 reducer_test_model.o : $(SRC_TEST_PATH)/reducer_test_model.vhd
 	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
 

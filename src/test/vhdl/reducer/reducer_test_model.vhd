@@ -676,42 +676,6 @@ end MODEL;
 library ieee;
 use     ieee.std_logic_1164.all;
 package COMPONENTS is
-    component REDUCER is
-        generic (
-            WORD_BITS   : integer;
-            ENBL_BITS   : integer;
-            I_WIDTH     : integer;
-            O_WIDTH     : integer;
-            QUEUE_SIZE  : integer;
-            VALID_MIN   : integer;
-            VALID_MAX   : integer;
-            I_JUSTIFIED : integer;
-            FLUSH_ENABLE: integer
-        );
-        port (
-            CLK         : in  std_logic; 
-            RST         : in  std_logic;
-            CLR         : in  std_logic;
-            START       : in  std_logic;
-            OFFSET      : in  std_logic_vector(O_WIDTH-1 downto 0);
-            DONE        : in  std_logic;
-            FLUSH       : in  std_logic;
-            BUSY        : out std_logic;
-            VALID       : out std_logic_vector(VALID_MAX downto VALID_MIN);
-            I_DATA      : in  std_logic_vector(I_WIDTH*WORD_BITS-1 downto 0);
-            I_ENBL      : in  std_logic_vector(I_WIDTH*ENBL_BITS-1 downto 0);
-            I_DONE      : in  std_logic;
-            I_FLUSH     : in  std_logic;
-            I_VAL       : in  std_logic;
-            I_RDY       : out std_logic;
-            O_DATA      : out std_logic_vector(O_WIDTH*WORD_BITS-1 downto 0);
-            O_ENBL      : out std_logic_vector(O_WIDTH*ENBL_BITS-1 downto 0);
-            O_DONE      : out std_logic;
-            O_FLUSH     : out std_logic;
-            O_VAL       : out std_logic;
-            O_RDY       : in  std_logic
-        );
-    end component;
     component REDUCER_TEST_MODEL is
         generic (
             NAME        : string;
