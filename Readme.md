@@ -1,9 +1,9 @@
 *PipeWork*
 ============
 
-##*PipeWork Component##
+##*PipeWork* Component##
 
-[Reducer](doc/ja/reducer.md)
+[Reducer](PipeWork/doc/ja/reducer.md)
 
-[Queue Arbiter](doc/ja/queue_arbiter.md)
+[Queue Arbiter](PipeWork/doc/ja/queue_arbiter.md)
 
