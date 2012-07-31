@@ -1,9 +1,9 @@
 *PipeWork*
 ============
 
-##*PipeWork* Component##
+###*PipeWork* Component###
 
-#Reducer#
+####Reducer####
 
 異なるデータ幅のパスを継ぐためのアダプタです.
 
@@ -14,7 +14,7 @@ REDUCER とは配管用語で径違い継ぎ手、つまり直径違う配管(�
 
 詳細は doc/ja/reducer.md を参照.
 
-#Queue Arbiter#
+####Queue Arbiter####
 
 キュー(ファーストインファーストアウト)方式の調停回路です.
 
@@ -37,3 +37,6 @@ REDUCER とは配管用語で径違い継ぎ手、つまり直径違う配管(�
     特にリクエストの数が増えると比例して遅延時間が増大します.
 
 詳細は doc/ja/queue_arbiter.md を参照.
+
+###ライセンス###
+二条項BSDライセンス (2-clause BSD license) で公開しています。
