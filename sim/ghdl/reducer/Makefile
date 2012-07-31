@@ -2,7 +2,7 @@ GHDL=ghdl
 GHDLFLAGS=--mb-comments
 WORK=work
 
-SRC_MAIN_PATH = ../../../src/main
+SRC_MAIN_PATH = ../../../src/main/vhdl/components
 SRC_TEST_PATH = ../../../src/test/vhdl/reducer
 
 TEST_BENCH = reducer_test_bench_dwc_w08_i1_o1_q0_j0 \
@@ -44,7 +44,7 @@ all: $(TEST_BENCH)
 clean:
 	rm -f *.o *.cf tmp.vhd $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
 
-reducer.o : $(SRC_MAIN_PATH)/vhdl/reducer.vhd
+reducer.o : $(SRC_MAIN_PATH)/reducer.vhd
 	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
 
 reducer_test_model.o : reducer.o

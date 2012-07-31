@@ -3,7 +3,7 @@ GHDLFLAGS=--mb-comments
 GHDLRUNFLAGS=$(GHDLFLAGS)
 WORK=work
 
-SRC_MAIN_PATH = ../../../src/main/vhdl
+SRC_MAIN_PATH = ../../../src/main/vhdl/components
 SRC_TEST_PATH = ../../../src/test/vhdl/queue_arbiter
 
 TEST_BENCH = test_bench_one_hot_arch \
