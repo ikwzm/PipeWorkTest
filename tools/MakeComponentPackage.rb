@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 #---------------------------------------------------------------------------------
 #
-#       Version     :   0.0.1
-#       Created     :   2012/7/31
+#       Version     :   0.0.2
+#       Created     :   2012/8/1
 #       File name   :   MakeComponentPackage.rb
 #       Author      :   Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 #       Description :   VHDLのソースコードから entity 宣言している部分を
@@ -45,29 +45,31 @@
 require 'optparse'
 class ComponentPackage
   def initialize
-    @program_name    = "MakeComponentPackage"
-    @program_version = "0.0.1"
-    @program_id      = @program_name + " " + @program_version
-    @line_width      = 83
-    @components      = Hash.new
-    @libraries       = Hash.new
-    @name            = "COMPONENT"
-    @library_name    = "PIPEWORK"
-    @file_name       = "components.vhd"
-    @title           = ""
-    @version         = "1.0.0"
-    @author          = "Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>"
-    @time            = Time.now
-    @license         = default_license
-    @verbose         = true
-    @opt             = OptionParser.new do |opt|
+    @program_name      = "MakeComponentPackage"
+    @program_version   = "0.0.2"
+    @program_id        = @program_name + " " + @program_version
+    @line_width        = 83
+    @components        = Hash.new
+    @libraries         = Hash.new
+    @name              = "COMPONENT"
+    @library_name      = "PIPEWORK"
+    @file_name         = nil
+    @entity_file_names = Array.new
+    @brief             = ""
+    @version           = "1.0.0"
+    @author            = "Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>"
+    @time              = Time.now
+    @date_format       = "%Y/%m/%d"
+    @license           = default_license
+    @verbose           = true
+    @opt               = OptionParser.new do |opt|
       opt.program_name = @program_name
       opt.version      = @program_version
       opt.on("--verbose"             ){|val| @verbose      = true}
       opt.on("--package PACKAGE_NAME"){|val| @name         = val }
       opt.on("--library LIBRARY_NAME"){|val| @library_name = val }
       opt.on("--output  FILE_NAME"   ){|val| @file_name    = val }
-      opt.on("--title   STRING"      ){|val| @title        = val }
+      opt.on("--brief   STRING"      ){|val| @brief        = val }
       opt.on("--version VERSION"     ){|val| @version      = val }
       opt.on("--author  AUTHOR_NAME" ){|val| @author       = val }
       opt.on("--licnese LICENSE"     ){|val| @license      = val }
@@ -82,8 +84,8 @@ class ComponentPackage
   def file_name=(val)
     @file_name = val
   end
-  def title=(val)
-    @title = val
+  def brief=(val)
+    @brief = val
   end
   def version=(val)
     @version = val
@@ -101,11 +103,14 @@ class ComponentPackage
   def program_version
     @program_version
   end
+  def entity_file_names=(val)
+    @entity_file_names = val
+  end
   #-------------------------------------------------------------------------------
   # parse_options
   #-------------------------------------------------------------------------------
   def parse_options(argv)
-    @opt.parse(argv)
+    @entity_file_names = @opt.parse(argv)
   end
   #-------------------------------------------------------------------------------
   # default_license
@@ -139,159 +144,173 @@ class ComponentPackage
       THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
       (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
       OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+ 
     LICENSE_END
   end
   #-------------------------------------------------------------------------------
-  # file_read : エンティティ宣言部を含むVHDLファイルを読み込んで、
-  #             エンティティ宣言部を抽出してレジストリに格納する
+  # read_entity_files : 
   #-------------------------------------------------------------------------------
-  def file_read(file_name)
-    File.open(file_name) do |file|
-      line_number    = 0
-      component_name = String.new
-      component_line = String.new
-      library_lines  = Array.new
-      use_lines      = Array.new
-      #---------------------------------------------------------------------------
-      # ファイルから一行ずつ読み込む。
-      #---------------------------------------------------------------------------
-      file.each_line {|o_line|
-        line = o_line.encode("UTF-8", "UTF-8", :invalid => :replace, :undef => :replace, :replace => '?')
-        #-------------------------------------------------------------------------
-        # 行番号の更新
-        #-------------------------------------------------------------------------
-        line_number += 1
-        #-------------------------------------------------------------------------
-        # コメント、行頭の空白部分、行末文字を削除する。
-        #-------------------------------------------------------------------------
-        parse_line = String.new(line)
-        parse_line.sub!(/--.*$/  ,'')
-        parse_line.sub!(/^[\s]+/ ,'')
-        parse_line.sub!(/[\n\r]$/,'')
-        #-------------------------------------------------------------------------
-        # entity 宣言の開始
-        #-------------------------------------------------------------------------
-        if (parse_line =~ /^entity[\s]+([\w]+)[\s]+is/i)
-          component_name = $1;
-          component_line = line.sub(/^[\s]*entity[\s]+[\w]+[\s]*is/i, "component " + component_name);
-          next;
-        end
-        #-------------------------------------------------------------------------
-        # library ライブラリ名; の解釈
-        #-------------------------------------------------------------------------
-        if (parse_line =~ /^library[\s]+[\w\s,]+;/i)
-          library_lines << line
-          next;
-        end
-        #-------------------------------------------------------------------------
-        # use ライブラリ名.パッケージ名.アイテム名; の解釈
-        #-------------------------------------------------------------------------
-        if (parse_line =~ /^use[\s]+[\w]+\.[\w]+\.[\w]+[\s]*;/i)
-          use_lines << line;
-          next;
-        end
-        #-------------------------------------------------------------------------
-        # entity宣言処理中でない場合はスキップ
-        #-------------------------------------------------------------------------
-        if (component_name == nil)
-          if (parse_line =~ /^end[\s]+[\w]+[\s]*;/i)
-            library_lines.clear
-            use_lines.clear
-          end
-          next;
-        end
-        #-------------------------------------------------------------------------
-        # entity宣言処理中の end 処理
-        #-------------------------------------------------------------------------
-        if (parse_line =~ /^end[\s]+([\w]+)[\s]*;/i)
-          if ($1 == component_name)
-            #---------------------------------------------------------------------
-            # コンポーネント宣言として登録
-            #---------------------------------------------------------------------
-            component_line += line.sub(/^end[\s]+([\w]+)[\s]*;/, "end component;")
-            @components[component_name] = component_line
-            #---------------------------------------------------------------------
-            # コンポーネント宣言で使用するライブラリ名の登録
-            #---------------------------------------------------------------------
-            library_lines.each do |library_line|
-              if (library_line =~ /^library[\s]+([\w\s,]+);/i)
-                library_list = $1.gsub(/\s/,'')
-                library_list.split(/,/).each do |library_name|
-                  @libraries[library_name.upcase] = {:Name => library_name}
-                end
-              end
-            end
-            #---------------------------------------------------------------------
-            # コンポーネント宣言で使用するライブラリのパッケージ名の登録
-            #---------------------------------------------------------------------
-            use_lines.each do |use_line|
-              if (use_line =~ /^use[\s]+([\w]+)\.([\w]+)\.([\w]+)[\s]*;/i)
-                library_name = $1.upcase;
-                package_name = $2.upcase;
-                item_name    = $3.upcase;
-                if (@libraries[library_name][:Use] == nil)
-                  @libraries[library_name][:Use] = Hash.new
-                end
-                if (@libraries[library_name][:Use][package_name] == nil)
-                  @libraries[library_name][:Use][package_name] = Hash.new
-                end
-                @libraries[library_name][:Use][package_name][item_name] = use_line
-              end
-            end
-            #---------------------------------------------------------------------
-            # 使った後の変数はクリアしておき次のentityに備える
-            #---------------------------------------------------------------------
-            component_name = nil
-            component_line = nil
-            library_lines.clear
-            use_lines.clear
-            next;
-          end
-          abort("#{@program} Error : #{file_name}(#{line_number}) end のコンポーネント名が一致しないよ!\n")
-        end
-        #-------------------------------------------------------------------------
-        # entity宣言処理中の end 以外は component_line に行を追加
-        #-------------------------------------------------------------------------
-        component_line += line;
-      }
-      #----------------------------------------------------------------------------
-      # ファイルを全て読み終っても end が無い場合はエラー
-      #---------------------------------------------------------------------------
-      if (component_name != nil)
-        abort("#{@program} Error : #{file_name}(#{line_number}) ファイルの最後まで対応する end が無いよ!\n")
-      end
+  def read_entity_files
+    @entity_file_names.each do |file_name|
+      read_entity_file(file_name)
     end
   end
   #-------------------------------------------------------------------------------
-  # file_write : パッケージファイルを生成する
+  # read_entity_file  : 
   #-------------------------------------------------------------------------------
-  def file_write
-    out = File.open(@file_name,"w")
-    write(out)
-    out.close
+  def read_entity_file(file_name)
+    File.open(file_name) do |file|
+      read_entity(file, file_name)
+    end
+  end
+  #-------------------------------------------------------------------------------
+  # read_entity  : エンティティ宣言部を含むファイル(ストリーム)を読み込んで、
+  #                エンティティ宣言部を抽出してレジストリに格納する.
+  #-------------------------------------------------------------------------------
+  def read_entity(file, file_name)
+    line_number    = 0
+    component_name = String.new
+    component_line = String.new
+    library_lines  = Array.new
+    use_lines      = Array.new
+    #-----------------------------------------------------------------------------
+    # ファイルから一行ずつ読み込む。
+    #-----------------------------------------------------------------------------
+    file.each_line {|o_line|
+      line = o_line.encode("UTF-8", "UTF-8", :invalid => :replace, :undef => :replace, :replace => '?')
+      #---------------------------------------------------------------------------
+      # 行番号の更新
+      #---------------------------------------------------------------------------
+      line_number += 1
+      #---------------------------------------------------------------------------
+      # コメント、行頭の空白部分、行末文字を削除する。
+      #---------------------------------------------------------------------------
+      parse_line = String.new(line)
+      parse_line.sub!(/--.*$/  ,'')
+      parse_line.sub!(/^[\s]+/ ,'')
+      parse_line.sub!(/[\n\r]$/,'')
+      #---------------------------------------------------------------------------
+      # entity 宣言の開始
+      #---------------------------------------------------------------------------
+      if (parse_line =~ /^entity[\s]+([\w]+)[\s]+is/i)
+        component_name = $1;
+        component_line = line.sub(/^[\s]*entity[\s]+[\w]+[\s]*is/i, "component #{component_name}");
+        next;
+      end
+      #---------------------------------------------------------------------------
+      # library ライブラリ名; の解釈
+      #---------------------------------------------------------------------------
+      if (parse_line =~ /^library[\s]+[\w\s,]+;/i)
+        library_lines << line
+        next;
+      end
+      #---------------------------------------------------------------------------
+      # use ライブラリ名.パッケージ名.アイテム名; の解釈
+      #---------------------------------------------------------------------------
+      if (parse_line =~ /^use[\s]+[\w]+\.[\w]+\.[\w]+[\s]*;/i)
+        use_lines << line;
+        next;
+      end
+      #---------------------------------------------------------------------------
+      # entity宣言処理中でない場合はスキップ
+      #---------------------------------------------------------------------------
+      if (component_name == nil)
+        if (parse_line =~ /^end[\s]+[\w]+[\s]*;/i)
+          library_lines.clear
+          use_lines.clear
+        end
+        next;
+      end
+      #---------------------------------------------------------------------------
+      # entity宣言処理中の end 処理
+      #---------------------------------------------------------------------------
+      if (parse_line =~ /^end[\s]+([\w]+)[\s]*;/i)
+        if ($1 == component_name)
+          #-----------------------------------------------------------------------
+          # コンポーネント宣言として登録
+          #-----------------------------------------------------------------------
+          component_line += line.sub(/^end[\s]+([\w]+)[\s]*;/, "end component;")
+          @components[component_name] = component_line
+          #-----------------------------------------------------------------------
+          # コンポーネント宣言で使用するライブラリ名の登録
+          #-----------------------------------------------------------------------
+          library_lines.each do |library_line|
+            if (library_line =~ /^library[\s]+([\w\s,]+);/i)
+              library_list = $1.gsub(/\s/,'')
+              library_list.split(/,/).each do |library_name|
+                @libraries[library_name.upcase] = {:Name => library_name}
+              end
+            end
+          end
+          #-----------------------------------------------------------------------
+          # コンポーネント宣言で使用するライブラリのパッケージ名の登録
+          #-----------------------------------------------------------------------
+          use_lines.each do |use_line|
+            if (use_line =~ /^use[\s]+([\w]+)\.([\w]+)\.([\w]+)[\s]*;/i)
+              library_name = $1.upcase;
+              package_name = $2.upcase;
+              item_name    = $3.upcase;
+              if (@libraries[library_name][:Use] == nil)
+                @libraries[library_name][:Use] = Hash.new
+              end
+              if (@libraries[library_name][:Use][package_name] == nil)
+                @libraries[library_name][:Use][package_name] = Hash.new
+              end
+              @libraries[library_name][:Use][package_name][item_name] = use_line
+            end
+          end
+          #-----------------------------------------------------------------------
+          # 使った後の変数はクリアしておき次のentityに備える
+          #-----------------------------------------------------------------------
+          component_name = nil
+          component_line = nil
+          library_lines.clear
+          use_lines.clear
+          next;
+        end
+        abort("#{@program_id} Error : #{file_name}(#{line_number}) end のコンポーネント名が一致しないよ!\n")
+      end
+      #---------------------------------------------------------------------------
+      # entity宣言処理中の end 以外は component_line に行を追加
+      #---------------------------------------------------------------------------
+      component_line += line;
+    }
+    #------------------------------------------------------------------------------
+    # ファイルを全て読み終っても end が無い場合はエラー
+    #---------------------------------------------------------------------------
+    if (component_name != nil)
+      abort("#{@program_id} Error : #{file_name}(#{line_number}) ファイルの最後まで対応する end が無いよ!\n")
+    end
+  end
+  #-------------------------------------------------------------------------------
+  # write_package_file : パッケージファイルを生成する
+  #-------------------------------------------------------------------------------
+  def write_package_file
+    if (@file_name != nil)
+      File.open(@file_name,"w") do |file|
+        write_package(file, @file_name)
+      end
+    else
+      abort("#{@program_id} Error : 出力ファイルの名前が指定されていないようだ\n")
+    end
   end
   #-------------------------------------------------------------------------------
   # write : パッケージファイルを生成する
   #-------------------------------------------------------------------------------
-  def write(out)
+  def write_package(out, file_name)
     #-----------------------------------------------------------------------------
     # ヘッダの出力
     #-----------------------------------------------------------------------------
-    out.print(comment(1, <<-END_OF_HEAD
-
-      Title        : #{@title}
-      Version      : #{@version}
-      Created      : #{@time.asctime}
-      File Name    : #{@file_name}
-      Package Name : #{@name}
-      Author       : #{@author}
-      Program      : #{@program_id}
-
-      #{@license}
-
+    date = @time.strftime(@date_format)
+    out.print(comment(0, <<-END_OF_HEAD
+!     @file    #{file_name}
+!     @brief   #{@brief}
+!     @version #{@version}
+!     @date    #{date}
+!     @author  #{@author}
     END_OF_HEAD
     ))
+    out.print(comment(0, @license))
     #-----------------------------------------------------------------------------
     # ライブラリ宣言
     #-----------------------------------------------------------------------------
@@ -325,12 +344,13 @@ class ComponentPackage
     #-----------------------------------------------------------------------------
     # パッケージ名の出力
     #-----------------------------------------------------------------------------
+    out.print(comment(0, "! @brief #{@brief}"))
     out.print("package #{@name} is\n")
     #-----------------------------------------------------------------------------
     # コンポーネント宣言
     #-----------------------------------------------------------------------------
     @components.each do |component_name, component_line|
-      out.print(  comment(1, component_name))
+      out.print(  comment(0, "! @brief #{component_name}"))
       out.print(statement(0, component_line))
     end
     #-----------------------------------------------------------------------------
@@ -378,12 +398,12 @@ class ComponentPackage
     str    = String.new
 
     if (indent > 1)
-      format = sprintf("%%-%ds-- %%-%ds --\n", indent, @line_width-indent-6);
+      format = sprintf("%%-%ds--%%-%ds --\n", indent, @line_width-indent-5);
       (1        .. indent     ).each{hr += " "}
       (indent+1 .. @line_width).each{hr += "-"}
       hr += "\n"
     else
-      format = sprintf("%%-%ds-- %%-%ds --\n", 0, @line_width-6);
+      format = sprintf("%%-%ds--%%-%ds --\n", 0, @line_width-5);
       (1        .. @line_width).each{hr += "-"}
       hr += "\n"
     end
@@ -398,8 +418,6 @@ class ComponentPackage
 end
 
 package = ComponentPackage.new
-file_name_list = package.parse_options(ARGV)
-file_name_list.each do |file_name|
-  package.file_read(file_name)
-end
-package.file_write
+package.parse_options(ARGV)
+package.read_entity_files
+package.write_package_file

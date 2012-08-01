@@ -1,6 +1,6 @@
 GHDL=ghdl
 GHDLFLAGS=--mb-comments
-WORK=work
+WORK=PIPEWORK
 
 SRC_MAIN_PATH = ../../../src/main/vhdl/components
 SRC_TEST_PATH = ../../../src/test/vhdl/reducer
@@ -45,22 +45,22 @@ clean:
 	rm -f *.o *.cf tmp.vhd $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
 
 components.o : $(SRC_MAIN_PATH)/components.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
 
 reducer.o    : $(SRC_MAIN_PATH)/reducer.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
 
 reducer_test_model.o : reducer.o components.o
 reducer_test_model.o : $(SRC_TEST_PATH)/reducer_test_model.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
+	 $(GHDL) -a $(GHDLFLAGS) --work=work $<
 
 $(addsuffix .o,$(TEST_BENCH)) : reducer_test_model.o
 %.o : %.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
+	 $(GHDL) -a $(GHDLFLAGS) --work=work $<
 
 $(TEST_BENCH) : $(addsuffix .o,$(TEST_BENCH))
-	 $(GHDL) -e $(GHDLFLAGS) --work=$(WORK) $@
-	-$(GHDL) -r $(GHDLFLAGS) --work=$(WORK) $@
+	 $(GHDL) -e $(GHDLFLAGS) --work=work $@
+	-$(GHDL) -r $(GHDLFLAGS) --work=work $@
 
 
 reducer_test_bench_dwc_w08_i1_o1_q0_j0.vhd : $(SRC_TEST_PATH)/reducer_test_bench_template.vhd

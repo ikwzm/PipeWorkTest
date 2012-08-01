@@ -4,7 +4,7 @@ ENTITY_FILES = reducer.vhd        \
 
 components.vhd : ${ENTITY_FILES}
 	../../../../tools/MakeComponentPackage.rb --verbose \
-            --title   'PIPEWORK COMPONENT LIBRARY DESCRIPTION' \
+            --brief   'PIPEWORK COMPONENT LIBRARY DESCRIPTION' \
             --version 1.0.0 \
             --author  'Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>' \
             --library PIPEWORK \

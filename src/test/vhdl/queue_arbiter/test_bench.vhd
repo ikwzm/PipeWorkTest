@@ -5,6 +5,8 @@ library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all; 
 use     std.textio.all;
+library PIPEWORK;
+use     PIPEWORK.COMPONENTS.QUEUE_ARBITER;
 --------------------------------------------------------------------------------
 -- 
 --------------------------------------------------------------------------------
@@ -138,27 +140,6 @@ architecture stimulus of TEST_BENCH is
         WRITE(str, " | NUM="    & INT_TO_STRING(GRANT_NUM,1,' '));
         WRITELINE(OUTPUT, str);
     end REPORT_SIGNALS;
-    ----------------------------------------------------------------------------
-    -- QUEUE_ARBITERのコンポーネント宣言
-    ----------------------------------------------------------------------------
-    component  QUEUE_ARBITER 
-        generic (
-            MIN_NUM     : integer;
-            MAX_NUM     : integer
-        );
-        port (
-            CLK         : in  std_logic; 
-            RST         : in  std_logic;
-            CLR         : in  std_logic;
-            ENABLE      : in  std_logic;
-            REQUEST     : in  std_logic_vector(MIN_NUM to MAX_NUM);
-            GRANT       : out std_logic_vector(MIN_NUM to MAX_NUM);
-            GRANT_NUM   : out integer   range  MIN_NUM to MAX_NUM;
-            REQUEST_O   : out std_logic;
-            VALID       : out std_logic;
-            SHIFT       : in  std_logic
-        );
-    end component;
 begin
     ----------------------------------------------------------------------------
     -- クロックの生成
@@ -508,14 +489,14 @@ end stimulus;
 configuration TEST_BENCH_ONE_HOT_ARCH of TEST_BENCH is
     for stimulus
         for ARB : QUEUE_ARBITER
-            use entity WORK.QUEUE_ARBITER(ONE_HOT_ARCH);
+            use entity PIPEWORK.QUEUE_ARBITER(ONE_HOT_ARCH);
         end for;
     end for;
 end TEST_BENCH_ONE_HOT_ARCH;
 configuration TEST_BENCH_INTEGER_ARCH of TEST_BENCH is
     for stimulus
         for ARB : QUEUE_ARBITER
-            use entity WORK.QUEUE_ARBITER(INTEGER_ARCH);
+            use entity PIPEWORK.QUEUE_ARBITER(INTEGER_ARCH);
         end for;
     end for;
 end TEST_BENCH_INTEGER_ARCH;
