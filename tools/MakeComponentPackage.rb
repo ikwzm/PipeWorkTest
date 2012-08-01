@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 #---------------------------------------------------------------------------------
 #
-#       Version     :   0.0.2
-#       Created     :   2012/8/1
+#       Version     :   0.0.3
+#       Created     :   2012/8/2
 #       File name   :   MakeComponentPackage.rb
 #       Author      :   Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 #       Description :   VHDLのソースコードから entity 宣言している部分を
@@ -46,13 +46,13 @@ require 'optparse'
 class ComponentPackage
   def initialize
     @program_name      = "MakeComponentPackage"
-    @program_version   = "0.0.2"
+    @program_version   = "0.0.3"
     @program_id        = @program_name + " " + @program_version
     @line_width        = 83
     @components        = Hash.new
     @libraries         = Hash.new
     @name              = "COMPONENT"
-    @library_name      = "PIPEWORK"
+    @library_name      = "WORK"
     @file_name         = nil
     @entity_file_names = Array.new
     @brief             = ""
@@ -238,7 +238,9 @@ class ComponentPackage
             if (library_line =~ /^library[\s]+([\w\s,]+);/i)
               library_list = $1.gsub(/\s/,'')
               library_list.split(/,/).each do |library_name|
-                @libraries[library_name.upcase] = {:Name => library_name}
+                if (@libraries[library_name.upcase] == nil)
+                  @libraries[library_name.upcase] = {:Name => library_name}
+                end 
               end
             end
           end
@@ -331,12 +333,12 @@ class ComponentPackage
         component_line = String.new;
         @components.each_key do |key|
           component_line += @components[key]
-          component_line.gsub!(/--.*\n/, ' ')
-          component_line.gsub!(/\W+/   , ' ')
-          package_items.each_key do |item_name|
-            if (component_line =~ /#{item_name}/i)
-              out.print(statement(0, package_items[item_name]))
-            end
+        end
+        component_line.gsub!(/--.*\n/, ' ')
+        component_line.gsub!(/\W+/   , ' ')
+        package_items.each_key do |item_name|
+          if (component_line =~ /#{item_name}/i)
+            out.print(statement(0, package_items[item_name]))
           end
         end
       end
