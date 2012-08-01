@@ -2,7 +2,7 @@
 --!     @file    components.vhd                                                  --
 --!     @brief   PIPEWORK COMPONENT LIBRARY DESCRIPTION                          --
 --!     @version 1.0.0                                                           --
---!     @date    2012/08/01                                                      --
+--!     @date    2012/08/02                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
