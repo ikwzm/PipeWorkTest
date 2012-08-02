@@ -38,14 +38,14 @@ library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
 use     std.textio.all;
-library PIPEWORK.COMPONENTS.SDPRAM
-use     work.MT19937AR.SEED_TYPE;
-use     work.MT19937AR.TO_SEED_TYPE;
-use     work.MT19937AR.PSEUDO_RANDOM_NUMBER_GENERATOR_TYPE;
-use     work.MT19937AR.NEW_PSEUDO_RANDOM_NUMBER_GENERATOR;
-use     work.MT19937AR.GENERATE_RANDOM_REAL1;
-library ieee;
-use     ieee.std_logic_1164.all;
+library DUMMY_PLUG;
+use     DUMMY_PLUG.MT19937AR.SEED_TYPE;
+use     DUMMY_PLUG.MT19937AR.TO_SEED_TYPE;
+use     DUMMY_PLUG.MT19937AR.PSEUDO_RANDOM_NUMBER_GENERATOR_TYPE;
+use     DUMMY_PLUG.MT19937AR.NEW_PSEUDO_RANDOM_NUMBER_GENERATOR;
+use     DUMMY_PLUG.MT19937AR.GENERATE_RANDOM_REAL1;
+library PIPEWORK;
+use     PIPEWORK.COMPONENTS.SDPRAM;
 entity  SDPRAM_TEST_BENCH is
     generic (
         DEPTH       : integer := 9;
