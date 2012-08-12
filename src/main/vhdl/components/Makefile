@@ -1,5 +1,6 @@
-ENTITY_FILES = reducer.vhd        \
-               queue_arbiter.vhd  \
+ENTITY_FILES = chopper.vhd                      \
+               reducer.vhd                      \
+               queue_arbiter.vhd                \
                sdpram.vhd
                ${ENDLIST}
 

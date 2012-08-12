@@ -3,7 +3,7 @@
 --!     @brief   QUEUE ARBITER ONE HOT ARCHITECTURE :
 --!              キュータイプの調停回路のアーキテクチャ(ワンホット)
 --!     @version 1.0.0
---!     @date    2012/4/1
+--!     @date    2012/8/11
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

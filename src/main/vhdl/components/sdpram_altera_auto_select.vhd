@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sdpram_altera_auto_select.vhd
 --!     @brief   Synchronous Dual Port RAM Model for Altera FPGA.
---!     @version 0.0.2
---!     @date    2012/8/1
+--!     @version 1.0.0
+--!     @date    2012/8/11
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

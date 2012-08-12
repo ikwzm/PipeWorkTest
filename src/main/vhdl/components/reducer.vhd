@@ -2,8 +2,8 @@
 --!     @file    reducer.vhd
 --!     @brief   REDUCER MODULE :
 --!              異なるデータ幅のパスを継ぐためのアダプタ
---!     @version 0.1.1
---!     @date    2012/4/8
+--!     @version 1.0.0
+--!     @date    2012/8/11
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
