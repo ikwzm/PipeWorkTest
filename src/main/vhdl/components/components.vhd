@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    components.vhd                                                  --
 --!     @brief   PIPEWORK COMPONENT LIBRARY DESCRIPTION                          --
---!     @version 1.0.0                                                           --
---!     @date    2012/08/11                                                      --
+--!     @version 1.0.1                                                           --
+--!     @date    2012/08/27                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
@@ -442,6 +442,141 @@ component QUEUE_ARBITER
         SHIFT       : --! @brief REQUEST QUEUE SHIFT :
                       --! リクエストキューの先頭からリクエストを取り除く信号.
                       in  std_logic
+    );
+end component;
+-----------------------------------------------------------------------------------
+--! @brief DELAY_REGISTER                                                        --
+-----------------------------------------------------------------------------------
+component DELAY_REGISTER
+    generic (
+        DATA_BITS   : --! @brief DATA BITS :
+                      --! データ(IDATA/ODATA)のビット幅を指定する.
+                      integer :=  8;
+        DELAY_MAX   : --! @brief DELAY CYCLE MAXIMUM :
+                      --! * 入力側データ(I_DATA)を出力側に伝達する際の遅延時間の
+                      --!   最大値を出力側のクロック数単位で指定する.
+                      --! * 詳細は次の DELAY_MIN を参照.
+                      integer := 0;
+        DELAY_MIN   : --! @brief DELAY CYCLE MINIMUM :
+                      --! * 入力側データ(I_DATAを出力側に伝達する際の遅延時間の
+                      --!   最小値を出力側のクロック数単位で指定する.
+                      --! * DELAY_MAX >= DELAY_MINでなければならない.
+                      --! * DELAY_MAX = DELAY_MIN の場合は回路が簡略化される.
+                      --!   この際、DELAY_SEL 信号は参照されない.
+                      --! * 遅延するクロック数が多いほど、そのぶんレジスタが
+                      --!   増えることに注意.
+                      integer := 0
+    );
+    port (
+    -------------------------------------------------------------------------------
+    -- クロック&リセット信号
+    -------------------------------------------------------------------------------
+        CLK         : --! @brief CLOCK :
+                      --! クロック信号
+                      in  std_logic; 
+        RST         : --! @brief ASYNCRONOUSE RESET :
+                      --! 非同期リセット信号.アクティブハイ.
+                      in  std_logic;
+        CLR         : --! @brief SYNCRONOUSE RESET :
+                      --! 同期リセット信号.アクティブハイ.
+                      in  std_logic;
+    -------------------------------------------------------------------------------
+    -- 制御/状態信号
+    -------------------------------------------------------------------------------
+        SEL         : --! @brief DELAY CYCLE SELECT :
+                      --! 遅延サイクル選択信号.
+                      --! * DELAY_MAX > DELAY_MIN の場合のみ有効.
+                      --! * DELAY_MAX = DELAY_MIN の場合はこの信号は無視される.
+                      in  std_logic_vector(DELAY_MAX   downto DELAY_MIN);
+        D_VAL       : --! @brief DELAY VALID :
+                      --! 対応する遅延レジスタに有効なデータが入っていることを示す.
+                      out std_logic_vector(DELAY_MAX   downto 0);
+    -------------------------------------------------------------------------------
+    -- 入力側 I/F
+    -------------------------------------------------------------------------------
+        I_DATA      : --! @brief INPUT WORD DATA :
+                      --! 入力データ.
+                      in  std_logic_vector(DATA_BITS-1 downto 0);
+        I_VAL       : --! @brief INPUT WORD VALID :
+                      --! 入力データ有効信号.
+                      in  std_logic;
+    -------------------------------------------------------------------------------
+    -- 出力側 I/F
+    -------------------------------------------------------------------------------
+        O_DATA      : --! @brief OUTPUT WORD DATA :
+                      --! 出力データ.
+                      out std_logic_vector(DATA_BITS-1 downto 0);
+        O_VAL       : --! @brief OUTPUT WORD VALID :
+                      --! 出力データ有効信号.
+                      out std_logic
+    );
+end component;
+-----------------------------------------------------------------------------------
+--! @brief DELAY_ADJUSTER                                                        --
+-----------------------------------------------------------------------------------
+component DELAY_ADJUSTER
+    generic (
+        DATA_BITS   : --! @brief DATA BITS :
+                      --! データ(IDATA/ODATA)のビット幅を指定する.
+                      integer :=  8;
+        DELAY_MAX   : --! @brief DELAY CYCLE MAXIMUM :
+                      --! * 入力側データ(I_DATA)を出力側に伝達する際の遅延時間の
+                      --!   最大値を出力側のクロック数単位で指定する.
+                      --! * 詳細は次の DELAY_MIN を参照.
+                      integer := 0;
+        DELAY_MIN   : --! @brief DELAY CYCLE MINIMUM :
+                      --! * 入力側データ(I_DATAを出力側に伝達する際の遅延時間の
+                      --!   最小値を出力側のクロック数単位で指定する.
+                      --! * DELAY_MAX >= DELAY_MINでなければならない.
+                      --! * DELAY_MAX = DELAY_MIN の場合は回路が簡略化される.
+                      --!   この際、DELAY_SEL 信号は参照されない.
+                      --! * 遅延するクロック数が多いほど、そのぶんレジスタが
+                      --!   増えることに注意.
+                      integer := 0
+    );
+    port (
+    -------------------------------------------------------------------------------
+    -- クロック&リセット信号
+    -------------------------------------------------------------------------------
+        CLK         : --! @brief CLOCK :
+                      --! クロック信号
+                      in  std_logic; 
+        RST         : --! @brief ASYNCRONOUSE RESET :
+                      --! 非同期リセット信号.アクティブハイ.
+                      in  std_logic;
+        CLR         : --! @brief SYNCRONOUSE RESET :
+                      --! 同期リセット信号.アクティブハイ.
+                      in  std_logic;
+    -------------------------------------------------------------------------------
+    -- 制御/状態信号
+    -------------------------------------------------------------------------------
+        SEL         : --! @brief DELAY CYCLE SELECT :
+                      --! 遅延サイクル選択信号.
+                      --! * DELAY_MAX > DELAY_MIN の場合のみ有効.
+                      --! * DELAY_MAX = DELAY_MIN の場合はこの信号は無視される.
+                      in  std_logic_vector(DELAY_MAX   downto DELAY_MIN);
+        D_VAL       : --! @brief DELAY VALID :
+                      --! DELAY_REGISTERからの状態入力.
+                      --! 対応する遅延レジスタに有効なデータが入っていることを示す.
+                      in  std_logic_vector(DELAY_MAX   downto 0);
+    -------------------------------------------------------------------------------
+    -- 入力側 I/F
+    -------------------------------------------------------------------------------
+        I_DATA      : --! @brief INPUT WORD DATA :
+                      --! 入力データ.
+                      in  std_logic_vector(DATA_BITS-1 downto 0);
+        I_VAL       : --! @brief INPUT WORD VALID :
+                      --! 入力データ有効信号.
+                      in  std_logic;
+    -------------------------------------------------------------------------------
+    -- 出力側 I/F
+    -------------------------------------------------------------------------------
+        O_DATA      : --! @brief OUTPUT WORD DATA :
+                      --! 出力データ.
+                      out std_logic_vector(DATA_BITS-1 downto 0);
+        O_VAL       : --! @brief OUTPUT WORD VALID :
+                      --! 出力データ有効信号.
+                      out std_logic
     );
 end component;
 -----------------------------------------------------------------------------------

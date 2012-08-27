@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="H:/gist/PipeWork/sim/isim/delay_register/components_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="components" />
+            <top_module name="components" />
+            <top_module name="delay_register_test_bench_8_3_3" />
+            <top_module name="numeric_std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="util" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="13" />
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/clr" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clr</obj_property>
+      <obj_property name="ObjectShortName">clr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/rst" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/sel" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">sel[3:3]</obj_property>
+      <obj_property name="ObjectShortName">sel[3:3]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/reg_data_val" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">reg_data_val[3:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_data_val[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/reg_i_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">reg_i_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_i_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/reg_i_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">reg_i_valid</obj_property>
+      <obj_property name="ObjectShortName">reg_i_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/reg_o_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">reg_o_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_o_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/reg_o_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">reg_o_valid</obj_property>
+      <obj_property name="ObjectShortName">reg_o_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/adj_i_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">adj_i_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">adj_i_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/adj_i_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">adj_i_valid</obj_property>
+      <obj_property name="ObjectShortName">adj_i_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/adj_o_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">adj_o_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">adj_o_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/delay_register_test_bench_8_3_3/TB/adj_o_valid" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">adj_o_valid</obj_property>
+      <obj_property name="ObjectShortName">adj_o_valid</obj_property>
+   </wvobject>
+</wave_config>
