@@ -51,6 +51,48 @@ REDUCER とは配管用語で径違い継ぎ手、つまり直径違う配管(�
 
 詳細は doc/ja/queue_arbiter.md を参照.
 
+####SYNCRONIZER####
+
+異なるクロックで動作するパスを継ぐアダプタのクロック同期化回路です.
+
+入力側のクロックに同期化された入力データを出力側クロックに同期化して出力します.
+
+入力側のクロックと出力側のクロックとの関係は、ジェネリック変数(I_CLK_RAGE,O_CLK_RATE)で指示します.
+
+  * I_CLK_RATE = 0 かつ O_CLK_RATE = 0 の場合は I_CLK とO_CLK は非同期.  
+
+  * I_CLK_RATE = 1 かつ O_CLK_RATE = 1 の場合は I_CLK とO_CLK は完全に同期している.  
+
+  * I_CLK_RATE > 1 かつ O_CLK_RATE = 1 の場合は I_CLK はO_CLK のI_CLK_RATE倍の周波数.
+    ただし I_CLK の立上りは O_CLK の立上りと一致している.
+
+  * I_CLK_RATE = 1 かつ O_CLK_RATE > 1 の場合は O_CLK はI_CLK の O_CLK_RATE倍の周波数.
+    ただし I_CLK の立上りは O_CLK の立上りと一致している.
+
+  * 例1)I_CLK_RATE=1 & O_CLK_RATE=1          
+
+        I_CLK _|~|_|~|_|~|_|~|_|~|_|~|_|~|_  
+
+        O_CLK _|~|_|~|_|~|_|~|_|~|_|~|_|~|_  
+
+  * 例2)I_CLK_RATE=2 & O_CLK_RATE=1          
+
+        I_CLK _|~|_|~|_|~|_|~|_|~|_|~|_|~|_  
+
+        O_CLK _|~~~|___|~~~|___|~~~|___|~~~  
+
+  * 例3)I_CLK_RATE=3 & O_CLK_RATE=1          
+
+        I_CLK _|~|_|~|_|~|_|~|_|~|_|~|_|~|_  
+
+        O_CLK _|~~~~~|_____|~~~~~|_____|~~~  
+
+  * 例4)I_CLK_RATE=1 & O_CLK_RATE=2          
+
+        I_CLK _|~~~|___|~~~|___|~~~|___|~~~  
+
+        O_CLK _|~|_|~|_|~|_|~|_|~|_|~|_|~|_  
+
 
 ####DELAY REGISTER####
 
