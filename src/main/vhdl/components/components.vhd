@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
 --!     @file    components.vhd                                                  --
 --!     @brief   PIPEWORK COMPONENT LIBRARY DESCRIPTION                          --
---!     @version 1.0.2                                                           --
+--!     @version 1.0.3                                                           --
 --!     @date    2012/08/28                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
@@ -577,6 +577,76 @@ component DELAY_ADJUSTER
         O_VAL       : --! @brief OUTPUT WORD VALID :
                       --! 出力データ有効信号.
                       out std_logic
+    );
+end component;
+-----------------------------------------------------------------------------------
+--! @brief QUEUE_REGISTER                                                        --
+-----------------------------------------------------------------------------------
+component QUEUE_REGISTER
+    -------------------------------------------------------------------------------
+    -- ジェネリック変数
+    -------------------------------------------------------------------------------
+    generic (
+        QUEUE_SIZE  : --! @brief QUEUE SIZE :
+                      --! キューの大きさをワード数で指定する.
+                      integer := 1;
+        DATA_BITS   : --! @brief DATA BITS :
+                      --! データ(I_DATA/O_DATA/Q_DATA)のビット幅を指定する.
+                      integer :=  32;
+        LOWPOWER    : --! @brief LOW POWER MODE :
+                      --! キューのレジスタに不必要なロードを行わないことにより、
+                      --! レジスタが不必要にトグルすることを防いで消費電力を
+                      --! 下げるようにする.
+                      --! ただし、回路が若干増える.
+                      integer := 1
+    );
+    port (
+    -------------------------------------------------------------------------------
+    -- クロック&リセット信号
+    -------------------------------------------------------------------------------
+        CLK         : --! @brief CLOCK :
+                      --! クロック信号
+                      in  std_logic; 
+        RST         : --! @brief ASYNCRONOUSE RESET :
+                      --! 非同期リセット信号.アクティブハイ.
+                      in  std_logic;
+        CLR         : --! @brief SYNCRONOUSE RESET :
+                      --! 同期リセット信号.アクティブハイ.
+                      in  std_logic;
+    -------------------------------------------------------------------------------
+    -- 入力側
+    -------------------------------------------------------------------------------
+        I_DATA      : --! @brief INPUT DATA  :
+                      --! 入力データ信号.
+                      in  std_logic_vector(DATA_BITS-1 downto 0);
+        I_VAL       : --! @brief INPUT DATA VALID :
+                      --! 入力データ有効信号.
+                      in  std_logic;
+        I_RDY       : --! @brief INPUT READY :
+                      --! 入力可能信号.
+                      --! キューが空いていて、入力データを受け付けることが可能で
+                      --! あることを示す信号.
+                      out std_logic;
+    -------------------------------------------------------------------------------
+    -- 出力側
+    -------------------------------------------------------------------------------
+        Q_DATA      : --! @brief OUTPUT REGISTERD DATA :
+                      --! レジスタ出力の出力データ.
+                      --! 出力データ(O_DATA)をクロックで叩いたもの.
+                      out std_logic_vector(DATA_BITS-1 downto 0);
+        Q_VAL       : --! @brief OUTPUT REGISTERD DATA VALID :
+                      --! レジスタ出力の出力データ(QDATA)が有効であることを示す信号.
+                      --! 出力データ有効信号(O_VAL)をクロックで叩いたもの.
+                      out std_logic;
+        O_DATA      : --! @brief OUTPUT DATA :
+                      --! 出力データ.
+                      out std_logic_vector(DATA_BITS-1 downto 0);
+        O_VAL       : --! @brief OUTPUT DATA VALID :
+                      --! 出力データ(O_DATA)が有効であることを示す信号.
+                      out std_logic;
+        O_RDY       : --! @brief OUTPUT READY :
+                      --! 出力可能信号.
+                      in  std_logic
     );
 end component;
 -----------------------------------------------------------------------------------
