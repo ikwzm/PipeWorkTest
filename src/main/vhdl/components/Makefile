@@ -11,7 +11,7 @@ ENTITY_FILES = chopper.vhd                             \
 components.vhd : ${ENTITY_FILES}
 	../../../../Dummy_Plug/tools/MakeComponentPackage.rb --verbose \
             --brief   'PIPEWORK COMPONENT LIBRARY DESCRIPTION' \
-            --version 1.0.3 \
+            --version 1.0.4 \
             --author  'Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>' \
             --library PIPEWORK \
             --package COMPONENTS \

@@ -67,16 +67,19 @@
       <outfile xil_pn:name="../../../src/main/vhdl/components/queue_register.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/queue_register/queue_register_test_bench.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1346166375" xil_pn:in_ck="7476068249958220620" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="5228060667323090091" xil_pn:start_ts="1346166365">
+    <transform xil_pn:end_ts="1346237179" xil_pn:in_ck="7476068249958220620" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="5228060667323090091" xil_pn:start_ts="1346237168">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER1_beh.prj"/>
       <outfile xil_pn:name="QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER1_isim_beh.exe"/>
       <outfile xil_pn:name="fuse.log"/>
       <outfile xil_pn:name="isim"/>
+      <outfile xil_pn:name="isim.log"/>
       <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
-    <transform xil_pn:end_ts="1346166376" xil_pn:in_ck="-5035583385212940583" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="4342417461361666410" xil_pn:start_ts="1346166375">
+    <transform xil_pn:end_ts="1346237180" xil_pn:in_ck="-5035583385212940583" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="4342417461361666410" xil_pn:start_ts="1346237179">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForOutputs"/>

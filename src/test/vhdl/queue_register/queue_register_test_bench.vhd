@@ -2,8 +2,8 @@
 --!     @file    queue_register_test_bench.vhd
 --!     @brief   QUEUE REGISTER/ADJUSTER TEST BENCH :
 --!              QUEUE REGISTER/ADJUSTERを検証するためのテストベンチ.
---!     @version 1.0.0
---!     @date    2012/8/11
+--!     @version 0.2.0
+--!     @date    2012/8/28
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -89,11 +89,11 @@ architecture MODEL of QUEUE_REGISTER_TEST_BENCH is
     signal   I_DATA      : std_logic_vector(DATA_BITS-1 downto 0);
     signal   I_VAL       : std_logic;
     signal   I_RDY       : std_logic;
-    signal   O_DATA      : std_logic_vector(DATA_BITS-1 downto 0);
-    signal   O_VAL       : std_logic;
-    signal   O_RDY       : std_logic;
+    signal   Q_RDY       : std_logic;
     signal   Q_DATA      : std_logic_vector(DATA_BITS-1 downto 0);
-    signal   Q_VAL       : std_logic;
+    signal   Q_VAL       : std_logic_vector(QUEUE_SIZE  downto 0);
+    signal   O_DATA      : std_logic_vector(DATA_BITS-1 downto 0);
+    signal   O_VAL       : std_logic_vector(QUEUE_SIZE  downto 0);
     signal   EXP_DATA    : std_logic_vector(DATA_BITS-1 downto 0);
     signal   MISMATCH    : boolean;
     function MESSAGE_TAG return STRING is
@@ -122,7 +122,7 @@ begin
             Q_VAL       => Q_VAL ,
             O_DATA      => O_DATA,
             O_VAL       => O_VAL ,
-            O_RDY       => O_RDY
+            Q_RDY       => Q_RDY
         );
 
     process begin
@@ -144,7 +144,7 @@ begin
         if (RST = '1') then
                 EXP_DATA <= (others => '0');
         elsif (CLK'event and CLK = '1') then
-            if (Q_VAL = '1' and O_RDY = '1') then
+            if (Q_VAL(0) = '1' and Q_RDY = '1') then
                 EXP_DATA <= std_logic_vector(unsigned(EXP_DATA) + 1);
             end if;
         end if;
@@ -153,7 +153,7 @@ begin
     process (CLK, RST) begin
         if (RST = '1') then
             MISMATCH <= FALSE;
-        elsif (CLK'event and CLK = '1' and Q_VAL = '1' and O_RDY = '1') then
+        elsif (CLK'event and CLK = '1' and Q_VAL(0) = '1' and Q_RDY = '1') then
             MISMATCH <= (Q_DATA /= EXP_DATA);
             assert(Q_DATA = EXP_DATA) report MESSAGE_TAG & "Mismatch data..." severity FAILURE;
         end if;
@@ -186,7 +186,7 @@ begin
                              RST      <= '1';
                              CLR      <= '1';
                              I_VAL    <= '0';
-                             O_RDY    <= '0';
+                             Q_RDY    <= '0';
         WAIT_CLK( 4);        RST      <= '0';
                              CLR      <= '0';
         WAIT_CLK( 4); 
@@ -196,17 +196,17 @@ begin
                              SCENARIO <= "1.1.1";
         WAIT_CLK( 1);        I_VAL    <= '1';
         WAIT_CLK(QUEUE_SIZE);I_VAL    <= '0';
-        WAIT_CLK( 1);        O_RDY    <= '1';
-        WAIT_CLK(QUEUE_SIZE);O_RDY    <= '0';
+        WAIT_CLK( 1);        Q_RDY    <= '1';
+        WAIT_CLK(QUEUE_SIZE);Q_RDY    <= '0';
         WAIT_CLK( 4);
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
                              SCENARIO <= "1.1.2";
-        WAIT_CLK( 1);        O_RDY    <= '1';
+        WAIT_CLK( 1);        Q_RDY    <= '1';
         WAIT_CLK( 3);        I_VAL    <= '1';
         WAIT_CLK(QUEUE_SIZE);I_VAL    <= '0';
-        WAIT_CLK( 1);        O_RDY    <= '0';
+        WAIT_CLK( 1);        Q_RDY    <= '0';
         WAIT_CLK( 4);
         ---------------------------------------------------------------------------
         -- 
@@ -214,63 +214,63 @@ begin
                             SCENARIO <= "1.1.3";
         WAIT_CLK( 1);       I_VAL    <= '1';
         for i in 1 to 10*QUEUE_SIZE loop
-            WAIT_CLK(1);    O_RDY    <= '1';
-            WAIT_CLK(1);    O_RDY    <= '0';
+            WAIT_CLK(1);    Q_RDY    <= '1';
+            WAIT_CLK(1);    Q_RDY    <= '0';
         end loop;
         WAIT_CLK( 4);       I_VAL    <= '0';
-                            O_RDY    <= '1';
-        wait until (CLK'event and CLK = '1' and Q_VAL = '0');
-        wait for DELAY;     O_RDY    <= '0';
+                            Q_RDY    <= '1';
+        wait until (CLK'event and CLK = '1' and Q_VAL(0) = '0');
+        wait for DELAY;     Q_RDY    <= '0';
         WAIT_CLK( 4);
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
                             SCENARIO <= "1.1.4";
-        WAIT_CLK( 1);       O_RDY    <= '1';
+        WAIT_CLK( 1);       Q_RDY    <= '1';
         for i in 1 to 10*QUEUE_SIZE loop
             WAIT_CLK(1);    I_VAL    <= '1';
             WAIT_CLK(1);    I_VAL    <= '0';
         end loop;
         WAIT_CLK( 4);       I_VAL    <= '0';
-                            O_RDY    <= '1';
-        wait until (CLK'event and CLK = '1' and Q_VAL = '0');
-        wait for DELAY;     O_RDY    <= '0';
+                            Q_RDY    <= '1';
+        wait until (CLK'event and CLK = '1' and Q_VAL(0) = '0');
+        wait for DELAY;     Q_RDY    <= '0';
         WAIT_CLK( 4);
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
                             SCENARIO <= "1.1.5";
         WAIT_CLK( 1);       I_VAL    <= '0';
-                            O_RDY    <= '0';
+                            Q_RDY    <= '0';
         for i in 1 to 10 loop
             WAIT_CLK(1);    I_VAL    <= '1';
-                            O_RDY    <= '0';
+                            Q_RDY    <= '0';
             WAIT_CLK(1);    I_VAL    <= '1';
-                            O_RDY    <= '1';
+                            Q_RDY    <= '1';
             WAIT_CLK(1);    I_VAL    <= '0';
-                            O_RDY    <= '1';
+                            Q_RDY    <= '1';
             WAIT_CLK(1);    I_VAL    <= '0';
-                            O_RDY    <= '0';
+                            Q_RDY    <= '0';
             WAIT_CLK(1);    I_VAL    <= '1';
-                            O_RDY    <= '0';
+                            Q_RDY    <= '0';
             WAIT_CLK(3);    I_VAL    <= '1';
-                            O_RDY    <= '1';
+                            Q_RDY    <= '1';
             WAIT_CLK(2);    I_VAL    <= '0';
-                            O_RDY    <= '1';
+                            Q_RDY    <= '1';
             WAIT_CLK(1);    I_VAL    <= '0';
-                            O_RDY    <= '0';
+                            Q_RDY    <= '0';
         end loop;
         WAIT_CLK( 4);       I_VAL    <= '0';
-                            O_RDY    <= '1';
-        wait until (CLK'event and CLK = '1' and Q_VAL = '0');
-        wait for DELAY;     O_RDY    <= '0';
+                            Q_RDY    <= '1';
+        wait until (CLK'event and CLK = '1' and Q_VAL(0) = '0');
+        wait for DELAY;     Q_RDY    <= '0';
         WAIT_CLK( 4);
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
                             SCENARIO <= "2.1.1";
         WAIT_CLK( 1);       I_VAL    <= '0';
-                            O_RDY    <= '0';
+                            Q_RDY    <= '0';
         for i in 1 to 1000 loop
             WAIT_CLK( 1);
             GENERATE_RANDOM_REAL1(rand,pattern);
@@ -281,22 +281,22 @@ begin
             end if;
             GENERATE_RANDOM_REAL1(rand,pattern);
             if (pattern >= 0.5) then
-                O_RDY <= '1';
+                Q_RDY <= '1';
             else
-                O_RDY <= '0';
+                Q_RDY <= '0';
             end if;
         end loop;
         WAIT_CLK( 4);       I_VAL    <= '0';
-                            O_RDY    <= '1';
-        wait until (CLK'event and CLK = '1' and Q_VAL = '0');
-        wait for DELAY;     O_RDY    <= '0';
+                            Q_RDY    <= '1';
+        wait until (CLK'event and CLK = '1' and Q_VAL(0) = '0');
+        wait for DELAY;     Q_RDY    <= '0';
         WAIT_CLK( 4);
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
                             SCENARIO <= "2.1.2";
         WAIT_CLK( 1);       I_VAL    <= '0';
-                            O_RDY    <= '0';
+                            Q_RDY    <= '0';
         for i in 1 to 1000 loop
             WAIT_CLK( 1);
             GENERATE_RANDOM_REAL1(rand,pattern);
@@ -307,22 +307,22 @@ begin
             end if;
             GENERATE_RANDOM_REAL1(rand,pattern);
             if (pattern >= 2.0/3.0) then
-                O_RDY <= '1';
+                Q_RDY <= '1';
             else
-                O_RDY <= '0';
+                Q_RDY <= '0';
             end if;
         end loop;
         WAIT_CLK( 4);       I_VAL    <= '0';
-                            O_RDY    <= '1';
-        wait until (CLK'event and CLK = '1' and Q_VAL = '0');
-        wait for DELAY;     O_RDY    <= '0';
+                            Q_RDY    <= '1';
+        wait until (CLK'event and CLK = '1' and Q_VAL(0) = '0');
+        wait for DELAY;     Q_RDY    <= '0';
         WAIT_CLK( 4);
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
                             SCENARIO <= "2.1.3";
         WAIT_CLK( 1);       I_VAL    <= '0';
-                            O_RDY    <= '0';
+                            Q_RDY    <= '0';
         for i in 1 to 1000 loop
             WAIT_CLK( 1);
             GENERATE_RANDOM_REAL1(rand,pattern);
@@ -333,15 +333,15 @@ begin
             end if;
             GENERATE_RANDOM_REAL1(rand,pattern);
             if (pattern >= 1.0/3.0) then
-                O_RDY <= '1';
+                Q_RDY <= '1';
             else
-                O_RDY <= '0';
+                Q_RDY <= '0';
             end if;
         end loop;
         WAIT_CLK( 4);       I_VAL    <= '0';
-                            O_RDY    <= '1';
-        wait until (CLK'event and CLK = '1' and Q_VAL = '0');
-        wait for DELAY;     O_RDY    <= '0';
+                            Q_RDY    <= '1';
+        wait until (CLK'event and CLK = '1' and Q_VAL(0) = '0');
+        wait for DELAY;     Q_RDY    <= '0';
         WAIT_CLK( 4);
         ---------------------------------------------------------------------------
         -- シミュレーション終了

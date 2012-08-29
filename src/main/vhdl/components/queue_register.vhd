@@ -2,8 +2,8 @@
 --!     @file    queue_register.vhd
 --!     @brief   QUEUE REGISTER MODULE :
 --!              フリップフロップベースの比較的浅いキュー.
---!     @version 0.1.1
---!     @date    2012/8/28
+--!     @version 0.2.0
+--!     @date    2012/8/29
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -91,21 +91,31 @@ entity  QUEUE_REGISTER is
     -------------------------------------------------------------------------------
     -- 出力側
     -------------------------------------------------------------------------------
+        O_DATA      : --! @brief OUTPUT DATA :
+                      --! 出力データ.
+                      out std_logic_vector(DATA_BITS-1 downto 0);
+        O_VAL       : --! @brief OUTPUT DATA VALID :
+                      --! キューレジスタに有効なデータが入っている事を示すフラグ.
+                      --! * キューレジスタは1〜QUEUE_SIZEまであるが、対応する位置の
+                      --!   フラグが'1'ならば有効なデータが入っている事を示す.
+                      --! * この出力信号の範囲が1からではなく0から始まっている事に
+                      --!   注意. これはQUEUE_SIZE=0の場合に対応するため.
+                      --!   QUEUE_SIZE>0の場合は、O_VAL(0)はO_VAL(1)と同じ.
+                      out std_logic_vector(QUEUE_SIZE  downto 0);
         Q_DATA      : --! @brief OUTPUT REGISTERD DATA :
                       --! レジスタ出力の出力データ.
                       --! 出力データ(O_DATA)をクロックで叩いたもの.
                       out std_logic_vector(DATA_BITS-1 downto 0);
         Q_VAL       : --! @brief OUTPUT REGISTERD DATA VALID :
-                      --! レジスタ出力の出力データ(QDATA)が有効であることを示す信号.
-                      --! 出力データ有効信号(O_VAL)をクロックで叩いたもの.
-                      out std_logic;
-        O_DATA      : --! @brief OUTPUT DATA :
-                      --! 出力データ.
-                      out std_logic_vector(DATA_BITS-1 downto 0);
-        O_VAL       : --! @brief OUTPUT DATA VALID :
-                      --! 出力データ(O_DATA)が有効であることを示す信号.
-                      out std_logic;
-        O_RDY       : --! @brief OUTPUT READY :
+                      --! キューレジスタに有効なデータが入っている事を示すフラグ.
+                      --! O_VALをクロックで叩いたもの.
+                      --! * キューレジスタは1〜QUEUE_SIZEまであるが、対応する位置の
+                      --!   フラグが'1'ならば有効なデータが入っている事を示す.
+                      --! * この出力信号の範囲が1からではなく0から始まっている事に
+                      --!   注意. これはQUEUE_SIZE=0の場合に対応するため.
+                      --!   QUEUE_SIZE>0の場合は、Q_VAL(0)はQ_VAL(1)と同じ.
+                      out std_logic_vector(QUEUE_SIZE  downto 0);
+        Q_RDY       : --! @brief OUTPUT READY :
                       --! 出力可能信号.
                       in  std_logic
     );
@@ -121,11 +131,11 @@ begin
     --  QUEUE_SIZE=0の場合はなにもしない
     -------------------------------------------------------------------------------
     QUEUE_SIZE_EQ_0: if (QUEUE_SIZE = 0) generate
-        O_DATA <= I_DATA;
-        Q_DATA <= I_DATA;
-        O_VAL  <= I_VAL;
-        Q_VAL  <= I_VAL;
-        I_RDY  <= O_RDY;
+        O_DATA   <= I_DATA;
+        Q_DATA   <= I_DATA;
+        O_VAL(0) <= I_VAL;
+        Q_VAL(0) <= I_VAL;
+        I_RDY    <= Q_RDY;
     end generate;
     -------------------------------------------------------------------------------
     -- QUEUE_SIZE>0の場合
@@ -136,18 +146,18 @@ begin
         type     QUEUE_DATA_VECTOR is array (natural range <>) of QUEUE_DATA_TYPE;
         constant FIRST_OF_QUEUE     : integer := 1;
         constant LAST_OF_QUEUE      : integer := QUEUE_SIZE;
-        signal   next_queue_data    : QUEUE_DATA_VECTOR(FIRST_OF_QUEUE to LAST_OF_QUEUE);
-        signal   curr_queue_data    : QUEUE_DATA_VECTOR(FIRST_OF_QUEUE to LAST_OF_QUEUE);
-        signal   queue_data_load    : std_logic_vector (FIRST_OF_QUEUE to LAST_OF_QUEUE);
-        signal   next_queue_valid   : std_logic_vector (FIRST_OF_QUEUE to LAST_OF_QUEUE);
-        signal   curr_queue_valid   : std_logic_vector (FIRST_OF_QUEUE to LAST_OF_QUEUE);
+        signal   next_queue_data    : QUEUE_DATA_VECTOR(LAST_OF_QUEUE downto FIRST_OF_QUEUE);
+        signal   curr_queue_data    : QUEUE_DATA_VECTOR(LAST_OF_QUEUE downto FIRST_OF_QUEUE);
+        signal   queue_data_load    : std_logic_vector (LAST_OF_QUEUE downto FIRST_OF_QUEUE);
+        signal   next_queue_valid   : std_logic_vector (LAST_OF_QUEUE downto FIRST_OF_QUEUE);
+        signal   curr_queue_valid   : std_logic_vector (LAST_OF_QUEUE downto FIRST_OF_QUEUE);
     begin
         ---------------------------------------------------------------------------
         -- next_queue_valid : 次のクロックでのキューの状態を示すフラグ.
         -- queue_data_load  : 次のクロックでcurr_queue_dataにnext_queue_dataの値を
         --                    ロードすることを示すフラグ.
         ---------------------------------------------------------------------------
-        process (I_VAL, O_RDY, curr_queue_valid) begin
+        process (I_VAL, Q_RDY, curr_queue_valid) begin
             for i in FIRST_OF_QUEUE to LAST_OF_QUEUE loop
                 -------------------------------------------------------------------
                 -- 自分のキューにデータが格納されている場合...
@@ -156,10 +166,10 @@ begin
                     ---------------------------------------------------------------
                     -- もし自分のキューにデータが格納されていて、
                     -- かつ自分がキューの最後ならば、
-                    -- O_RDY='1'で自分のキューをクリアする.
+                    -- Q_RDY='1'で自分のキューをクリアする.
                     ---------------------------------------------------------------
                     if (i = LAST_OF_QUEUE) then
-                        if (O_RDY = '1') then
+                        if (Q_RDY = '1') then
                             next_queue_valid(i) <= '0';
                         else
                             next_queue_valid(i) <= '1';
@@ -169,11 +179,11 @@ begin
                     -- もし自分のキューにデータが格納されていて、
                     -- かつ自分がキューの最後でなくて、
                     -- かつ後ろのキューにデータが入っているならば、
-                    -- O_RDY='1'で後ろのキューのデータを自分のキューに格納する.
+                    -- Q_RDY='1'で後ろのキューのデータを自分のキューに格納する.
                     ---------------------------------------------------------------
                     elsif (curr_queue_valid(i+1) = '1') then
                         next_queue_valid(i) <= '1';
-                        if (O_RDY = '1') then
+                        if (Q_RDY = '1') then
                             queue_data_load(i) <= '1';
                         else
                             queue_data_load(i) <= '0';
@@ -182,17 +192,17 @@ begin
                     -- もし自分のキューにデータが格納されていて、
                     -- かつ自分がキューの最後でなくて、
                     -- かつ後ろのキューにデータが入っていないならば、
-                    -- I_VAL='0' かつ O_RDY='1'ならば自分のキューをクリアする. 
-                    -- I_VAL='1' かつ O_RDY='1'ならばI_DATAを自分のキューに格納する.
+                    -- I_VAL='0' かつ Q_RDY='1'ならば自分のキューをクリアする. 
+                    -- I_VAL='1' かつ Q_RDY='1'ならばI_DATAを自分のキューに格納する.
                     ---------------------------------------------------------------
                     else
-                        if (I_VAL = '0' and O_RDY = '1') then
+                        if (I_VAL = '0' and Q_RDY = '1') then
                             next_queue_valid(i) <= '0';
                         else
                             next_queue_valid(i) <= '1';
                         end if;
-                        if (LOWPOWER > 0 and I_VAL = '1' and O_RDY = '1') or
-                           (LOWPOWER = 0                 and O_RDY = '1') then
+                        if (LOWPOWER > 0 and I_VAL = '1' and Q_RDY = '1') or
+                           (LOWPOWER = 0                 and Q_RDY = '1') then
                             queue_data_load(i)  <= '1';
                         else
                             queue_data_load(i)  <= '0';
@@ -219,16 +229,16 @@ begin
                     -- もし自分のキューにデータが格納されてなくて、
                     -- かつ自分がキューの先頭なくて、
                     -- かつ前のキューにデータが格納されているならば、
-                    -- I_VAL='1'かつO_RDY='0'で自分のキューにデータを格納する.
+                    -- I_VAL='1'かつQ_RDY='0'で自分のキューにデータを格納する.
                     ---------------------------------------------------------------
                     elsif (curr_queue_valid(i-1) = '1') then
-                        if (I_VAL = '1' and O_RDY = '0') then
+                        if (I_VAL = '1' and Q_RDY = '0') then
                             next_queue_valid(i) <= '1';
                         else
                             next_queue_valid(i) <= '0';
                         end if;
                         if (LOWPOWER = 0) or
-                           (LOWPOWER > 0 and I_VAL = '1' and O_RDY = '0') then
+                           (LOWPOWER > 0 and I_VAL = '1' and Q_RDY = '0') then
                             queue_data_load(i)  <= '1';
                         else
                             queue_data_load(i)  <= '0';
@@ -289,9 +299,11 @@ begin
         ---------------------------------------------------------------------------
         -- 各種出力信号
         ---------------------------------------------------------------------------
-        O_DATA <= next_queue_data (FIRST_OF_QUEUE);
-        Q_DATA <= curr_queue_data (FIRST_OF_QUEUE);
-        O_VAL  <= next_queue_valid(FIRST_OF_QUEUE);
-        Q_VAL  <= curr_queue_valid(FIRST_OF_QUEUE);
+        O_DATA                     <= next_queue_data (FIRST_OF_QUEUE);
+        Q_DATA                     <= curr_queue_data (FIRST_OF_QUEUE);
+        O_VAL(0)                   <= next_queue_valid(FIRST_OF_QUEUE);
+        O_VAL(QUEUE_SIZE downto 1) <= next_queue_valid;
+        Q_VAL(0)                   <= curr_queue_valid(FIRST_OF_QUEUE);
+        Q_VAL(QUEUE_SIZE downto 1) <= curr_queue_valid;
     end generate;
 end RTL;

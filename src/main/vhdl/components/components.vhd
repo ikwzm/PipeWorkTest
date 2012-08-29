@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    components.vhd                                                  --
 --!     @brief   PIPEWORK COMPONENT LIBRARY DESCRIPTION                          --
---!     @version 1.0.3                                                           --
---!     @date    2012/08/28                                                      --
+--!     @version 1.0.4                                                           --
+--!     @date    2012/08/29                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
@@ -630,21 +630,31 @@ component QUEUE_REGISTER
     -------------------------------------------------------------------------------
     -- 出力側
     -------------------------------------------------------------------------------
+        O_DATA      : --! @brief OUTPUT DATA :
+                      --! 出力データ.
+                      out std_logic_vector(DATA_BITS-1 downto 0);
+        O_VAL       : --! @brief OUTPUT DATA VALID :
+                      --! キューレジスタに有効なデータが入っている事を示すフラグ.
+                      --! * キューレジスタは1〜QUEUE_SIZEまであるが、対応する位置の
+                      --!   フラグが'1'ならば有効なデータが入っている事を示す.
+                      --! * この出力信号の範囲が1からではなく0から始まっている事に
+                      --!   注意. これはQUEUE_SIZE=0の場合に対応するため.
+                      --!   QUEUE_SIZE>0の場合は、O_VAL(0)はO_VAL(1)と同じ.
+                      out std_logic_vector(QUEUE_SIZE  downto 0);
         Q_DATA      : --! @brief OUTPUT REGISTERD DATA :
                       --! レジスタ出力の出力データ.
                       --! 出力データ(O_DATA)をクロックで叩いたもの.
                       out std_logic_vector(DATA_BITS-1 downto 0);
         Q_VAL       : --! @brief OUTPUT REGISTERD DATA VALID :
-                      --! レジスタ出力の出力データ(QDATA)が有効であることを示す信号.
-                      --! 出力データ有効信号(O_VAL)をクロックで叩いたもの.
-                      out std_logic;
-        O_DATA      : --! @brief OUTPUT DATA :
-                      --! 出力データ.
-                      out std_logic_vector(DATA_BITS-1 downto 0);
-        O_VAL       : --! @brief OUTPUT DATA VALID :
-                      --! 出力データ(O_DATA)が有効であることを示す信号.
-                      out std_logic;
-        O_RDY       : --! @brief OUTPUT READY :
+                      --! キューレジスタに有効なデータが入っている事を示すフラグ.
+                      --! O_VALをクロックで叩いたもの.
+                      --! * キューレジスタは1〜QUEUE_SIZEまであるが、対応する位置の
+                      --!   フラグが'1'ならば有効なデータが入っている事を示す.
+                      --! * この出力信号の範囲が1からではなく0から始まっている事に
+                      --!   注意. これはQUEUE_SIZE=0の場合に対応するため.
+                      --!   QUEUE_SIZE>0の場合は、Q_VAL(0)はQ_VAL(1)と同じ.
+                      out std_logic_vector(QUEUE_SIZE  downto 0);
+        Q_RDY       : --! @brief OUTPUT READY :
                       --! 出力可能信号.
                       in  std_logic
     );
