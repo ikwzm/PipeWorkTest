@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sdpram_altera_auto_select.vhd
 --!     @brief   Synchronous Dual Port RAM Model for Altera FPGA.
---!     @version 1.0.0
---!     @date    2012/8/11
+--!     @version 1.0.5
+--!     @date    2012/8/30
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -116,8 +116,10 @@ architecture ALTERA_AUTO_SELECT of SDPRAM is
             eccstatus         : out std_logic_vector(width_eccstatus-1 downto 0)
         );
     end component;
-    constant sig1       : std_logic_vector(          0 downto 0) := (others => '1');
-    constant sig0       : std_logic_vector(2**RWIDTH-1 downto 0) := (others => '0');
+    constant sig0       : std_logic := '0';
+    constant sig1       : std_logic := '1';
+    constant data_b     : std_logic_vector(2**(RWIDTH  )-1 downto 0) := (others => '0');
+    constant byteena_b  : std_logic_vector(2**(RWIDTH-3)-1 downto 0) := (others => '1');
     signal   wren       : std_logic;
     signal   byteena    : std_logic_vector(2**(WWIDTH-3)-1 downto 0);
 begin
@@ -172,7 +174,7 @@ begin
             wrcontrol_aclr_b                       => "NONE",
             address_aclr_b                         => "NONE",
             byteena_aclr_b                         => "NONE",
-            width_byteena_b                        => 1,
+            width_byteena_b                        => byteena_b'length,
             clock_enable_input_b                   => "NORMAL",
             clock_enable_output_b                  => "NORMAL",
             clock_enable_core_b                    => "USE_INPUT_CLKEN",
@@ -196,25 +198,25 @@ begin
         )
         port map (
             wren_a            => wren,
-            wren_b            => sig0(0),
-            rden_a            => sig1(0),
-            rden_b            => sig1(0),
+            wren_b            => sig0,
+            rden_a            => sig1,
+            rden_b            => sig1,
             data_a            => WDATA,
-            data_b            => sig0,
+            data_b            => data_b,
             address_a         => WADDR,
             address_b         => RADDR,
             clock0            => WCLK,
             clock1            => RCLK,
-            clocken0          => sig1(0),
-            clocken1          => sig1(0),
-            clocken2          => sig1(0),
-            clocken3          => sig1(0),
-            aclr0             => sig0(0),
-            aclr1             => sig0(0),
-            addressstall_a    => sig0(0),
-            addressstall_b    => sig0(0),
+            clocken0          => sig1,
+            clocken1          => sig1,
+            clocken2          => sig1,
+            clocken3          => sig1,
+            aclr0             => sig0,
+            aclr1             => sig0,
+            addressstall_a    => sig0,
+            addressstall_b    => sig0,
             byteena_a         => byteena,
-            byteena_b         => sig0(0 downto 0),
+            byteena_b         => byteena_b,
             q_a               => open,
             q_b               => RDATA,
             eccstatus         => open
