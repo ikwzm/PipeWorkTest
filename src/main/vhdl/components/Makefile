@@ -5,13 +5,14 @@ ENTITY_FILES = chopper.vhd                             \
                delay_adjuster.vhd                      \
                queue_register.vhd                      \
                syncronizer.vhd                         \
+               syncronizer_input_pending_register.vhd  \
                sdpram.vhd
                ${ENDLIST}
 
 components.vhd : ${ENTITY_FILES}
 	../../../../Dummy_Plug/tools/MakeComponentPackage.rb --verbose \
             --brief   'PIPEWORK COMPONENT LIBRARY DESCRIPTION' \
-            --version 1.0.6 \
+            --version 1.0.7 \
             --author  'Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>' \
             --library PIPEWORK \
             --package COMPONENTS \
