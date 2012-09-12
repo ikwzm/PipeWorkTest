@@ -1,6 +1,5 @@
 GHDL=ghdl
-GHDLFLAGS=--mb-comments
-WORK=PIPEWORK
+GHDLFLAGS=--mb-comments -P../pipework
 
 SRC_MAIN_PATH = ../../../src/main/vhdl/components
 SRC_TEST_PATH = ../../../src/test/vhdl/reducer
@@ -44,13 +43,6 @@ all: $(TEST_BENCH)
 clean:
 	rm -f *.o *.cf tmp.vhd $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
 
-components.o : $(SRC_MAIN_PATH)/components.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
-
-reducer.o    : $(SRC_MAIN_PATH)/reducer.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
-
-reducer_test_model.o : reducer.o components.o
 reducer_test_model.o : $(SRC_TEST_PATH)/reducer_test_model.vhd
 	 $(GHDL) -a $(GHDLFLAGS) --work=work $<
 
