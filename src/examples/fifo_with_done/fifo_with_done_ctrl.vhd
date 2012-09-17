@@ -178,8 +178,8 @@ begin
         I_COUNT   <= std_logic_vector(curr_counter);
         I_RDY     <= '1' when (in_ready) else '0';
         process (I_CLK, RST)
-            variable  next_pointer : unsigned(FIFO_DEPTH-1 downto 0);
-            variable  next_counter : unsigned(FIFO_DEPTH   downto 0);
+            variable  next_pointer : unsigned(FIFO_DEPTH downto 0);
+            variable  next_counter : unsigned(FIFO_DEPTH downto 0);
         begin
             if (RST = '1') then
                 curr_pointer <= (others => '0');
@@ -187,7 +187,7 @@ begin
                 in_ready     <= FALSE;
                 wait_done    <= FALSE;
             elsif (I_CLK'event and I_CLK = '1') then
-                next_pointer := curr_pointer;
+                next_pointer := "0" & curr_pointer;
                 next_counter := curr_counter;
                 if (req_valid = '1') then
                     next_counter := next_counter + unsigned(in_size);
@@ -200,7 +200,7 @@ begin
                     next_pointer := (others => '0');
                     next_counter := (others => '0');
                 end if;
-                curr_pointer <= next_pointer;
+                curr_pointer <= next_pointer(curr_pointer'range);
                 curr_counter <= next_counter;
                 if (o2i_done = '1') then
                     wait_done <= FALSE;
@@ -268,14 +268,14 @@ begin
     -------------------------------------------------------------------------------
     O_BLK: block
         signal    curr_pointer  : unsigned(FIFO_DEPTH-1 downto 0);
-        signal    next_pointer  : unsigned(FIFO_DEPTH-1 downto 0);
+        signal    next_pointer  : unsigned(FIFO_DEPTH   downto 0);
         signal    curr_counter  : unsigned(FIFO_DEPTH   downto 0);
         signal    next_counter  : unsigned(FIFO_DEPTH   downto 0);
     begin
         O_VAL     <= '1' when (out_valid) else '0';
         O_DONE    <= '1' when (out_done ) else '0';
         O_COUNT   <= std_logic_vector(curr_counter);
-        R_PTR     <= std_logic_vector(next_pointer);
+        R_PTR     <= std_logic_vector(next_pointer(R_PTR'range));
         ret_done  <= '1' when (out_done  and next_counter = 0) else '0';
         ret_valid <= '1' when (out_valid and O_RDY = '1') else '0';
         process (curr_counter, i2o_valid, i2o_size, ret_valid)
@@ -292,9 +292,9 @@ begin
         end process;
         process (curr_pointer, ret_valid) begin
             if (ret_valid = '1') then
-                next_pointer <= curr_pointer + unsigned(out_size);
+                next_pointer <= "0" & curr_pointer + unsigned(out_size);
             else
-                next_pointer <= curr_pointer;
+                next_pointer <= "0" & curr_pointer;
             end if;
         end process;
         process (O_CLK, RST) begin
@@ -309,7 +309,7 @@ begin
                     curr_pointer <= (others => '0');
                 else
                     curr_counter <= next_counter;
-                    curr_pointer <= next_pointer;
+                    curr_pointer <= next_pointer(curr_pointer'range);
                 end if;
                 if    (i2o_done = '1') then
                     out_done  <= TRUE;

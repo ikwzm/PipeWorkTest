@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="H:/gist/PipeWork/sim/isim/fifo_with_done/util_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="components" />
+            <top_module name="fifo_with_done_components" />
+            <top_module name="fifo_with_done_test_bench" />
+            <top_module name="numeric_std" />
+            <top_module name="std_logic_1164" />
+            <top_module name="tinymt32" />
+            <top_module name="util" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="30" />
+   <wvobject fp_name="/fifo_with_done_test_bench/finish" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">finish</obj_property>
+      <obj_property name="ObjectShortName">finish</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/scenario" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">scenario[1:5]</obj_property>
+      <obj_property name="ObjectShortName">scenario[1:5]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/rst" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/i_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_clk</obj_property>
+      <obj_property name="ObjectShortName">i_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/i_cke" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_cke</obj_property>
+      <obj_property name="ObjectShortName">i_cke</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/i_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">i_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/i_done" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_done</obj_property>
+      <obj_property name="ObjectShortName">i_done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/i_val" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_val</obj_property>
+      <obj_property name="ObjectShortName">i_val</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/i_rdy" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">i_rdy</obj_property>
+      <obj_property name="ObjectShortName">i_rdy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/i_count" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">i_count[10:0]</obj_property>
+      <obj_property name="ObjectShortName">i_count[10:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">o_clk</obj_property>
+      <obj_property name="ObjectShortName">o_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_cke" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">o_cke</obj_property>
+      <obj_property name="ObjectShortName">o_cke</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">o_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data[7:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_done" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">o_done</obj_property>
+      <obj_property name="ObjectShortName">o_done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_val" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">o_val</obj_property>
+      <obj_property name="ObjectShortName">o_val</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_rdy" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">o_rdy</obj_property>
+      <obj_property name="ObjectShortName">o_rdy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_count" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">o_count[10:0]</obj_property>
+      <obj_property name="ObjectShortName">o_count[10:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_start" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">o_start</obj_property>
+      <obj_property name="ObjectShortName">o_start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_run" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">o_run</obj_property>
+      <obj_property name="ObjectShortName">o_run</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_total_size" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">o_total_size</obj_property>
+      <obj_property name="ObjectShortName">o_total_size</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_block_size" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">o_block_size</obj_property>
+      <obj_property name="ObjectShortName">o_block_size</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/fifo_depth" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">fifo_depth</obj_property>
+      <obj_property name="ObjectShortName">fifo_depth</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/i_clk_period" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">i_clk_period</obj_property>
+      <obj_property name="ObjectShortName">i_clk_period</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/i_clk_rate" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">i_clk_rate</obj_property>
+      <obj_property name="ObjectShortName">i_clk_rate</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_clk_period" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">o_clk_period</obj_property>
+      <obj_property name="ObjectShortName">o_clk_period</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/o_clk_rate" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">o_clk_rate</obj_property>
+      <obj_property name="ObjectShortName">o_clk_rate</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/delay_cycle" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">delay_cycle</obj_property>
+      <obj_property name="ObjectShortName">delay_cycle</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/auto_finish" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">auto_finish</obj_property>
+      <obj_property name="ObjectShortName">auto_finish</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/data_width" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">data_width</obj_property>
+      <obj_property name="ObjectShortName">data_width</obj_property>
+   </wvobject>
+   <wvobject fp_name="/fifo_with_done_test_bench/delay" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">delay</obj_property>
+      <obj_property name="ObjectShortName">delay</obj_property>
+   </wvobject>
+</wave_config>
