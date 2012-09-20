@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    fifo_with_done.vhd
 --!     @brief   終了処理付きFIFO
---!     @version 0.1.2
---!     @date    2012/9/3
+--!     @version 0.1.3
+--!     @date    2012/9/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -152,12 +152,12 @@ architecture RTL of FIFO_WITH_DONE is
 begin
     CTRL:  FIFO_WITH_DONE_CTRL
         generic map (
-            FIFO_DEPTH  => FIFO_DEPTH,
-            I_CLK_RATE  => I_CLK_RATE,
-            O_CLK_RATE  => O_CLK_RATE,
-            DELAY_CYCLE => DELAY_CYCLE
-        )
-        port map (
+            FIFO_DEPTH  => FIFO_DEPTH  , -- 
+            I_CLK_RATE  => I_CLK_RATE  , -- 
+            O_CLK_RATE  => O_CLK_RATE  , -- 
+            DELAY_CYCLE => DELAY_CYCLE   -- 
+        )                                -- 
+        port map (                       -- 
             RST         => RST         , -- In  :
             I_CLK       => I_CLK       , -- In  :
             I_CKE       => I_CKE       , -- In  :
@@ -179,12 +179,12 @@ begin
     RAM: SDPRAM 
         generic map(
             DEPTH       => FIFO_DEPTH+DATA_WIDTH,
-            RWIDTH      => DATA_WIDTH,
-            WWIDTH      => DATA_WIDTH,
-            WEBIT       => 0,
-            ID          => 0
-        )
-        port map (
+            RWIDTH      => DATA_WIDTH  , --
+            WWIDTH      => DATA_WIDTH  , --
+            WEBIT       => 0           , --
+            ID          => 0             -- 
+        )                                -- 
+        port map (                       -- 
             WCLK        => I_CLK       , -- In  :
             WE          => wr_ena      , -- In  :
             WADDR       => wr_ptr      , -- In  :
