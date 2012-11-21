@@ -104,6 +104,7 @@
     <transform xil_pn:end_ts="1347863712" xil_pn:in_ck="-8741435231251307027" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="1750451948343043555" xil_pn:start_ts="1347863699">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="FIFO_WITH_DONE_TEST_BENCH_ASYNC_5_9_beh.prj"/>
@@ -116,6 +117,7 @@
     <transform xil_pn:end_ts="1347863713" xil_pn:in_ck="-3492908075136113717" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-1834045131392473712" xil_pn:start_ts="1347863712">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="FIFO_WITH_DONE_TEST_BENCH_ASYNC_5_9_isim_beh.wdb"/>
