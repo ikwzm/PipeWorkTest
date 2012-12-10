@@ -2,8 +2,8 @@
 --!     @file    reducer.vhd
 --!     @brief   REDUCER MODULE :
 --!              異なるデータ幅のパスを継ぐためのアダプタ
---!     @version 1.0.0
---!     @date    2012/8/11
+--!     @version 1.0.1
+--!     @date    2012/12/11
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -463,9 +463,9 @@ begin
                         next_flush_pending := '0';
                         next_flush_fall    := '0';
                     end if;
-                 elsif (flush_pending = '1') or
-                       (FLUSH         = '1') or
-                       (I_VAL = '1' and i_ready = '1' and I_FLUSH = '1') then
+                elsif (flush_pending = '1') or
+                      (FLUSH         = '1') or
+                      (I_VAL = '1' and i_ready = '1' and I_FLUSH = '1') then
                     if (pending_flag) then
                         next_flush_output  := '0';
                         next_flush_pending := '1';
