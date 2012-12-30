@@ -15,6 +15,8 @@ COMPONENTS = chopper                            \
              sdpram_model                       \
              syncronizer                        \
              syncronizer_input_pending_register \
+             pump_count_up_register             \
+             pump_count_down_register           \
              $(END_LINE)
 
 OBJS      = $(addsuffix .o,$(COMPONENTS))
@@ -62,4 +64,9 @@ syncronizer.o                        : $(SRC_MAIN_PATH)/syncronizer.vhd
 syncronizer_input_pending_register.o : $(SRC_MAIN_PATH)/syncronizer_input_pending_register.vhd
 	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
 
+pump_count_up_register.o             : $(SRC_MAIN_PATH)/pump_count_up_register.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
+
+pump_count_down_register.o           : $(SRC_MAIN_PATH)/pump_count_down_register.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=$(WORK) $<
 
