@@ -2,7 +2,7 @@
 --!     @file    axi4_types.vhd
 --!     @brief   AXI4 Channel Signal Type Package.
 --!     @version 0.0.1
---!     @date    2012/12/14
+--!     @date    2013/1/2
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

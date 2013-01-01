@@ -2,11 +2,11 @@
 --!     @file    aix4_register_interface_test_bench.vhd
 --!     @brief   TEST BENCH for AXI4_REGISTER_INTERFACE
 --!     @version 0.0.1
---!     @date    2012/12/30
+--!     @date    2013/1/2
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012 Ichiro Kawazome
+--      Copyright (C) 2012,2013 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,7 @@ architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH is
     constant PERIOD          : time    := 10 ns;
     constant DELAY           : time    :=  1 ns;
     constant AXI4_ADDR_WIDTH : integer := 32;
-    constant REGS_ADDR_WIDTH : integer := 10;
+    constant REGS_ADDR_WIDTH : integer := 12;
     constant WIDTH           : AXI4_SIGNAL_WIDTH_TYPE := (
                                  ID          => 4,
                                  AWADDR      => AXI4_ADDR_WIDTH,
@@ -198,7 +198,8 @@ architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    constant RAM_DEPTH       : integer := REGS_DATA_SIZE+REGS_ADDR_WIDTH;
+    constant RAM_DEPTH       : integer := REGS_ADDR_WIDTH+3;
+    signal   RAM_ADDR        : std_logic_vector(REGS_ADDR_WIDTH  -1 downto REGS_DATA_SIZE-3);
     signal   RAM_RDATA       : std_logic_vector(REGS_DATA_WIDTH  -1 downto 0);
     signal   RAM_WE          : std_logic_vector(REGS_DATA_WIDTH/8-1 downto 0);
     signal   regs_state      : std_logic_vector(1 downto 0);
@@ -503,8 +504,11 @@ begin
     REGS_ACK   <= '1' when (REGS_REQ = '1' and REGS_WRITE = '1') or
                          (regs_state = "01") else '0';
     REGS_ERR   <= '0';
-    RAM_WE     <= REGS_BEN when (REGS_REQ = '1' and REGS_WRITE = '1' and REGS_ACK = '1') else (others => '0');
     REGS_RDATA <= RAM_RDATA;
+    RAM_ADDR   <= REGS_ADDR(RAM_ADDR'range);
+    RAM_WE_GEN: for i in RAM_WE'range generate
+        RAM_WE(i) <= '1' when (REGS_REQ = '1' and REGS_WRITE = '1' and REGS_ACK = '1' and REGS_BEN(i) = '1') else '0';
+    end generate;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -519,10 +523,10 @@ begin
         port map (
             WCLK            => ACLK            ,
             WE              => RAM_WE          ,
-            WADDR           => REGS_ADDR       ,
+            WADDR           => RAM_ADDR        ,
             WDATA           => REGS_WDATA      ,
             RCLK            => ACLK            ,
-            RADDR           => REGS_ADDR       ,
+            RADDR           => RAM_ADDR        ,
             RDATA           => RAM_RDATA
         );
     

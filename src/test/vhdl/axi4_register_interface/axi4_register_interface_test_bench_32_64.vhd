@@ -36,9 +36,9 @@
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-entity  AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32 is
-end     AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32;
-architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32 is
+entity  AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64 is
+end     AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64;
+architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64 is
     component  AXI4_REGISTER_INTERFACE_TEST_BENCH is
         generic (
             NAME            : STRING;
@@ -49,9 +49,9 @@ architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32 is
     end component;
 begin
     TB: AXI4_REGISTER_INTERFACE_TEST_BENCH generic map(
-            NAME            => string'("AXI4_REGS_IF_32_32"),
-            SCENARIO_FILE   => string'("axi4_register_interface_test_bench_32_32.snr"),
+            NAME            => string'("AXI4_REGS_IF_32_64"),
+            SCENARIO_FILE   => string'("axi4_register_interface_test_bench_32_64.snr"),
             AXI4_DATA_WIDTH => 32,
-            REGS_DATA_WIDTH => 32
+            REGS_DATA_WIDTH => 64
     );
 end MODEL;

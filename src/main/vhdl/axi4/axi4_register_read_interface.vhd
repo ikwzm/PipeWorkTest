@@ -2,11 +2,11 @@
 --!     @file    axi4_register_read_interface.vhd
 --!     @brief   AXI4 Register Read Interface
 --!     @version 0.0.1
---!     @date    2012/12/30
+--!     @date    2013/1/2
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012 Ichiro Kawazome
+--      Copyright (C) 2012,2013 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -451,12 +451,14 @@ begin
         constant R_IDLE         : std_logic_vector(1 downto 0) := "00";
         constant R_XFER         : std_logic_vector(1 downto 0) := "11";
         constant R_SKIP         : std_logic_vector(1 downto 0) := "01";
+        constant R_DONE         : std_logic_vector(1 downto 0) := "10";
         signal   b_valid        : std_logic;
         signal   b_ready        : std_logic;
         signal   b_done         : std_logic;
+        signal   b_clear        : std_logic;
     begin
         ---------------------------------------------------------------------------
-        --
+        -- リードバッファ用のステートマシン.
         ---------------------------------------------------------------------------
         process (CLK, RST) begin
             if (RST = '1') then
@@ -481,7 +483,7 @@ begin
                             end if;
                         when R_XFER =>
                             if    (r_valid = '1' and RREADY = '1' and r_last = '1') then
-                                r_state <= R_IDLE;
+                                r_state <= R_DONE;
                             elsif (r_valid = '1' and RREADY = '1' and b_done = '1') then
                                 r_state <= R_SKIP;
                             else
@@ -489,10 +491,12 @@ begin
                             end if;
                         when R_SKIP =>
                             if    (r_valid = '1' and RREADY = '1' and r_last = '1') then
-                                r_state <= R_IDLE;
+                                r_state <= R_DONE;
                             else
                                 r_state <= R_SKIP;
                             end if;
+                        when R_DONE =>
+                                r_state <= R_IDLE;
                         when others =>
                                 r_state <= R_IDLE;
                     end case;
@@ -500,16 +504,25 @@ begin
             end if;
         end process;
         ---------------------------------------------------------------------------
-        --
+        -- リードバッファが動作中であることを示すフラグ.  
+        -- curr_state が TURN_AR から抜け出して IDLE に戻るめに使う.  
+        -- １クロック早めに(r_state = R_DONE を含んでいない)この信号をネゲートして
+        -- いること注意.
         ---------------------------------------------------------------------------
-        rbuf_busy <= '1' when (r_state /= R_IDLE) else '0';
+        rbuf_busy <= '1' when (r_state = R_XFER or r_state = R_SKIP) else '0';
         ---------------------------------------------------------------------------
-        --
+        -- 転送の最後に B:REDUCER を初期化してしまうためのクリア信号.
+        -- これが無いと、B:REDUCER 内部にデータが残ってしまう.
+        ---------------------------------------------------------------------------
+        b_clear   <= '1' when (r_state = R_DONE or CLR = '1') else '0';
+        ---------------------------------------------------------------------------
+        -- RVALID の内部信号
         ---------------------------------------------------------------------------
         r_valid   <= '1' when (r_state = R_XFER and b_valid = '1') or
                               (r_state = R_SKIP) else '0';
         ---------------------------------------------------------------------------
-        --
+        -- r_length : バースト長カウンタ.
+        -- r_last   : 最後の転送である事を示すフラグ.
         ---------------------------------------------------------------------------
         process (CLK, RST)
             variable next_length : unsigned(AXI4_ALEN_WIDTH-1 downto 0);
@@ -540,7 +553,8 @@ begin
             end if;
         end process;
         ---------------------------------------------------------------------------
-        --
+        -- init_pos : 出力するバイト位置(curr_pos)の初期値.
+        -- offset   : バッファの使用開始時に設定するオフセット量.
         ---------------------------------------------------------------------------
         process (xfer_req_addr)
             variable addr : unsigned(AXI4_DATA_SIZE downto 0);
@@ -562,7 +576,8 @@ begin
             end loop;
         end process;
         ---------------------------------------------------------------------------
-        --
+        -- curr_pos   : 現在出力しているバイト位置.
+        -- word_bytes : 一回の転送で何バイト転送するかを示す.
         ---------------------------------------------------------------------------
         process (CLK, RST) begin
             if (RST = '1') then
@@ -591,7 +606,8 @@ begin
             end if;
         end process;
         ---------------------------------------------------------------------------
-        --
+        -- next_pos  : 次に出力する予定のバイト位置.
+        -- word_last : バイト位置が１ワードの最後の位置であることを示すフラグ.
         ---------------------------------------------------------------------------
         process(curr_pos, word_bytes, r_valid, RREADY)
             variable temp_pos : unsigned(AXI4_DATA_SIZE downto 0);
@@ -609,9 +625,12 @@ begin
                 word_last <= FALSE;
             end if;
         end process;
+        ---------------------------------------------------------------------------
+        -- B:REDUCER からデータを取り出すための信号.
+        ---------------------------------------------------------------------------
         b_ready <= '1' when (r_valid = '1' and RREADY = '1' and word_last) else '0';
         ---------------------------------------------------------------------------
-        --
+        -- 内部バッファ 兼 幅変換 兼 バイトレーン調整 回路
         ---------------------------------------------------------------------------
         B: REDUCER
             generic map (
@@ -631,7 +650,7 @@ begin
             -----------------------------------------------------------------------
                 CLK             => CLK            , -- In  :
                 RST             => RST            , -- In  :
-                CLR             => CLR            , -- In  :
+                CLR             => b_clear        , -- In  :
             -----------------------------------------------------------------------
             -- 各種制御信号
             -----------------------------------------------------------------------

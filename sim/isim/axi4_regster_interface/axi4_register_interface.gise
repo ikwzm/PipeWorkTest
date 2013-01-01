@@ -41,10 +41,11 @@
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_UNROUTES" xil_pn:name="AXI4_REGISTER_INTERFACE.unroutes" xil_pn:subbranch="Par"/>
     <file xil_pn:fileType="FILE_XPI" xil_pn:name="AXI4_REGISTER_INTERFACE.xpi"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST" xil_pn:name="AXI4_REGISTER_INTERFACE.xst"/>
-    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_beh.prj"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_isim_beh.exe"/>
-    <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_isim_beh.wdb"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_stx_beh.prj"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_beh.prj"/>
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_isim_beh.exe"/>
+    <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_isim_beh.wdb"/>
     <file xil_pn:fileType="FILE_HTML" xil_pn:name="AXI4_REGISTER_INTERFACE_envsettings.html"/>
     <file xil_pn:fileType="FILE_NCD" xil_pn:name="AXI4_REGISTER_INTERFACE_guide.ncd" xil_pn:origination="imported"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_MAP_REPORT" xil_pn:name="AXI4_REGISTER_INTERFACE_map.map" xil_pn:subbranch="Map"/>
@@ -81,7 +82,7 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1356868471" xil_pn:in_ck="2243920746139936245" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1356868470">
+    <transform xil_pn:end_ts="1357061595" xil_pn:in_ck="-7895734104798549095" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1357061594">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_channel_player.vhd"/>
@@ -111,12 +112,14 @@
       <outfile xil_pn:name="../../../src/main/vhdl/components/sdpram_model.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_32_32.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_32_64.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_64_32.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1356848826" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-5525160456960287545" xil_pn:start_ts="1356848826">
+    <transform xil_pn:end_ts="1357061595" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-4681455359079106420" xil_pn:start_ts="1357061595">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1356848826" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="49902099993780037" xil_pn:start_ts="1356848826">
+    <transform xil_pn:end_ts="1357061595" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="-4838914730400504566" xil_pn:start_ts="1357061595">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
@@ -124,7 +127,7 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1356868471" xil_pn:in_ck="2243920746139936245" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1356868471">
+    <transform xil_pn:end_ts="1357061595" xil_pn:in_ck="-7895734104798549095" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1357061595">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_channel_player.vhd"/>
@@ -154,25 +157,27 @@
       <outfile xil_pn:name="../../../src/main/vhdl/components/sdpram_model.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_32_32.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_32_64.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_64_32.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1356868500" xil_pn:in_ck="2243920746139936245" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="3172832362339592536" xil_pn:start_ts="1356868471">
+    <transform xil_pn:end_ts="1357061620" xil_pn:in_ck="-7895734104798549095" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="2997412613787958018" xil_pn:start_ts="1357061595">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_beh.prj"/>
-      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_isim_beh.exe"/>
+      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_beh.prj"/>
+      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_isim_beh.exe"/>
       <outfile xil_pn:name="fuse.log"/>
       <outfile xil_pn:name="isim"/>
       <outfile xil_pn:name="isim.log"/>
       <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
-    <transform xil_pn:end_ts="1356868502" xil_pn:in_ck="-8241409295961196993" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="8014600651792380090" xil_pn:start_ts="1356868500">
+    <transform xil_pn:end_ts="1357061622" xil_pn:in_ck="6421135297265042019" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-4892608755493903356" xil_pn:start_ts="1357061620">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_isim_beh.wdb"/>
+      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_isim_beh.wdb"/>
       <outfile xil_pn:name="isim.cmd"/>
       <outfile xil_pn:name="isim.log"/>
     </transform>
@@ -208,8 +213,12 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputAdded"/>
+      <status xil_pn:value="InputChanged"/>
       <status xil_pn:value="OutputChanged"/>
+      <status xil_pn:value="OutputRemoved"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.lso"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.ngc"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.ngr"/>
@@ -217,7 +226,6 @@
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.stx"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.syr"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.xst"/>
-      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_beh.prj"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_xst.xrpt"/>
       <outfile xil_pn:name="_xmsgs/xst.xmsgs"/>
       <outfile xil_pn:name="webtalk_pn.xml"/>
@@ -230,6 +238,7 @@
     <transform xil_pn:end_ts="1356868076" xil_pn:in_ck="6636533895911673296" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="7763276367981698592" xil_pn:start_ts="1356868058">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.bld"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.ngd"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_ngdbuild.xrpt"/>
@@ -239,6 +248,7 @@
     <transform xil_pn:end_ts="1356868252" xil_pn:in_ck="6636533895911673297" xil_pn:name="TRANEXT_map_spartan6" xil_pn:prop_ck="6094698697723550085" xil_pn:start_ts="1356868076">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.pcf"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_map.map"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_map.mrp"/>
@@ -252,6 +262,7 @@
     <transform xil_pn:end_ts="1356868348" xil_pn:in_ck="-9125137068152791702" xil_pn:name="TRANEXT_par_spartan6" xil_pn:prop_ck="832869163894192598" xil_pn:start_ts="1356868252">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.ncd"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.pad"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.par"/>
@@ -266,6 +277,7 @@
     <transform xil_pn:end_ts="1356868348" xil_pn:in_ck="6636533895911673165" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416185" xil_pn:start_ts="1356868325">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.twr"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE.twx"/>
       <outfile xil_pn:name="_xmsgs/trce.xmsgs"/>

@@ -2,11 +2,11 @@
 --!     @file    axi4_register_write_interface.vhd
 --!     @brief   AXI4 Register Write Interface
 --!     @version 0.0.1
---!     @date    2012/12/30
+--!     @date    2013/1/2
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012 Ichiro Kawazome
+--      Copyright (C) 2012,2013 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
