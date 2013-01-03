@@ -7,8 +7,6 @@ ENTITY_FILES = chopper.vhd                             \
                syncronizer.vhd                         \
                syncronizer_input_pending_register.vhd  \
                sdpram.vhd                              \
-               pump_count_up_register.vhd              \
-               pump_count_down_register.vhd            \
                ${ENDLIST}
 
 components.vhd : ${ENTITY_FILES}

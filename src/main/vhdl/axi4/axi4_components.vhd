@@ -1,13 +1,13 @@
 -----------------------------------------------------------------------------------
---!     @file    axi4_components.vhd                                             --
+--!     @file    ../../../src/main/vhdl/axi4/axi4_components.vhd                 --
 --!     @brief   PIPEWORK AXI4 LIBRARY DESCRIPTION                               --
---!     @version 0.0.1                                                           --
---!     @date    2012/12/30                                                      --
+--!     @version 1.0.7                                                           --
+--!     @date    2013/01/03                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 --                                                                               --
---      Copyright (C) 2012 Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>           --
+--      Copyright (C) 2013 Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>           --
 --      All rights reserved.                                                     --
 --                                                                               --
 --      Redistribution and use in source and binary forms, with or without       --
@@ -108,11 +108,15 @@ component AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER
         RES_NONE        : out   std_logic;
         RES_SIZE        : out   std_logic_vector(SIZE_BITS    -1 downto 0);
         ---------------------------------------------------------------------------
-        -- Transfer Control Signals.
+        -- Flow Control Signals.
         ---------------------------------------------------------------------------
-        XFER_PAUSE      : in    std_logic;
-        XFER_STOP       : in    std_logic;
-        XFER_SIZE       : in    std_logic_vector(SIZE_BITS    -1 downto 0);
+        FLOW_PAUSE      : in    std_logic;
+        FLOW_STOP       : in    std_logic;
+        FLOW_LAST       : in    std_logic;
+        FLOW_SIZE       : in    std_logic_vector(SIZE_BITS    -1 downto 0);
+        ---------------------------------------------------------------------------
+        -- Transfer Size Select Signals.
+        ---------------------------------------------------------------------------
         XFER_SIZE_SEL   : in    std_logic_vector(XFER_MAX_SIZE   downto XFER_MIN_SIZE);
         ---------------------------------------------------------------------------
         -- Transfer Request Signals.
@@ -294,6 +298,7 @@ component AXI4_MASTER_READ_CONTROLLER
         REQ_VAL         : in    std_logic;
         REQ_RDY         : out   std_logic;
         XFER_SIZE_SEL   : in    std_logic_vector(XFER_MAX_SIZE downto XFER_MIN_SIZE);
+        XFER_BUSY       : out   std_logic;
         ---------------------------------------------------------------------------
         -- Response Signals.
         ---------------------------------------------------------------------------
@@ -304,30 +309,254 @@ component AXI4_MASTER_READ_CONTROLLER
         RES_NONE        : out   std_logic;
         RES_SIZE        : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         ---------------------------------------------------------------------------
-        -- Transfer Control Signals.
+        -- Flow Control Signals.
         ---------------------------------------------------------------------------
-        XFER_PAUSE      : in    std_logic;
-        XFER_STOP       : in    std_logic;
-        XFER_SIZE       : in    std_logic_vector(SIZE_BITS        -1 downto 0);
-        XFER_BUSY       : out   std_logic;
+        FLOW_PAUSE      : in    std_logic;
+        FLOW_STOP       : in    std_logic;
+        FLOW_LAST       : in    std_logic;
+        FLOW_SIZE       : in    std_logic_vector(SIZE_BITS        -1 downto 0);
         ---------------------------------------------------------------------------
         -- Reserve Size Signals.
         ---------------------------------------------------------------------------
         RESV_VAL        : out   std_logic;
         RESV_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
-        RESV_TERM       : out   std_logic;
+        RESV_LAST       : out   std_logic;
         ---------------------------------------------------------------------------
         -- Push Size Signals.
         ---------------------------------------------------------------------------
         PUSH_VAL        : out   std_logic;
         PUSH_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
-        PUSH_TERM       : out   std_logic;
+        PUSH_LAST       : out   std_logic;
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
         BUF_WEN         : out   std_logic;
         BUF_BEN         : out   std_logic_vector(BUF_DATA_WIDTH/8 -1 downto 0);
         BUF_DATA        : out   std_logic_vector(BUF_DATA_WIDTH   -1 downto 0);
+        BUF_PTR         : out   std_logic_vector(BUF_PTR_BITS     -1 downto 0);
+        BUF_RDY         : in    std_logic
+    );
+end component;
+-----------------------------------------------------------------------------------
+--! @brief AXI4_MASTER_WRITE_CONTROLLER                                          --
+-----------------------------------------------------------------------------------
+component AXI4_MASTER_WRITE_CONTROLLER
+    -------------------------------------------------------------------------------
+    -- ジェネリック変数.
+    -------------------------------------------------------------------------------
+    generic (
+        AXI4_ADDR_WIDTH : --! @brief AIX4 ADDRESS CHANNEL ADDR WIDTH :
+                          --! AXI4 ライトアドレスチャネルのAWADDR信号のビット幅.
+                          integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
+        AXI4_DATA_WIDTH : --! @brief AXI4 WRITE DATA CHANNEL DATA WIDTH :
+                          --! AXI4 ライトデータチャネルのRDATA信号のビット幅.
+                          integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
+        AXI4_AUSER_WIDTH: --! @brief AXI4 ADDRESS CHANNEL USER WIDTH :
+                          --! AXI4 ライトアドレスチャネルのAUSER信号のビット幅.
+                          integer := 4;
+        AXI4_WUSER_WIDTH: --! @brief AXI4 WRITE DATA CHANNEL USER WIDTH :
+                          --! AXI4 ライトデータチャネルのUSER信号のビット幅.
+                          integer := 4;
+        AXI4_BUSER_WIDTH: --! @brief AXI4 WRITE RESPONSE CHANNEL USER WIDTH :
+                          --! AXI4 ライトレスポンスチャネルのUSER信号のビット幅.
+                          integer := 4;
+        AXI4_ID_WIDTH   : --! @brief AXI4 ID WIDTH :
+                          --! AXI4 アドレスチャネルおよびライトレスポンスチャネルの
+                          --! ID信号のビット幅.
+                          integer range 1 to AXI4_ID_MAX_WIDTH;
+        REQ_SIZE_BITS   : --! @brief REQUEST SIZE BITS:
+                          --! REQ_SIZE信号のビット数を指定する.
+                          integer := 32;
+        SIZE_BITS       : --! @brief SIZE BITS :
+                          --! 各種サイズカウンタのビット数を指定する.
+                          integer := 32;
+        BUF_DATA_WIDTH  : --! @brief BUFFER DATA WIDTH :
+                          --! バッファのビット幅を指定する.
+                          integer := 32;
+        BUF_PTR_BITS    : --! @brief BUFFER POINTER BITS :
+                          --! バッファポインタなどを表す信号のビット数を指定する.
+                          integer := 8;
+        XFER_MIN_SIZE   : --! @brief TRANSFER MINIMUM SIZE :
+                          --! 一回の転送サイズの最小バイト数を２のべき乗で指定する.
+                          integer := 4;
+        XFER_MAX_SIZE   : --! @brief TRANSFER MAXIMUM SIZE :
+                          --! 一回の転送サイズの最大バイト数を２のべき乗で指定する.
+                          integer := 4;
+        QUEUE_SIZE      : --! @brief RESPONSE QUEUE SIZE :
+                          --! キューの大きさを指定する.
+                          integer := 1
+    );
+    -------------------------------------------------------------------------------
+    -- 入出力ポートの定義.
+    -------------------------------------------------------------------------------
+    port(
+        --------------------------------------------------------------------------
+        -- Clock and Reset Signals.
+        --------------------------------------------------------------------------
+        CLK             : --! @brief Global clock signal.  
+                          in    std_logic;
+        RST             : --! @brief Global asyncrounos reset signal, active HIGH.
+                          in    std_logic;
+        CLR             : --! @brief Global syncrounos reset signal, active HIGH.
+                          in    std_logic;
+        --------------------------------------------------------------------------
+        -- AXI4 Write Address Channel Signals.
+        --------------------------------------------------------------------------
+        AWID            : --! @brief Write address ID.
+                          --! This signal is identification tag for the write
+                          --! address group of singals.
+                          out   std_logic_vector(AXI4_ID_WIDTH    -1 downto 0);
+        AWADDR          : --! @brief Write address.  
+                          --! The read address gives the address of the first
+                          --! transfer in a write burst transaction.
+                          out   std_logic_vector(AXI4_ADDR_WIDTH  -1 downto 0);
+        AWLEN           : --! @brief Burst length.  
+                          --! This signal indicates the exact number of transfer
+                          --! in a burst.
+                          out   AXI4_ALEN_TYPE;
+        AWSIZE          : --! @brief Burst size.
+                          --! This signal indicates the size of each transfer in
+                          --! the burst.
+                          out   AXI4_ASIZE_TYPE;
+        AWBURST         : --! @brief Burst type.
+                          --! The burst type and size infomation determine how
+                          --! the address for each transfer within the burst is
+                          --! calculated.
+                          out   AXI4_ABURST_TYPE;
+        AWLOCK          : --! @brief Lock type.
+                          --! This signal provides additional information about
+                          --! the atomic characteristics of the transfer.
+                          out   AXI4_ALOCK_TYPE;
+        AWCACHE         : --! @brief Memory type.
+                          --! This signal indicates how transactions are required
+                          --! to progress through a system.
+                          out   AXI4_ACACHE_TYPE;
+        AWPROT          : --! @brief Protection type.
+                          --! This signal indicates the privilege and security
+                          --! level of the transaction, and wherther the
+                          --! transaction is a data access or an instruction access.
+                          out   AXI4_APROT_TYPE;
+        AWQOS           : --! @brief Quality of Service, QoS.
+                          --! QoS identifier sent for each read transaction.
+                          out   AXI4_AQOS_TYPE;
+        AWREGION        : --! @brief Region identifier.
+                          --! Permits a single physical interface on a slave to be
+                          --! used for multiple logical interfaces.
+                          out   AXI4_AREGION_TYPE;
+        AWUSER          : --! @brief User signal.
+                          --! Optional User-defined signal in the write address channel.
+                          out   std_logic_vector(AXI4_AUSER_WIDTH -1 downto 0);
+        AWVALID         : --! @brief Write address valid.
+                          --! This signal indicates that the channel is signaling
+                          --! valid read address and control infomation.
+                          out   std_logic;
+        AWREADY         : --! @brief Write address ready.
+                          --! This signal indicates that the slave is ready to
+                          --! accept and associated control signals.
+                          in    std_logic;
+        --------------------------------------------------------------------------
+        -- AXI4 Write Data Channel Signals.
+        --------------------------------------------------------------------------
+        WID             : --! @brief Write ID tag.
+                          --! This signal is the identification tag for the write
+                          --! data transfer. Supported only AXI3.
+                          out   std_logic_vector(AXI4_ID_WIDTH    -1 downto 0);
+        WDATA           : --! @brief Write data.
+                          out   std_logic_vector(AXI4_DATA_WIDTH  -1 downto 0);
+        WSTRB           : --! @brief Write strobes.
+                          --! This signal indicates which byte lanes holdvalid 
+                          --! data. There is one write strobe bit for each eight
+                          --! bits of the write data bus.
+                          out   std_logic_vector(AXI4_DATA_WIDTH/8-1 downto 0);
+        WUSER           : --! @brief User signal.
+                          --! Optional User-defined signal in the write data channel.
+                          out   std_logic_vector(AXI4_WUSER_WIDTH -1 downto 0);
+        WLAST           : --! @brief Write last.
+                          --! This signal indicates the last transfer in a write burst.
+                          out   std_logic;
+        WVALID          : --! @brief Write valid.
+                          --! This signal indicates that valid write data and
+                          --! strobes are available.
+                          out   std_logic;
+        WREADY          : --! @brief Write ready.
+                          --! This signal indicates that the slave can accept the
+                          --! write data.
+                          in    std_logic;
+        --------------------------------------------------------------------------
+        -- AXI4 Write Response Channel Signals.
+        --------------------------------------------------------------------------
+        BID             : --! @brief Response ID tag.
+                          --! This signal is the identification tag of write
+                          --! response .
+                          in    std_logic_vector(AXI4_ID_WIDTH    -1 downto 0);
+        BRESP           : --! @brief Write response.
+                          --! This signal indicates the status of the write transaction.
+                          in    AXI4_RESP_TYPE;
+        BUSER           : --! @brief User signal.
+                          --! Optional User-defined signal in the read data channel.
+                          in    std_logic_vector(AXI4_BUSER_WIDTH -1 downto 0);
+        BVALID          : --! @brief Write response valid.
+                          --! This signal indicates that the channel is signaling
+                          --! a valid write response.
+                          in    std_logic;
+        BREADY          : --! @brief Write response ready.
+                          --! This signal indicates that the master can accept a
+                          --! write response.
+                          out   std_logic;
+        ---------------------------------------------------------------------------
+        -- Command Request Signals.
+        ---------------------------------------------------------------------------
+        REQ_ADDR        : in    std_logic_vector(AXI4_ADDR_WIDTH  -1 downto 0);
+        REQ_SIZE        : in    std_logic_vector(REQ_SIZE_BITS    -1 downto 0);
+        REQ_USER        : in    std_logic_vector(AXI4_AUSER_WIDTH -1 downto 0);
+        REQ_ID          : in    std_logic_vector(AXI4_ID_WIDTH    -1 downto 0);
+        REQ_BURST       : in    AXI4_ABURST_TYPE;
+        REQ_LOCK        : in    AXI4_ALOCK_TYPE;
+        REQ_CACHE       : in    AXI4_ACACHE_TYPE;
+        REQ_PROT        : in    AXI4_APROT_TYPE;
+        REQ_QOS         : in    AXI4_AQOS_TYPE;
+        REQ_REGION      : in    AXI4_AREGION_TYPE;
+        REQ_FIRST       : in    std_logic;
+        REQ_LAST        : in    std_logic;
+        REQ_SPECULATIVE : in    std_logic;
+        REQ_SAFETY      : in    std_logic;
+        REQ_VAL         : in    std_logic;
+        REQ_RDY         : out   std_logic;
+        XFER_SIZE_SEL   : in    std_logic_vector(XFER_MAX_SIZE downto XFER_MIN_SIZE);
+        XFER_BUSY       : out   std_logic;
+        ---------------------------------------------------------------------------
+        -- Response Signals.
+        ---------------------------------------------------------------------------
+        RES_VAL         : out   std_logic;
+        RES_ERROR       : out   std_logic;
+        RES_LAST        : out   std_logic;
+        RES_STOP        : out   std_logic;
+        RES_NONE        : out   std_logic;
+        RES_SIZE        : out   std_logic_vector(SIZE_BITS        -1 downto 0);
+        ---------------------------------------------------------------------------
+        -- Flow Control Signals.
+        ---------------------------------------------------------------------------
+        FLOW_PAUSE      : in    std_logic;
+        FLOW_STOP       : in    std_logic;
+        FLOW_LAST       : in    std_logic;
+        FLOW_SIZE       : in    std_logic_vector(SIZE_BITS        -1 downto 0);
+        ---------------------------------------------------------------------------
+        -- Reserve Size Signals.
+        ---------------------------------------------------------------------------
+        RESV_VAL        : out   std_logic;
+        RESV_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
+        RESV_LAST       : out   std_logic;
+        ---------------------------------------------------------------------------
+        -- Pull Size Signals.
+        ---------------------------------------------------------------------------
+        PULL_VAL        : out   std_logic;
+        PULL_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
+        PULL_LAST       : out   std_logic;
+        ---------------------------------------------------------------------------
+        -- Read Buffer Interface Signals.
+        ---------------------------------------------------------------------------
+        BUF_REN         : out   std_logic;
+        BUF_DATA        : in    std_logic_vector(BUF_DATA_WIDTH   -1 downto 0);
         BUF_PTR         : out   std_logic_vector(BUF_PTR_BITS     -1 downto 0);
         BUF_RDY         : in    std_logic
     );
@@ -446,12 +675,22 @@ component AXI4_REGISTER_WRITE_INTERFACE
         ---------------------------------------------------------------------------
         -- Register Write Interface.
         ---------------------------------------------------------------------------
-        REGS_REQ        : out std_logic;
-        REGS_ACK        : in  std_logic;
-        REGS_ERR        : in  std_logic;
-        REGS_ADDR       : out std_logic_vector(REGS_ADDR_WIDTH  -1 downto 0);
-        REGS_BEN        : out std_logic_vector(REGS_DATA_WIDTH/8-1 downto 0);
-        REGS_DATA       : out std_logic_vector(REGS_DATA_WIDTH  -1 downto 0)
+        REGS_REQ        : --! @breif レジスタアクセス要求信号.
+                          --! レジスタアクセス要求時にアサートされる.
+                          --! REGS_ACK 信号がアサートされるまで、この信号はアサー
+                          --! トされたまま.
+                          out std_logic;
+        REGS_ACK        : --! @brief レジスタアクセス応答信号.
+                          in  std_logic;
+        REGS_ERR        : --! @brief レジスタアクセスエラー信号.
+                          --! エラーが発生した時にREGS_ACK信号と共にアサートする.
+                          in  std_logic;
+        REGS_ADDR       : --! @brief レジスタアドレス信号.
+                          out std_logic_vector(REGS_ADDR_WIDTH  -1 downto 0);
+        REGS_BEN        : --! @brief バイトイネーブル信号.
+                          out std_logic_vector(REGS_DATA_WIDTH/8-1 downto 0);
+        REGS_DATA       : --! @brief レジスタライトデータ出力信号.
+                          out std_logic_vector(REGS_DATA_WIDTH  -1 downto 0)
     );
 end component;
 -----------------------------------------------------------------------------------
@@ -552,12 +791,22 @@ component AXI4_REGISTER_READ_INTERFACE
         ---------------------------------------------------------------------------
         -- Register Read Interface.
         ---------------------------------------------------------------------------
-        REGS_REQ        : out std_logic;
-        REGS_ACK        : in  std_logic;
-        REGS_ERR        : in  std_logic;
-        REGS_ADDR       : out std_logic_vector(REGS_ADDR_WIDTH  -1 downto 0);
-        REGS_BEN        : out std_logic_vector(REGS_DATA_WIDTH/8-1 downto 0);
-        REGS_DATA       : in  std_logic_vector(REGS_DATA_WIDTH  -1 downto 0)
+        REGS_REQ        : --! @breif レジスタアクセス要求信号.
+                          --! レジスタアクセス要求時にアサートされる.
+                          --! REGS_ACK 信号がアサートされるまで、この信号はアサー
+                          --! トされたまま.
+                          out std_logic;
+        REGS_ACK        : --! @brief レジスタアクセス応答信号.
+                          in  std_logic;
+        REGS_ERR        : --! @brief レジスタアクセスエラー信号.
+                          --! エラーが発生した時にREGS_ACK信号と共にアサートする.
+                          in  std_logic;
+        REGS_ADDR       : --! @brief レジスタアドレス信号.
+                          out std_logic_vector(REGS_ADDR_WIDTH  -1 downto 0);
+        REGS_BEN        : --! @brief バイトイネーブル信号.
+                          out std_logic_vector(REGS_DATA_WIDTH/8-1 downto 0);
+        REGS_DATA       : --! @brief レジスタライトデータ出力信号.
+                          in  std_logic_vector(REGS_DATA_WIDTH  -1 downto 0)
     );
 end component;
 -----------------------------------------------------------------------------------
@@ -727,16 +976,29 @@ component AXI4_REGISTER_INTERFACE
                           --! write response.
                           in    std_logic;
         --------------------------------------------------------------------------
-        -- Register Write Interface.
+        -- Register Interface.
         --------------------------------------------------------------------------
-        REGS_REQ        : out std_logic;
-        REGS_WRITE      : out std_logic;
-        REGS_ACK        : in  std_logic;
-        REGS_ERR        : in  std_logic;
-        REGS_ADDR       : out std_logic_vector(REGS_ADDR_WIDTH  -1 downto 0);
-        REGS_BEN        : out std_logic_vector(REGS_DATA_WIDTH/8-1 downto 0);
-        REGS_WDATA      : out std_logic_vector(REGS_DATA_WIDTH  -1 downto 0);
-        REGS_RDATA      : in  std_logic_vector(REGS_DATA_WIDTH  -1 downto 0)
+        REGS_REQ        : --! @breif レジスタアクセス要求信号.
+                          --! レジスタアクセス要求時にアサートされる.
+                          --! REGS_ACK 信号がアサートされるまで、この信号はアサー
+                          --! トされたまま.
+                          out std_logic;
+        REGS_WRITE      : --! @brief レジスタライト信号.
+                          --! レジスタ書き込み時にアサートされる.
+                          out std_logic;
+        REGS_ACK        : --! @brief レジスタアクセス応答信号.
+                          in  std_logic;
+        REGS_ERR        : --! @brief レジスタアクセスエラー信号.
+                          --! エラーが発生した時にREGS_ACK信号と共にアサートする.
+                          in  std_logic;
+        REGS_ADDR       : --! @brief レジスタアドレス信号.
+                          out std_logic_vector(REGS_ADDR_WIDTH  -1 downto 0);
+        REGS_BEN        : --! @brief バイトイネーブル信号.
+                          out std_logic_vector(REGS_DATA_WIDTH/8-1 downto 0);
+        REGS_WDATA      : --! @brief レジスタライトデータ出力信号.
+                          out std_logic_vector(REGS_DATA_WIDTH  -1 downto 0);
+        REGS_RDATA      : --! @brief レジスタリードデータ入力信号.
+                          in  std_logic_vector(REGS_DATA_WIDTH  -1 downto 0)
     );
 end component;
 end AXI4_COMPONENTS;

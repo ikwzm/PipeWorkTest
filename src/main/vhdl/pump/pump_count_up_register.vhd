@@ -3,11 +3,11 @@
 --!     @brief   PUMP COUNT UP REGISTER
 --!              データを転送したバイト数をカウントするレジスタ.
 --!     @version 1.0.0
---!     @date    2012/12/24
+--!     @date    2013/1/2
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012 Ichiro Kawazome
+--      Copyright (C) 2012,2013 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
