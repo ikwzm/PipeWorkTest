@@ -271,6 +271,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   i_xfer_busy        : std_logic;
     signal   i_res_valid        : std_logic;
     signal   i_res_error        : std_logic;
+    signal   i_res_done         : std_logic;
     signal   i_res_last         : std_logic;
     signal   i_res_stop         : std_logic;
     signal   i_res_none         : std_logic;
@@ -279,6 +280,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   i_flow_stop        : std_logic;
     signal   i_flow_last        : std_logic;
     signal   i_flow_size        : std_logic_vector(SIZE_BITS        -1 downto 0);
+    signal   i_running          : std_logic;
     ------------------------------------------------------------------------------
     -- 
     ------------------------------------------------------------------------------
@@ -303,6 +305,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   o_xfer_busy        : std_logic;
     signal   o_res_valid        : std_logic;
     signal   o_res_error        : std_logic;
+    signal   o_res_done         : std_logic;
     signal   o_res_last         : std_logic;
     signal   o_res_stop         : std_logic;
     signal   o_res_none         : std_logic;
@@ -311,6 +314,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   o_flow_stop        : std_logic;
     signal   o_flow_last        : std_logic;
     signal   o_flow_size        : std_logic_vector(SIZE_BITS        -1 downto 0);
+    signal   o_running          : std_logic;
     ------------------------------------------------------------------------------
     -- 
     ------------------------------------------------------------------------------
@@ -531,6 +535,7 @@ begin
             -----------------------------------------------------------------------
             RES_VAL         => i_res_valid     , -- Out :
             RES_ERROR       => i_res_error     , -- Out :
+            RES_DONE        => i_res_done      , -- Out :
             RES_LAST        => i_res_last      , -- Out :
             RES_STOP        => i_res_stop      , -- Out :
             RES_NONE        => i_res_none      , -- Out :
@@ -649,6 +654,7 @@ begin
             -----------------------------------------------------------------------
             RES_VAL         => o_res_valid     , -- Out :
             RES_ERROR       => o_res_error     , -- Out :
+            RES_DONE        => o_res_done      , -- Out :
             RES_LAST        => o_res_last      , -- Out :
             RES_STOP        => o_res_stop      , -- Out :
             RES_NONE        => o_res_none      , -- Out :
@@ -695,12 +701,12 @@ begin
     ------------------------------------------------------------------------------
     -- 
     ------------------------------------------------------------------------------
-    process (regs_addr, regs_write, regs_ben)
+    process (regs_addr, regs_req, regs_write, regs_ben)
         variable addr      : unsigned(REGS_ADDR_WIDTH-1 downto 0);
         constant ben_bit_0 : std_logic_vector(REGS_DATA_WIDTH-1 downto 0) := (others => '0');
         variable ben_bit   : std_logic_vector(REGS_DATA_WIDTH-1 downto 0);
     begin
-        addr := unsigned(to_x01(regs_addr));
+        addr := to_01(unsigned(regs_addr));
         for i in 0 to REGS_DATA_WIDTH/8-1 loop
             if (regs_ben(i) = '1') then
                 ben_bit(8*(i+1)-1 downto 8*i) := (8*(i+1)-1 downto 8*i => '1');
@@ -723,7 +729,7 @@ begin
         variable addr      : unsigned(REGS_ADDR_WIDTH-1 downto 0);
         variable data      : std_logic_vector(REGS_DATA_WIDTH-1 downto 0);
     begin
-        addr := unsigned(to_x01(regs_addr));
+        addr := to_01(unsigned(regs_addr));
         data := (others => '0');
         for i in 0 to REGS_DATA_BITS/REGS_DATA_WIDTH-1 loop
             if (i = addr/(REGS_DATA_WIDTH/8)) then
@@ -748,7 +754,7 @@ begin
             REGS_WEN        => regs_wen (I_ADDR_REGS_HI downto I_ADDR_REGS_LO),
             REGS_WDATA      => regs_wbit(I_ADDR_REGS_HI downto I_ADDR_REGS_LO),
             REGS_RDATA      => regs_rbit(I_ADDR_REGS_HI downto I_ADDR_REGS_LO),
-            UP_ENA          => i_xfer_busy     ,
+            UP_ENA          => i_running       ,
             UP_VAL          => i_res_valid     ,
             UP_BEN          => i_addr_up_ben   ,
             UP_SIZE         => i_res_size      ,
@@ -771,7 +777,7 @@ begin
             REGS_WEN        => regs_wen (I_SIZE_REGS_HI downto I_SIZE_REGS_LO),
             REGS_WDATA      => regs_wbit(I_SIZE_REGS_HI downto I_SIZE_REGS_LO),
             REGS_RDATA      => regs_rbit(I_SIZE_REGS_HI downto I_SIZE_REGS_LO),
-            DN_ENA          => i_xfer_busy     ,
+            DN_ENA          => i_running       ,
             DN_VAL          => i_res_valid     ,
             DN_SIZE         => i_res_size      ,
             COUNTER         => i_req_size      ,
@@ -817,6 +823,7 @@ begin
             REQ_READY       => i_req_ready     ,
             RES_VALID       => i_res_valid     ,
             RES_ERROR       => i_res_error     ,
+            RES_DONE        => i_res_done      ,
             RES_LAST        => i_res_last      ,
             RES_STOP        => i_res_stop      ,
             RES_NONE        => i_res_none      ,
@@ -833,7 +840,8 @@ begin
             PULL_LAST       => pull_last       ,
             PULL_SIZE       => pull_size       ,
             FLOW_COUNT      => open            ,
-            FLOW_NEG        => open            
+            FLOW_NEG        => open            ,
+            RUNNING         => i_running
         );
     regs_rbit(I_CTRL_RESV1_HI downto I_CTRL_RESV1_LO) <= (I_CTRL_RESV1_HI downto I_CTRL_RESV1_LO => '0');
     regs_rbit(I_CTRL_RESV2_HI downto I_CTRL_RESV2_LO) <= (I_CTRL_RESV2_HI downto I_CTRL_RESV2_LO => '0');
@@ -854,7 +862,7 @@ begin
             REGS_WEN        => regs_wen (O_ADDR_REGS_HI downto O_ADDR_REGS_LO),
             REGS_WDATA      => regs_wbit(O_ADDR_REGS_HI downto O_ADDR_REGS_LO),
             REGS_RDATA      => regs_rbit(O_ADDR_REGS_HI downto O_ADDR_REGS_LO),
-            UP_ENA          => o_xfer_busy     ,
+            UP_ENA          => o_running       ,
             UP_VAL          => o_res_valid     ,
             UP_BEN          => o_addr_up_ben   ,
             UP_SIZE         => o_res_size      ,
@@ -877,7 +885,7 @@ begin
             REGS_WEN        => regs_wen (O_SIZE_REGS_HI downto O_SIZE_REGS_LO),
             REGS_WDATA      => regs_wbit(O_SIZE_REGS_HI downto O_SIZE_REGS_LO),
             REGS_RDATA      => regs_rbit(O_SIZE_REGS_HI downto O_SIZE_REGS_LO),
-            DN_ENA          => o_xfer_busy     ,
+            DN_ENA          => o_running       ,
             DN_VAL          => o_res_valid     ,
             DN_SIZE         => o_res_size      ,
             COUNTER         => o_req_size      ,
@@ -923,6 +931,7 @@ begin
             REQ_READY       => o_req_ready     ,
             RES_VALID       => o_res_valid     ,
             RES_ERROR       => o_res_error     ,
+            RES_DONE        => o_res_done      ,
             RES_LAST        => o_res_last      ,
             RES_STOP        => o_res_stop      ,
             RES_NONE        => o_res_none      ,
@@ -939,7 +948,8 @@ begin
             PULL_LAST       => o_res_last      ,
             PULL_SIZE       => o_res_size      ,
             FLOW_COUNT      => open            ,
-            FLOW_NEG        => open            
+            FLOW_NEG        => open            ,
+            RUNNING         => o_running       
         );
     regs_rbit(O_CTRL_RESV1_HI downto O_CTRL_RESV1_LO) <= (O_CTRL_RESV1_HI downto O_CTRL_RESV1_LO => '0');
     regs_rbit(O_CTRL_RESV2_HI downto O_CTRL_RESV2_LO) <= (O_CTRL_RESV2_HI downto O_CTRL_RESV2_LO => '0');

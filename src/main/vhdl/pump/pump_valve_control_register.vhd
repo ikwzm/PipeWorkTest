@@ -96,6 +96,7 @@ entity  PUMP_VALVE_CONTROL_REGISTER is
     -------------------------------------------------------------------------------
         RES_VALID       : in  std_logic;
         RES_ERROR       : in  std_logic;
+        RES_DONE        : in  std_logic;
         RES_LAST        : in  std_logic;
         RES_STOP        : in  std_logic;
         RES_NONE        : in  std_logic;
@@ -127,7 +128,11 @@ entity  PUMP_VALVE_CONTROL_REGISTER is
     -- Flow Counter.
     -------------------------------------------------------------------------------
         FLOW_COUNT      : out std_logic_vector(SIZE_BITS-1 downto 0);
-        FLOW_NEG        : out std_logic
+        FLOW_NEG        : out std_logic;
+    -------------------------------------------------------------------------------
+    -- Status
+    -------------------------------------------------------------------------------
+        RUNNING         : out std_logic
     );
 end PUMP_VALVE_CONTROL_REGISTER;
 -----------------------------------------------------------------------------------
@@ -205,7 +210,7 @@ begin
                         if    (REQ_READY = '0') then
                                 next_state := REQ_STATE;
                         elsif (RES_VALID = '1') then
-                            if (RES_LAST = '1' or RES_ERROR = '1' or RES_STOP = '1' or RES_NONE = '1') then
+                            if (RES_DONE = '1' or RES_ERROR = '1' or RES_STOP = '1' or RES_NONE = '1') then
                                 next_state := DONE_STATE;
                             else
                                 next_state := TURN_AR;
@@ -215,7 +220,7 @@ begin
                         end if;
                     when RES_STATE  =>
                         if (RES_VALID = '1') then
-                            if (RES_LAST = '1' or RES_ERROR = '1' or RES_STOP = '1' or RES_NONE = '1') then
+                            if (RES_DONE = '1' or RES_ERROR = '1' or RES_STOP = '1' or RES_NONE = '1') then
                                 next_state := DONE_STATE;
                             else
                                 next_state := TURN_AR;
@@ -305,6 +310,10 @@ begin
     DONE_RDATA  <= done_bit;
     ERROR_RDATA <= error_bit;
     -------------------------------------------------------------------------------
+    -- Status
+    -------------------------------------------------------------------------------
+    RUNNING     <= start_bit;
+    -------------------------------------------------------------------------------
     -- Transaction Command Request Signals.
     -------------------------------------------------------------------------------
     REQ_VALID <= '1' when (curr_state = REQ_STATE) else '0';
@@ -389,9 +398,9 @@ begin
     FLOW_SINK_MODE : if (FLOW_SINK /= 0) generate
         FLOW_STOP  <= '1' when (stop_bit  = '1') or
                                (pull_last_flag) else '0';
-        FLOW_PAUSE <= '1' when (flow_counter > unsigned(to_x01(THRESHOLD_SIZE))) else '0';
+        FLOW_PAUSE <= '1' when (to_01(flow_counter) > to_01(unsigned(THRESHOLD_SIZE))) else '0';
         FLOW_LAST  <= '0';
-        FLOW_SIZE  <= std_logic_vector(unsigned(to_x01(BUFFER_SIZE)) - unsigned(to_x01(THRESHOLD_SIZE)));
+        FLOW_SIZE  <= std_logic_vector(to_01(unsigned(BUFFER_SIZE)) - to_01(unsigned(THRESHOLD_SIZE)));
     end generate;
     -------------------------------------------------------------------------------
     -- Flow Control (Flow Source Mode)
@@ -400,8 +409,8 @@ begin
         FLOW_STOP  <= '1' when (stop_bit  = '1') or
                                (push_last_flag and flow_negative) else '0';
         FLOW_PAUSE <= '1' when (push_last_flag = TRUE  and flow_zero) or
-                               (push_last_flag = FALSE and flow_counter <  unsigned(to_x01(THRESHOLD_SIZE))) else '0';
-        FLOW_LAST  <= '1' when (push_last_flag = TRUE  and flow_counter <= unsigned(to_x01(THRESHOLD_SIZE))) else '0';
+                               (push_last_flag = FALSE and to_01(flow_counter) <  to_01(unsigned(THRESHOLD_SIZE))) else '0';
+        FLOW_LAST  <= '1' when (push_last_flag = TRUE  and to_01(flow_counter) <= to_01(unsigned(THRESHOLD_SIZE))) else '0';
         FLOW_SIZE  <= std_logic_vector(flow_counter);
     end generate;
 end RTL;

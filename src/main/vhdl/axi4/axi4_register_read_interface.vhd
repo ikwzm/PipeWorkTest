@@ -324,8 +324,8 @@ begin
         variable u_addr  : unsigned(              6 downto 0);
         constant u_zero  : unsigned(              6 downto 0) := (6 downto 0 => '0');
     begin
-        dt_len := RESIZE(unsigned(to_x01(burst_length)) + 1, dt_len'length);
-        u_addr := unsigned(to_x01(xfer_req_addr(6 downto 0)));
+        dt_len := RESIZE(to_01(unsigned(burst_length )) +1, dt_len'length);
+        u_addr := RESIZE(to_01(unsigned(xfer_req_addr))   , u_addr'length);
         if    (word_size = AXI4_ASIZE_128BYTE and AXI4_DATA_WIDTH >= 128*8) then
             dt_addr := RESIZE(         u_addr(6 downto 0), dt_addr'length);
             dt_size := RESIZE(dt_len & u_zero(6 downto 0), dt_size'length);
@@ -617,7 +617,7 @@ begin
             else
                 temp_pos := curr_pos;
             end if;
-            if (temp_pos >= 2**AXI4_DATA_SIZE) then
+            if (to_01(temp_pos) >= 2**AXI4_DATA_SIZE) then
                 next_pos  <= (others => '0');
                 word_last <= TRUE;
             else

@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_write_controller.vhd
 --!     @brief   AXI4 Master Write Controller
---!     @version 0.0.1
---!     @date    2013/1/2
+--!     @version 0.0.2
+--!     @date    2013/1/4
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -230,6 +230,7 @@ entity  AXI4_MASTER_WRITE_CONTROLLER is
         ---------------------------------------------------------------------------
         RES_VAL         : out   std_logic;
         RES_ERROR       : out   std_logic;
+        RES_DONE        : out   std_logic;
         RES_LAST        : out   std_logic;
         RES_STOP        : out   std_logic;
         RES_NONE        : out   std_logic;
@@ -296,6 +297,7 @@ architecture RTL of AXI4_MASTER_WRITE_CONTROLLER is
     signal   xfer_req_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
     signal   xfer_req_valid     : std_logic;
     signal   xfer_req_ready     : std_logic;
+    signal   xfer_req_done      : std_logic;
     signal   xfer_req_last      : std_logic;
     signal   xfer_req_first     : std_logic;
     signal   xfer_req_safety    : std_logic;
@@ -304,6 +306,7 @@ architecture RTL of AXI4_MASTER_WRITE_CONTROLLER is
     -------------------------------------------------------------------------------
     signal   xfer_res_valid     : std_logic;
     signal   xfer_res_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
+    signal   xfer_res_done      : std_logic;
     signal   xfer_res_last      : std_logic;
     signal   xfer_res_safety    : std_logic;
     signal   xfer_res_error     : std_logic;
@@ -344,6 +347,7 @@ architecture RTL of AXI4_MASTER_WRITE_CONTROLLER is
     -------------------------------------------------------------------------------
     signal   res_queue_ready    : std_logic;
     signal   res_queue_valid    : std_logic_vector(QUEUE_SIZE     downto 0);
+    signal   res_queue_done     : std_logic;
     signal   res_queue_last     : std_logic;
     signal   res_queue_size     : std_logic_vector(XFER_MAX_SIZE  downto 0);
     signal   res_queue_empty    : std_logic;
@@ -395,6 +399,7 @@ begin
             -- Command Response Signals.
             -----------------------------------------------------------------------
             RES_VAL         => RES_VAL           , -- Out :
+            RES_DONE        => RES_DONE          , -- Out :
             RES_ERROR       => RES_ERROR         , -- Out :
             RES_LAST        => RES_LAST          , -- Out :
             RES_STOP        => RES_STOP          , -- Out :
@@ -418,6 +423,7 @@ begin
             XFER_REQ_SIZE   => xfer_req_size     , -- Out :
             XFER_REQ_FIRST  => xfer_req_first    , -- Out :
             XFER_REQ_LAST   => xfer_req_last     , -- Out :
+            XFER_REQ_DONE   => xfer_req_done     , -- Out :
             XFER_REQ_SAFETY => xfer_req_safety   , -- Out :
             XFER_REQ_VAL    => xfer_req_valid    , -- Out :
             XFER_REQ_RDY    => xfer_req_ready    , -- In  :
@@ -426,6 +432,7 @@ begin
             -----------------------------------------------------------------------
             XFER_RES_SIZE   => xfer_res_size     , -- In  :
             XFER_RES_VAL    => xfer_res_valid    , -- In  :
+            XFER_RES_DONE   => xfer_res_done     , -- In  :
             XFER_RES_LAST   => xfer_res_last     , -- In  :
             XFER_RES_ERR    => xfer_res_error    , -- In  :
             XFER_BUSY       => xfer_busy_i         -- In  :
@@ -578,7 +585,7 @@ begin
             end if;
         end if;
     end process;
-    BUF_PTR <= init_read_ptr when (xfer_req_first = '1') else
+    BUF_PTR <= init_read_ptr when (xfer_start     = '1') else
                next_read_ptr when (xfer_beat_chop = '1') else
                curr_read_ptr;
     -------------------------------------------------------------------------------
@@ -698,7 +705,8 @@ begin
         constant VEC_LO         : integer := 0;
         constant VEC_SIZE_LO    : integer := VEC_LO;
         constant VEC_SIZE_HI    : integer := VEC_SIZE_LO  + XFER_MAX_SIZE;
-        constant VEC_LAST_POS   : integer := VEC_SIZE_HI  + 1;
+        constant VEC_DONE_POS   : integer := VEC_SIZE_HI  + 1;
+        constant VEC_LAST_POS   : integer := VEC_DONE_POS + 1;
         constant VEC_SAFETY_POS : integer := VEC_LAST_POS + 1;
         constant VEC_HI         : integer := VEC_SAFETY_POS;
         signal   i_vec          : std_logic_vector(VEC_HI downto VEC_LO);
@@ -706,6 +714,7 @@ begin
         constant Q_ALL_0        : std_logic_vector(QUEUE_SIZE downto 0) := (others => '0');
     begin
         i_vec(VEC_SIZE_HI downto VEC_SIZE_LO) <= xfer_req_size;
+        i_vec(VEC_DONE_POS)                   <= xfer_req_done;
         i_vec(VEC_LAST_POS)                   <= xfer_req_last;
         i_vec(VEC_SAFETY_POS)                 <= xfer_req_safety;
         QUEUE: QUEUE_REGISTER
@@ -728,6 +737,7 @@ begin
                 Q_RDY       => BVALID              -- In  :
             );
         res_queue_size   <= q_vec(VEC_SIZE_HI downto VEC_SIZE_LO);
+        res_queue_done   <= q_vec(VEC_DONE_POS);
         res_queue_last   <= q_vec(VEC_LAST_POS);
         res_queue_safety <= q_vec(VEC_SAFETY_POS);
         res_queue_empty  <= '1' when (res_queue_valid = Q_ALL_0) else '0';
@@ -735,6 +745,19 @@ begin
     -------------------------------------------------------------------------------
     -- BREADY : Write Response Ready
     -------------------------------------------------------------------------------
-    BREADY <= '1' when (res_queue_valid(0) = '1') else '0';
-    
+    BREADY  <= '1' when (res_queue_valid(0) = '1') else '0';
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    xfer_res_valid <= '1' when (res_queue_valid(0) = '1' and BVALID = '1') else '0';
+    xfer_res_error <= '1' when (BRESP = AXI4_RESP_SLVERR or BRESP = AXI4_RESP_DECERR) else '0';
+    xfer_res_done  <= '1' when (res_queue_done = '1') else '0';
+    xfer_res_last  <= '1' when (res_queue_last = '1') else '0';
+    xfer_res_size  <= res_queue_size when (xfer_res_error = '0') else (others => '0');
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    PULL_VAL       <= '1' when (res_queue_valid(0) = '1' and BVALID = '1') else '0';
+    PULL_LAST      <= '1' when (res_queue_last = '1') else '0';
+    PULL_SIZE      <= std_logic_vector(RESIZE(unsigned(res_queue_size), PULL_SIZE'length)) when (xfer_res_error = '0') else (others => '0');
 end RTL;

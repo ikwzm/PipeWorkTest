@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_read_controller.vhd
 --!     @brief   AXI4 Master Read Controller
---!     @version 0.0.1
---!     @date    2013/1/2
+--!     @version 0.0.2
+--!     @date    2013/1/4
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -204,6 +204,7 @@ entity  AXI4_MASTER_READ_CONTROLLER is
         ---------------------------------------------------------------------------
         RES_VAL         : out   std_logic;
         RES_ERROR       : out   std_logic;
+        RES_DONE        : out   std_logic;
         RES_LAST        : out   std_logic;
         RES_STOP        : out   std_logic;
         RES_NONE        : out   std_logic;
@@ -270,6 +271,7 @@ architecture RTL of AXI4_MASTER_READ_CONTROLLER is
     signal   xfer_req_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
     signal   xfer_req_valid     : std_logic;
     signal   xfer_req_ready     : std_logic;
+    signal   xfer_req_done      : std_logic;
     signal   xfer_req_last      : std_logic;
     signal   xfer_req_first     : std_logic;
     signal   xfer_req_safety    : std_logic;
@@ -278,6 +280,7 @@ architecture RTL of AXI4_MASTER_READ_CONTROLLER is
     -------------------------------------------------------------------------------
     signal   xfer_res_valid     : std_logic;
     signal   xfer_res_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
+    signal   xfer_res_done      : std_logic;
     signal   xfer_res_last      : std_logic;
     signal   xfer_res_safety    : std_logic;
     signal   xfer_res_error     : std_logic;
@@ -286,6 +289,7 @@ architecture RTL of AXI4_MASTER_READ_CONTROLLER is
     -------------------------------------------------------------------------------
     signal   xfer_queue_addr    : std_logic_vector(AXI4_DATA_SIZE downto 0);
     signal   xfer_queue_size    : std_logic_vector(XFER_MAX_SIZE  downto 0);
+    signal   xfer_queue_done    : std_logic;
     signal   xfer_queue_last    : std_logic;
     signal   xfer_queue_first   : std_logic;
     signal   xfer_queue_safety  : std_logic;
@@ -372,6 +376,7 @@ begin
             -- Command Response Signals.
             -----------------------------------------------------------------------
             RES_VAL         => RES_VAL           , -- Out :
+            RES_DONE        => RES_DONE          , -- Out :
             RES_ERROR       => RES_ERROR         , -- Out :
             RES_LAST        => RES_LAST          , -- Out :
             RES_STOP        => RES_STOP          , -- Out :
@@ -395,6 +400,7 @@ begin
             XFER_REQ_SIZE   => xfer_req_size     , -- Out :
             XFER_REQ_FIRST  => xfer_req_first    , -- Out :
             XFER_REQ_LAST   => xfer_req_last     , -- Out :
+            XFER_REQ_DONE   => xfer_req_done     , -- Out :
             XFER_REQ_SAFETY => xfer_req_safety   , -- Out :
             XFER_REQ_VAL    => xfer_req_valid    , -- Out :
             XFER_REQ_RDY    => xfer_req_ready    , -- In  :
@@ -403,6 +409,7 @@ begin
             -----------------------------------------------------------------------
             XFER_RES_SIZE   => xfer_res_size     , -- In  :
             XFER_RES_VAL    => xfer_res_valid    , -- In  :
+            XFER_RES_DONE   => xfer_res_done     , -- In  :
             XFER_RES_LAST   => xfer_res_last     , -- In  :
             XFER_RES_ERR    => xfer_res_error    , -- In  :
             XFER_BUSY       => xfer_busy_i         -- In  :
@@ -428,7 +435,8 @@ begin
         constant VEC_SIZE_HI    : integer := VEC_SIZE_LO  + XFER_MAX_SIZE;
         constant VEC_ADDR_LO    : integer := VEC_SIZE_HI  + 1;
         constant VEC_ADDR_HI    : integer := VEC_ADDR_LO  + AXI4_DATA_SIZE;
-        constant VEC_LAST_POS   : integer := VEC_ADDR_HI  + 1;
+        constant VEC_DONE_POS   : integer := VEC_ADDR_HI  + 1;
+        constant VEC_LAST_POS   : integer := VEC_DONE_POS + 1;
         constant VEC_FIRST_POS  : integer := VEC_LAST_POS + 1;
         constant VEC_SAFETY_POS : integer := VEC_FIRST_POS+ 1;
         constant VEC_HI         : integer := VEC_SAFETY_POS;
@@ -438,6 +446,7 @@ begin
     begin
         i_vec(VEC_SIZE_HI downto VEC_SIZE_LO) <= xfer_req_size;
         i_vec(VEC_ADDR_HI downto VEC_ADDR_LO) <= xfer_req_addr(AXI4_DATA_SIZE downto 0);
+        i_vec(VEC_DONE_POS)                   <= xfer_req_done;
         i_vec(VEC_LAST_POS)                   <= xfer_req_last;
         i_vec(VEC_FIRST_POS)                  <= xfer_req_first;
         i_vec(VEC_SAFETY_POS)                 <= xfer_req_safety;
@@ -462,6 +471,7 @@ begin
             );
         xfer_queue_size   <= q_vec(VEC_SIZE_HI downto VEC_SIZE_LO);
         xfer_queue_addr   <= q_vec(VEC_ADDR_HI downto VEC_ADDR_LO);
+        xfer_queue_done   <= q_vec(VEC_DONE_POS);
         xfer_queue_last   <= q_vec(VEC_LAST_POS);
         xfer_queue_first  <= q_vec(VEC_FIRST_POS);
         xfer_queue_safety <= q_vec(VEC_SAFETY_POS);
@@ -587,15 +597,18 @@ begin
     process(CLK, RST) begin
         if (RST = '1') then
                 xfer_res_size   <= (others => '0');
+                xfer_res_done   <= '0';
                 xfer_res_last   <= '0';
                 xfer_res_safety <= '0';
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then 
                 xfer_res_size   <= (others => '0');
+                xfer_res_done   <= '0';
                 xfer_res_last   <= '0';
                 xfer_res_safety <= '0';
             elsif (xfer_start = '1') then
                 xfer_res_size   <= xfer_queue_size;
+                xfer_res_done   <= xfer_queue_done;
                 xfer_res_last   <= xfer_queue_last;
                 xfer_res_safety <= xfer_queue_safety;
             end if;
@@ -655,7 +668,7 @@ begin
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    RESV_SIZE <= xfer_res_size;
+    RESV_SIZE <= std_logic_vector(RESIZE(unsigned(xfer_res_size), RESV_SIZE'length));
     RESV_LAST <= xfer_res_last;
     RESV_VAL  <= '1' when (curr_state = WAIT_RFIRST) and
                           (RVALID     = '1'        ) and
@@ -814,7 +827,7 @@ begin
             elsif (xfer_init_start = '1') then
                 buf_write_ptr <= (others => '0');
             elsif (buf_beat_valid = '1' and BUF_RDY = '1') then
-                buf_write_ptr <= buf_write_ptr + buf_beat_size;
+                buf_write_ptr <= buf_write_ptr + RESIZE(buf_beat_size, buf_write_ptr'length);
             end if;
         end if;
     end process;

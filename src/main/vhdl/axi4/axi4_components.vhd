@@ -2,7 +2,7 @@
 --!     @file    ../../../src/main/vhdl/axi4/axi4_components.vhd                 --
 --!     @brief   PIPEWORK AXI4 LIBRARY DESCRIPTION                               --
 --!     @version 1.0.7                                                           --
---!     @date    2013/01/03                                                      --
+--!     @date    2013/01/05                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
@@ -102,6 +102,7 @@ component AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER
         -- Command Response Signals.
         ---------------------------------------------------------------------------
         RES_VAL         : out   std_logic;
+        RES_DONE        : out   std_logic;
         RES_ERROR       : out   std_logic;
         RES_LAST        : out   std_logic;
         RES_STOP        : out   std_logic;
@@ -125,6 +126,7 @@ component AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER
         XFER_REQ_SIZE   : out   std_logic_vector(XFER_MAX_SIZE   downto 0);
         XFER_REQ_FIRST  : out   std_logic;
         XFER_REQ_LAST   : out   std_logic;
+        XFER_REQ_DONE   : out   std_logic;
         XFER_REQ_SAFETY : out   std_logic;
         XFER_REQ_VAL    : out   std_logic;
         XFER_REQ_RDY    : in    std_logic;
@@ -133,6 +135,7 @@ component AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER
         ---------------------------------------------------------------------------
         XFER_RES_SIZE   : in    std_logic_vector(XFER_MAX_SIZE   downto 0);
         XFER_RES_VAL    : in    std_logic;
+        XFER_RES_DONE   : in    std_logic;
         XFER_RES_LAST   : in    std_logic;
         XFER_RES_ERR    : in    std_logic;
         XFER_BUSY       : in    std_logic
@@ -304,6 +307,7 @@ component AXI4_MASTER_READ_CONTROLLER
         ---------------------------------------------------------------------------
         RES_VAL         : out   std_logic;
         RES_ERROR       : out   std_logic;
+        RES_DONE        : out   std_logic;
         RES_LAST        : out   std_logic;
         RES_STOP        : out   std_logic;
         RES_NONE        : out   std_logic;
@@ -529,6 +533,7 @@ component AXI4_MASTER_WRITE_CONTROLLER
         ---------------------------------------------------------------------------
         RES_VAL         : out   std_logic;
         RES_ERROR       : out   std_logic;
+        RES_DONE        : out   std_logic;
         RES_LAST        : out   std_logic;
         RES_STOP        : out   std_logic;
         RES_NONE        : out   std_logic;

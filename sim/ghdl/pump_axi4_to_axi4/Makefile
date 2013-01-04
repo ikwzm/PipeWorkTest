@@ -42,7 +42,7 @@ all: DUT $(TEST_BENCH)
 clean:
 	rm -f *.o *.cf $(TEST_BENCH)
 
-$(TEST_BENCH) : $(addsuffix .o,$(TEST_BENCH))
+$(TEST_BENCH) : $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .snr,$(TEST_BENCH))
 	 $(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
@@ -54,22 +54,22 @@ axi4_types.o                             : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_t
 axi4_components.o                        : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_components.vhd axi4_types.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
-axi4_master_address_channel_controller.o : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_address_channel_controller.vhd axi4_components.o
+axi4_master_address_channel_controller.o : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_address_channel_controller.vhd  axi4_components.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
-axi4_master_read_controller.o            : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_read_controller.vhd            axi4_components.o
+axi4_master_read_controller.o            : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_read_controller.vhd             axi4_components.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
-axi4_master_write_controller.o           : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_write_controller.vhd           axi4_components.o
+axi4_master_write_controller.o           : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_write_controller.vhd            axi4_components.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
-axi4_register_write_interface.o          : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_write_interface.vhd
+axi4_register_write_interface.o          : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_write_interface.vhd           axi4_components.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
-axi4_register_read_interface.o           : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_read_interface.vhd
+axi4_register_read_interface.o           : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_read_interface.vhd            axi4_components.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
-axi4_register_interface.o                : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_interface.vhd
+axi4_register_interface.o                : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_interface.vhd                 axi4_components.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
 components.o                             : $(PIPEWORK_SRC_MAIN_PATH)/components/components.vhd

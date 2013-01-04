@@ -163,6 +163,7 @@
     <transform xil_pn:end_ts="1357061620" xil_pn:in_ck="-7895734104798549095" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="2997412613787958018" xil_pn:start_ts="1357061595">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_beh.prj"/>
@@ -175,6 +176,7 @@
     <transform xil_pn:end_ts="1357061622" xil_pn:in_ck="6421135297265042019" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-4892608755493903356" xil_pn:start_ts="1357061620">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_isim_beh.wdb"/>

@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_address_channel_controller.vhd
 --!     @brief   AXI4 Master Address Channel Controller
---!     @version 0.0.1
---!     @date    2013/1/2
+--!     @version 0.0.2
+--!     @date    2013/1/3
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -97,6 +97,7 @@ entity  AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER is
         -- Command Response Signals.
         ---------------------------------------------------------------------------
         RES_VAL         : out   std_logic;
+        RES_DONE        : out   std_logic;
         RES_ERROR       : out   std_logic;
         RES_LAST        : out   std_logic;
         RES_STOP        : out   std_logic;
@@ -120,6 +121,7 @@ entity  AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER is
         XFER_REQ_SIZE   : out   std_logic_vector(XFER_MAX_SIZE   downto 0);
         XFER_REQ_FIRST  : out   std_logic;
         XFER_REQ_LAST   : out   std_logic;
+        XFER_REQ_DONE   : out   std_logic;
         XFER_REQ_SAFETY : out   std_logic;
         XFER_REQ_VAL    : out   std_logic;
         XFER_REQ_RDY    : in    std_logic;
@@ -128,6 +130,7 @@ entity  AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER is
         ---------------------------------------------------------------------------
         XFER_RES_SIZE   : in    std_logic_vector(XFER_MAX_SIZE   downto 0);
         XFER_RES_VAL    : in    std_logic;
+        XFER_RES_DONE   : in    std_logic;
         XFER_RES_LAST   : in    std_logic;
         XFER_RES_ERR    : in    std_logic;
         XFER_BUSY       : in    std_logic
@@ -160,18 +163,21 @@ architecture RTL of AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER is
     signal   req_xfer_valid     : std_logic;
     signal   req_xfer_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
     signal   req_xfer_last      : std_logic;
+    signal   req_xfer_done      : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     signal   res_xfer_valid     : std_logic;
     signal   res_xfer_error     : std_logic;
     signal   res_xfer_last      : std_logic;
+    signal   res_xfer_done      : std_logic;
     signal   res_xfer_size      : std_logic_vector(SIZE_BITS-1   downto 0);
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     signal   q_res_xfer_size    : std_logic_vector(XFER_MAX_SIZE downto 0);
     signal   q_res_xfer_last    : std_logic;
+    signal   q_res_xfer_done    : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -297,7 +303,8 @@ begin
         );
     -------------------------------------------------------------------------------
     -- req_xfer_size : 実際の転送要求サイズ.
-    -- req_xfer_last : 最後の転送要求であることを示すフラグ.
+    -- req_xfer_last : 最後の転送要求かつREQ_LAST='1'であることを示すフラグ.
+    -- req_xfer_done : 最後の転送要求であることを示すフラグ.
     -- burst_length  : バースト長(１少ないことに注意).
     -------------------------------------------------------------------------------
     process (max_xfer_size, req_size_last, FLOW_SIZE, FLOW_LAST, REQ_ADDR, REQ_LAST)
@@ -312,10 +319,12 @@ begin
         u_xfer_max_size := to_01(unsigned(max_xfer_size), '0');
         if (u_xfer_max_size > u_flow_size) then
             u_xfer_req_size := RESIZE(u_flow_size    , u_xfer_req_size'length);
-            req_xfer_last <= FLOW_LAST;
+            req_xfer_last   <= FLOW_LAST;
+            req_xfer_done   <= '0';
         else
             u_xfer_req_size := RESIZE(u_xfer_max_size, u_xfer_req_size'length);
-            req_xfer_last <= req_size_last and REQ_LAST;
+            req_xfer_last   <= req_size_last and REQ_LAST;
+            req_xfer_done   <= req_size_last;
         end if;
         for i in u_start_address'range loop
             if (i < DATA_SIZE) then
@@ -330,20 +339,24 @@ begin
         req_xfer_size  <= std_logic_vector(u_xfer_req_size);
     end process;
     -------------------------------------------------------------------------------
-    -- q_res_xfer_size : req_xfer_size を保持しておくレジスタ.REQ_MODE=2の時に使用.
-    -- q_res_xfer_last : req_xfer_last を保持しておくレジスタ.REQ_MODE=2の時に使用.
+    -- q_res_xfer_size : req_xfer_size を保持しておくレジスタ.
+    -- q_res_xfer_last : req_xfer_last を保持しておくレジスタ.
+    -- q_res_xfer_done : req_xfer_done を保持しておくレジスタ.
     -------------------------------------------------------------------------------
     process(CLK, RST) begin
         if (RST = '1') then
                 q_res_xfer_size <= (others => '0');
                 q_res_xfer_last <= '0';
+                q_res_xfer_done <= '0';
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then 
                 q_res_xfer_size <= (others => '0');
                 q_res_xfer_last <= '0';
+                q_res_xfer_done <= '0';
             elsif (curr_state = WAIT_XFER_REQ) then
                 q_res_xfer_size <= req_xfer_size;
                 q_res_xfer_last <= req_xfer_last;
+                q_res_xfer_done <= req_xfer_done;
             end if;
         end if;
     end process;
@@ -390,6 +403,8 @@ begin
                                (REQ_SPECULATIVE = '0' and XFER_RES_VAL    = '1') else '0';
     res_xfer_last  <= '1' when (REQ_SPECULATIVE = '1' and q_res_xfer_last = '1') or
                                (REQ_SPECULATIVE = '0' and XFER_RES_LAST   = '1') else '0';
+    res_xfer_done  <= '1' when (REQ_SPECULATIVE = '1' and q_res_xfer_done = '1') or
+                               (REQ_SPECULATIVE = '0' and XFER_RES_DONE   = '1') else '0';
     res_xfer_size  <= std_logic_vector(RESIZE(unsigned(q_res_xfer_size),SIZE_BITS)) when (REQ_SPECULATIVE = '1') else
                       std_logic_vector(RESIZE(unsigned(  XFER_RES_SIZE),SIZE_BITS));
     -------------------------------------------------------------------------------
@@ -402,6 +417,7 @@ begin
     RES_VAL   <= '1' when (curr_state = WAIT_XFER_RES and res_xfer_valid = '1') or
                           (curr_state = STOP_STATE) or
                           (curr_state = NONE_STATE) else '0';
+    RES_DONE  <= '1' when (curr_state = WAIT_XFER_RES and res_xfer_done  = '1') else '0';
     RES_LAST  <= '1' when (curr_state = WAIT_XFER_RES and res_xfer_last  = '1') else '0';
     RES_ERROR <= '1' when (curr_state = WAIT_XFER_RES and XFER_RES_ERR   = '1') else '0';
     RES_STOP  <= '1' when (curr_state = STOP_STATE) else '0';
@@ -418,6 +434,7 @@ begin
     XFER_REQ_VAL    <= req_xfer_valid;
     XFER_REQ_ADDR   <= REQ_ADDR;
     XFER_REQ_SIZE   <= req_xfer_size;
+    XFER_REQ_DONE   <= req_xfer_done;
     XFER_REQ_LAST   <= req_xfer_last;
     XFER_REQ_FIRST  <= xfer_first_state(0);
     XFER_REQ_SAFETY <= REQ_SAFETY;

@@ -2,7 +2,7 @@
 --!     @file    ../../../src/main/vhdl/pump/pump_components.vhd                 --
 --!     @brief   PIPEWORK PUMP LIBRARY DESCRIPTION                               --
 --!     @version 0.0.1                                                           --
---!     @date    2013/01/03                                                      --
+--!     @date    2013/01/05                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
@@ -262,6 +262,7 @@ component PUMP_VALVE_CONTROL_REGISTER
     -------------------------------------------------------------------------------
         RES_VALID       : in  std_logic;
         RES_ERROR       : in  std_logic;
+        RES_DONE        : in  std_logic;
         RES_LAST        : in  std_logic;
         RES_STOP        : in  std_logic;
         RES_NONE        : in  std_logic;
@@ -293,7 +294,11 @@ component PUMP_VALVE_CONTROL_REGISTER
     -- Flow Counter.
     -------------------------------------------------------------------------------
         FLOW_COUNT      : out std_logic_vector(SIZE_BITS-1 downto 0);
-        FLOW_NEG        : out std_logic
+        FLOW_NEG        : out std_logic;
+    -------------------------------------------------------------------------------
+    -- Status
+    -------------------------------------------------------------------------------
+        RUNNING         : out std_logic
     );
 end component;
 end PUMP_COMPONENTS;
