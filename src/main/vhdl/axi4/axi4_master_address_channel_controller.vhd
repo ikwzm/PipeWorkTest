@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_address_channel_controller.vhd
 --!     @brief   AXI4 Master Address Channel Controller
---!     @version 0.0.2
---!     @date    2013/1/3
+--!     @version 0.0.3
+--!     @date    2013/1/5
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -184,6 +184,7 @@ architecture RTL of AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER is
     signal   xfer_first_state   : std_logic_vector(1 downto 0);
     signal   burst_length       : AXI4_ALEN_TYPE;
     signal   addr_valid         : std_logic;
+    signal   speculative        : boolean;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -395,17 +396,23 @@ begin
         end if;
     end process;
     -------------------------------------------------------------------------------
-    -- res_xfer_valid  : 転送応答有効信号.
-    -- res_xfer_last   : 
-    -- res_xfer_size   : 
+    -- speculative     : 投機実行可能であることを示すフラグ.
     -------------------------------------------------------------------------------
-    res_xfer_valid <= '1' when (REQ_SPECULATIVE = '1' and addr_valid = '1' and AREADY = '1') or
-                               (REQ_SPECULATIVE = '0' and XFER_RES_VAL    = '1') else '0';
-    res_xfer_last  <= '1' when (REQ_SPECULATIVE = '1' and q_res_xfer_last = '1') or
-                               (REQ_SPECULATIVE = '0' and XFER_RES_LAST   = '1') else '0';
-    res_xfer_done  <= '1' when (REQ_SPECULATIVE = '1' and q_res_xfer_done = '1') or
-                               (REQ_SPECULATIVE = '0' and XFER_RES_DONE   = '1') else '0';
-    res_xfer_size  <= std_logic_vector(RESIZE(unsigned(q_res_xfer_size),SIZE_BITS)) when (REQ_SPECULATIVE = '1') else
+    speculative    <= (REQ_SPECULATIVE = '1' and
+                      not (q_res_xfer_last = '1' and q_res_xfer_done = '1'));
+    -------------------------------------------------------------------------------
+    -- res_xfer_valid  : 転送応答有効信号.
+    -- res_xfer_last   : 最後の転送要求の応答であることを示すフラグ.
+    -- res_xfer_done   : 最後の転送要求の応答であることを示すフラグ.
+    -- res_xfer_size   : 転送応答サイズ.
+    -------------------------------------------------------------------------------
+    res_xfer_valid <= '1' when (speculative = TRUE  and addr_valid = '1' and AREADY = '1') or
+                               (speculative = FALSE and XFER_RES_VAL    = '1') else '0';
+    res_xfer_last  <= '1' when (speculative = TRUE  and q_res_xfer_last = '1') or
+                               (speculative = FALSE and XFER_RES_LAST   = '1') else '0';
+    res_xfer_done  <= '1' when (speculative = TRUE  and q_res_xfer_done = '1') or
+                               (speculative = FALSE and XFER_RES_DONE   = '1') else '0';
+    res_xfer_size  <= std_logic_vector(RESIZE(unsigned(q_res_xfer_size),SIZE_BITS)) when (speculative) else
                       std_logic_vector(RESIZE(unsigned(  XFER_RES_SIZE),SIZE_BITS));
     -------------------------------------------------------------------------------
     -- RES_VAL         : 転送応答有効信号出力.
@@ -437,7 +444,8 @@ begin
     XFER_REQ_DONE   <= req_xfer_done;
     XFER_REQ_LAST   <= req_xfer_last;
     XFER_REQ_FIRST  <= xfer_first_state(0);
-    XFER_REQ_SAFETY <= REQ_SAFETY;
+    XFER_REQ_SAFETY <= '1' when (REQ_SAFETY    = '1') or
+                                (req_xfer_done = '1' and req_xfer_last = '1') else '0';
     -------------------------------------------------------------------------------
     -- AXI4 Read Address Channel Signals Output.
     -------------------------------------------------------------------------------

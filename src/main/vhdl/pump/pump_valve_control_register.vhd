@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_valve_control_register.vhd
 --!     @brief   PUMP VALVE CONTROL REGISTER
---!     @version 1.0.0
---!     @date    2013/1/3
+--!     @version 1.0.1
+--!     @date    2013/1/4
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -41,6 +41,10 @@ use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
 entity  PUMP_VALVE_CONTROL_REGISTER is
     generic (
+        MODE_BITS       : --! @brief MODE REGISTER BITS :
+                          integer := 32;
+        STAT_BITS       : --! @brief STATUS REGISTER BITS :
+                          integer := 32;
         SIZE_BITS       : --! @brief COUNTER SIZE BITS :
                           --! 各種サイズ信号のビット数を指定する.
                           integer := 32;
@@ -61,29 +65,65 @@ entity  PUMP_VALVE_CONTROL_REGISTER is
                           --! 同期リセット信号.アクティブハイ.
                           in  std_logic;
     -------------------------------------------------------------------------------
-    -- Register Access Interface.
+    -- RESET Bit Register Access Interface.
+    -------------------------------------------------------------------------------
+        RESET_WRITE     : in  std_logic;
+        RESET_WDATA     : in  std_logic;
+        RESET_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- START Bit Register Access Interface.
     -------------------------------------------------------------------------------
         START_WRITE     : in  std_logic;
         START_WDATA     : in  std_logic;
         START_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- STOP Bit Register Access Interface.
+    -------------------------------------------------------------------------------
         STOP_WRITE      : in  std_logic;
         STOP_WDATA      : in  std_logic;
         STOP_RDATA      : out std_logic;
+    -------------------------------------------------------------------------------
+    -- PAUSE Bit Register Access Interface.
+    -------------------------------------------------------------------------------
+        PAUSE_WRITE     : in  std_logic;
+        PAUSE_WDATA     : in  std_logic;
+        PAUSE_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- FIRST Bit Register Access Interface.
+    -------------------------------------------------------------------------------
         FIRST_WRITE     : in  std_logic;
         FIRST_WDATA     : in  std_logic;
         FIRST_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- LAST Bit Register Access Interface.
+    -------------------------------------------------------------------------------
         LAST_WRITE      : in  std_logic;
         LAST_WDATA      : in  std_logic;
         LAST_RDATA      : out std_logic;
-        RESET_WRITE     : in  std_logic;
-        RESET_WDATA     : in  std_logic;
-        RESET_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- DONE Status Bit Register Access Interface.
+    -------------------------------------------------------------------------------
         DONE_WRITE      : in  std_logic;
         DONE_WDATA      : in  std_logic;
         DONE_RDATA      : out std_logic;
+    -------------------------------------------------------------------------------
+    -- ERROR Status Bit Register Access Interface.
+    -------------------------------------------------------------------------------
         ERROR_WRITE     : in  std_logic;
         ERROR_WDATA     : in  std_logic;
         ERROR_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- MODE Register Access Interface.
+    -------------------------------------------------------------------------------
+        MODE_WRITE      : in  std_logic_vector(MODE_BITS-1 downto 0);
+        MODE_WDATA      : in  std_logic_vector(MODE_BITS-1 downto 0);
+        MODE_RDATA      : out std_logic_vector(MODE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    -- STAT Register Access Interface.
+    -------------------------------------------------------------------------------
+        STAT_WRITE      : in  std_logic_vector(STAT_BITS-1 downto 0);
+        STAT_WDATA      : in  std_logic_vector(STAT_BITS-1 downto 0);
+        STAT_RDATA      : out std_logic_vector(STAT_BITS-1 downto 0);
     -------------------------------------------------------------------------------
     -- Transaction Command Request Signals.
     -------------------------------------------------------------------------------
@@ -132,6 +172,9 @@ entity  PUMP_VALVE_CONTROL_REGISTER is
     -------------------------------------------------------------------------------
     -- Status
     -------------------------------------------------------------------------------
+        STAT_IN         : in  std_logic_vector(STAT_BITS-1 downto 0);
+        PAUSED          : out std_logic;
+        DONE            : out std_logic;
         RUNNING         : out std_logic
     );
 end PUMP_VALVE_CONTROL_REGISTER;
@@ -148,10 +191,13 @@ architecture RTL of PUMP_VALVE_CONTROL_REGISTER is
     signal   reset_bit          : std_logic;
     signal   start_bit          : std_logic;
     signal   stop_bit           : std_logic;
+    signal   pause_bit          : std_logic;
     signal   first_bit          : std_logic;
     signal   last_bit           : std_logic;
     signal   done_bit           : std_logic;
     signal   error_bit          : std_logic;
+    signal   mode_regs          : std_logic_vector(MODE_BITS-1 downto 0);
+    signal   stat_regs          : std_logic_vector(STAT_BITS-1 downto 0);
     -------------------------------------------------------------------------------
     -- Flow Counter.
     -------------------------------------------------------------------------------
@@ -181,20 +227,26 @@ begin
                 reset_bit  <= '0';
                 start_bit  <= '0';
                 stop_bit   <= '0';
+                pause_bit  <= '0';
                 first_bit  <= '0';
                 last_bit   <= '0';
                 done_bit   <= '0';
                 error_bit  <= '0';
+                mode_regs  <= (others => '0');
+                stat_regs  <= (others => '0');
         elsif (CLK'event and CLK = '1') then
             if (CLR   = '1') then
                 curr_state <= IDLE_STATE;
                 reset_bit  <= '0';
                 start_bit  <= '0';
                 stop_bit   <= '0';
+                pause_bit  <= '0';
                 first_bit  <= '0';
                 last_bit   <= '0';
                 done_bit   <= '0';
                 error_bit  <= '0';
+                mode_regs  <= (others => '0');
+                stat_regs  <= (others => '0');
             else
                 -------------------------------------------------------------------
                 -- ステートマシン
@@ -265,6 +317,12 @@ begin
                     stop_bit  <= '0';
                 end if;
                 -------------------------------------------------------------------
+                -- PAUSE BIT
+                -------------------------------------------------------------------
+                if    (PAUSE_WRITE = '1') then
+                    pause_bit <= PAUSE_WDATA;
+                end if;
+                -------------------------------------------------------------------
                 -- FIRST BIT
                 -------------------------------------------------------------------
                 if    (FIRST_WRITE = '1') then
@@ -296,6 +354,32 @@ begin
                 elsif (ERROR_WRITE = '1' and ERROR_WDATA = '0') then
                     error_bit  <= '0';
                 end if;
+                -------------------------------------------------------------------
+                -- MODE REGISTER
+                -------------------------------------------------------------------
+                if (reset_bit = '1') then
+                    mode_regs <= (others => '0');
+                else
+                    for i in mode_regs'range loop
+                        if (MODE_WRITE(i) = '1') then
+                            mode_regs(i) <= MODE_WDATA(i);
+                        end if;
+                    end loop;
+                end if;
+                -------------------------------------------------------------------
+                -- STATUS REGISTER
+                -------------------------------------------------------------------
+                if (reset_bit = '1') then
+                    stat_regs <= (others => '0');
+                else
+                    for i in stat_regs'range loop
+                        if    (STAT_WRITE(i) = '1' and STAT_WDATA(i) = '0') then
+                            stat_regs(i) <= '0';
+                        elsif (STAT_IN(i) = '1') then
+                            stat_regs(i) <= '1';
+                        end if;
+                    end loop;
+                end if;
             end if;
         end if;
     end process;
@@ -305,20 +389,24 @@ begin
     RESET_RDATA <= reset_bit;
     START_RDATA <= start_bit;
     STOP_RDATA  <= stop_bit;
+    PAUSE_RDATA <= pause_bit;
     FIRST_RDATA <= first_bit;
     LAST_RDATA  <= last_bit;
     DONE_RDATA  <= done_bit;
     ERROR_RDATA <= error_bit;
+    MODE_RDATA  <= mode_regs;
+    STAT_RDATA  <= stat_regs;
     -------------------------------------------------------------------------------
     -- Status
     -------------------------------------------------------------------------------
     RUNNING     <= start_bit;
+    DONE        <= '1' when (curr_state = DONE_STATE) else '0';
     -------------------------------------------------------------------------------
     -- Transaction Command Request Signals.
     -------------------------------------------------------------------------------
-    REQ_VALID <= '1' when (curr_state = REQ_STATE) else '0';
-    REQ_FIRST <= first_bit;
-    REQ_LAST  <= last_bit;
+    REQ_VALID   <= '1' when (curr_state = REQ_STATE ) else '0';
+    REQ_FIRST   <= first_bit;
+    REQ_LAST    <= last_bit;
     -------------------------------------------------------------------------------
     -- Flow Counter.
     -------------------------------------------------------------------------------
@@ -398,7 +486,10 @@ begin
     FLOW_SINK_MODE : if (FLOW_SINK /= 0) generate
         FLOW_STOP  <= '1' when (stop_bit  = '1') or
                                (pull_last_flag) else '0';
-        FLOW_PAUSE <= '1' when (to_01(flow_counter) > to_01(unsigned(THRESHOLD_SIZE))) else '0';
+        FLOW_PAUSE <= '1' when (pause_bit = '1') or
+                               (to_01(flow_counter) > to_01(unsigned(THRESHOLD_SIZE))) else '0';
+        PAUSED     <= '1' when (pause_bit = '1') or
+                               (to_01(flow_counter) > to_01(unsigned(THRESHOLD_SIZE))) else '0';
         FLOW_LAST  <= '0';
         FLOW_SIZE  <= std_logic_vector(to_01(unsigned(BUFFER_SIZE)) - to_01(unsigned(THRESHOLD_SIZE)));
     end generate;
@@ -408,7 +499,11 @@ begin
     FLOW_SOURCE_MODE : if (FLOW_SINK  = 0) generate
         FLOW_STOP  <= '1' when (stop_bit  = '1') or
                                (push_last_flag and flow_negative) else '0';
-        FLOW_PAUSE <= '1' when (push_last_flag = TRUE  and flow_zero) or
+        FLOW_PAUSE <= '1' when (pause_bit = '1') or
+                               (push_last_flag = TRUE  and flow_zero) or
+                               (push_last_flag = FALSE and to_01(flow_counter) <  to_01(unsigned(THRESHOLD_SIZE))) else '0';
+        PAUSED     <= '1' when (pause_bit = '1') or
+                               (push_last_flag = TRUE  and flow_zero) or
                                (push_last_flag = FALSE and to_01(flow_counter) <  to_01(unsigned(THRESHOLD_SIZE))) else '0';
         FLOW_LAST  <= '1' when (push_last_flag = TRUE  and to_01(flow_counter) <= to_01(unsigned(THRESHOLD_SIZE))) else '0';
         FLOW_SIZE  <= std_logic_vector(flow_counter);

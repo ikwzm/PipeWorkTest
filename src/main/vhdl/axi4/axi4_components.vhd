@@ -529,7 +529,7 @@ component AXI4_MASTER_WRITE_CONTROLLER
         XFER_SIZE_SEL   : in    std_logic_vector(XFER_MAX_SIZE downto XFER_MIN_SIZE);
         XFER_BUSY       : out   std_logic;
         ---------------------------------------------------------------------------
-        -- Response Signals.
+        -- Command Response Signals.
         ---------------------------------------------------------------------------
         RES_VAL         : out   std_logic;
         RES_ERROR       : out   std_logic;

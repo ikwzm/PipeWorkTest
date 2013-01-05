@@ -207,6 +207,10 @@ end component;
 -----------------------------------------------------------------------------------
 component PUMP_VALVE_CONTROL_REGISTER
     generic (
+        MODE_BITS       : --! @brief MODE REGISTER BITS :
+                          integer := 32;
+        STAT_BITS       : --! @brief STATUS REGISTER BITS :
+                          integer := 32;
         SIZE_BITS       : --! @brief COUNTER SIZE BITS :
                           --! 各種サイズ信号のビット数を指定する.
                           integer := 32;
@@ -227,29 +231,65 @@ component PUMP_VALVE_CONTROL_REGISTER
                           --! 同期リセット信号.アクティブハイ.
                           in  std_logic;
     -------------------------------------------------------------------------------
-    -- Register Access Interface.
+    -- RESET Bit Register Access Interface.
+    -------------------------------------------------------------------------------
+        RESET_WRITE     : in  std_logic;
+        RESET_WDATA     : in  std_logic;
+        RESET_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- START Bit Register Access Interface.
     -------------------------------------------------------------------------------
         START_WRITE     : in  std_logic;
         START_WDATA     : in  std_logic;
         START_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- STOP Bit Register Access Interface.
+    -------------------------------------------------------------------------------
         STOP_WRITE      : in  std_logic;
         STOP_WDATA      : in  std_logic;
         STOP_RDATA      : out std_logic;
+    -------------------------------------------------------------------------------
+    -- PAUSE Bit Register Access Interface.
+    -------------------------------------------------------------------------------
+        PAUSE_WRITE     : in  std_logic;
+        PAUSE_WDATA     : in  std_logic;
+        PAUSE_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- FIRST Bit Register Access Interface.
+    -------------------------------------------------------------------------------
         FIRST_WRITE     : in  std_logic;
         FIRST_WDATA     : in  std_logic;
         FIRST_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- LAST Bit Register Access Interface.
+    -------------------------------------------------------------------------------
         LAST_WRITE      : in  std_logic;
         LAST_WDATA      : in  std_logic;
         LAST_RDATA      : out std_logic;
-        RESET_WRITE     : in  std_logic;
-        RESET_WDATA     : in  std_logic;
-        RESET_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- DONE Status Bit Register Access Interface.
+    -------------------------------------------------------------------------------
         DONE_WRITE      : in  std_logic;
         DONE_WDATA      : in  std_logic;
         DONE_RDATA      : out std_logic;
+    -------------------------------------------------------------------------------
+    -- ERROR Status Bit Register Access Interface.
+    -------------------------------------------------------------------------------
         ERROR_WRITE     : in  std_logic;
         ERROR_WDATA     : in  std_logic;
         ERROR_RDATA     : out std_logic;
+    -------------------------------------------------------------------------------
+    -- MODE Register Access Interface.
+    -------------------------------------------------------------------------------
+        MODE_WRITE      : in  std_logic_vector(MODE_BITS-1 downto 0);
+        MODE_WDATA      : in  std_logic_vector(MODE_BITS-1 downto 0);
+        MODE_RDATA      : out std_logic_vector(MODE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    -- STAT Register Access Interface.
+    -------------------------------------------------------------------------------
+        STAT_WRITE      : in  std_logic_vector(STAT_BITS-1 downto 0);
+        STAT_WDATA      : in  std_logic_vector(STAT_BITS-1 downto 0);
+        STAT_RDATA      : out std_logic_vector(STAT_BITS-1 downto 0);
     -------------------------------------------------------------------------------
     -- Transaction Command Request Signals.
     -------------------------------------------------------------------------------
@@ -298,6 +338,9 @@ component PUMP_VALVE_CONTROL_REGISTER
     -------------------------------------------------------------------------------
     -- Status
     -------------------------------------------------------------------------------
+        STAT_IN         : in  std_logic_vector(STAT_BITS-1 downto 0);
+        PAUSED          : out std_logic;
+        DONE            : out std_logic;
         RUNNING         : out std_logic
     );
 end component;

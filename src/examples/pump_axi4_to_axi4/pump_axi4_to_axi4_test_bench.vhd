@@ -268,7 +268,8 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal   IRQ             : std_logic;
+    signal   I_IRQ           : std_logic;
+    signal   O_IRQ           : std_logic;
     -------------------------------------------------------------------------------
     -- シンクロ用信号
     -------------------------------------------------------------------------------
@@ -434,7 +435,8 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH is
             ----------------------------------------------------------------------
             -- 
             ----------------------------------------------------------------------
-            IRQ             : out   std_logic
+            I_IRQ           : out   std_logic;
+            O_IRQ           : out   std_logic
         );
     end component;
 begin
@@ -579,7 +581,8 @@ begin
             ----------------------------------------------------------------------
             -- 
             ----------------------------------------------------------------------
-            IRQ             => IRQ               -- Out:
+            I_IRQ           => I_IRQ           ,  -- Out:
+            O_IRQ           => O_IRQ              -- Out:
         );
     -------------------------------------------------------------------------------
     -- 
@@ -907,10 +910,12 @@ begin
         wait for PERIOD / 2;
     end process;
 
-    ARESETn <= '1' when (RESET = '0') else '0';
-    C_GPI   <= C_GPO;
-    I_GPI   <= C_GPO;
-    I_GPI   <= C_GPO;
+    ARESETn  <= '1' when (RESET = '0') else '0';
+    C_GPI(0) <= I_IRQ;
+    C_GPI(1) <= O_IRQ;
+    C_GPI(C_GPI'high downto 2) <= (C_GPI'high downto 2 => '0');
+    I_GPI    <= (others => '0');
+    O_GPI    <= (others => '0');
     process
         variable L   : LINE;
         constant T   : STRING(1 to 7) := "  ***  ";

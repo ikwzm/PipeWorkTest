@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_read_controller.vhd
 --!     @brief   AXI4 Master Read Controller
---!     @version 0.0.2
---!     @date    2013/1/4
+--!     @version 0.0.3
+--!     @date    2013/1/5
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -264,6 +264,7 @@ architecture RTL of AXI4_MASTER_READ_CONTROLLER is
         return value;
     end function;
     constant AXI4_DATA_SIZE     : integer := CALC_DATA_SIZE(AXI4_DATA_WIDTH);
+    constant BUF_DATA_SIZE      : integer := CALC_DATA_SIZE( BUF_DATA_WIDTH);
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -287,6 +288,12 @@ architecture RTL of AXI4_MASTER_READ_CONTROLLER is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
+    signal   xfer_start         : std_logic;
+    signal   xfer_init_start    : std_logic;
+    signal   xfer_busy_i        : std_logic;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
     signal   xfer_queue_addr    : std_logic_vector(AXI4_DATA_SIZE downto 0);
     signal   xfer_queue_size    : std_logic_vector(XFER_MAX_SIZE  downto 0);
     signal   xfer_queue_done    : std_logic;
@@ -296,12 +303,6 @@ architecture RTL of AXI4_MASTER_READ_CONTROLLER is
     signal   xfer_queue_empty   : std_logic;
     signal   xfer_queue_valid   : std_logic_vector(QUEUE_SIZE    downto 0);
     signal   xfer_queue_ready   : std_logic;
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    signal   xfer_start         : std_logic;
-    signal   xfer_init_start    : std_logic;
-    signal   xfer_busy_i        : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -684,6 +685,7 @@ begin
         constant ENBL_BITS      : integer := 1;
         constant I_WIDTH        : integer := AXI4_DATA_WIDTH/WORD_BITS;
         constant O_WIDTH        : integer :=  BUF_DATA_WIDTH/WORD_BITS;
+        constant QUEUE_SIZE     : integer := O_WIDTH+I_WIDTH+I_WIDTH-1;
         constant offset         : std_logic_vector(O_WIDTH-1 downto 0) := (others => '0');
         constant start          : std_logic := '0';
         constant done           : std_logic := '0';
@@ -704,7 +706,7 @@ begin
                 ENBL_BITS       => ENBL_BITS      ,
                 I_WIDTH         => I_WIDTH        ,
                 O_WIDTH         => O_WIDTH        ,
-                QUEUE_SIZE      => 0              ,
+                QUEUE_SIZE      => QUEUE_SIZE     ,
                 VALID_MIN       => 0              ,
                 VALID_MAX       => 0              ,
                 I_JUSTIFIED     => 0              ,

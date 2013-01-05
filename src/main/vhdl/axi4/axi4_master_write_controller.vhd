@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_write_controller.vhd
 --!     @brief   AXI4 Master Write Controller
---!     @version 0.0.2
---!     @date    2013/1/4
+--!     @version 0.0.3
+--!     @date    2013/1/5
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -226,7 +226,7 @@ entity  AXI4_MASTER_WRITE_CONTROLLER is
         XFER_SIZE_SEL   : in    std_logic_vector(XFER_MAX_SIZE downto XFER_MIN_SIZE);
         XFER_BUSY       : out   std_logic;
         ---------------------------------------------------------------------------
-        -- Response Signals.
+        -- Command Response Signals.
         ---------------------------------------------------------------------------
         RES_VAL         : out   std_logic;
         RES_ERROR       : out   std_logic;
@@ -310,12 +310,31 @@ architecture RTL of AXI4_MASTER_WRITE_CONTROLLER is
     signal   xfer_res_last      : std_logic;
     signal   xfer_res_safety    : std_logic;
     signal   xfer_res_error     : std_logic;
-    signal   xfer_busy_i        : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     signal   xfer_start         : std_logic;
-    signal   xfer_init_start    : std_logic;
+    signal   xfer_busy_i        : std_logic;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    signal   risky_res_mode     : boolean;
+    signal   risky_res_valid    : std_logic;
+    signal   risky_res_size     : std_logic_vector(XFER_MAX_SIZE downto 0);
+    signal   risky_res_done     : std_logic;
+    signal   risky_res_last     : std_logic;
+    signal   risky_res_safety   : std_logic;
+    signal   risky_res_error    : std_logic;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    signal   safety_res_mode    : boolean;
+    signal   safety_res_valid   : std_logic;
+    signal   safety_res_size    : std_logic_vector(XFER_MAX_SIZE downto 0);
+    signal   safety_res_done    : std_logic;
+    signal   safety_res_last    : std_logic;
+    signal   safety_res_safety  : std_logic;
+    signal   safety_res_error   : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -334,8 +353,8 @@ architecture RTL of AXI4_MASTER_WRITE_CONTROLLER is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal   buf_valid          : std_logic;
-    signal   buf_last           : std_logic;
+    signal   data_valid         : std_logic;
+    signal   data_last          : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -355,8 +374,8 @@ architecture RTL of AXI4_MASTER_WRITE_CONTROLLER is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    type     WDATA_STATE_TYPE is ( WDATA_IDLE, WDATA_WAIT_FIRST, WDATA_WAIT_LAST, WDATA_TURN_AR);
-    signal   wdata_state        : WDATA_STATE_TYPE;
+    type     STATE_TYPE      is ( IDLE, WAIT_WFIRST, WAIT_WLAST, TURN_AR);
+    signal   curr_state         : STATE_TYPE;
 begin
     -------------------------------------------------------------------------------
     -- AXI4 Write Address Channel Controller.
@@ -455,51 +474,51 @@ begin
     -------------------------------------------------------------------------------
     WDT_FSM: process(CLK, RST) begin
         if (RST = '1') then
-                wdata_state <= WDATA_IDLE;
+                curr_state <= IDLE;
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then 
-                wdata_state <= WDATA_IDLE;
+                curr_state <= IDLE;
             else
-                case wdata_state is
+                case curr_state is
                     ---------------------------------------------------------------
                     -- Transfer Request の受け付け待ち.
                     ---------------------------------------------------------------
-                    when WDATA_IDLE =>
+                    when IDLE =>
                         if (xfer_req_valid = '1' and res_queue_ready = '1') then
-                            wdata_state <= WDATA_WAIT_FIRST;
+                            curr_state <= WAIT_WFIRST;
                         else
-                            wdata_state <= WDATA_IDLE;
+                            curr_state <= IDLE;
                         end if;
                     ---------------------------------------------------------------
                     -- AXI4 Write Data Channel に最初のデータを出力するのを待つ.
                     ---------------------------------------------------------------
-                    when WDATA_WAIT_FIRST =>
-                        if    (buf_valid = '1' and WREADY = '1' and buf_last = '1') then
-                            wdata_state <= WDATA_TURN_AR;
-                        elsif (buf_valid = '1' and WREADY = '1' and buf_last = '0') then
-                            wdata_state <= WDATA_WAIT_LAST;
+                    when WAIT_WFIRST =>
+                        if    (data_valid = '1' and WREADY = '1' and data_last = '1') then
+                            curr_state <= TURN_AR;
+                        elsif (data_valid = '1' and WREADY = '1' and data_last = '0') then
+                            curr_state <= WAIT_WLAST;
                         else
-                            wdata_state <= WDATA_WAIT_FIRST;
+                            curr_state <= WAIT_WFIRST;
                         end if;
                     ---------------------------------------------------------------
                     -- AXI4 Write Data Channel に最初のデータを出力するのを待つ.
                     ---------------------------------------------------------------
-                    when WDATA_WAIT_LAST  =>
-                        if    (buf_valid = '1' and WREADY = '1' and buf_last = '1') then
-                            wdata_state <= WDATA_TURN_AR;
+                    when WAIT_WLAST  =>
+                        if    (data_valid = '1' and WREADY = '1' and data_last = '1') then
+                            curr_state <= TURN_AR;
                         else
-                            wdata_state <= WDATA_WAIT_LAST;
+                            curr_state <= WAIT_WLAST;
                         end if;
                     ---------------------------------------------------------------
                     -- １クロック待ってから IDLE に戻る.
                     ---------------------------------------------------------------
-                    when WDATA_TURN_AR   =>
-                            wdata_state <= WDATA_IDLE;
+                    when TURN_AR   =>
+                            curr_state <= IDLE;
                     ---------------------------------------------------------------
                     -- 念のため.
                     ---------------------------------------------------------------
                     when others      =>
-                            wdata_state <= WDATA_IDLE;
+                            curr_state <= IDLE;
                 end case;
             end if;
         end if;
@@ -507,7 +526,7 @@ begin
     -------------------------------------------------------------------------------
     -- xfer_req_ready : 
     -------------------------------------------------------------------------------
-    xfer_req_ready  <= '1' when (wdata_state = WDATA_IDLE and res_queue_ready = '1') else '0';
+    xfer_req_ready  <= '1' when (curr_state = IDLE and res_queue_ready = '1') else '0';
     -------------------------------------------------------------------------------
     -- xfer_start     : この信号がトリガーとなっていろいろと処理を開始する.
     -------------------------------------------------------------------------------
@@ -620,6 +639,7 @@ begin
         constant ENBL_BITS      : integer := 1;
         constant I_WIDTH        : integer :=  BUF_DATA_WIDTH/WORD_BITS;
         constant O_WIDTH        : integer := AXI4_DATA_WIDTH/WORD_BITS;
+        constant QUEUE_SIZE     : integer := O_WIDTH+I_WIDTH+I_WIDTH-1;
         constant done           : std_logic := '0';
         constant flush          : std_logic := '0';
         signal   offset         : std_logic_vector(O_WIDTH-1 downto 0);
@@ -654,7 +674,7 @@ begin
                 ENBL_BITS       => ENBL_BITS      ,
                 I_WIDTH         => I_WIDTH        ,
                 O_WIDTH         => O_WIDTH        ,
-                QUEUE_SIZE      => 0              ,
+                QUEUE_SIZE      => QUEUE_SIZE     ,
                 VALID_MIN       => 0              ,
                 VALID_MAX       => 0              ,
                 I_JUSTIFIED     => 0              ,
@@ -690,14 +710,51 @@ begin
             -----------------------------------------------------------------------
                 O_DATA          => WDATA          , -- Out :
                 O_ENBL          => WSTRB          , -- Out :
-                O_DONE          => buf_last       , -- Out :
+                O_DONE          => data_last      , -- Out :
                 O_FLUSH         => open           , -- Out :
-                O_VAL           => buf_valid      , -- Out :
+                O_VAL           => data_valid     , -- Out :
                 O_RDY           => WREADY           -- In  :
         );
-        WVALID <= buf_valid;
-        WLAST  <= buf_last;
+        WVALID <= data_valid;
+        WLAST  <= data_last;
     end block;
+    -------------------------------------------------------------------------------
+    -- Non Safety(Risky) Return Response.
+    -------------------------------------------------------------------------------
+    process (CLK, RST) begin
+        if (RST = '1') then
+                risky_res_size <= (others => '0');
+                risky_res_done <= '0';
+                risky_res_last <= '0';
+                risky_res_mode <= FALSE;
+        elsif (CLK'event and CLK = '1') then
+            if (CLR = '1') then 
+                risky_res_size <= (others => '0');
+                risky_res_done <= '0';
+                risky_res_last <= '0';
+                risky_res_mode <= FALSE;
+            elsif (xfer_start = '1') then
+                if (xfer_req_safety = '0') then
+                    risky_res_size <= xfer_req_size;
+                    risky_res_done <= xfer_req_done;
+                    risky_res_last <= xfer_req_last;
+                    risky_res_mode <= TRUE;
+                else
+                    risky_res_size <= (others => '0');
+                    risky_res_done <= '0';
+                    risky_res_last <= '0';
+                    risky_res_mode <= FALSE;
+                end if;
+            elsif (risky_res_valid = '1') then
+                    risky_res_size <= (others => '0');
+                    risky_res_done <= '0';
+                    risky_res_last <= '0';
+                    risky_res_mode <= FALSE;
+            end if;
+        end if;
+    end process;
+    risky_res_valid <= '1' when (risky_res_mode and data_valid = '1' and data_last = '1' and WREADY = '1') else '0';
+    risky_res_error <= '0';
     -------------------------------------------------------------------------------
     -- Transfer Response Queue.
     -------------------------------------------------------------------------------
@@ -747,17 +804,33 @@ begin
     -------------------------------------------------------------------------------
     BREADY  <= '1' when (res_queue_valid(0) = '1') else '0';
     -------------------------------------------------------------------------------
-    -- 
+    -- Safety Return Response.
     -------------------------------------------------------------------------------
-    xfer_res_valid <= '1' when (res_queue_valid(0) = '1' and BVALID = '1') else '0';
-    xfer_res_error <= '1' when (BRESP = AXI4_RESP_SLVERR or BRESP = AXI4_RESP_DECERR) else '0';
-    xfer_res_done  <= '1' when (res_queue_done = '1') else '0';
-    xfer_res_last  <= '1' when (res_queue_last = '1') else '0';
-    xfer_res_size  <= res_queue_size when (xfer_res_error = '0') else (others => '0');
+    safety_res_mode  <= (res_queue_safety = '1');
+    safety_res_valid <= '1' when (safety_res_mode and res_queue_valid(0) = '1' and BVALID = '1') else '0';
+    safety_res_error <= '1' when (safety_res_mode and (BRESP = AXI4_RESP_SLVERR or BRESP = AXI4_RESP_DECERR)) else '0';
+    safety_res_done  <= '1' when (safety_res_mode and res_queue_done = '1') else '0';
+    safety_res_last  <= '1' when (safety_res_mode and res_queue_last = '1') else '0';
+    safety_res_size  <= res_queue_size when (safety_res_mode and safety_res_error = '0') else (others => '0');
     -------------------------------------------------------------------------------
-    -- 
+    -- Return Response.
+    -------------------------------------------------------------------------------
+    xfer_res_valid <= risky_res_valid or safety_res_valid;
+    xfer_res_error <= risky_res_error or safety_res_error;
+    xfer_res_done  <= risky_res_done  or safety_res_done;
+    xfer_res_last  <= risky_res_last  or safety_res_last;
+    xfer_res_size  <= risky_res_size  or safety_res_size;
+    -------------------------------------------------------------------------------
+    -- Reserve Size and Last
+    -------------------------------------------------------------------------------
+    RESV_VAL       <= '1' when (xfer_start    = '1') else '0';
+    RESV_LAST      <= '1' when (xfer_req_last = '1') else '0';
+    RESV_SIZE      <= std_logic_vector(RESIZE(unsigned(xfer_req_size) , RESV_SIZE'length));
+    -------------------------------------------------------------------------------
+    -- Pull Size and Last
     -------------------------------------------------------------------------------
     PULL_VAL       <= '1' when (res_queue_valid(0) = '1' and BVALID = '1') else '0';
     PULL_LAST      <= '1' when (res_queue_last = '1') else '0';
-    PULL_SIZE      <= std_logic_vector(RESIZE(unsigned(res_queue_size), PULL_SIZE'length)) when (xfer_res_error = '0') else (others => '0');
+    PULL_SIZE      <= (others => '0') when (BRESP = AXI4_RESP_SLVERR or BRESP = AXI4_RESP_DECERR) else
+                      std_logic_vector(RESIZE(unsigned(res_queue_size), PULL_SIZE'length));
 end RTL;
