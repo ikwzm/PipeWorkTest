@@ -6,22 +6,22 @@
 
 ####REDUCER####
 
-異なるデータ幅のパスを継ぐためのアダプタです.
+異なるデータ幅のパスを継ぐためのアダプタです.  
 詳細は [docs/ja/reducer.md](docs/ja/reducer.md) を参照.
 
 ####CHOPPER####
 
-先頭アドレスとサイズで示されたブロックを、指定された大きさのピースに分割する回路です.
+先頭アドレスとサイズで示されたブロックを、指定された大きさのピースに分割する回路です.  
 詳細は [docs/ja/chopper.md](docs/ja/chopper.md) を参照.
 
 ####QUEUE ARBITER####
 
-キュー(ファーストインファーストアウト)方式の調停回路です.
+キュー(ファーストインファーストアウト)方式の調停回路です.  
 詳細は [docs/ja/queue_arbiter.md](docs/ja/queue_arbiter.md) を参照.
 
 ####SYNCRONIZER####
 
-異なるクロックで動作するパスを継ぐアダプタのクロック同期化回路です.
+異なるクロックで動作するパスを継ぐアダプタのクロック同期化回路です.  
 詳細は [docs/ja/syncronizer.md](docs/ja/syncronizer.md) を参照.
 
 ####QUEUE REGISTER####
@@ -30,7 +30,7 @@
 
 ####DELAY REGISTER####
 
-入力データを指定したクロックだけ遅延して出力する回路です.
+入力データを指定したクロックだけ遅延して出力する回路です.  
 遅延するクロック数はジェネリック変数および信号によって設定することが出来ます.
 
 ####DELAY ADJUSTER####
@@ -64,7 +64,7 @@ AXI4 スレーブ I/F から簡単なレジスタアクセスを行うための�
 
 ####FIFO with done####
 
-終了処理付きのFIFOです.
+終了処理付きのFIFOです.  
 詳細は [docs/ja/fifo_with_done.md](docs/ja/fifo_with_done.md) を参照.
 
 ####PUMP AXI4 to AXI4####
