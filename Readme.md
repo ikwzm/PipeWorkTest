@@ -12,7 +12,7 @@ REDUCER とは配管用語で径違い継ぎ手、つまり直径違う配管(�
 論理回路の世界でも、ビット幅の異なるデータパスどうしを継ぐことが多い
 のでこのような汎用のアダプタを作って REDUCER という名前をつけました.
 
-詳細は doc/ja/reducer.md を参照.
+詳細は [doc/ja/reducer.md](doc/ja/reducer.md) を参照.
 
 
 ####CHOPPER####
