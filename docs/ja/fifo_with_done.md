@@ -1,5 +1,5 @@
-FIFO with done (PipeWork Example) 
----------------------------------
+FIFO with done Module
+---------------------
 
 ###概要###
 
