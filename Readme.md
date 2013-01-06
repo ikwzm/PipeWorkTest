@@ -1,13 +1,13 @@
 *PipeWork*
 ============
-
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ###*PipeWork* Component###
 
 ####REDUCER####
 
 異なるデータ幅のパスを継ぐためのアダプタです.
 
-詳細は [docs/ja/reducer.md](PipeWork/docs/ja/reducer.md) を参照.
+詳細は [docs/ja/reducer.md](docs/ja/reducer.md) を参照.
 
 ####CHOPPER####
 
@@ -40,6 +40,7 @@
 
 入力データを DELAY REGISTER の出力に合わせて調整して出力する回路です.
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ###*PipeWork* AIX4 Component###
 
 ####AXI4_TYPES####
@@ -58,6 +59,7 @@ AXI4 Master Write コントローラーです.
 
 AXI4 スレーブ I/F から簡単なレジスタアクセスを行うためのアダプタです.
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ###*PipeWork* Examples###
 
 *PipeWork*Componentを使った例です.
@@ -74,5 +76,6 @@ AXI4 スレーブ I/F から簡単なレジスタアクセスを行うための�
 
 ####DELAY ADJUSTER####
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ###ライセンス###
 二条項BSDライセンス (2-clause BSD license) で公開しています。
