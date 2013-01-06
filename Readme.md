@@ -7,7 +7,7 @@
 
 異なるデータ幅のパスを継ぐためのアダプタです.
 
-詳細は [docs/ja/reducer.md](docs/ja/reducer.md) を参照.
+詳細は [docs/ja/reducer.md](PipeWork/docs/ja/reducer.md) を参照.
 
 ####CHOPPER####
 
