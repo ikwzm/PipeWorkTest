@@ -1,7 +1,8 @@
 *PipeWork*
 ============
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-###*PipeWork* Component###
+
+*PipeWork* Component
+--------------------
 
 ####REDUCER####
 
@@ -40,8 +41,8 @@
 
 入力データを DELAY REGISTER の出力に合わせて調整して出力する回路です.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-###*PipeWork* AIX4 Component###
+*PipeWork* AIX4 Component
+-------------------------
 
 ####AXI4_TYPES####
 
@@ -59,10 +60,11 @@ AXI4 Master Write コントローラーです.
 
 AXI4 スレーブ I/F から簡単なレジスタアクセスを行うためのアダプタです.
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-###*PipeWork* Examples###
 
-*PipeWork*Componentを使った例です.
+*PipeWork* Examples
+-------------------
+
+*PipeWork* Componentを使った例です.
 
 ####FIFO with done####
 
@@ -74,8 +76,7 @@ AXI4 スレーブ I/F から簡単なレジスタアクセスを行うための�
 
 入力側と出力側に AXI4 Master I/F を持つポンプ(所謂DMA)です.
 
-####DELAY ADJUSTER####
+ライセンス
+----------
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-###ライセンス###
 二条項BSDライセンス (2-clause BSD license) で公開しています。
