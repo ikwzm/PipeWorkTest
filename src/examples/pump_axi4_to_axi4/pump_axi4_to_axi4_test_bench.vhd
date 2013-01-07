@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4_test_bench.vhd
 --!     @brief   Test Bench for Pump Sample Module (AXI4 to AXI4)
---!     @version 0.0.1
---!     @date    2013/1/3
+--!     @version 0.0.4
+--!     @date    2013/1/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -106,6 +106,8 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH is
                                  WUSER       => 1,
                                  RUSER       => 1,
                                  BUSER       => 1);
+    constant I_AXI_ID        : integer :=  1;
+    constant O_AXI_ID        : integer :=  2;
     constant BUF_DEPTH       : integer := 12;
     constant MAX_XFER_SIZE   : integer :=  8;
     constant SYNC_WIDTH      : integer :=  2;
@@ -305,11 +307,13 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH is
             C_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             C_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             C_ID_WIDTH      : integer range 1 to AXI4_ID_MAX_WIDTH   := AXI4_ID_MAX_WIDTH;
+            I_AXI_ID        : integer                                :=  1;
             I_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             I_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             I_ID_WIDTH      : integer range 1 to AXI4_ID_MAX_WIDTH   := AXI4_ID_MAX_WIDTH;
             I_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
             I_RUSER_WIDTH   : integer range 1 to 32                  :=  4;
+            O_AXI_ID        : integer                                :=  2;
             O_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             O_ID_WIDTH      : integer range 1 to AXI4_ID_MAX_WIDTH   := AXI4_ID_MAX_WIDTH;
@@ -451,11 +455,13 @@ begin
             C_ADDR_WIDTH    => C_WIDTH.AWADDR     ,
             C_DATA_WIDTH    => C_WIDTH.WDATA      ,
             C_ID_WIDTH      => C_WIDTH.ID         ,
+            I_AXI_ID        => I_AXI_ID           ,
             I_ADDR_WIDTH    => I_WIDTH.ARADDR     ,
             I_DATA_WIDTH    => I_WIDTH.RDATA      ,
             I_ID_WIDTH      => I_WIDTH.ID         ,
             I_AUSER_WIDTH   => I_WIDTH.ARUSER     ,
             I_RUSER_WIDTH   => I_WIDTH.RUSER      ,
+            O_AXI_ID        => O_AXI_ID           ,
             O_ADDR_WIDTH    => O_WIDTH.AWADDR     ,
             O_DATA_WIDTH    => O_WIDTH.WDATA      ,
             O_ID_WIDTH      => O_WIDTH.ID         ,

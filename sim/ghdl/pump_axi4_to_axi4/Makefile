@@ -26,8 +26,8 @@ PIPEWORK_COMPONENTS = components                             \
                       axi4_types                             \
                       axi4_components                        \
                       axi4_master_address_channel_controller \
-                      axi4_master_read_controller            \
-                      axi4_master_write_controller           \
+                      axi4_master_read_interface             \
+                      axi4_master_write_interface            \
                       axi4_register_write_interface          \
                       axi4_register_read_interface           \
                       axi4_register_interface                \
@@ -57,10 +57,10 @@ axi4_components.o                        : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_c
 axi4_master_address_channel_controller.o : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_address_channel_controller.vhd  axi4_components.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
-axi4_master_read_controller.o            : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_read_controller.vhd             axi4_components.o
+axi4_master_read_interface.o             : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_read_interface.vhd              axi4_components.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
-axi4_master_write_controller.o           : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_write_controller.vhd            axi4_components.o
+axi4_master_write_interface.o            : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_write_interface.vhd             axi4_components.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
 axi4_register_write_interface.o          : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_write_interface.vhd           axi4_components.o
@@ -120,22 +120,22 @@ pump_axi4_to_axi4_test_bench_32_32.o     : $(SRC_PATH)/pump_axi4_to_axi4_test_be
 $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_components.vhd :                                  \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_types.vhd                             \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_address_channel_controller.vhd \
-            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_read_controller.vhd            \
-            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_write_controller.vhd           \
+            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_read_interface.vhd             \
+            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_write_interface.vhd            \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_write_interface.vhd          \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_read_interface.vhd           \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_interface.vhd                \
             $(END_LIST)
 	$(MAKECOMPONENTPACKAGE) --verbose \
             --brief   'PIPEWORK AXI4 LIBRARY DESCRIPTION' \
-            --version 1.0.7 \
+            --version 0.0.4 \
             --author  'Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>' \
             --library PIPEWORK \
             --package AXI4_COMPONENTS \
             --output  $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_components.vhd              \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_address_channel_controller.vhd \
-            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_read_controller.vhd            \
-            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_write_controller.vhd           \
+            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_read_interface.vhd             \
+            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_write_interface.vhd            \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_write_interface.vhd          \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_read_interface.vhd           \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_interface.vhd                \

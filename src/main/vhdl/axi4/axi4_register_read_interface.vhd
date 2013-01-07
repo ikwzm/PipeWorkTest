@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_register_read_interface.vhd
 --!     @brief   AXI4 Register Read Interface
---!     @version 0.0.1
---!     @date    2013/1/2
+--!     @version 0.0.4
+--!     @date    2013/1/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

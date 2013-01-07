@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4.vhd
 --!     @brief   Pump Sample Module (AXI4 to AXI4)
---!     @version 0.0.1
---!     @date    2013/1/3
+--!     @version 0.0.4
+--!     @date    2013/1/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -60,6 +60,8 @@ entity  PUMP_AXI4_TO_AXI4 is
         O_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
         O_WUSER_WIDTH   : integer range 1 to 32                  :=  4;
         O_BUSER_WIDTH   : integer range 1 to 32                  :=  4;
+        I_AXI_ID        : integer                                :=  1;
+        O_AXI_ID        : integer                                :=  2;
         BUF_DEPTH       : integer                                := 12;
         MAX_XFER_SIZE   : integer                                :=  8
     );
@@ -191,8 +193,8 @@ use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
 library PIPEWORK;
 use     PIPEWORK.AXI4_TYPES.all;
-use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_READ_CONTROLLER;
-use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_WRITE_CONTROLLER;
+use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_READ_INTERFACE;
+use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_WRITE_INTERFACE;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_REGISTER_INTERFACE;
 use     PIPEWORK.COMPONENTS.SDPRAM;
 use     PIPEWORK.PUMP_COMPONENTS.PUMP_COUNT_UP_REGISTER;
@@ -200,7 +202,7 @@ use     PIPEWORK.PUMP_COMPONENTS.PUMP_COUNT_DOWN_REGISTER;
 use     PIPEWORK.PUMP_COMPONENTS.PUMP_VALVE_CONTROL_REGISTER;
 architecture RTL of PUMP_AXI4_TO_AXI4 is
     ------------------------------------------------------------------------------
-    -- 
+    -- リセット信号.
     ------------------------------------------------------------------------------
     signal   RST                : std_logic;
     constant CLR                : std_logic := '0';
@@ -217,26 +219,59 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
         return value;
     end function;
     ------------------------------------------------------------------------------
-    -- 
+    -- アドレスレジスタのビット数.
     ------------------------------------------------------------------------------
     constant ADDR_REGS_BITS     : integer := 64;
+    ------------------------------------------------------------------------------
+    -- サイズレジスタのビット数.
+    ------------------------------------------------------------------------------
     constant SIZE_REGS_BITS     : integer := 32;
+    ------------------------------------------------------------------------------
+    -- 各種サイズカウンタのビット数.
+    ------------------------------------------------------------------------------
     constant SIZE_BITS          : integer := BUF_DEPTH+1;
+    ------------------------------------------------------------------------------
+    -- 最大転送バイト数.
+    ------------------------------------------------------------------------------
     constant MAX_XFER_BYTES     : integer := 2**MAX_XFER_SIZE;
+    ------------------------------------------------------------------------------
+    -- バッファデータのビット幅.
+    ------------------------------------------------------------------------------
     constant BUF_DATA_WIDTH     : integer := O_DATA_WIDTH;
+    ------------------------------------------------------------------------------
+    -- バッファデータのバイト数(２のべき乗値).
+    ------------------------------------------------------------------------------
     constant BUF_DATA_SIZE      : integer := CALC_DATA_SIZE(BUF_DATA_WIDTH);
+    ------------------------------------------------------------------------------
+    -- バッファのバイト数.
+    ------------------------------------------------------------------------------
     constant BUF_BYTES          : std_logic_vector(SIZE_BITS-1 downto 0) := 
                                   std_logic_vector(to_unsigned(2**BUF_DEPTH  , SIZE_BITS));
+    ------------------------------------------------------------------------------
+    -- 入力側の閾値. フローカウンタがこの値以下の時に入力する.
+    ------------------------------------------------------------------------------
     constant I_THRESHOLD_SIZE   : std_logic_vector(SIZE_BITS-1 downto 0) :=
                                   std_logic_vector(to_unsigned(2**BUF_DEPTH-MAX_XFER_BYTES, SIZE_BITS));
+    ------------------------------------------------------------------------------
+    -- 出力側の閾値. フローカウンタがこの値以上の時に出力する.
+    ------------------------------------------------------------------------------
     constant O_THRESHOLD_SIZE   : std_logic_vector(SIZE_BITS-1 downto 0) :=
                                   std_logic_vector(to_unsigned(MAX_XFER_BYTES, SIZE_BITS));
     ------------------------------------------------------------------------------
-    -- 
+    -- レジスタアクセスインターフェースのアドレスのビット数.
     ------------------------------------------------------------------------------
     constant REGS_ADDR_WIDTH    : integer := 5;
+    ------------------------------------------------------------------------------
+    -- レジスタアクセスインターフェースのデータのビット数.
+    ------------------------------------------------------------------------------
     constant REGS_DATA_WIDTH    : integer := 32;
+    ------------------------------------------------------------------------------
+    -- 全レジスタのビット数.
+    ------------------------------------------------------------------------------
     constant REGS_DATA_BITS     : integer := (2**REGS_ADDR_WIDTH)*8;
+    ------------------------------------------------------------------------------
+    -- レジスタアクセス用の信号群.
+    ------------------------------------------------------------------------------
     signal   regs_req           : std_logic;
     signal   regs_write         : std_logic;
     signal   regs_ack           : std_logic;
@@ -249,10 +284,11 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   regs_wbit          : std_logic_vector(REGS_DATA_BITS   -1 downto 0);
     signal   regs_rbit          : std_logic_vector(REGS_DATA_BITS   -1 downto 0);
     ------------------------------------------------------------------------------
-    -- 
+    -- 入力側の各種定数.
     ------------------------------------------------------------------------------
     constant I_USER             : std_logic_vector(I_AUSER_WIDTH    -1 downto 0) := (others => '0');
-    constant I_ID               : std_logic_vector(I_ID_WIDTH       -1 downto 0) := (others => '0');
+    constant I_ID               : std_logic_vector(I_ID_WIDTH       -1 downto 0) :=
+                                  std_logic_vector(to_unsigned(I_AXI_ID, I_ID_WIDTH));
     constant I_BURST_TYPE       : AXI4_ABURST_TYPE := AXI4_ABURST_INCR;
     constant I_LOCK             : AXI4_ALOCK_TYPE  := (others => '0');
     constant I_CACHE            : AXI4_ACACHE_TYPE := (others => '0');
@@ -262,6 +298,9 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     constant I_XFER_SIZE_SEL    : std_logic_vector(MAX_XFER_SIZE downto MAX_XFER_SIZE) := "1";
     constant I_SPECULATIVE      : std_logic        := '1';
     constant I_SAFETY           : std_logic        := '0';
+    ------------------------------------------------------------------------------
+    -- 入力側の各種信号群.
+    ------------------------------------------------------------------------------
     signal   i_addr_up_ben      : std_logic_vector(I_ADDR_WIDTH     -1 downto 0);
     signal   i_req_addr         : std_logic_vector(I_ADDR_WIDTH     -1 downto 0);
     signal   i_req_size         : std_logic_vector(SIZE_REGS_BITS   -1 downto 0);
@@ -285,10 +324,11 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   i_done             : std_logic;
     signal   i_stat_in          : std_logic_vector(5 downto 0);
     ------------------------------------------------------------------------------
-    -- 
+    -- 出力側の各種定数.
     ------------------------------------------------------------------------------
     constant O_USER             : std_logic_vector(O_AUSER_WIDTH    -1 downto 0) := (others => '0');
-    constant O_ID               : std_logic_vector(O_ID_WIDTH       -1 downto 0) := (others => '0');
+    constant O_ID               : std_logic_vector(O_ID_WIDTH       -1 downto 0) := 
+                                  std_logic_vector(to_unsigned(O_AXI_ID, O_ID_WIDTH));
     constant O_BURST_TYPE       : AXI4_ABURST_TYPE := AXI4_ABURST_INCR;
     constant O_LOCK             : AXI4_ALOCK_TYPE  := (others => '0');
     constant O_CACHE            : AXI4_ACACHE_TYPE := (others => '0');
@@ -298,6 +338,9 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     constant O_XFER_SIZE_SEL    : std_logic_vector(MAX_XFER_SIZE downto MAX_XFER_SIZE) := "1";
     constant O_SPECULATIVE      : std_logic        := '1';
     constant O_SAFETY           : std_logic        := '0';
+    ------------------------------------------------------------------------------
+    -- 出力側の各種信号群.
+    ------------------------------------------------------------------------------
     signal   o_addr_up_ben      : std_logic_vector(I_ADDR_WIDTH     -1 downto 0);
     signal   o_req_addr         : std_logic_vector(I_ADDR_WIDTH     -1 downto 0);
     signal   o_req_size         : std_logic_vector(SIZE_REGS_BITS   -1 downto 0);
@@ -321,7 +364,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   o_done             : std_logic;
     signal   o_stat_in          : std_logic_vector(5 downto 0);
     ------------------------------------------------------------------------------
-    -- 
+    -- フローカウンタ制御用信号群.
     ------------------------------------------------------------------------------
     signal   push_valid         : std_logic;
     signal   push_last          : std_logic;
@@ -330,7 +373,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   pull_last          : std_logic;
     signal   pull_size          : std_logic_vector(SIZE_BITS        -1 downto 0);
     ------------------------------------------------------------------------------
-    -- 
+    -- バッファへのアクセス用信号群.
     ------------------------------------------------------------------------------
     signal   buf_wdata          : std_logic_vector(BUF_DATA_WIDTH   -1 downto 0);
     signal   buf_ben            : std_logic_vector(BUF_DATA_WIDTH/8 -1 downto 0);
@@ -342,7 +385,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   buf_rptr           : std_logic_vector(BUF_DEPTH        -1 downto 0);
     constant buf_rready         : std_logic := '1';
     ------------------------------------------------------------------------------
-    -- 
+    -- レジスタのアドレスマップ.
     ------------------------------------------------------------------------------
     constant O_ADDR_REGS_ADDR   : integer := 16#00#;
     constant O_SIZE_REGS_ADDR   : integer := 16#08#;
@@ -468,7 +511,7 @@ begin
     ------------------------------------------------------------------------------
     -- 
     ------------------------------------------------------------------------------
-    I_IF: AXI4_MASTER_READ_CONTROLLER
+    I_IF: AXI4_MASTER_READ_INTERFACE
         generic map (
             AXI4_ADDR_WIDTH => I_ADDR_WIDTH    ,
             AXI4_DATA_WIDTH => I_DATA_WIDTH    ,
@@ -578,7 +621,7 @@ begin
     ------------------------------------------------------------------------------
     -- 
     ------------------------------------------------------------------------------
-    O_IF: AXI4_MASTER_WRITE_CONTROLLER
+    O_IF: AXI4_MASTER_WRITE_INTERFACE
         generic map (
             AXI4_ADDR_WIDTH => O_ADDR_WIDTH    ,
             AXI4_DATA_WIDTH => O_DATA_WIDTH    ,
