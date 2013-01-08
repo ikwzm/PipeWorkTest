@@ -47,7 +47,8 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32 is
             NAME            : STRING;
             SCENARIO_FILE   : STRING;
             I_DATA_WIDTH    : integer;
-            O_DATA_WIDTH    : integer
+            O_DATA_WIDTH    : integer;
+            MAX_XFER_SIZE   : integer
         );
     end component;
 begin
@@ -56,7 +57,8 @@ begin
             NAME            => string'("PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32"),
             SCENARIO_FILE   => string'("pump_axi4_to_axi4_test_bench_32_32.snr"),
             I_DATA_WIDTH    => 32,
-            O_DATA_WIDTH    => 32
+            O_DATA_WIDTH    => 32,
+            MAX_XFER_SIZE   =>  6
         );        
 end MODEL;
 

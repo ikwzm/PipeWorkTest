@@ -117,6 +117,9 @@ pump_axi4_to_axi4_test_bench.o           : $(SRC_PATH)/pump_axi4_to_axi4_test_be
 pump_axi4_to_axi4_test_bench_32_32.o     : $(SRC_PATH)/pump_axi4_to_axi4_test_bench_32_32.vhd pump_axi4_to_axi4_test_bench.o
 	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
+pump_axi4_to_axi4_test_bench_32_32.snr   : $(SRC_PATH)/make_scenario.rb
+	 $(SRC_PATH)/make_scenario.rb
+
 $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_components.vhd :                                  \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_types.vhd                             \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_address_channel_controller.vhd \
@@ -126,34 +129,11 @@ $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_components.vhd :                            
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_read_interface.vhd           \
             $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_interface.vhd                \
             $(END_LIST)
-	$(MAKECOMPONENTPACKAGE) --verbose \
-            --brief   'PIPEWORK AXI4 LIBRARY DESCRIPTION' \
-            --version 0.0.4 \
-            --author  'Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>' \
-            --library PIPEWORK \
-            --package AXI4_COMPONENTS \
-            --output  $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_components.vhd              \
-            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_address_channel_controller.vhd \
-            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_read_interface.vhd             \
-            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_master_write_interface.vhd            \
-            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_write_interface.vhd          \
-            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_read_interface.vhd           \
-            $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_interface.vhd                \
-            $(END_LIST)
+	make -C  $(PIPEWORK_SRC_MAIN_PATH)/axi4
 
 $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_components.vhd :                                  \
             $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_count_up_register.vhd                 \
             $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_count_down_register.vhd               \
             $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_valve_control_register.vhd            \
             $(END_LIST)
-	$(MAKECOMPONENTPACKAGE) --verbose \
-            --brief   'PIPEWORK PUMP LIBRARY DESCRIPTION' \
-            --version 0.0.1 \
-            --author  'Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>' \
-            --library PIPEWORK \
-            --package PUMP_COMPONENTS \
-            --output  $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_components.vhd              \
-            $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_count_up_register.vhd                 \
-            $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_count_down_register.vhd               \
-            $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_valve_control_register.vhd            \
-            $(END_LIST)
+	make -C  $(PIPEWORK_SRC_MAIN_PATH)/pump

@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
---!     @file    ../../../src/main/vhdl/pump/pump_components.vhd                 --
---!     @brief   PIPEWORK PUMP LIBRARY DESCRIPTION                               --
---!     @version 0.0.1                                                           --
---!     @date    2013/01/05                                                      --
+--!     @file    pump_components.vhd                                             --
+--!     @brief   PIPEWORK PUMP COMPONENTS LIBRARY DESCRIPTION                    --
+--!     @version 0.0.2                                                           --
+--!     @date    2013/01/09                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
@@ -38,7 +38,7 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
---! @brief PIPEWORK PUMP LIBRARY DESCRIPTION                                     --
+--! @brief PIPEWORK PUMP COMPONENTS LIBRARY DESCRIPTION                          --
 -----------------------------------------------------------------------------------
 package PUMP_COMPONENTS is
 -----------------------------------------------------------------------------------

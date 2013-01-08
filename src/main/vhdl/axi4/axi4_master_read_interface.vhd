@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_read_interface.vhd
 --!     @brief   AXI4 Master Read Interface
---!     @version 0.0.4
---!     @date    2013/1/7
+--!     @version 0.0.5
+--!     @date    2013/1/8
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -290,7 +290,7 @@ architecture RTL of AXI4_MASTER_READ_INTERFACE is
     -------------------------------------------------------------------------------
     signal   xfer_start         : std_logic;
     signal   xfer_init_start    : std_logic;
-    signal   xfer_busy_i        : std_logic;
+    signal   xfer_running       : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -413,7 +413,7 @@ begin
             XFER_RES_DONE   => xfer_res_done     , -- In  :
             XFER_RES_LAST   => xfer_res_last     , -- In  :
             XFER_RES_ERR    => xfer_res_error    , -- In  :
-            XFER_BUSY       => xfer_busy_i         -- In  :
+            XFER_RUNNING    => xfer_running        -- In  :
         );
     -------------------------------------------------------------------------------
     -- AXI4 Read Address Channel Signals Output.
@@ -586,14 +586,15 @@ begin
         end if;
     end process;
     -------------------------------------------------------------------------------
-    -- 
+    -- xfer_running   : 動作中である事を示すフラグ.
     -------------------------------------------------------------------------------
-    xfer_busy_i <= '1' when (curr_state = WAIT_RFIRST or
-                             curr_state = WAIT_RLAST ) else '0';
+    xfer_running <= '1' when (curr_state = WAIT_RFIRST or
+                              curr_state = WAIT_RLAST  or
+                              xfer_queue_empty = '0' ) else '0';
     -------------------------------------------------------------------------------
-    -- xfer_res_size   : Transfer Request Queue から取り出したサイズ情報を保持.
-    -- xfer_res_last   : Transfer Request Queue から取り出したLASTを保持.
-    -- xfer_res_safety : Transfer Request Queue から取り出したSAFETYを保持.
+    -- xfer_res_size  : Transfer Request Queue から取り出したサイズ情報を保持.
+    -- xfer_res_last  : Transfer Request Queue から取り出したLASTを保持.
+    -- xfer_res_safety: Transfer Request Queue から取り出したSAFETYを保持.
     -------------------------------------------------------------------------------
     process(CLK, RST) begin
         if (RST = '1') then
@@ -618,7 +619,7 @@ begin
     -------------------------------------------------------------------------------
     -- xfer_queue_ready : Transfer Request Queue から情報を取り出すための信号.
     -------------------------------------------------------------------------------
-    xfer_queue_ready <= '1' when (curr_state = IDLE) else '0';
+    xfer_queue_ready<= '1' when (curr_state = IDLE) else '0';
     -------------------------------------------------------------------------------
     -- xfer_start       : この信号がトリガーとなっていろいろと処理を開始する.
     -------------------------------------------------------------------------------

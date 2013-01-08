@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_valve_control_register.vhd
 --!     @brief   PUMP VALVE CONTROL REGISTER
---!     @version 1.0.1
---!     @date    2013/1/4
+--!     @version 1.0.2
+--!     @date    2013/1/8
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -262,7 +262,7 @@ begin
                         if    (REQ_READY = '0') then
                                 next_state := REQ_STATE;
                         elsif (RES_VALID = '1') then
-                            if (RES_DONE = '1' or RES_ERROR = '1' or RES_STOP = '1' or RES_NONE = '1') then
+                            if (RES_DONE = '1' or RES_NONE = '1' or RES_ERROR = '1' or RES_STOP = '1') then
                                 next_state := DONE_STATE;
                             else
                                 next_state := TURN_AR;
@@ -272,7 +272,7 @@ begin
                         end if;
                     when RES_STATE  =>
                         if (RES_VALID = '1') then
-                            if (RES_DONE = '1' or RES_ERROR = '1' or RES_STOP = '1' or RES_NONE = '1') then
+                            if (RES_DONE = '1' or RES_NONE = '1' or RES_ERROR = '1' or RES_STOP = '1') then
                                 next_state := DONE_STATE;
                             else
                                 next_state := TURN_AR;
@@ -484,8 +484,7 @@ begin
     -- Flow Control (Flow Sink Mode)
     -------------------------------------------------------------------------------
     FLOW_SINK_MODE : if (FLOW_SINK /= 0) generate
-        FLOW_STOP  <= '1' when (stop_bit  = '1') or
-                               (pull_last_flag) else '0';
+        FLOW_STOP  <= '1' when (stop_bit  = '1') else '0';
         FLOW_PAUSE <= '1' when (pause_bit = '1') or
                                (to_01(flow_counter) > to_01(unsigned(THRESHOLD_SIZE))) else '0';
         PAUSED     <= '1' when (pause_bit = '1') or

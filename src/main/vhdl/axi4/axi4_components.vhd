@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_components.vhd                                             --
 --!     @brief   PIPEWORK AXI4 LIBRARY DESCRIPTION                               --
---!     @version 0.0.4                                                           --
---!     @date    2013/01/07                                                      --
+--!     @version 0.0.5                                                           --
+--!     @date    2013/01/09                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ component AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER
         XFER_RES_DONE   : in    std_logic;
         XFER_RES_LAST   : in    std_logic;
         XFER_RES_ERR    : in    std_logic;
-        XFER_BUSY       : in    std_logic
+        XFER_RUNNING    : in    std_logic
     );
 end component;
 -----------------------------------------------------------------------------------

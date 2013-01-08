@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_address_channel_controller.vhd
 --!     @brief   AXI4 Master Address Channel Controller
---!     @version 0.0.3
---!     @date    2013/1/5
+--!     @version 0.0.5
+--!     @date    2013/1/8
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -133,7 +133,7 @@ entity  AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER is
         XFER_RES_DONE   : in    std_logic;
         XFER_RES_LAST   : in    std_logic;
         XFER_RES_ERR    : in    std_logic;
-        XFER_BUSY       : in    std_logic
+        XFER_RUNNING    : in    std_logic
     );
 end AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER;
 -----------------------------------------------------------------------------------
@@ -188,7 +188,11 @@ architecture RTL of AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    type     STATE_TYPE     is  ( IDLE, WAIT_XFER_REQ, WAIT_XFER_RES, STOP_STATE, NONE_STATE);
+    type     STATE_TYPE     is  ( IDLE_STATE, 
+                                  WAIT_STATE,
+                                  XFER_STATE,
+                                  STOP_STATE,
+                                  NONE_STATE);
     signal   curr_state         : STATE_TYPE;
 begin
     -------------------------------------------------------------------------------
@@ -214,40 +218,44 @@ begin
         variable next_state : STATE_TYPE;
     begin
         if (RST = '1') then
-                curr_state    <= IDLE;
+                curr_state    <= IDLE_STATE;
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then 
-                curr_state    <= IDLE;
+                curr_state    <= IDLE_STATE;
             else
                 case curr_state is
-                    when IDLE =>
+                    when IDLE_STATE =>
                         if (REQ_VAL = '1') then
-                            next_state := WAIT_XFER_REQ;
+                            next_state := WAIT_STATE;
                         else
-                            next_state := IDLE;
+                            next_state := IDLE_STATE;
                         end if;
-                    when WAIT_XFER_REQ =>
+                    when WAIT_STATE =>
                         if    (req_xfer_stop  = '1') then
                             next_state := STOP_STATE;
                         elsif (req_xfer_none  = '1') then
                             next_state := NONE_STATE;
                         elsif (req_xfer_start = '1') then
-                            next_state := WAIT_XFER_RES;
+                            next_state := XFER_STATE;
                         else
-                            next_state := WAIT_XFER_REQ;
+                            next_state := WAIT_STATE;
                         end if;
-                    when WAIT_XFER_RES =>
+                    when XFER_STATE =>
                         if (res_xfer_valid = '1') then
-                            next_state := IDLE;
+                            next_state := IDLE_STATE;
                         else
-                            next_state := WAIT_XFER_RES;
+                            next_state := XFER_STATE;
                         end if;
                     when STOP_STATE =>
-                        next_state := IDLE;
+                        if (XFER_RUNNING = '1') then
+                            next_state := STOP_STATE;
+                        else 
+                            next_state := IDLE_STATE;
+                        end if;
                     when NONE_STATE =>
-                        next_state := IDLE;
+                        next_state := IDLE_STATE;
                     when others =>
-                        next_state := IDLE;
+                        next_state := IDLE_STATE;
                 end case;
                 curr_state <= next_state;
             end if;
@@ -256,16 +264,15 @@ begin
     -------------------------------------------------------------------------------
     -- REQ_RDY
     -------------------------------------------------------------------------------
-    REQ_RDY        <= '1' when (curr_state = IDLE) else '0';
+    REQ_RDY        <= '1' when (curr_state = IDLE_STATE) else '0';
     -------------------------------------------------------------------------------
     -- max_xfer_load : max_xfer_size などを計算するためのトリガー信号.
     -------------------------------------------------------------------------------
-    max_xfer_load  <= '1' when (curr_state = IDLE and REQ_VAL = '1') else '0';
+    max_xfer_load  <= '1' when (curr_state = IDLE_STATE and REQ_VAL = '1') else '0';
     -------------------------------------------------------------------------------
     -- req_xfer_valid: 転送開始要求トリガー.
     -------------------------------------------------------------------------------
-    req_xfer_valid <= '1' when (curr_state = WAIT_XFER_REQ and
-                                req_xfer_start = '1') else '0';
+    req_xfer_valid <= '1' when (curr_state = WAIT_STATE and req_xfer_start = '1') else '0';
     -------------------------------------------------------------------------------
     -- max_xfer_size : １回のトランザクションでの最大転送サイズ.
     -- req_size_none : REQ_SIZEの値が0であることを示すフラグ.
@@ -354,7 +361,7 @@ begin
                 q_res_xfer_size <= (others => '0');
                 q_res_xfer_last <= '0';
                 q_res_xfer_done <= '0';
-            elsif (curr_state = WAIT_XFER_REQ) then
+            elsif (curr_state = WAIT_STATE) then
                 q_res_xfer_size <= req_xfer_size;
                 q_res_xfer_last <= req_xfer_last;
                 q_res_xfer_done <= req_xfer_done;
@@ -371,26 +378,27 @@ begin
             if (CLR = '1') then 
                     xfer_first_state <= "00";
             elsif (xfer_first_state = "00") then
-                if (curr_state = IDLE and REQ_VAL = '1' and REQ_FIRST = '1') then
+                if (curr_state = IDLE_STATE and REQ_VAL = '1' and REQ_FIRST = '1') then
                     xfer_first_state <= "11";
                 else
                     xfer_first_state <= "00";
                 end if;
             elsif (xfer_first_state = "11") or
                   (xfer_first_state = "10") then
-                if    (curr_state = WAIT_XFER_RES and res_xfer_valid = '1') then
+                if    (curr_state = XFER_STATE and res_xfer_valid = '1') then
                     if (res_xfer_last = '1') then
                         xfer_first_state <= "00";
                     else
                         xfer_first_state <= "10";
                     end if;
-                elsif (curr_state = STOP_STATE) or
-                      (curr_state = NONE_STATE) then
+                elsif (curr_state = STOP_STATE) then
                     if (q_res_xfer_last = '1') then
                         xfer_first_state <= "00";
                     else
                         xfer_first_state <= "10";
                     end if;
+                elsif (curr_state = STOP_STATE) then
+                        xfer_first_state <= "00";
                 end if;
             end if;
         end if;
@@ -416,24 +424,27 @@ begin
                       std_logic_vector(RESIZE(unsigned(  XFER_RES_SIZE),SIZE_BITS));
     -------------------------------------------------------------------------------
     -- RES_VAL         : 転送応答有効信号出力.
+    -- REQ_DONE        : 最後の転送要求の応答であることを示すフラグ.
+    -- REQ_LAST        : 最後の転送要求の応答であることを示すフラグ.
     -- RES_ERROR       : 転送エラーが発生した事を示すフラグ.
     -- RES_STOP        : XFER_STOP による転送中止が発生した事を示すフラグ.
     -- RES_NONE        : 転送サイズが０の転送要求だったことを示すフラグ.
     -- RES_SIZE        : 転送応答サイズ信号出力.
     -------------------------------------------------------------------------------
-    RES_VAL   <= '1' when (curr_state = WAIT_XFER_RES and res_xfer_valid = '1') or
-                          (curr_state = STOP_STATE) or
+    RES_VAL   <= '1' when (curr_state = XFER_STATE and res_xfer_valid = '1') or
+                          (curr_state = STOP_STATE and XFER_RUNNING   = '0') or
                           (curr_state = NONE_STATE) else '0';
-    RES_DONE  <= '1' when (curr_state = WAIT_XFER_RES and res_xfer_done  = '1') else '0';
-    RES_LAST  <= '1' when (curr_state = WAIT_XFER_RES and res_xfer_last  = '1') else '0';
-    RES_ERROR <= '1' when (curr_state = WAIT_XFER_RES and XFER_RES_ERR   = '1') else '0';
-    RES_STOP  <= '1' when (curr_state = STOP_STATE) else '0';
+    RES_DONE  <= '1' when (curr_state = XFER_STATE and res_xfer_done  = '1') else '0';
+    RES_LAST  <= '1' when (curr_state = XFER_STATE and res_xfer_last  = '1') else '0';
+    RES_ERROR <= '1' when (curr_state = XFER_STATE and XFER_RES_ERR   = '1') else '0';
+    RES_STOP  <= '1' when (curr_state = STOP_STATE and XFER_RUNNING   = '0') else '0';
     RES_NONE  <= '1' when (curr_state = NONE_STATE) else '0';
-    RES_SIZE  <= res_xfer_size when (curr_state = WAIT_XFER_RES) else (others => '0');
+    RES_SIZE  <= res_xfer_size when (curr_state = XFER_STATE) else (others => '0');
     -------------------------------------------------------------------------------
     -- XFER_REQ_VAL    : 転送要求有効信号
     -- XFER_REQ_ADDR   : 転送要求開始アドレス
     -- XFER_REQ_SIZE   : 転送要求サイズ.
+    -- XFER_REQ_DONE   : 最後の転送要求であることを示すフラグ.
     -- XFER_REQ_LAST   : 最後の転送要求であることを示すフラグ.
     -- XFER_REQ_FIRST  : 最初の転送要求であることを示すフラグ.
     -- XFER_REQ_SAFETY : セーフティモード.

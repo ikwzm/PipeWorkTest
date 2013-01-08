@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_write_interface.vhd
 --!     @brief   AXI4 Master Write Interface
---!     @version 0.0.4
---!     @date    2013/1/7
+--!     @version 0.0.5
+--!     @date    2013/1/8
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -314,7 +314,7 @@ architecture RTL of AXI4_MASTER_WRITE_INTERFACE is
     -- 
     -------------------------------------------------------------------------------
     signal   xfer_start         : std_logic;
-    signal   xfer_busy_i        : std_logic;
+    signal   xfer_running       : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -323,7 +323,6 @@ architecture RTL of AXI4_MASTER_WRITE_INTERFACE is
     signal   risky_res_size     : std_logic_vector(XFER_MAX_SIZE downto 0);
     signal   risky_res_done     : std_logic;
     signal   risky_res_last     : std_logic;
-    signal   risky_res_safety   : std_logic;
     signal   risky_res_error    : std_logic;
     -------------------------------------------------------------------------------
     -- 
@@ -333,7 +332,6 @@ architecture RTL of AXI4_MASTER_WRITE_INTERFACE is
     signal   safety_res_size    : std_logic_vector(XFER_MAX_SIZE downto 0);
     signal   safety_res_done    : std_logic;
     signal   safety_res_last    : std_logic;
-    signal   safety_res_safety  : std_logic;
     signal   safety_res_error   : std_logic;
     -------------------------------------------------------------------------------
     -- 
@@ -454,7 +452,7 @@ begin
             XFER_RES_DONE   => xfer_res_done     , -- In  :
             XFER_RES_LAST   => xfer_res_last     , -- In  :
             XFER_RES_ERR    => xfer_res_error    , -- In  :
-            XFER_BUSY       => xfer_busy_i         -- In  :
+            XFER_RUNNING    => xfer_running        -- In  :
         );
     -------------------------------------------------------------------------------
     -- AXI4 Write Address Channel Signals Output.
@@ -523,6 +521,12 @@ begin
             end if;
         end if;
     end process;
+    -------------------------------------------------------------------------------
+    -- xfer_running   : 動作中である事を示すフラグ.
+    -------------------------------------------------------------------------------
+    xfer_running <= '1' when (curr_state = WAIT_WFIRST or
+                              curr_state = WAIT_WLAST  or
+                              res_queue_empty = '0' ) else '0';
     -------------------------------------------------------------------------------
     -- xfer_req_ready : 
     -------------------------------------------------------------------------------
