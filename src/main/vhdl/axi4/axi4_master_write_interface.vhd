@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_write_interface.vhd
 --!     @brief   AXI4 Master Write Interface
---!     @version 0.0.5
---!     @date    2013/1/8
+--!     @version 0.0.6
+--!     @date    2013/1/9
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -52,15 +52,6 @@ entity  AXI4_MASTER_WRITE_INTERFACE is
         AXI4_DATA_WIDTH : --! @brief AXI4 WRITE DATA CHANNEL DATA WIDTH :
                           --! AXI4 ライトデータチャネルのRDATA信号のビット幅.
                           integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        AXI4_AUSER_WIDTH: --! @brief AXI4 ADDRESS CHANNEL USER WIDTH :
-                          --! AXI4 ライトアドレスチャネルのAUSER信号のビット幅.
-                          integer := 4;
-        AXI4_WUSER_WIDTH: --! @brief AXI4 WRITE DATA CHANNEL USER WIDTH :
-                          --! AXI4 ライトデータチャネルのUSER信号のビット幅.
-                          integer := 4;
-        AXI4_BUSER_WIDTH: --! @brief AXI4 WRITE RESPONSE CHANNEL USER WIDTH :
-                          --! AXI4 ライトレスポンスチャネルのUSER信号のビット幅.
-                          integer := 4;
         AXI4_ID_WIDTH   : --! @brief AXI4 ID WIDTH :
                           --! AXI4 アドレスチャネルおよびライトレスポンスチャネルの
                           --! ID信号のビット幅.
@@ -144,9 +135,6 @@ entity  AXI4_MASTER_WRITE_INTERFACE is
                           --! Permits a single physical interface on a slave to be
                           --! used for multiple logical interfaces.
                           out   AXI4_AREGION_TYPE;
-        AWUSER          : --! @brief User signal.
-                          --! Optional User-defined signal in the write address channel.
-                          out   std_logic_vector(AXI4_AUSER_WIDTH -1 downto 0);
         AWVALID         : --! @brief Write address valid.
                           --! This signal indicates that the channel is signaling
                           --! valid read address and control infomation.
@@ -169,9 +157,6 @@ entity  AXI4_MASTER_WRITE_INTERFACE is
                           --! data. There is one write strobe bit for each eight
                           --! bits of the write data bus.
                           out   std_logic_vector(AXI4_DATA_WIDTH/8-1 downto 0);
-        WUSER           : --! @brief User signal.
-                          --! Optional User-defined signal in the write data channel.
-                          out   std_logic_vector(AXI4_WUSER_WIDTH -1 downto 0);
         WLAST           : --! @brief Write last.
                           --! This signal indicates the last transfer in a write burst.
                           out   std_logic;
@@ -193,9 +178,6 @@ entity  AXI4_MASTER_WRITE_INTERFACE is
         BRESP           : --! @brief Write response.
                           --! This signal indicates the status of the write transaction.
                           in    AXI4_RESP_TYPE;
-        BUSER           : --! @brief User signal.
-                          --! Optional User-defined signal in the read data channel.
-                          in    std_logic_vector(AXI4_BUSER_WIDTH -1 downto 0);
         BVALID          : --! @brief Write response valid.
                           --! This signal indicates that the channel is signaling
                           --! a valid write response.
@@ -209,7 +191,6 @@ entity  AXI4_MASTER_WRITE_INTERFACE is
         ---------------------------------------------------------------------------
         REQ_ADDR        : in    std_logic_vector(AXI4_ADDR_WIDTH  -1 downto 0);
         REQ_SIZE        : in    std_logic_vector(REQ_SIZE_BITS    -1 downto 0);
-        REQ_USER        : in    std_logic_vector(AXI4_AUSER_WIDTH -1 downto 0);
         REQ_ID          : in    std_logic_vector(AXI4_ID_WIDTH    -1 downto 0);
         REQ_BURST       : in    AXI4_ABURST_TYPE;
         REQ_LOCK        : in    AXI4_ALOCK_TYPE;
@@ -228,13 +209,13 @@ entity  AXI4_MASTER_WRITE_INTERFACE is
         ---------------------------------------------------------------------------
         -- Command Response Signals.
         ---------------------------------------------------------------------------
-        RES_VAL         : out   std_logic;
-        RES_ERROR       : out   std_logic;
-        RES_DONE        : out   std_logic;
-        RES_LAST        : out   std_logic;
-        RES_STOP        : out   std_logic;
-        RES_NONE        : out   std_logic;
-        RES_SIZE        : out   std_logic_vector(SIZE_BITS        -1 downto 0);
+        ACK_VAL         : out   std_logic;
+        ACK_NEXT        : out   std_logic;
+        ACK_LAST        : out   std_logic;
+        ACK_ERROR       : out   std_logic;
+        ACK_STOP        : out   std_logic;
+        ACK_NONE        : out   std_logic;
+        ACK_SIZE        : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
@@ -248,12 +229,14 @@ entity  AXI4_MASTER_WRITE_INTERFACE is
         RESV_VAL        : out   std_logic;
         RESV_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         RESV_LAST       : out   std_logic;
+        RESV_ERROR      : out   std_logic;
         ---------------------------------------------------------------------------
         -- Pull Size Signals.
         ---------------------------------------------------------------------------
         PULL_VAL        : out   std_logic;
         PULL_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         PULL_LAST       : out   std_logic;
+        PULL_ERROR      : out   std_logic;
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
@@ -297,19 +280,18 @@ architecture RTL of AXI4_MASTER_WRITE_INTERFACE is
     signal   xfer_req_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
     signal   xfer_req_valid     : std_logic;
     signal   xfer_req_ready     : std_logic;
-    signal   xfer_req_done      : std_logic;
+    signal   xfer_req_next      : std_logic;
     signal   xfer_req_last      : std_logic;
     signal   xfer_req_first     : std_logic;
     signal   xfer_req_safety    : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal   xfer_res_valid     : std_logic;
-    signal   xfer_res_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
-    signal   xfer_res_done      : std_logic;
-    signal   xfer_res_last      : std_logic;
-    signal   xfer_res_safety    : std_logic;
-    signal   xfer_res_error     : std_logic;
+    signal   xfer_ack_valid     : std_logic;
+    signal   xfer_ack_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
+    signal   xfer_ack_next      : std_logic;
+    signal   xfer_ack_last      : std_logic;
+    signal   xfer_ack_error     : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -318,21 +300,21 @@ architecture RTL of AXI4_MASTER_WRITE_INTERFACE is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal   risky_res_mode     : boolean;
-    signal   risky_res_valid    : std_logic;
-    signal   risky_res_size     : std_logic_vector(XFER_MAX_SIZE downto 0);
-    signal   risky_res_done     : std_logic;
-    signal   risky_res_last     : std_logic;
-    signal   risky_res_error    : std_logic;
+    signal   risky_ack_mode     : boolean;
+    signal   risky_ack_valid    : std_logic;
+    signal   risky_ack_size     : std_logic_vector(XFER_MAX_SIZE downto 0);
+    signal   risky_ack_next     : std_logic;
+    signal   risky_ack_last     : std_logic;
+    signal   risky_ack_error    : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal   safety_res_mode    : boolean;
-    signal   safety_res_valid   : std_logic;
-    signal   safety_res_size    : std_logic_vector(XFER_MAX_SIZE downto 0);
-    signal   safety_res_done    : std_logic;
-    signal   safety_res_last    : std_logic;
-    signal   safety_res_error   : std_logic;
+    signal   safety_ack_mode    : boolean;
+    signal   safety_ack_valid   : std_logic;
+    signal   safety_ack_size    : std_logic_vector(XFER_MAX_SIZE downto 0);
+    signal   safety_ack_next    : std_logic;
+    signal   safety_ack_last    : std_logic;
+    signal   safety_ack_error   : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -362,13 +344,13 @@ architecture RTL of AXI4_MASTER_WRITE_INTERFACE is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal   res_queue_ready    : std_logic;
-    signal   res_queue_valid    : std_logic_vector(QUEUE_SIZE     downto 0);
-    signal   res_queue_done     : std_logic;
-    signal   res_queue_last     : std_logic;
-    signal   res_queue_size     : std_logic_vector(XFER_MAX_SIZE  downto 0);
-    signal   res_queue_empty    : std_logic;
-    signal   res_queue_safety   : std_logic;
+    signal   ack_queue_ready    : std_logic;
+    signal   ack_queue_valid    : std_logic_vector(QUEUE_SIZE     downto 0);
+    signal   ack_queue_next     : std_logic;
+    signal   ack_queue_last     : std_logic;
+    signal   ack_queue_size     : std_logic_vector(XFER_MAX_SIZE  downto 0);
+    signal   ack_queue_empty    : std_logic;
+    signal   ack_queue_safety   : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -415,13 +397,13 @@ begin
             -----------------------------------------------------------------------
             -- Command Response Signals.
             -----------------------------------------------------------------------
-            RES_VAL         => RES_VAL           , -- Out :
-            RES_DONE        => RES_DONE          , -- Out :
-            RES_ERROR       => RES_ERROR         , -- Out :
-            RES_LAST        => RES_LAST          , -- Out :
-            RES_STOP        => RES_STOP          , -- Out :
-            RES_NONE        => RES_NONE          , -- Out :
-            RES_SIZE        => RES_SIZE          , -- Out :
+            ACK_VAL         => ACK_VAL           , -- Out :
+            ACK_NEXT        => ACK_NEXT          , -- Out :
+            ACK_LAST        => ACK_LAST          , -- Out :
+            ACK_ERROR       => ACK_ERROR         , -- Out :
+            ACK_STOP        => ACK_STOP          , -- Out :
+            ACK_NONE        => ACK_NONE          , -- Out :
+            ACK_SIZE        => ACK_SIZE          , -- Out :
             -----------------------------------------------------------------------
             -- Transfer Control Signals.
             -----------------------------------------------------------------------
@@ -440,18 +422,18 @@ begin
             XFER_REQ_SIZE   => xfer_req_size     , -- Out :
             XFER_REQ_FIRST  => xfer_req_first    , -- Out :
             XFER_REQ_LAST   => xfer_req_last     , -- Out :
-            XFER_REQ_DONE   => xfer_req_done     , -- Out :
+            XFER_REQ_NEXT   => xfer_req_next     , -- Out :
             XFER_REQ_SAFETY => xfer_req_safety   , -- Out :
             XFER_REQ_VAL    => xfer_req_valid    , -- Out :
             XFER_REQ_RDY    => xfer_req_ready    , -- In  :
             -----------------------------------------------------------------------
             -- Transfer Response Signals.
             -----------------------------------------------------------------------
-            XFER_RES_SIZE   => xfer_res_size     , -- In  :
-            XFER_RES_VAL    => xfer_res_valid    , -- In  :
-            XFER_RES_DONE   => xfer_res_done     , -- In  :
-            XFER_RES_LAST   => xfer_res_last     , -- In  :
-            XFER_RES_ERR    => xfer_res_error    , -- In  :
+            XFER_ACK_SIZE   => xfer_ack_size     , -- In  :
+            XFER_ACK_VAL    => xfer_ack_valid    , -- In  :
+            XFER_ACK_NEXT   => xfer_ack_next     , -- In  :
+            XFER_ACK_LAST   => xfer_ack_last     , -- In  :
+            XFER_ACK_ERR    => xfer_ack_error    , -- In  :
             XFER_RUNNING    => xfer_running        -- In  :
         );
     -------------------------------------------------------------------------------
@@ -464,7 +446,6 @@ begin
     AWPROT   <= REQ_PROT;
     AWQOS    <= REQ_QOS;
     AWREGION <= REQ_REGION;
-    AWUSER   <= REQ_USER;
     AWID     <= REQ_ID;
     WID      <= REQ_ID;
     -------------------------------------------------------------------------------
@@ -482,7 +463,7 @@ begin
                     -- Transfer Request の受け付け待ち.
                     ---------------------------------------------------------------
                     when IDLE =>
-                        if (xfer_req_valid = '1' and res_queue_ready = '1') then
+                        if (xfer_req_valid = '1' and ack_queue_ready = '1') then
                             curr_state <= WAIT_WFIRST;
                         else
                             curr_state <= IDLE;
@@ -526,11 +507,11 @@ begin
     -------------------------------------------------------------------------------
     xfer_running <= '1' when (curr_state = WAIT_WFIRST or
                               curr_state = WAIT_WLAST  or
-                              res_queue_empty = '0' ) else '0';
+                              ack_queue_empty = '0' ) else '0';
     -------------------------------------------------------------------------------
     -- xfer_req_ready : 
     -------------------------------------------------------------------------------
-    xfer_req_ready  <= '1' when (curr_state = IDLE and res_queue_ready = '1') else '0';
+    xfer_req_ready  <= '1' when (curr_state = IDLE and ack_queue_ready = '1') else '0';
     -------------------------------------------------------------------------------
     -- xfer_start     : この信号がトリガーとなっていろいろと処理を開始する.
     -------------------------------------------------------------------------------
@@ -727,38 +708,38 @@ begin
     -------------------------------------------------------------------------------
     process (CLK, RST) begin
         if (RST = '1') then
-                risky_res_size <= (others => '0');
-                risky_res_done <= '0';
-                risky_res_last <= '0';
-                risky_res_mode <= FALSE;
+                risky_ack_size <= (others => '0');
+                risky_ack_next <= '0';
+                risky_ack_last <= '0';
+                risky_ack_mode <= FALSE;
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then 
-                risky_res_size <= (others => '0');
-                risky_res_done <= '0';
-                risky_res_last <= '0';
-                risky_res_mode <= FALSE;
+                risky_ack_size <= (others => '0');
+                risky_ack_next <= '0';
+                risky_ack_last <= '0';
+                risky_ack_mode <= FALSE;
             elsif (xfer_start = '1') then
                 if (xfer_req_safety = '0') then
-                    risky_res_size <= xfer_req_size;
-                    risky_res_done <= xfer_req_done;
-                    risky_res_last <= xfer_req_last;
-                    risky_res_mode <= TRUE;
+                    risky_ack_size <= xfer_req_size;
+                    risky_ack_next <= xfer_req_next;
+                    risky_ack_last <= xfer_req_last;
+                    risky_ack_mode <= TRUE;
                 else
-                    risky_res_size <= (others => '0');
-                    risky_res_done <= '0';
-                    risky_res_last <= '0';
-                    risky_res_mode <= FALSE;
+                    risky_ack_size <= (others => '0');
+                    risky_ack_next <= '0';
+                    risky_ack_last <= '0';
+                    risky_ack_mode <= FALSE;
                 end if;
-            elsif (risky_res_valid = '1') then
-                    risky_res_size <= (others => '0');
-                    risky_res_done <= '0';
-                    risky_res_last <= '0';
-                    risky_res_mode <= FALSE;
+            elsif (risky_ack_valid = '1') then
+                    risky_ack_size <= (others => '0');
+                    risky_ack_next <= '0';
+                    risky_ack_last <= '0';
+                    risky_ack_mode <= FALSE;
             end if;
         end if;
     end process;
-    risky_res_valid <= '1' when (risky_res_mode and data_valid = '1' and data_last = '1' and WREADY = '1') else '0';
-    risky_res_error <= '0';
+    risky_ack_valid <= '1' when (risky_ack_mode and data_valid = '1' and data_last = '1' and WREADY = '1') else '0';
+    risky_ack_error <= '0';
     -------------------------------------------------------------------------------
     -- Transfer Response Queue.
     -------------------------------------------------------------------------------
@@ -766,8 +747,8 @@ begin
         constant VEC_LO         : integer := 0;
         constant VEC_SIZE_LO    : integer := VEC_LO;
         constant VEC_SIZE_HI    : integer := VEC_SIZE_LO  + XFER_MAX_SIZE;
-        constant VEC_DONE_POS   : integer := VEC_SIZE_HI  + 1;
-        constant VEC_LAST_POS   : integer := VEC_DONE_POS + 1;
+        constant VEC_NEXT_POS   : integer := VEC_SIZE_HI  + 1;
+        constant VEC_LAST_POS   : integer := VEC_NEXT_POS + 1;
         constant VEC_SAFETY_POS : integer := VEC_LAST_POS + 1;
         constant VEC_HI         : integer := VEC_SAFETY_POS;
         signal   i_vec          : std_logic_vector(VEC_HI downto VEC_LO);
@@ -775,7 +756,7 @@ begin
         constant Q_ALL_0        : std_logic_vector(QUEUE_SIZE downto 0) := (others => '0');
     begin
         i_vec(VEC_SIZE_HI downto VEC_SIZE_LO) <= xfer_req_size;
-        i_vec(VEC_DONE_POS)                   <= xfer_req_done;
+        i_vec(VEC_NEXT_POS)                   <= xfer_req_next;
         i_vec(VEC_LAST_POS)                   <= xfer_req_last;
         i_vec(VEC_SAFETY_POS)                 <= xfer_req_safety;
         QUEUE: QUEUE_REGISTER
@@ -790,51 +771,53 @@ begin
                 CLR         => CLR               , -- In  :
                 I_DATA      => i_vec             , -- In  :
                 I_VAL       => xfer_start        , -- In  :
-                I_RDY       => res_queue_ready   , -- Out :
+                I_RDY       => ack_queue_ready   , -- Out :
                 O_DATA      => open              , -- Out :
                 O_VAL       => open              , -- Out :
                 Q_DATA      => q_vec             , -- Out :
-                Q_VAL       => res_queue_valid   , -- Out :
+                Q_VAL       => ack_queue_valid   , -- Out :
                 Q_RDY       => BVALID              -- In  :
             );
-        res_queue_size   <= q_vec(VEC_SIZE_HI downto VEC_SIZE_LO);
-        res_queue_done   <= q_vec(VEC_DONE_POS);
-        res_queue_last   <= q_vec(VEC_LAST_POS);
-        res_queue_safety <= q_vec(VEC_SAFETY_POS);
-        res_queue_empty  <= '1' when (res_queue_valid = Q_ALL_0) else '0';
+        ack_queue_size   <= q_vec(VEC_SIZE_HI downto VEC_SIZE_LO);
+        ack_queue_next   <= q_vec(VEC_NEXT_POS);
+        ack_queue_last   <= q_vec(VEC_LAST_POS);
+        ack_queue_safety <= q_vec(VEC_SAFETY_POS);
+        ack_queue_empty  <= '1' when (ack_queue_valid = Q_ALL_0) else '0';
     end block;
     -------------------------------------------------------------------------------
     -- BREADY : Write Response Ready
     -------------------------------------------------------------------------------
-    BREADY  <= '1' when (res_queue_valid(0) = '1') else '0';
+    BREADY  <= '1' when (ack_queue_valid(0) = '1') else '0';
     -------------------------------------------------------------------------------
     -- Safety Return Response.
     -------------------------------------------------------------------------------
-    safety_res_mode  <= (res_queue_safety = '1');
-    safety_res_valid <= '1' when (safety_res_mode and res_queue_valid(0) = '1' and BVALID = '1') else '0';
-    safety_res_error <= '1' when (safety_res_mode and (BRESP = AXI4_RESP_SLVERR or BRESP = AXI4_RESP_DECERR)) else '0';
-    safety_res_done  <= '1' when (safety_res_mode and res_queue_done = '1') else '0';
-    safety_res_last  <= '1' when (safety_res_mode and res_queue_last = '1') else '0';
-    safety_res_size  <= res_queue_size when (safety_res_mode and safety_res_error = '0') else (others => '0');
+    safety_ack_mode  <= (ack_queue_safety = '1');
+    safety_ack_valid <= '1' when (safety_ack_mode and ack_queue_valid(0) = '1' and BVALID = '1') else '0';
+    safety_ack_error <= '1' when (safety_ack_mode and (BRESP = AXI4_RESP_SLVERR or BRESP = AXI4_RESP_DECERR)) else '0';
+    safety_ack_next  <= '1' when (safety_ack_mode and ack_queue_next = '1') else '0';
+    safety_ack_last  <= '1' when (safety_ack_mode and ack_queue_last = '1') else '0';
+    safety_ack_size  <= ack_queue_size when (safety_ack_mode and safety_ack_error = '0') else (others => '0');
     -------------------------------------------------------------------------------
     -- Return Response.
     -------------------------------------------------------------------------------
-    xfer_res_valid <= risky_res_valid or safety_res_valid;
-    xfer_res_error <= risky_res_error or safety_res_error;
-    xfer_res_done  <= risky_res_done  or safety_res_done;
-    xfer_res_last  <= risky_res_last  or safety_res_last;
-    xfer_res_size  <= risky_res_size  or safety_res_size;
+    xfer_ack_valid <= risky_ack_valid or safety_ack_valid;
+    xfer_ack_error <= risky_ack_error or safety_ack_error;
+    xfer_ack_next  <= risky_ack_next  or safety_ack_next;
+    xfer_ack_last  <= risky_ack_last  or safety_ack_last;
+    xfer_ack_size  <= risky_ack_size  or safety_ack_size;
     -------------------------------------------------------------------------------
     -- Reserve Size and Last
     -------------------------------------------------------------------------------
     RESV_VAL       <= '1' when (xfer_start    = '1') else '0';
     RESV_LAST      <= '1' when (xfer_req_last = '1') else '0';
+    RESV_ERROR     <= '0';
     RESV_SIZE      <= std_logic_vector(RESIZE(unsigned(xfer_req_size) , RESV_SIZE'length));
     -------------------------------------------------------------------------------
     -- Pull Size and Last
     -------------------------------------------------------------------------------
-    PULL_VAL       <= '1' when (res_queue_valid(0) = '1' and BVALID = '1') else '0';
-    PULL_LAST      <= '1' when (res_queue_last = '1') else '0';
+    PULL_VAL       <= '1' when (ack_queue_valid(0) = '1' and BVALID = '1') else '0';
+    PULL_LAST      <= '1' when (ack_queue_last = '1') else '0';
+    PULL_ERROR     <= '1' when (BRESP = AXI4_RESP_SLVERR or BRESP = AXI4_RESP_DECERR) else '0';
     PULL_SIZE      <= (others => '0') when (BRESP = AXI4_RESP_SLVERR or BRESP = AXI4_RESP_DECERR) else
-                      std_logic_vector(RESIZE(unsigned(res_queue_size), PULL_SIZE'length));
+                      std_logic_vector(RESIZE(unsigned(ack_queue_size), PULL_SIZE'length));
 end RTL;

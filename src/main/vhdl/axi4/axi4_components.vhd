@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_components.vhd                                             --
 --!     @brief   PIPEWORK AXI4 LIBRARY DESCRIPTION                               --
---!     @version 0.0.5                                                           --
+--!     @version 0.0.6                                                           --
 --!     @date    2013/01/09                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
@@ -99,15 +99,15 @@ component AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER
         REQ_VAL         : in    std_logic;
         REQ_RDY         : out   std_logic;
         ---------------------------------------------------------------------------
-        -- Command Response Signals.
+        -- Command Acknowledge Signals.
         ---------------------------------------------------------------------------
-        RES_VAL         : out   std_logic;
-        RES_DONE        : out   std_logic;
-        RES_ERROR       : out   std_logic;
-        RES_LAST        : out   std_logic;
-        RES_STOP        : out   std_logic;
-        RES_NONE        : out   std_logic;
-        RES_SIZE        : out   std_logic_vector(SIZE_BITS    -1 downto 0);
+        ACK_VAL         : out   std_logic;
+        ACK_NEXT        : out   std_logic;
+        ACK_LAST        : out   std_logic;
+        ACK_ERROR       : out   std_logic;
+        ACK_STOP        : out   std_logic;
+        ACK_NONE        : out   std_logic;
+        ACK_SIZE        : out   std_logic_vector(SIZE_BITS    -1 downto 0);
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
@@ -126,18 +126,21 @@ component AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER
         XFER_REQ_SIZE   : out   std_logic_vector(XFER_MAX_SIZE   downto 0);
         XFER_REQ_FIRST  : out   std_logic;
         XFER_REQ_LAST   : out   std_logic;
-        XFER_REQ_DONE   : out   std_logic;
+        XFER_REQ_NEXT   : out   std_logic;
         XFER_REQ_SAFETY : out   std_logic;
         XFER_REQ_VAL    : out   std_logic;
         XFER_REQ_RDY    : in    std_logic;
         ---------------------------------------------------------------------------
         -- Transfer Response Signals.
         ---------------------------------------------------------------------------
-        XFER_RES_SIZE   : in    std_logic_vector(XFER_MAX_SIZE   downto 0);
-        XFER_RES_VAL    : in    std_logic;
-        XFER_RES_DONE   : in    std_logic;
-        XFER_RES_LAST   : in    std_logic;
-        XFER_RES_ERR    : in    std_logic;
+        XFER_ACK_SIZE   : in    std_logic_vector(XFER_MAX_SIZE   downto 0);
+        XFER_ACK_VAL    : in    std_logic;
+        XFER_ACK_NEXT   : in    std_logic;
+        XFER_ACK_LAST   : in    std_logic;
+        XFER_ACK_ERR    : in    std_logic;
+        ---------------------------------------------------------------------------
+        -- Transfer Status Signals.
+        ---------------------------------------------------------------------------
         XFER_RUNNING    : in    std_logic
     );
 end component;
@@ -155,12 +158,6 @@ component AXI4_MASTER_READ_INTERFACE
         AXI4_DATA_WIDTH : --! @brief AXI4 READ DATA CHANNEL DATA WIDTH :
                           --! AXI4 リードデータチャネルのRDATA信号のビット幅.
                           integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        AXI4_AUSER_WIDTH: --! @brief AXI4 ADDRESS CHANNEL USER WIDTH :
-                          --! AXI4 リードアドレスチャネルのAUSER信号のビット幅.
-                          integer := 4;
-        AXI4_RUSER_WIDTH: --! @brief AXI4 READ DATA CHANNEL USER WIDTH :
-                          --! AXI4 リードデータチャネルのUSER信号のビット幅.
-                          integer := 4;
         AXI4_ID_WIDTH   : --! @brief AXI4 ID WIDTH :
                           --! AXI4 アドレスチャネルおよびリードデータチャネルの
                           --! ID信号のビット幅.
@@ -244,9 +241,6 @@ component AXI4_MASTER_READ_INTERFACE
                           --! Permits a single physical interface on a slave to be
                           --! used for multiple logical interfaces.
                           out   AXI4_AREGION_TYPE;
-        ARUSER          : --! @brief User signal.
-                          --! Optional User-defined signal in the read address channel.
-                          out   std_logic_vector(AXI4_AUSER_WIDTH -1 downto 0);
         ARVALID         : --! @brief Read address valid.
                           --! This signal indicates that the channel is signaling
                           --! valid read address and control infomation.
@@ -270,9 +264,6 @@ component AXI4_MASTER_READ_INTERFACE
         RLAST           : --! @brief Read last.
                           --! This signal indicates the last transfer in a read burst.
                           in    std_logic;
-        RUSER           : --! @brief User signal.
-                          --! Optional User-defined signal in the read data channel.
-                          in    std_logic_vector(AXI4_RUSER_WIDTH -1 downto 0);
         RVALID          : --! @brief Read data valid.
                           --! This signal indicates that the channel is signaling
                           --! the required read data.
@@ -286,7 +277,6 @@ component AXI4_MASTER_READ_INTERFACE
         ---------------------------------------------------------------------------
         REQ_ADDR        : in    std_logic_vector(AXI4_ADDR_WIDTH  -1 downto 0);
         REQ_SIZE        : in    std_logic_vector(REQ_SIZE_BITS    -1 downto 0);
-        REQ_USER        : in    std_logic_vector(AXI4_AUSER_WIDTH -1 downto 0);
         REQ_ID          : in    std_logic_vector(AXI4_ID_WIDTH    -1 downto 0);
         REQ_BURST       : in    AXI4_ABURST_TYPE;
         REQ_LOCK        : in    AXI4_ALOCK_TYPE;
@@ -303,15 +293,15 @@ component AXI4_MASTER_READ_INTERFACE
         XFER_SIZE_SEL   : in    std_logic_vector(XFER_MAX_SIZE downto XFER_MIN_SIZE);
         XFER_BUSY       : out   std_logic;
         ---------------------------------------------------------------------------
-        -- Response Signals.
+        -- Command Acknowledge Signals.
         ---------------------------------------------------------------------------
-        RES_VAL         : out   std_logic;
-        RES_ERROR       : out   std_logic;
-        RES_DONE        : out   std_logic;
-        RES_LAST        : out   std_logic;
-        RES_STOP        : out   std_logic;
-        RES_NONE        : out   std_logic;
-        RES_SIZE        : out   std_logic_vector(SIZE_BITS        -1 downto 0);
+        ACK_VAL         : out   std_logic;
+        ACK_NEXT        : out   std_logic;
+        ACK_LAST        : out   std_logic;
+        ACK_ERROR       : out   std_logic;
+        ACK_STOP        : out   std_logic;
+        ACK_NONE        : out   std_logic;
+        ACK_SIZE        : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
@@ -325,12 +315,14 @@ component AXI4_MASTER_READ_INTERFACE
         RESV_VAL        : out   std_logic;
         RESV_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         RESV_LAST       : out   std_logic;
+        RESV_ERROR      : out   std_logic;
         ---------------------------------------------------------------------------
         -- Push Size Signals.
         ---------------------------------------------------------------------------
         PUSH_VAL        : out   std_logic;
         PUSH_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         PUSH_LAST       : out   std_logic;
+        PUSH_ERROR      : out   std_logic;
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
@@ -355,15 +347,6 @@ component AXI4_MASTER_WRITE_INTERFACE
         AXI4_DATA_WIDTH : --! @brief AXI4 WRITE DATA CHANNEL DATA WIDTH :
                           --! AXI4 ライトデータチャネルのRDATA信号のビット幅.
                           integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        AXI4_AUSER_WIDTH: --! @brief AXI4 ADDRESS CHANNEL USER WIDTH :
-                          --! AXI4 ライトアドレスチャネルのAUSER信号のビット幅.
-                          integer := 4;
-        AXI4_WUSER_WIDTH: --! @brief AXI4 WRITE DATA CHANNEL USER WIDTH :
-                          --! AXI4 ライトデータチャネルのUSER信号のビット幅.
-                          integer := 4;
-        AXI4_BUSER_WIDTH: --! @brief AXI4 WRITE RESPONSE CHANNEL USER WIDTH :
-                          --! AXI4 ライトレスポンスチャネルのUSER信号のビット幅.
-                          integer := 4;
         AXI4_ID_WIDTH   : --! @brief AXI4 ID WIDTH :
                           --! AXI4 アドレスチャネルおよびライトレスポンスチャネルの
                           --! ID信号のビット幅.
@@ -447,9 +430,6 @@ component AXI4_MASTER_WRITE_INTERFACE
                           --! Permits a single physical interface on a slave to be
                           --! used for multiple logical interfaces.
                           out   AXI4_AREGION_TYPE;
-        AWUSER          : --! @brief User signal.
-                          --! Optional User-defined signal in the write address channel.
-                          out   std_logic_vector(AXI4_AUSER_WIDTH -1 downto 0);
         AWVALID         : --! @brief Write address valid.
                           --! This signal indicates that the channel is signaling
                           --! valid read address and control infomation.
@@ -472,9 +452,6 @@ component AXI4_MASTER_WRITE_INTERFACE
                           --! data. There is one write strobe bit for each eight
                           --! bits of the write data bus.
                           out   std_logic_vector(AXI4_DATA_WIDTH/8-1 downto 0);
-        WUSER           : --! @brief User signal.
-                          --! Optional User-defined signal in the write data channel.
-                          out   std_logic_vector(AXI4_WUSER_WIDTH -1 downto 0);
         WLAST           : --! @brief Write last.
                           --! This signal indicates the last transfer in a write burst.
                           out   std_logic;
@@ -496,9 +473,6 @@ component AXI4_MASTER_WRITE_INTERFACE
         BRESP           : --! @brief Write response.
                           --! This signal indicates the status of the write transaction.
                           in    AXI4_RESP_TYPE;
-        BUSER           : --! @brief User signal.
-                          --! Optional User-defined signal in the read data channel.
-                          in    std_logic_vector(AXI4_BUSER_WIDTH -1 downto 0);
         BVALID          : --! @brief Write response valid.
                           --! This signal indicates that the channel is signaling
                           --! a valid write response.
@@ -512,7 +486,6 @@ component AXI4_MASTER_WRITE_INTERFACE
         ---------------------------------------------------------------------------
         REQ_ADDR        : in    std_logic_vector(AXI4_ADDR_WIDTH  -1 downto 0);
         REQ_SIZE        : in    std_logic_vector(REQ_SIZE_BITS    -1 downto 0);
-        REQ_USER        : in    std_logic_vector(AXI4_AUSER_WIDTH -1 downto 0);
         REQ_ID          : in    std_logic_vector(AXI4_ID_WIDTH    -1 downto 0);
         REQ_BURST       : in    AXI4_ABURST_TYPE;
         REQ_LOCK        : in    AXI4_ALOCK_TYPE;
@@ -531,13 +504,13 @@ component AXI4_MASTER_WRITE_INTERFACE
         ---------------------------------------------------------------------------
         -- Command Response Signals.
         ---------------------------------------------------------------------------
-        RES_VAL         : out   std_logic;
-        RES_ERROR       : out   std_logic;
-        RES_DONE        : out   std_logic;
-        RES_LAST        : out   std_logic;
-        RES_STOP        : out   std_logic;
-        RES_NONE        : out   std_logic;
-        RES_SIZE        : out   std_logic_vector(SIZE_BITS        -1 downto 0);
+        ACK_VAL         : out   std_logic;
+        ACK_NEXT        : out   std_logic;
+        ACK_LAST        : out   std_logic;
+        ACK_ERROR       : out   std_logic;
+        ACK_STOP        : out   std_logic;
+        ACK_NONE        : out   std_logic;
+        ACK_SIZE        : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
@@ -551,12 +524,14 @@ component AXI4_MASTER_WRITE_INTERFACE
         RESV_VAL        : out   std_logic;
         RESV_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         RESV_LAST       : out   std_logic;
+        RESV_ERROR      : out   std_logic;
         ---------------------------------------------------------------------------
         -- Pull Size Signals.
         ---------------------------------------------------------------------------
         PULL_VAL        : out   std_logic;
         PULL_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         PULL_LAST       : out   std_logic;
+        PULL_ERROR      : out   std_logic;
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------

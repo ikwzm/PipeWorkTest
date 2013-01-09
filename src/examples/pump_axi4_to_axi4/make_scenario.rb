@@ -34,20 +34,20 @@ class ScenarioGenerater
     end
   end
 
-  def initialize(name, i_axi4_data_width, o_axi4_data_width)
+  def initialize(name, i_axi4_data_width, o_axi4_data_width, max_xfer_size)
     @name   = name
-    @i_gen  = IOScenarioGenerater.new("I", "READ" , i_axi4_data_width, 64, 1)
-    @o_gen  = IOScenarioGenerater.new("O", "WRITE", o_axi4_data_width, 64, 2)
+    @i_gen  = IOScenarioGenerater.new("I", "READ" , i_axi4_data_width, max_xfer_size, 1)
+    @o_gen  = IOScenarioGenerater.new("O", "WRITE", o_axi4_data_width, max_xfer_size, 2)
     @no     = 0
     @id     = 10
   end
 
-  def gen(io, i_address, o_address, size)
-    @no += 1
+  def gen(title, io, i_address, o_address, i_size, o_size)
+    size  = i_size
     data  = (1..size).collect{rand(256)}
     io.print "---\n"
     io.print "- MARCHAL : \n"
-    io.print "  - SAY : ", @name, ".", @no, "\n"
+    io.print "  - SAY : ", title, "\n"
     io.print "- CSR : \n"
     io.print "  - WRITE : \n"
     io.print "      ADDR : 0x00000000\n"
@@ -56,11 +56,11 @@ class ScenarioGenerater
     io.print "      ID   : 10\n"
     io.print "      DATA : - ", sprintf("0x%08X", o_address)     , " # O_ADDR[31:00]\n"
     io.print "             - 0x00000000"                         , " # O_ADDR[63:32]\n"                  
-    io.print "             - ", sprintf("0x%08X", size)          , " # O_SIZE[31:00]\n"
+    io.print "             - ", sprintf("0x%08X", o_size)        , " # O_SIZE[31:00]\n"
     io.print "             - 0x07000007"                         , " # O_CTRL[31:00]\n"
     io.print "             - ", sprintf("0x%08X", i_address)     , " # I_ADDR[31:00]\n"
     io.print "             - 0x00000000"                         , " # I_ADDR[63:32]\n"
-    io.print "             - ", sprintf("0x%08X", size)          , " # I_SIZE[31:00]\n"
+    io.print "             - ", sprintf("0x%08X", i_size)        , " # I_SIZE[31:00]\n"
     io.print "             - 0x07000007"                         , " # I_CTRL[31:00]\n"
     io.print "      RESP : OKAY\n"
     io.print "  - WAIT  : {GPI(0) : 1, TIMEOUT: 10000}\n"
@@ -73,11 +73,11 @@ class ScenarioGenerater
     io.print "      ID   : 10\n"
     io.print "      DATA : - ", sprintf("0x%08X", o_address+size), " # O_ADDR[31:00]\n"
     io.print "             - 0x00000000"                         , " # O_ADDR[63:32]\n"                  
-    io.print "             - 0x00000000"                         , " # O_SIZE[31:00]\n"
+    io.print "             - ", sprintf("0x%08X", o_size-size   ), " # O_SIZE[31:00]\n"
     io.print "             - 0x06010007"                         , " # O_CTRL[31:00]\n"
     io.print "             - ", sprintf("0x%08X", i_address+size), " # I_ADDR[31:00]\n"
     io.print "             - 0x00000000"                         , " # I_ADDR[63:32]\n"                  
-    io.print "             - 0x00000000"                         , " # I_SIZE[31:00]\n"
+    io.print "             - ", sprintf("0x%08X", i_size-size   ), " # I_SIZE[31:00]\n"
     io.print "             - 0x06010007"                         , " # I_CTRL[31:00]\n"
     io.print "      RESP : OKAY\n"
     io.print "  - WRITE : \n"
@@ -103,14 +103,26 @@ class ScenarioGenerater
 
   def generate(file_name)
     io = open(file_name, "w")
+    test_num = 0
     [1,2,3,4,5,6,7,8,9,10,16,21,32,49,64,71,85,99,110,128,140,155,189,200,212,234,256].each{|size|
       (0xFC00..0xFC07).each {|i_address|
       (0x1000..0x1007).each {|o_address|
-        gen(io, i_address, o_address, size)
+        title = @name.to_s + ".1." + test_num.to_s
+        gen(title, io, i_address, o_address, size, size)
+        test_num += 1
+      }}
+    }
+    test_num = 0
+    [1,2,3,4,5,6,7,8,9,10,16,21,32,49,64,71,85,99,110,128,140,155,189,200,212,234,256].each{|size|
+      (0xFC00..0xFC07).each {|i_address|
+      (0x1000..0x1007).each {|o_address|
+        title = @name.to_s + ".2." + test_num.to_s
+        gen(title, io, i_address, o_address, size, size+15)
+        test_num += 1
       }}
     }
   end
 end
 
-gen = ScenarioGenerater.new("PUMP_AXI4_TO_AXI4 TEST 1", 32, 32)
+gen = ScenarioGenerater.new("PUMP_AXI4_TO_AXI4 TEST", 32, 32, 64)
 gen.generate("pump_axi4_to_axi4_test_bench_32_32.snr")

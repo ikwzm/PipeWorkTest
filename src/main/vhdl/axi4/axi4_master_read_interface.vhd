@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_read_interface.vhd
 --!     @brief   AXI4 Master Read Interface
---!     @version 0.0.5
---!     @date    2013/1/8
+--!     @version 0.0.6
+--!     @date    2013/1/9
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -52,12 +52,6 @@ entity  AXI4_MASTER_READ_INTERFACE is
         AXI4_DATA_WIDTH : --! @brief AXI4 READ DATA CHANNEL DATA WIDTH :
                           --! AXI4 リードデータチャネルのRDATA信号のビット幅.
                           integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        AXI4_AUSER_WIDTH: --! @brief AXI4 ADDRESS CHANNEL USER WIDTH :
-                          --! AXI4 リードアドレスチャネルのAUSER信号のビット幅.
-                          integer := 4;
-        AXI4_RUSER_WIDTH: --! @brief AXI4 READ DATA CHANNEL USER WIDTH :
-                          --! AXI4 リードデータチャネルのUSER信号のビット幅.
-                          integer := 4;
         AXI4_ID_WIDTH   : --! @brief AXI4 ID WIDTH :
                           --! AXI4 アドレスチャネルおよびリードデータチャネルの
                           --! ID信号のビット幅.
@@ -141,9 +135,6 @@ entity  AXI4_MASTER_READ_INTERFACE is
                           --! Permits a single physical interface on a slave to be
                           --! used for multiple logical interfaces.
                           out   AXI4_AREGION_TYPE;
-        ARUSER          : --! @brief User signal.
-                          --! Optional User-defined signal in the read address channel.
-                          out   std_logic_vector(AXI4_AUSER_WIDTH -1 downto 0);
         ARVALID         : --! @brief Read address valid.
                           --! This signal indicates that the channel is signaling
                           --! valid read address and control infomation.
@@ -167,9 +158,6 @@ entity  AXI4_MASTER_READ_INTERFACE is
         RLAST           : --! @brief Read last.
                           --! This signal indicates the last transfer in a read burst.
                           in    std_logic;
-        RUSER           : --! @brief User signal.
-                          --! Optional User-defined signal in the read data channel.
-                          in    std_logic_vector(AXI4_RUSER_WIDTH -1 downto 0);
         RVALID          : --! @brief Read data valid.
                           --! This signal indicates that the channel is signaling
                           --! the required read data.
@@ -183,7 +171,6 @@ entity  AXI4_MASTER_READ_INTERFACE is
         ---------------------------------------------------------------------------
         REQ_ADDR        : in    std_logic_vector(AXI4_ADDR_WIDTH  -1 downto 0);
         REQ_SIZE        : in    std_logic_vector(REQ_SIZE_BITS    -1 downto 0);
-        REQ_USER        : in    std_logic_vector(AXI4_AUSER_WIDTH -1 downto 0);
         REQ_ID          : in    std_logic_vector(AXI4_ID_WIDTH    -1 downto 0);
         REQ_BURST       : in    AXI4_ABURST_TYPE;
         REQ_LOCK        : in    AXI4_ALOCK_TYPE;
@@ -200,15 +187,15 @@ entity  AXI4_MASTER_READ_INTERFACE is
         XFER_SIZE_SEL   : in    std_logic_vector(XFER_MAX_SIZE downto XFER_MIN_SIZE);
         XFER_BUSY       : out   std_logic;
         ---------------------------------------------------------------------------
-        -- Response Signals.
+        -- Command Acknowledge Signals.
         ---------------------------------------------------------------------------
-        RES_VAL         : out   std_logic;
-        RES_ERROR       : out   std_logic;
-        RES_DONE        : out   std_logic;
-        RES_LAST        : out   std_logic;
-        RES_STOP        : out   std_logic;
-        RES_NONE        : out   std_logic;
-        RES_SIZE        : out   std_logic_vector(SIZE_BITS        -1 downto 0);
+        ACK_VAL         : out   std_logic;
+        ACK_NEXT        : out   std_logic;
+        ACK_LAST        : out   std_logic;
+        ACK_ERROR       : out   std_logic;
+        ACK_STOP        : out   std_logic;
+        ACK_NONE        : out   std_logic;
+        ACK_SIZE        : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
@@ -222,12 +209,14 @@ entity  AXI4_MASTER_READ_INTERFACE is
         RESV_VAL        : out   std_logic;
         RESV_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         RESV_LAST       : out   std_logic;
+        RESV_ERROR      : out   std_logic;
         ---------------------------------------------------------------------------
         -- Push Size Signals.
         ---------------------------------------------------------------------------
         PUSH_VAL        : out   std_logic;
         PUSH_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         PUSH_LAST       : out   std_logic;
+        PUSH_ERROR      : out   std_logic;
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
@@ -272,19 +261,19 @@ architecture RTL of AXI4_MASTER_READ_INTERFACE is
     signal   xfer_req_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
     signal   xfer_req_valid     : std_logic;
     signal   xfer_req_ready     : std_logic;
-    signal   xfer_req_done      : std_logic;
+    signal   xfer_req_next      : std_logic;
     signal   xfer_req_last      : std_logic;
     signal   xfer_req_first     : std_logic;
     signal   xfer_req_safety    : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal   xfer_res_valid     : std_logic;
-    signal   xfer_res_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
-    signal   xfer_res_done      : std_logic;
-    signal   xfer_res_last      : std_logic;
-    signal   xfer_res_safety    : std_logic;
-    signal   xfer_res_error     : std_logic;
+    signal   xfer_ack_valid     : std_logic;
+    signal   xfer_ack_size      : std_logic_vector(XFER_MAX_SIZE downto 0);
+    signal   xfer_ack_next      : std_logic;
+    signal   xfer_ack_last      : std_logic;
+    signal   xfer_ack_error     : std_logic;
+    signal   xfer_safety        : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -296,12 +285,12 @@ architecture RTL of AXI4_MASTER_READ_INTERFACE is
     -------------------------------------------------------------------------------
     signal   xfer_queue_addr    : std_logic_vector(AXI4_DATA_SIZE downto 0);
     signal   xfer_queue_size    : std_logic_vector(XFER_MAX_SIZE  downto 0);
-    signal   xfer_queue_done    : std_logic;
+    signal   xfer_queue_next    : std_logic;
     signal   xfer_queue_last    : std_logic;
     signal   xfer_queue_first   : std_logic;
     signal   xfer_queue_safety  : std_logic;
     signal   xfer_queue_empty   : std_logic;
-    signal   xfer_queue_valid   : std_logic_vector(QUEUE_SIZE    downto 0);
+    signal   xfer_queue_valid   : std_logic_vector(QUEUE_SIZE     downto 0);
     signal   xfer_queue_ready   : std_logic;
     -------------------------------------------------------------------------------
     -- 
@@ -315,12 +304,14 @@ architecture RTL of AXI4_MASTER_READ_INTERFACE is
     -- 
     -------------------------------------------------------------------------------
     signal   buf_busy           : std_logic;
-    signal   buf_enable         : std_logic;
-    signal   buf_push_valid     : std_logic;
-    signal   buf_push_ben       : std_logic_vector(AXI4_DATA_WIDTH/8-1 downto 0);
-    signal   buf_push_flush     : std_logic;
-    signal   buf_push_done      : std_logic;
-    signal   buf_push_ready     : std_logic;
+    signal   read_enable        : std_logic;
+    signal   read_data_valid    : std_logic;
+    signal   read_data_ready    : std_logic;
+    signal   read_data_ben      : std_logic_vector(AXI4_DATA_WIDTH/8-1 downto 0);
+    signal   read_data_flush    : std_logic;
+    signal   read_data_done     : std_logic;
+    signal   read_data_error    : boolean;
+    signal   response_error     : boolean;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -376,13 +367,13 @@ begin
             -----------------------------------------------------------------------
             -- Command Response Signals.
             -----------------------------------------------------------------------
-            RES_VAL         => RES_VAL           , -- Out :
-            RES_DONE        => RES_DONE          , -- Out :
-            RES_ERROR       => RES_ERROR         , -- Out :
-            RES_LAST        => RES_LAST          , -- Out :
-            RES_STOP        => RES_STOP          , -- Out :
-            RES_NONE        => RES_NONE          , -- Out :
-            RES_SIZE        => RES_SIZE          , -- Out :
+            ACK_VAL         => ACK_VAL           , -- Out :
+            ACK_NEXT        => ACK_NEXT          , -- Out :
+            ACK_LAST        => ACK_LAST          , -- Out :
+            ACK_ERROR       => ACK_ERROR         , -- Out :
+            ACK_STOP        => ACK_STOP          , -- Out :
+            ACK_NONE        => ACK_NONE          , -- Out :
+            ACK_SIZE        => ACK_SIZE          , -- Out :
             -----------------------------------------------------------------------
             -- Transfer Control Signals.
             -----------------------------------------------------------------------
@@ -401,18 +392,18 @@ begin
             XFER_REQ_SIZE   => xfer_req_size     , -- Out :
             XFER_REQ_FIRST  => xfer_req_first    , -- Out :
             XFER_REQ_LAST   => xfer_req_last     , -- Out :
-            XFER_REQ_DONE   => xfer_req_done     , -- Out :
+            XFER_REQ_NEXT   => xfer_req_next     , -- Out :
             XFER_REQ_SAFETY => xfer_req_safety   , -- Out :
             XFER_REQ_VAL    => xfer_req_valid    , -- Out :
             XFER_REQ_RDY    => xfer_req_ready    , -- In  :
             -----------------------------------------------------------------------
             -- Transfer Response Signals.
             -----------------------------------------------------------------------
-            XFER_RES_SIZE   => xfer_res_size     , -- In  :
-            XFER_RES_VAL    => xfer_res_valid    , -- In  :
-            XFER_RES_DONE   => xfer_res_done     , -- In  :
-            XFER_RES_LAST   => xfer_res_last     , -- In  :
-            XFER_RES_ERR    => xfer_res_error    , -- In  :
+            XFER_ACK_SIZE   => xfer_ack_size     , -- In  :
+            XFER_ACK_VAL    => xfer_ack_valid    , -- In  :
+            XFER_ACK_NEXT   => xfer_ack_next     , -- In  :
+            XFER_ACK_LAST   => xfer_ack_last     , -- In  :
+            XFER_ACK_ERR    => xfer_ack_error    , -- In  :
             XFER_RUNNING    => xfer_running        -- In  :
         );
     -------------------------------------------------------------------------------
@@ -425,7 +416,6 @@ begin
     ARPROT   <= REQ_PROT;
     ARQOS    <= REQ_QOS;
     ARREGION <= REQ_REGION;
-    ARUSER   <= REQ_USER;
     ARID     <= REQ_ID;
     -------------------------------------------------------------------------------
     -- Transfer Request Queue.
@@ -436,8 +426,8 @@ begin
         constant VEC_SIZE_HI    : integer := VEC_SIZE_LO  + XFER_MAX_SIZE;
         constant VEC_ADDR_LO    : integer := VEC_SIZE_HI  + 1;
         constant VEC_ADDR_HI    : integer := VEC_ADDR_LO  + AXI4_DATA_SIZE;
-        constant VEC_DONE_POS   : integer := VEC_ADDR_HI  + 1;
-        constant VEC_LAST_POS   : integer := VEC_DONE_POS + 1;
+        constant VEC_NEXT_POS   : integer := VEC_ADDR_HI  + 1;
+        constant VEC_LAST_POS   : integer := VEC_NEXT_POS + 1;
         constant VEC_FIRST_POS  : integer := VEC_LAST_POS + 1;
         constant VEC_SAFETY_POS : integer := VEC_FIRST_POS+ 1;
         constant VEC_HI         : integer := VEC_SAFETY_POS;
@@ -447,7 +437,7 @@ begin
     begin
         i_vec(VEC_SIZE_HI downto VEC_SIZE_LO) <= xfer_req_size;
         i_vec(VEC_ADDR_HI downto VEC_ADDR_LO) <= xfer_req_addr(AXI4_DATA_SIZE downto 0);
-        i_vec(VEC_DONE_POS)                   <= xfer_req_done;
+        i_vec(VEC_NEXT_POS)                   <= xfer_req_next;
         i_vec(VEC_LAST_POS)                   <= xfer_req_last;
         i_vec(VEC_FIRST_POS)                  <= xfer_req_first;
         i_vec(VEC_SAFETY_POS)                 <= xfer_req_safety;
@@ -472,7 +462,7 @@ begin
             );
         xfer_queue_size   <= q_vec(VEC_SIZE_HI downto VEC_SIZE_LO);
         xfer_queue_addr   <= q_vec(VEC_ADDR_HI downto VEC_ADDR_LO);
-        xfer_queue_done   <= q_vec(VEC_DONE_POS);
+        xfer_queue_next   <= q_vec(VEC_NEXT_POS);
         xfer_queue_last   <= q_vec(VEC_LAST_POS);
         xfer_queue_first  <= q_vec(VEC_FIRST_POS);
         xfer_queue_safety <= q_vec(VEC_SAFETY_POS);
@@ -532,9 +522,9 @@ begin
             NEXT_VALID      => open                    -- Out :
         );
     -------------------------------------------------------------------------------
-    -- レスポンス側の状態遷移
+    -- 応答側の状態遷移
     -------------------------------------------------------------------------------
-    RES_FSM: process(CLK, RST) begin
+    ACK_FSM: process(CLK, RST) begin
         if (RST = '1') then
                 curr_state <= IDLE;
         elsif (CLK'event and CLK = '1') then
@@ -555,9 +545,9 @@ begin
                     -- AXI4 Read Data Channel から最初の RVALID が来るのを待つ.
                     ---------------------------------------------------------------
                     when WAIT_RFIRST =>
-                        if    (RVALID = '1' and buf_push_ready = '1' and RLAST = '1') then
+                        if    (RVALID = '1' and read_data_ready = '1' and RLAST = '1') then
                             curr_state <= TURN_AR;
-                        elsif (RVALID = '1' and buf_push_ready = '1' and RLAST = '0') then
+                        elsif (RVALID = '1' and read_data_ready = '1' and RLAST = '0') then
                             curr_state <= WAIT_RLAST;
                         else
                             curr_state <= WAIT_RFIRST;
@@ -566,7 +556,7 @@ begin
                     -- AXI4 Read Data Channel から最後の RVALID が来るのを待つ.
                     ---------------------------------------------------------------
                     when WAIT_RLAST  =>
-                        if    (RVALID = '1' and buf_push_ready = '1' and RLAST = '1') then
+                        if    (RVALID = '1' and read_data_ready = '1' and RLAST = '1') then
                             curr_state <= TURN_AR;
                         else
                             curr_state <= WAIT_RLAST;
@@ -592,27 +582,28 @@ begin
                               curr_state = WAIT_RLAST  or
                               xfer_queue_empty = '0' ) else '0';
     -------------------------------------------------------------------------------
-    -- xfer_res_size  : Transfer Request Queue から取り出したサイズ情報を保持.
-    -- xfer_res_last  : Transfer Request Queue から取り出したLASTを保持.
-    -- xfer_res_safety: Transfer Request Queue から取り出したSAFETYを保持.
+    -- xfer_ack_size  : Transfer Request Queue から取り出したサイズ情報を保持.
+    -- xfer_ack_next  : Transfer Request Queue から取り出したNEXTを保持.
+    -- xfer_ack_last  : Transfer Request Queue から取り出したLASTを保持.
+    -- xfer_safety    : Transfer Request Queue から取り出したSAFETYを保持.
     -------------------------------------------------------------------------------
     process(CLK, RST) begin
         if (RST = '1') then
-                xfer_res_size   <= (others => '0');
-                xfer_res_done   <= '0';
-                xfer_res_last   <= '0';
-                xfer_res_safety <= '0';
+                xfer_ack_size <= (others => '0');
+                xfer_ack_next <= '0';
+                xfer_ack_last <= '0';
+                xfer_safety   <= '0';
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then 
-                xfer_res_size   <= (others => '0');
-                xfer_res_done   <= '0';
-                xfer_res_last   <= '0';
-                xfer_res_safety <= '0';
+                xfer_ack_size <= (others => '0');
+                xfer_ack_next <= '0';
+                xfer_ack_last <= '0';
+                xfer_safety   <= '0';
             elsif (xfer_start = '1') then
-                xfer_res_size   <= xfer_queue_size;
-                xfer_res_done   <= xfer_queue_done;
-                xfer_res_last   <= xfer_queue_last;
-                xfer_res_safety <= xfer_queue_safety;
+                xfer_ack_size <= xfer_queue_size;
+                xfer_ack_next <= xfer_queue_next;
+                xfer_ack_last <= xfer_queue_last;
+                xfer_safety   <= xfer_queue_safety;
             end if;
         end if;
     end process;
@@ -631,52 +622,71 @@ begin
     -------------------------------------------------------------------------------
     -- xfer_beat_chop   : バイトイネーブル信号生成用のトリガー信号.
     -------------------------------------------------------------------------------
-    xfer_beat_chop  <= '1' when (buf_push_valid = '1' and buf_push_ready = '1') else '0';
+    xfer_beat_chop  <= '1' when (read_data_valid = '1' and read_data_ready = '1') else '0';
     -------------------------------------------------------------------------------
-    -- buf_enable       : レシーブバッファを有効にするための信号.
+    -- read_enable      : レシーブバッファを有効にするための信号.
     -------------------------------------------------------------------------------
-    buf_enable      <= '1' when (curr_state = WAIT_RFIRST or curr_state = WAIT_RLAST) else '0';
+    read_enable     <= '1' when (curr_state = WAIT_RFIRST or curr_state = WAIT_RLAST) else '0';
     -------------------------------------------------------------------------------
-    -- buf_push_valid   : レシーブバッファにRDATAを書き込むための信号.
+    -- read_data_valid  : レシーブバッファにRDATAを書き込むための信号.
     -------------------------------------------------------------------------------
-    buf_push_valid  <= '1' when (buf_enable = '1' and RVALID = '1') else '0';
+    read_data_valid <= '1' when (read_enable = '1' and RVALID = '1') else '0';
     -------------------------------------------------------------------------------
-    -- buf_push_flush   : レシーブバッファに最後のデータであることを示す信号.
+    -- read_data_flush  : レシーブバッファに最後のデータであることを示す信号.
     -------------------------------------------------------------------------------
-    buf_push_flush  <= '1' when (buf_push_valid  = '1' and RLAST  = '1' and xfer_res_last = '0') else '0';
+    read_data_flush <= '1' when (read_data_valid  = '1' and RLAST  = '1' and xfer_ack_last = '0') else '0';
     -------------------------------------------------------------------------------
-    -- buf_push_done    : レシーブバッファに最後のデータであることを示す信号.
+    -- read_data_done   : レシーブバッファに最後のデータであることを示す信号.
     -------------------------------------------------------------------------------
-    buf_push_done   <= '1' when (buf_push_valid  = '1' and RLAST  = '1' and xfer_res_last = '1') else '0';
+    read_data_done  <= '1' when (read_data_valid  = '1' and RLAST  = '1' and xfer_ack_last = '1') else '0';
     -------------------------------------------------------------------------------
-    -- buf_push_done    : レシーブバッファへのバイトイネーブル信号.
+    -- read_data_ben    : レシーブバッファへのバイトイネーブル信号.
     --                    エラー時は書き込みが行われないようにしておく.
     -------------------------------------------------------------------------------
-    buf_push_ben    <= xfer_beat_valid when (RRESP = AXI4_RESP_OKAY   or
-                                             RRESP = AXI4_RESP_EXOKAY) else (others => '0');
+    read_data_ben   <= (others => '0') when (read_data_error) else xfer_beat_valid;
     -------------------------------------------------------------------------------
-    -- 
+    -- read_data_error  : エラーレスンポンス
     -------------------------------------------------------------------------------
-    xfer_res_valid  <= '1' when ((xfer_res_safety = '0' and curr_state = WAIT_RFIRST                ) or
-                                 (xfer_res_safety = '1' and curr_state = WAIT_RFIRST and RLAST = '1') or
-                                 (xfer_res_safety = '1' and curr_state = WAIT_RLAST  and RLAST = '1')) and
-                                 (RVALID = '1' and buf_push_ready = '1') else '0';
-    xfer_res_error  <= '1' when (xfer_res_valid = '1' and RRESP = AXI4_RESP_SLVERR) or
-                                (xfer_res_valid = '1' and RRESP = AXI4_RESP_EXOKAY) else '0';
+    read_data_error <= (RRESP = AXI4_RESP_SLVERR or RRESP = AXI4_RESP_DECERR);
+    -------------------------------------------------------------------------------
+    -- xfer_ack_valid   : 
+    -------------------------------------------------------------------------------
+    xfer_ack_valid  <= '1' when ((xfer_safety = '0' and curr_state = WAIT_RFIRST                ) or
+                                 (xfer_safety = '1' and curr_state = WAIT_RFIRST and RLAST = '1') or
+                                 (xfer_safety = '1' and curr_state = WAIT_RLAST  and RLAST = '1')) and
+                                 (RVALID = '1' and read_data_ready = '1') else '0';
+    -------------------------------------------------------------------------------
+    -- xfer_ack_error   : 
+    -------------------------------------------------------------------------------
+    xfer_ack_error  <= '1' when (read_data_error or response_error) else '0';
+    -------------------------------------------------------------------------------
+    -- read_res_error   : 
+    -------------------------------------------------------------------------------
+    process(CLK, RST) begin
+        if (RST = '1') then
+                response_error <= FALSE;
+        elsif (CLK'event and CLK = '1') then
+            if (CLR = '1' or xfer_init_start = '1') then 
+                response_error <= FALSE;
+            elsif (read_data_error) then
+                response_error <= TRUE;
+            end if;
+        end if;
+    end process;
     -------------------------------------------------------------------------------
     -- RREADY : AXI4 Read Data Channel の レディ信号出力.
     -------------------------------------------------------------------------------
-    RREADY <= '1' when (buf_enable = '1' and buf_push_ready = '1') else '0';
+    RREADY <= '1' when (read_enable = '1' and read_data_ready = '1') else '0';
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    RESV_SIZE <= std_logic_vector(RESIZE(unsigned(xfer_res_size), RESV_SIZE'length));
-    RESV_LAST <= xfer_res_last;
-    RESV_VAL  <= '1' when (curr_state = WAIT_RFIRST) and
-                          (RVALID     = '1'        ) and
-                          (buf_push_ready = '1'    ) and
-                          (RRESP = AXI4_RESP_OKAY  or
-                           RRESP = AXI4_RESP_EXOKAY) else '0';
+    RESV_SIZE  <= (others => '0') when (read_data_error) else
+                  std_logic_vector(RESIZE(unsigned(xfer_ack_size), RESV_SIZE'length));
+    RESV_LAST  <= xfer_ack_last;
+    RESV_ERROR <= '1' when (read_data_error) else '0';
+    RESV_VAL   <= '1' when (curr_state = WAIT_RFIRST) and
+                           (read_data_valid = '1'   ) and
+                           (read_data_ready = '1'   ) else '0';
     -------------------------------------------------------------------------------
     -- レシーブバッファ : 外部のリードバッファに書き込む前に、一旦このバッファで
     --                    受けて、バス幅の変換やバイトレーンの調整を行う.
@@ -733,11 +743,11 @@ begin
             -- 入力側 I/F
             -----------------------------------------------------------------------
                 I_DATA          => RDATA          , -- In  :
-                I_ENBL          => buf_push_ben   , -- In  :
-                I_DONE          => buf_push_done  , -- In  :
-                I_FLUSH         => buf_push_flush , -- In  :
-                I_VAL           => buf_push_valid , -- In  :
-                I_RDY           => buf_push_ready , -- Out :
+                I_ENBL          => read_data_ben  , -- In  :
+                I_DONE          => read_data_done , -- In  :
+                I_FLUSH         => read_data_flush, -- In  :
+                I_VAL           => read_data_valid, -- In  :
+                I_RDY           => read_data_ready, -- Out :
             -----------------------------------------------------------------------
             -- 出力側 I/F
             -----------------------------------------------------------------------
@@ -807,9 +817,10 @@ begin
     -- PUSH_TERM : 最後のデータ書き込みであることを転送量カウンタに示す信号.
     -- PUSH_VAL  : PUSH_SIZE、PUSH_TERM が有効であることを示す信号.
     -------------------------------------------------------------------------------
-    PUSH_VAL  <= '1' when (buf_beat_valid = '1' and BUF_RDY       = '1') else '0';
-    PUSH_LAST <= '1' when (buf_beat_valid = '1' and buf_beat_done = '1') else '0';
-    PUSH_SIZE <= std_logic_vector(buf_beat_size);
+    PUSH_VAL   <= '1' when (buf_beat_valid = '1' and BUF_RDY       = '1') else '0';
+    PUSH_LAST  <= '1' when (buf_beat_valid = '1' and buf_beat_done = '1') else '0';
+    PUSH_ERROR <= '1' when (buf_beat_valid = '1' and buf_beat_done = '1' and response_error) else '0';
+    PUSH_SIZE  <= std_logic_vector(buf_beat_size);
     -------------------------------------------------------------------------------
     -- BUF_WEN  : 外部リードバッファへの書き込み信号.
     -------------------------------------------------------------------------------

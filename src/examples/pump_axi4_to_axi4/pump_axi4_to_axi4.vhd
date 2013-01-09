@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4.vhd
 --!     @brief   Pump Sample Module (AXI4 to AXI4)
---!     @version 0.0.4
---!     @date    2013/1/7
+--!     @version 0.0.6
+--!     @date    2013/1/9
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -286,7 +286,6 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     ------------------------------------------------------------------------------
     -- 入力側の各種定数.
     ------------------------------------------------------------------------------
-    constant I_USER             : std_logic_vector(I_AUSER_WIDTH    -1 downto 0) := (others => '0');
     constant I_ID               : std_logic_vector(I_ID_WIDTH       -1 downto 0) :=
                                   std_logic_vector(to_unsigned(I_AXI_ID, I_ID_WIDTH));
     constant I_BURST_TYPE       : AXI4_ABURST_TYPE := AXI4_ABURST_INCR;
@@ -309,13 +308,13 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   i_req_valid        : std_logic;
     signal   i_req_ready        : std_logic;
     signal   i_xfer_busy        : std_logic;
-    signal   i_res_valid        : std_logic;
-    signal   i_res_error        : std_logic;
-    signal   i_res_done         : std_logic;
-    signal   i_res_last         : std_logic;
-    signal   i_res_stop         : std_logic;
-    signal   i_res_none         : std_logic;
-    signal   i_res_size         : std_logic_vector(SIZE_BITS        -1 downto 0);
+    signal   i_ack_valid        : std_logic;
+    signal   i_ack_error        : std_logic;
+    signal   i_ack_next         : std_logic;
+    signal   i_ack_last         : std_logic;
+    signal   i_ack_stop         : std_logic;
+    signal   i_ack_none         : std_logic;
+    signal   i_ack_size         : std_logic_vector(SIZE_BITS        -1 downto 0);
     signal   i_flow_pause       : std_logic;
     signal   i_flow_stop        : std_logic;
     signal   i_flow_last        : std_logic;
@@ -326,7 +325,6 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     ------------------------------------------------------------------------------
     -- 出力側の各種定数.
     ------------------------------------------------------------------------------
-    constant O_USER             : std_logic_vector(O_AUSER_WIDTH    -1 downto 0) := (others => '0');
     constant O_ID               : std_logic_vector(O_ID_WIDTH       -1 downto 0) := 
                                   std_logic_vector(to_unsigned(O_AXI_ID, O_ID_WIDTH));
     constant O_BURST_TYPE       : AXI4_ABURST_TYPE := AXI4_ABURST_INCR;
@@ -349,13 +347,13 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   o_req_valid        : std_logic;
     signal   o_req_ready        : std_logic;
     signal   o_xfer_busy        : std_logic;
-    signal   o_res_valid        : std_logic;
-    signal   o_res_error        : std_logic;
-    signal   o_res_done         : std_logic;
-    signal   o_res_last         : std_logic;
-    signal   o_res_stop         : std_logic;
-    signal   o_res_none         : std_logic;
-    signal   o_res_size         : std_logic_vector(SIZE_BITS        -1 downto 0);
+    signal   o_ack_valid        : std_logic;
+    signal   o_ack_error        : std_logic;
+    signal   o_ack_next         : std_logic;
+    signal   o_ack_last         : std_logic;
+    signal   o_ack_stop         : std_logic;
+    signal   o_ack_none         : std_logic;
+    signal   o_ack_size         : std_logic_vector(SIZE_BITS        -1 downto 0);
     signal   o_flow_pause       : std_logic;
     signal   o_flow_stop        : std_logic;
     signal   o_flow_last        : std_logic;
@@ -367,9 +365,11 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     -- フローカウンタ制御用信号群.
     ------------------------------------------------------------------------------
     signal   push_valid         : std_logic;
+    signal   push_error         : std_logic;
     signal   push_last          : std_logic;
     signal   push_size          : std_logic_vector(SIZE_BITS        -1 downto 0);
     signal   pull_valid         : std_logic;
+    signal   pull_error         : std_logic;
     signal   pull_last          : std_logic;
     signal   pull_size          : std_logic_vector(SIZE_BITS        -1 downto 0);
     ------------------------------------------------------------------------------
@@ -515,8 +515,6 @@ begin
         generic map (
             AXI4_ADDR_WIDTH => I_ADDR_WIDTH    ,
             AXI4_DATA_WIDTH => I_DATA_WIDTH    ,
-            AXI4_AUSER_WIDTH=> I_AUSER_WIDTH   ,
-            AXI4_RUSER_WIDTH=> I_RUSER_WIDTH   ,
             AXI4_ID_WIDTH   => I_ID_WIDTH      ,
             REQ_SIZE_BITS   => SIZE_REGS_BITS  ,
             SIZE_BITS       => SIZE_BITS       ,
@@ -546,7 +544,6 @@ begin
             ARPROT          => I_ARPROT        , -- Out :
             ARQOS           => I_ARQOS         , -- Out :
             ARREGION        => I_ARREGION      , -- Out :
-            ARUSER          => I_ARUSER        , -- Out :
             ARVALID         => I_ARVALID       , -- Out :
             ARREADY         => I_ARREADY       , -- In  :
             ----------------------------------------------------------------------
@@ -556,7 +553,6 @@ begin
             RDATA           => I_RDATA         , -- In  :
             RRESP           => I_RRESP         , -- In  :
             RLAST           => I_RLAST         , -- In  :
-            RUSER           => I_RUSER         , -- In  :
             RVALID          => I_RVALID        , -- In  :
             RREADY          => I_RREADY        , -- Out :
             -----------------------------------------------------------------------
@@ -564,7 +560,6 @@ begin
             -----------------------------------------------------------------------
             REQ_ADDR        => i_req_addr      , -- In  :
             REQ_SIZE        => i_req_size      , -- In  :
-            REQ_USER        => I_USER          , -- In  :
             REQ_ID          => I_ID            , -- In  :
             REQ_BURST       => I_BURST_TYPE    , -- In  :
             REQ_LOCK        => I_LOCK          , -- In  :
@@ -583,13 +578,13 @@ begin
             -----------------------------------------------------------------------
             -- Response Signals.
             -----------------------------------------------------------------------
-            RES_VAL         => i_res_valid     , -- Out :
-            RES_ERROR       => i_res_error     , -- Out :
-            RES_DONE        => i_res_done      , -- Out :
-            RES_LAST        => i_res_last      , -- Out :
-            RES_STOP        => i_res_stop      , -- Out :
-            RES_NONE        => i_res_none      , -- Out :
-            RES_SIZE        => i_res_size      , -- Out :
+            ACK_VAL         => i_ack_valid     , -- Out :
+            ACK_ERROR       => i_ack_error     , -- Out :
+            ACK_NEXT        => i_ack_next      , -- Out :
+            ACK_LAST        => i_ack_last      , -- Out :
+            ACK_STOP        => i_ack_stop      , -- Out :
+            ACK_NONE        => i_ack_none      , -- Out :
+            ACK_SIZE        => i_ack_size      , -- Out :
             -----------------------------------------------------------------------
             -- Flow Control Signals.
             -----------------------------------------------------------------------
@@ -603,12 +598,14 @@ begin
             RESV_VAL        => open            , -- Out :
             RESV_SIZE       => open            , -- Out :
             RESV_LAST       => open            , -- Out :
+            RESV_ERROR      => open            , -- Out :
             -----------------------------------------------------------------------
             -- Push Size Signals.
             -----------------------------------------------------------------------
             PUSH_VAL        => push_valid      , -- Out :
             PUSH_SIZE       => push_size       , -- Out :
             PUSH_LAST       => push_last       , -- Out :
+            PUSH_ERROR      => push_error      , -- Out :
             -----------------------------------------------------------------------
             -- Read Buffer Interface Signals.
             -----------------------------------------------------------------------
@@ -618,6 +615,7 @@ begin
             BUF_PTR         => buf_wptr        , -- Out :
             BUF_RDY         => buf_wready        -- In  :
         );
+    I_ARUSER <= (others => '0');
     ------------------------------------------------------------------------------
     -- 
     ------------------------------------------------------------------------------
@@ -625,9 +623,6 @@ begin
         generic map (
             AXI4_ADDR_WIDTH => O_ADDR_WIDTH    ,
             AXI4_DATA_WIDTH => O_DATA_WIDTH    ,
-            AXI4_AUSER_WIDTH=> O_AUSER_WIDTH   ,
-            AXI4_WUSER_WIDTH=> O_WUSER_WIDTH   ,
-            AXI4_BUSER_WIDTH=> O_BUSER_WIDTH   ,
             AXI4_ID_WIDTH   => O_ID_WIDTH      ,
             REQ_SIZE_BITS   => SIZE_REGS_BITS  ,
             SIZE_BITS       => SIZE_BITS       ,
@@ -657,7 +652,6 @@ begin
             AWPROT          => O_AWPROT        , -- Out :
             AWQOS           => O_AWQOS         , -- Out :
             AWREGION        => O_AWREGION      , -- Out :
-            AWUSER          => O_AWUSER        , -- Out :
             AWVALID         => O_AWVALID       , -- Out :
             AWREADY         => O_AWREADY       , -- In  :
             ----------------------------------------------------------------------
@@ -666,7 +660,6 @@ begin
             WID             => O_WID           , -- Out :
             WDATA           => O_WDATA         , -- Out :
             WSTRB           => O_WSTRB         , -- Out :
-            WUSER           => O_WUSER         , -- Out :
             WLAST           => O_WLAST         , -- Out :
             WVALID          => O_WVALID        , -- Out :
             WREADY          => O_WREADY        , -- In  :
@@ -675,7 +668,6 @@ begin
             ----------------------------------------------------------------------
             BID             => O_BID           , -- In  :
             BRESP           => O_BRESP         , -- In  :
-            BUSER           => O_BUSER         , -- In  :
             BVALID          => O_BVALID        , -- In  :
             BREADY          => O_BREADY        , -- Out :
             -----------------------------------------------------------------------
@@ -683,7 +675,6 @@ begin
             -----------------------------------------------------------------------
             REQ_ADDR        => o_req_addr      , -- In  :
             REQ_SIZE        => o_req_size      , -- In  :
-            REQ_USER        => O_USER          , -- In  :
             REQ_ID          => O_ID            , -- In  :
             REQ_BURST       => O_BURST_TYPE    , -- In  :
             REQ_LOCK        => O_LOCK          , -- In  :
@@ -702,13 +693,13 @@ begin
             -----------------------------------------------------------------------
             -- Response Signals.
             -----------------------------------------------------------------------
-            RES_VAL         => o_res_valid     , -- Out :
-            RES_ERROR       => o_res_error     , -- Out :
-            RES_DONE        => o_res_done      , -- Out :
-            RES_LAST        => o_res_last      , -- Out :
-            RES_STOP        => o_res_stop      , -- Out :
-            RES_NONE        => o_res_none      , -- Out :
-            RES_SIZE        => o_res_size      , -- Out :
+            ACK_VAL         => o_ack_valid     , -- Out :
+            ACK_ERROR       => o_ack_error     , -- Out :
+            ACK_NEXT        => o_ack_next      , -- Out :
+            ACK_LAST        => o_ack_last      , -- Out :
+            ACK_STOP        => o_ack_stop      , -- Out :
+            ACK_NONE        => o_ack_none      , -- Out :
+            ACK_SIZE        => o_ack_size      , -- Out :
             -----------------------------------------------------------------------
             -- Flow Control Signals.
             -----------------------------------------------------------------------
@@ -722,12 +713,14 @@ begin
             RESV_VAL        => open            , -- Out :
             RESV_SIZE       => open            , -- Out :
             RESV_LAST       => open            , -- Out :
+            RESV_ERROR      => open            , -- Out :
             -----------------------------------------------------------------------
             -- Pull Size Signals.
             -----------------------------------------------------------------------
             PULL_VAL        => pull_valid      , -- Out :
             PULL_SIZE       => pull_size       , -- Out :
             PULL_LAST       => pull_last       , -- Out :
+            PULL_ERROR      => pull_error      , -- Out :
             -----------------------------------------------------------------------
             -- Read Buffer Interface Signals.
             -----------------------------------------------------------------------
@@ -736,6 +729,8 @@ begin
             BUF_PTR         => buf_rptr        , -- Out :
             BUF_RDY         => buf_rready
         );
+    O_AWUSER <= (others => '0');
+    O_WUSER  <= (others => '0');
     ------------------------------------------------------------------------------
     -- 
     ------------------------------------------------------------------------------
@@ -805,9 +800,9 @@ begin
             REGS_WDATA      => regs_wbit(I_ADDR_REGS_HI downto I_ADDR_REGS_LO),
             REGS_RDATA      => regs_rbit(I_ADDR_REGS_HI downto I_ADDR_REGS_LO),
             UP_ENA          => i_running       ,
-            UP_VAL          => i_res_valid     ,
+            UP_VAL          => i_ack_valid     ,
             UP_BEN          => i_addr_up_ben   ,
-            UP_SIZE         => i_res_size      ,
+            UP_SIZE         => i_ack_size      ,
             COUNTER         => i_req_addr
        );
     i_addr_up_ben <= (others => '1') when (I_BURST_TYPE = AXI4_ABURST_INCR) else (others => '0');
@@ -828,8 +823,8 @@ begin
             REGS_WDATA      => regs_wbit(I_SIZE_REGS_HI downto I_SIZE_REGS_LO),
             REGS_RDATA      => regs_rbit(I_SIZE_REGS_HI downto I_SIZE_REGS_LO),
             DN_ENA          => i_running       ,
-            DN_VAL          => i_res_valid     ,
-            DN_SIZE         => i_res_size      ,
+            DN_VAL          => i_ack_valid     ,
+            DN_SIZE         => i_ack_size      ,
             COUNTER         => i_req_size      ,
             ZERO            => open            ,
             NEG             => open
@@ -888,21 +883,21 @@ begin
             REQ_FIRST               => i_req_first     ,
             REQ_LAST                => i_req_last      ,
             REQ_READY               => i_req_ready     ,
-            RES_VALID               => i_res_valid     ,
-            RES_ERROR               => i_res_error     ,
-            RES_DONE                => i_res_done      ,
-            RES_LAST                => i_res_last      ,
-            RES_STOP                => i_res_stop      ,
-            RES_NONE                => i_res_none      ,
+            ACK_VALID               => i_ack_valid     ,
+            ACK_ERROR               => i_ack_error     ,
+            ACK_NEXT                => i_ack_next      ,
+            ACK_LAST                => i_ack_last      ,
+            ACK_STOP                => i_ack_stop      ,
+            ACK_NONE                => i_ack_none      ,
             BUFFER_SIZE             => BUF_BYTES       ,
             THRESHOLD_SIZE          => I_THRESHOLD_SIZE,
             FLOW_PAUSE              => i_flow_pause    ,
             FLOW_STOP               => i_flow_stop     ,
             FLOW_LAST               => i_flow_last     ,
             FLOW_SIZE               => i_flow_size     ,
-            PUSH_VAL                => i_res_valid     ,
-            PUSH_LAST               => i_res_last      ,
-            PUSH_SIZE               => i_res_size      ,
+            PUSH_VAL                => i_ack_valid     ,
+            PUSH_LAST               => i_ack_last      ,
+            PUSH_SIZE               => i_ack_size      ,
             PULL_VAL                => pull_valid      ,
             PULL_LAST               => pull_last       ,
             PULL_SIZE               => pull_size       ,
@@ -955,9 +950,9 @@ begin
             REGS_WDATA      => regs_wbit(O_ADDR_REGS_HI downto O_ADDR_REGS_LO),
             REGS_RDATA      => regs_rbit(O_ADDR_REGS_HI downto O_ADDR_REGS_LO),
             UP_ENA          => o_running       ,
-            UP_VAL          => o_res_valid     ,
+            UP_VAL          => o_ack_valid     ,
             UP_BEN          => o_addr_up_ben   ,
-            UP_SIZE         => o_res_size      ,
+            UP_SIZE         => o_ack_size      ,
             COUNTER         => o_req_addr
        );
     o_addr_up_ben <= (others => '1') when (O_BURST_TYPE = AXI4_ABURST_INCR) else (others => '0');
@@ -978,8 +973,8 @@ begin
             REGS_WDATA      => regs_wbit(O_SIZE_REGS_HI downto O_SIZE_REGS_LO),
             REGS_RDATA      => regs_rbit(O_SIZE_REGS_HI downto O_SIZE_REGS_LO),
             DN_ENA          => o_running       ,
-            DN_VAL          => o_res_valid     ,
-            DN_SIZE         => o_res_size      ,
+            DN_VAL          => o_ack_valid     ,
+            DN_SIZE         => o_ack_size      ,
             COUNTER         => o_req_size      ,
             ZERO            => open            ,
             NEG             => open
@@ -1038,12 +1033,12 @@ begin
             REQ_FIRST               => o_req_first     ,
             REQ_LAST                => o_req_last      ,
             REQ_READY               => o_req_ready     ,
-            RES_VALID               => o_res_valid     ,
-            RES_ERROR               => o_res_error     ,
-            RES_DONE                => o_res_done      ,
-            RES_LAST                => o_res_last      ,
-            RES_STOP                => o_res_stop      ,
-            RES_NONE                => o_res_none      ,
+            ACK_VALID               => o_ack_valid     ,
+            ACK_ERROR               => o_ack_error     ,
+            ACK_NEXT                => o_ack_next      ,
+            ACK_LAST                => o_ack_last      ,
+            ACK_STOP                => o_ack_stop      ,
+            ACK_NONE                => o_ack_none      ,
             BUFFER_SIZE             => BUF_BYTES       ,
             THRESHOLD_SIZE          => O_THRESHOLD_SIZE,
             FLOW_PAUSE              => o_flow_pause    ,
@@ -1053,9 +1048,9 @@ begin
             PUSH_VAL                => push_valid      ,
             PUSH_LAST               => push_last       ,
             PUSH_SIZE               => push_size       ,
-            PULL_VAL                => o_res_valid     ,
-            PULL_LAST               => o_res_last      ,
-            PULL_SIZE               => o_res_size      ,
+            PULL_VAL                => o_ack_valid     ,
+            PULL_LAST               => o_ack_last      ,
+            PULL_SIZE               => o_ack_size      ,
             FLOW_COUNT              => open            ,
             FLOW_NEG                => open            ,
             STAT_IN                 => o_stat_in       ,

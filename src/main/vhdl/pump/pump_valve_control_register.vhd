@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_valve_control_register.vhd
 --!     @brief   PUMP VALVE CONTROL REGISTER
---!     @version 1.0.2
---!     @date    2013/1/8
+--!     @version 1.0.3
+--!     @date    2013/1/9
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -134,12 +134,12 @@ entity  PUMP_VALVE_CONTROL_REGISTER is
     -------------------------------------------------------------------------------
     -- Transaction Command Response Signals.
     -------------------------------------------------------------------------------
-        RES_VALID       : in  std_logic;
-        RES_ERROR       : in  std_logic;
-        RES_DONE        : in  std_logic;
-        RES_LAST        : in  std_logic;
-        RES_STOP        : in  std_logic;
-        RES_NONE        : in  std_logic;
+        ACK_VALID       : in  std_logic;
+        ACK_ERROR       : in  std_logic;
+        ACK_NEXT        : in  std_logic;
+        ACK_LAST        : in  std_logic;
+        ACK_STOP        : in  std_logic;
+        ACK_NONE        : in  std_logic;
     -------------------------------------------------------------------------------
     -- Flow Control Signals.
     -------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ architecture RTL of PUMP_VALVE_CONTROL_REGISTER is
     -------------------------------------------------------------------------------
     -- State Machine.
     -------------------------------------------------------------------------------
-    type     STATE_TYPE     is  ( IDLE_STATE, REQ_STATE, RES_STATE, TURN_AR, DONE_STATE);
+    type     STATE_TYPE     is  ( IDLE_STATE, REQ_STATE, ACK_STATE, TURN_AR, DONE_STATE);
     signal   curr_state         : STATE_TYPE;
     -------------------------------------------------------------------------------
     -- Other Flags.
@@ -261,24 +261,24 @@ begin
                     when REQ_STATE  =>
                         if    (REQ_READY = '0') then
                                 next_state := REQ_STATE;
-                        elsif (RES_VALID = '1') then
-                            if (RES_DONE = '1' or RES_NONE = '1' or RES_ERROR = '1' or RES_STOP = '1') then
+                        elsif (ACK_VALID = '1') then
+                            if (ACK_NEXT = '1' or ACK_LAST = '1' or ACK_NONE = '1' or ACK_ERROR = '1' or ACK_STOP = '1') then
                                 next_state := DONE_STATE;
                             else
                                 next_state := TURN_AR;
                             end if;
                         else
-                                next_state := RES_STATE;
+                                next_state := ACK_STATE;
                         end if;
-                    when RES_STATE  =>
-                        if (RES_VALID = '1') then
-                            if (RES_DONE = '1' or RES_NONE = '1' or RES_ERROR = '1' or RES_STOP = '1') then
+                    when ACK_STATE  =>
+                        if (ACK_VALID = '1') then
+                            if (ACK_NEXT = '1' or ACK_LAST = '1' or ACK_NONE = '1' or ACK_ERROR = '1' or ACK_STOP = '1') then
                                 next_state := DONE_STATE;
                             else
                                 next_state := TURN_AR;
                             end if;
                         else
-                                next_state := RES_STATE;
+                                next_state := ACK_STATE;
                         end if;
                     when TURN_AR    =>
                                 next_state := REQ_STATE;
@@ -349,7 +349,7 @@ begin
                 -------------------------------------------------------------------
                 if    (reset_bit = '1') then
                     error_bit <= '0';
-                elsif (next_state = DONE_STATE and RES_ERROR = '1') then
+                elsif (next_state = DONE_STATE and ACK_ERROR = '1') then
                     error_bit <= '1';
                 elsif (ERROR_WRITE = '1' and ERROR_WDATA = '0') then
                     error_bit  <= '0';

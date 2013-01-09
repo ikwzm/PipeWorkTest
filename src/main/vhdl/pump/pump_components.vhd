@@ -300,12 +300,12 @@ component PUMP_VALVE_CONTROL_REGISTER
     -------------------------------------------------------------------------------
     -- Transaction Command Response Signals.
     -------------------------------------------------------------------------------
-        RES_VALID       : in  std_logic;
-        RES_ERROR       : in  std_logic;
-        RES_DONE        : in  std_logic;
-        RES_LAST        : in  std_logic;
-        RES_STOP        : in  std_logic;
-        RES_NONE        : in  std_logic;
+        ACK_VALID       : in  std_logic;
+        ACK_ERROR       : in  std_logic;
+        ACK_NEXT        : in  std_logic;
+        ACK_LAST        : in  std_logic;
+        ACK_STOP        : in  std_logic;
+        ACK_NONE        : in  std_logic;
     -------------------------------------------------------------------------------
     -- Flow Control Signals.
     -------------------------------------------------------------------------------
