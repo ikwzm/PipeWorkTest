@@ -330,16 +330,21 @@ begin
     begin
         u_flow_size     := to_01(unsigned(FLOW_SIZE    ), '0');
         u_xfer_max_size := to_01(unsigned(max_xfer_size), '0');
-        if (u_xfer_max_size > u_flow_size) then
+        if    (u_flow_size < u_xfer_max_size) then
             u_xfer_req_size := RESIZE(u_flow_size    , u_xfer_req_size'length);
             req_xfer_last   <= FLOW_LAST;
             req_xfer_next   <= '0';
             req_xfer_end    <= FLOW_LAST;
+        elsif (u_flow_size = u_xfer_max_size) then
+            u_xfer_req_size := RESIZE(u_xfer_max_size, u_xfer_req_size'length);
+            req_xfer_last   <= FLOW_LAST or (req_size_last and     REQ_LAST);
+            req_xfer_next   <= '0'       or (req_size_last and not REQ_LAST);
+            req_xfer_end    <= FLOW_LAST or (req_size_last                 );
         else
             u_xfer_req_size := RESIZE(u_xfer_max_size, u_xfer_req_size'length);
-            req_xfer_last   <= req_size_last and     REQ_LAST;
-            req_xfer_next   <= req_size_last and not REQ_LAST;
-            req_xfer_end    <= req_size_last;
+            req_xfer_last   <= '0'       or (req_size_last and     REQ_LAST);
+            req_xfer_next   <= '0'       or (req_size_last and not REQ_LAST);
+            req_xfer_end    <= '0'       or (req_size_last                 );
         end if;
         for i in u_start_address'range loop
             if (i < DATA_SIZE) then
