@@ -199,7 +199,9 @@ use     PIPEWORK.AXI4_COMPONENTS.AXI4_REGISTER_INTERFACE;
 use     PIPEWORK.COMPONENTS.SDPRAM;
 use     PIPEWORK.PUMP_COMPONENTS.PUMP_COUNT_UP_REGISTER;
 use     PIPEWORK.PUMP_COMPONENTS.PUMP_COUNT_DOWN_REGISTER;
-use     PIPEWORK.PUMP_COMPONENTS.PUMP_VALVE_CONTROL_REGISTER;
+use     PIPEWORK.PUMP_COMPONENTS.PUMP_CONTROL_REGISTER;
+use     PIPEWORK.PUMP_COMPONENTS.PUMP_IN_VALVE;
+use     PIPEWORK.PUMP_COMPONENTS.PUMP_OUT_VALVE;
 architecture RTL of PUMP_AXI4_TO_AXI4 is
     ------------------------------------------------------------------------------
     -- リセット信号.
@@ -319,6 +321,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   i_flow_stop        : std_logic;
     signal   i_flow_last        : std_logic;
     signal   i_flow_size        : std_logic_vector(SIZE_BITS        -1 downto 0);
+    signal   i_open             : std_logic;
     signal   i_running          : std_logic;
     signal   i_done             : std_logic;
     signal   i_stat_in          : std_logic_vector(5 downto 0);
@@ -358,6 +361,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   o_flow_stop        : std_logic;
     signal   o_flow_last        : std_logic;
     signal   o_flow_size        : std_logic_vector(SIZE_BITS        -1 downto 0);
+    signal   o_open             : std_logic;
     signal   o_running          : std_logic;
     signal   o_done             : std_logic;
     signal   o_stat_in          : std_logic_vector(5 downto 0);
@@ -832,12 +836,10 @@ begin
     ------------------------------------------------------------------------------
     -- 
     ------------------------------------------------------------------------------
-    I_CTRL_REGS: PUMP_VALVE_CONTROL_REGISTER
+    I_CTRL_REGS: PUMP_CONTROL_REGISTER
         generic map (
             MODE_BITS               => 18              ,
-            STAT_BITS               =>  6              ,
-            SIZE_BITS               => SIZE_BITS       ,
-            FLOW_SINK               =>  1               
+            STAT_BITS               =>  6              
         )
         port map (
             CLK                     => ACLK            ,
@@ -879,6 +881,7 @@ begin
             STAT_WRITE( 5 downto  0)=> regs_wen (I_CTRL_STAT_HI downto I_CTRL_STAT_LO),
             STAT_WDATA( 5 downto  0)=> regs_wbit(I_CTRL_STAT_HI downto I_CTRL_STAT_LO),
             STAT_RDATA( 5 downto  0)=> regs_rbit(I_CTRL_STAT_HI downto I_CTRL_STAT_LO),
+            STAT                    => i_stat_in       ,
             REQ_VALID               => i_req_valid     ,
             REQ_FIRST               => i_req_first     ,
             REQ_LAST                => i_req_last      ,
@@ -889,24 +892,42 @@ begin
             ACK_LAST                => i_ack_last      ,
             ACK_STOP                => i_ack_stop      ,
             ACK_NONE                => i_ack_none      ,
+            VALVE_OPEN              => i_open          ,
+            XFER_DONE               => i_done          ,
+            XFER_RUNNING            => i_running       
+        );
+    ------------------------------------------------------------------------------
+    -- 
+    ------------------------------------------------------------------------------
+    I_VALVE: PUMP_IN_VALVE 
+        generic map (
+            COUNT_BITS              => SIZE_BITS       ,
+            SIZE_BITS               => SIZE_BITS       
+        )
+        port map (
+            CLK                     => ACLK            ,
+            RST                     => RST             ,
+            CLR                     => CLR             ,
             BUFFER_SIZE             => BUF_BYTES       ,
             THRESHOLD_SIZE          => I_THRESHOLD_SIZE,
-            FLOW_PAUSE              => i_flow_pause    ,
-            FLOW_STOP               => i_flow_stop     ,
-            FLOW_LAST               => i_flow_last     ,
-            FLOW_SIZE               => i_flow_size     ,
+            I_OPEN                  => i_open          ,
+            O_OPEN                  => o_open          ,
+            RESET                   => regs_rbit(I_CTRL_RESET_POS),
+            PAUSE                   => regs_rbit(I_CTRL_PAUSE_POS),
+            STOP                    => regs_rbit(I_CTRL_STOP_POS ),
             PUSH_VAL                => i_ack_valid     ,
             PUSH_LAST               => i_ack_last      ,
             PUSH_SIZE               => i_ack_size      ,
             PULL_VAL                => pull_valid      ,
             PULL_LAST               => pull_last       ,
             PULL_SIZE               => pull_size       ,
+            FLOW_PAUSE              => i_flow_pause    ,
+            FLOW_STOP               => i_flow_stop     ,
+            FLOW_LAST               => i_flow_last     ,
+            FLOW_SIZE               => i_flow_size     ,
             FLOW_COUNT              => open            ,
             FLOW_NEG                => open            ,
-            STAT_IN                 => i_stat_in       ,
-            PAUSED                  => open            ,
-            DONE                    => i_done          ,
-            RUNNING                 => i_running       
+            PAUSED                  => open            
         );
     ------------------------------------------------------------------------------
     -- 
@@ -982,12 +1003,10 @@ begin
     ------------------------------------------------------------------------------
     -- 
     ------------------------------------------------------------------------------
-    O_CTRL_REGS: PUMP_VALVE_CONTROL_REGISTER
+    O_CTRL_REGS: PUMP_CONTROL_REGISTER
         generic map (
             MODE_BITS               => 18              ,
-            STAT_BITS               =>  6              ,
-            SIZE_BITS               => SIZE_BITS       ,
-            FLOW_SINK               =>  0               
+            STAT_BITS               =>  6              
         )
         port map (
             CLK                     => ACLK            ,
@@ -1029,6 +1048,7 @@ begin
             STAT_WRITE( 5 downto  0)=> regs_wen (O_CTRL_STAT_HI downto O_CTRL_STAT_LO),
             STAT_WDATA( 5 downto  0)=> regs_wbit(O_CTRL_STAT_HI downto O_CTRL_STAT_LO),
             STAT_RDATA( 5 downto  0)=> regs_rbit(O_CTRL_STAT_HI downto O_CTRL_STAT_LO),
+            STAT                    => o_stat_in       ,
             REQ_VALID               => o_req_valid     ,
             REQ_FIRST               => o_req_first     ,
             REQ_LAST                => o_req_last      ,
@@ -1039,24 +1059,41 @@ begin
             ACK_LAST                => o_ack_last      ,
             ACK_STOP                => o_ack_stop      ,
             ACK_NONE                => o_ack_none      ,
-            BUFFER_SIZE             => BUF_BYTES       ,
-            THRESHOLD_SIZE          => O_THRESHOLD_SIZE,
-            FLOW_PAUSE              => o_flow_pause    ,
-            FLOW_STOP               => o_flow_stop     ,
-            FLOW_LAST               => o_flow_last     ,
-            FLOW_SIZE               => o_flow_size     ,
+            VALVE_OPEN              => o_open          ,
+            XFER_DONE               => o_done          ,
+            XFER_RUNNING            => o_running       
+        );
+    ------------------------------------------------------------------------------
+    -- 
+    ------------------------------------------------------------------------------
+    O_VALVE: PUMP_OUT_VALVE 
+        generic map (
+            COUNT_BITS              => SIZE_BITS       ,
+            SIZE_BITS               => SIZE_BITS       
+        )
+        port map (
+            CLK                     => ACLK            ,
+            RST                     => RST             ,
+            CLR                     => CLR             ,
+            THRESHOLD_SIZE          => I_THRESHOLD_SIZE,
+            I_OPEN                  => i_open          ,
+            O_OPEN                  => o_open          ,
+            RESET                   => regs_rbit(O_CTRL_RESET_POS),
+            PAUSE                   => regs_rbit(O_CTRL_PAUSE_POS),
+            STOP                    => regs_rbit(O_CTRL_STOP_POS ),
             PUSH_VAL                => push_valid      ,
             PUSH_LAST               => push_last       ,
             PUSH_SIZE               => push_size       ,
             PULL_VAL                => o_ack_valid     ,
             PULL_LAST               => o_ack_last      ,
             PULL_SIZE               => o_ack_size      ,
+            FLOW_PAUSE              => o_flow_pause    ,
+            FLOW_STOP               => o_flow_stop     ,
+            FLOW_LAST               => o_flow_last     ,
+            FLOW_SIZE               => o_flow_size     ,
             FLOW_COUNT              => open            ,
             FLOW_NEG                => open            ,
-            STAT_IN                 => o_stat_in       ,
-            PAUSED                  => open            ,
-            DONE                    => o_done          ,
-            RUNNING                 => o_running       
+            PAUSED                  => open            
         );
     ------------------------------------------------------------------------------
     -- 

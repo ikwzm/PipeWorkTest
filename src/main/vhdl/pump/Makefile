@@ -1,6 +1,8 @@
 ENTITY_FILES = pump_count_up_register.vhd              \
                pump_count_down_register.vhd            \
-               pump_valve_control_register.vhd         \
+               pump_control_register.vhd               \
+               pump_in_valve.vhd                       \
+               pump_out_valve.vhd                      \
                ${ENDLIST}
 
 components.vhd : ${ENTITY_FILES}

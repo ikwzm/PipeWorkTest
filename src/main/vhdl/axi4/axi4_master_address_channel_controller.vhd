@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_address_channel_controller.vhd
 --!     @brief   AXI4 Master Address Channel Controller
---!     @version 0.0.6
---!     @date    2013/1/9
+--!     @version 0.0.7
+--!     @date    2013/1/13
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -186,7 +186,6 @@ architecture RTL of AXI4_MASTER_ADDRESS_CHANNEL_CONTROLLER is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal   xfer_first_state   : std_logic_vector(1 downto 0);
     signal   burst_length       : AXI4_ALEN_TYPE;
     signal   addr_valid         : std_logic;
     signal   speculative        : boolean;
@@ -385,41 +384,6 @@ begin
         end if;
     end process;
     -------------------------------------------------------------------------------
-    -- xfer_first_state : 最初の転送要求信号を作るためのステートマシン.
-    -------------------------------------------------------------------------------
-    process(CLK, RST) begin
-        if (RST = '1') then
-                    xfer_first_state <= "00";
-        elsif (CLK'event and CLK = '1') then
-            if (CLR = '1') then 
-                    xfer_first_state <= "00";
-            elsif (xfer_first_state = "00") then
-                if (curr_state = IDLE_STATE and REQ_VAL = '1' and REQ_FIRST = '1') then
-                    xfer_first_state <= "11";
-                else
-                    xfer_first_state <= "00";
-                end if;
-            elsif (xfer_first_state = "11") or
-                  (xfer_first_state = "10") then
-                if    (curr_state = XFER_STATE and ack_xfer_valid = '1') then
-                    if (ack_xfer_last = '1') then
-                        xfer_first_state <= "00";
-                    else
-                        xfer_first_state <= "10";
-                    end if;
-                elsif (curr_state = NONE_STATE) then
-                    if (q_ack_xfer_last = '1') then
-                        xfer_first_state <= "00";
-                    else
-                        xfer_first_state <= "10";
-                    end if;
-                elsif (curr_state = STOP_STATE) then
-                        xfer_first_state <= "00";
-                end if;
-            end if;
-        end if;
-    end process;
-    -------------------------------------------------------------------------------
     -- speculative     : 投機実行可能であることを示すフラグ.
     -------------------------------------------------------------------------------
     speculative    <= (REQ_SPECULATIVE = '1' and
@@ -450,8 +414,10 @@ begin
     ACK_VAL   <= '1' when (curr_state = XFER_STATE and ack_xfer_valid = '1') or
                           (curr_state = STOP_STATE and XFER_RUNNING   = '0') or
                           (curr_state = NONE_STATE) else '0';
-    ACK_NEXT  <= '1' when (curr_state = XFER_STATE and ack_xfer_next  = '1') else '0';
-    ACK_LAST  <= '1' when (curr_state = XFER_STATE and ack_xfer_last  = '1') else '0';
+    ACK_NEXT  <= '1' when (curr_state = XFER_STATE and ack_xfer_next  = '1') or
+                          (curr_state = NONE_STATE and REQ_LAST       = '0') else '0';
+    ACK_LAST  <= '1' when (curr_state = XFER_STATE and ack_xfer_last  = '1') or
+                          (curr_state = NONE_STATE and REQ_LAST       = '1') else '0';
     ACK_ERROR <= '1' when (curr_state = XFER_STATE and XFER_ACK_ERR   = '1') else '0';
     ACK_STOP  <= '1' when (curr_state = STOP_STATE and XFER_RUNNING   = '0') else '0';
     ACK_NONE  <= '1' when (curr_state = NONE_STATE) else '0';
@@ -470,7 +436,7 @@ begin
     XFER_REQ_SIZE   <= req_xfer_size;
     XFER_REQ_NEXT   <= req_xfer_next;
     XFER_REQ_LAST   <= req_xfer_last;
-    XFER_REQ_FIRST  <= xfer_first_state(0);
+    XFER_REQ_FIRST  <= REQ_FIRST;
     XFER_REQ_SAFETY <= '1' when (REQ_SAFETY   = '1') or
                                 (req_xfer_end = '1' and req_xfer_last = '1') else '0';
     -------------------------------------------------------------------------------

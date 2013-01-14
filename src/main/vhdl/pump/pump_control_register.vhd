@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
---!     @file    pump_valve_control_register.vhd
---!     @brief   PUMP VALVE CONTROL REGISTER
+--!     @file    pump_control_register.vhd
+--!     @brief   PUMP CONTROL REGISTER
 --!     @version 1.0.3
---!     @date    2013/1/9
+--!     @date    2013/1/14
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -39,17 +39,12 @@ use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
 --! @brief   PUMP VALVE CONTROL REGISTER :
 -----------------------------------------------------------------------------------
-entity  PUMP_VALVE_CONTROL_REGISTER is
+entity  PUMP_CONTROL_REGISTER is
     generic (
         MODE_BITS       : --! @brief MODE REGISTER BITS :
                           integer := 32;
         STAT_BITS       : --! @brief STATUS REGISTER BITS :
-                          integer := 32;
-        SIZE_BITS       : --! @brief COUNTER SIZE BITS :
-                          --! 各種サイズ信号のビット数を指定する.
-                          integer := 32;
-        FLOW_SINK       : --! @brief FLOW SINK MODE :
-                          integer := 0
+                          integer := 32
     );
     port (
     -------------------------------------------------------------------------------
@@ -124,6 +119,7 @@ entity  PUMP_VALVE_CONTROL_REGISTER is
         STAT_WRITE      : in  std_logic_vector(STAT_BITS-1 downto 0);
         STAT_WDATA      : in  std_logic_vector(STAT_BITS-1 downto 0);
         STAT_RDATA      : out std_logic_vector(STAT_BITS-1 downto 0);
+        STAT            : in  std_logic_vector(STAT_BITS-1 downto 0);
     -------------------------------------------------------------------------------
     -- Transaction Command Request Signals.
     -------------------------------------------------------------------------------
@@ -141,50 +137,20 @@ entity  PUMP_VALVE_CONTROL_REGISTER is
         ACK_STOP        : in  std_logic;
         ACK_NONE        : in  std_logic;
     -------------------------------------------------------------------------------
-    -- Flow Control Signals.
+    -- Status.
     -------------------------------------------------------------------------------
-        BUFFER_SIZE     : in  std_logic_vector(SIZE_BITS-1 downto 0);
-        THRESHOLD_SIZE  : in  std_logic_vector(SIZE_BITS-1 downto 0);
-    -------------------------------------------------------------------------------
-    -- Flow Control Signals.
-    -------------------------------------------------------------------------------
-        FLOW_PAUSE      : out std_logic;
-        FLOW_STOP       : out std_logic;
-        FLOW_LAST       : out std_logic;
-        FLOW_SIZE       : out std_logic_vector(SIZE_BITS-1 downto 0);
-    -------------------------------------------------------------------------------
-    -- Push Size Signals.
-    -------------------------------------------------------------------------------
-        PUSH_VAL        : in  std_logic;
-        PUSH_LAST       : in  std_logic;
-        PUSH_SIZE       : in  std_logic_vector(SIZE_BITS-1 downto 0);
-    -------------------------------------------------------------------------------
-    -- Pull Size Signals.
-    -------------------------------------------------------------------------------
-        PULL_VAL        : in  std_logic;
-        PULL_LAST       : in  std_logic;
-        PULL_SIZE       : in  std_logic_vector(SIZE_BITS-1 downto 0);
-    -------------------------------------------------------------------------------
-    -- Flow Counter.
-    -------------------------------------------------------------------------------
-        FLOW_COUNT      : out std_logic_vector(SIZE_BITS-1 downto 0);
-        FLOW_NEG        : out std_logic;
-    -------------------------------------------------------------------------------
-    -- Status
-    -------------------------------------------------------------------------------
-        STAT_IN         : in  std_logic_vector(STAT_BITS-1 downto 0);
-        PAUSED          : out std_logic;
-        DONE            : out std_logic;
-        RUNNING         : out std_logic
+        VALVE_OPEN      : out std_logic;
+        XFER_RUNNING    : out std_logic;
+        XFER_DONE       : out std_logic
     );
-end PUMP_VALVE_CONTROL_REGISTER;
+end PUMP_CONTROL_REGISTER;
 -----------------------------------------------------------------------------------
 -- 
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-architecture RTL of PUMP_VALVE_CONTROL_REGISTER is
+architecture RTL of PUMP_CONTROL_REGISTER is
     -------------------------------------------------------------------------------
     -- Register Bits.
     -------------------------------------------------------------------------------
@@ -199,22 +165,12 @@ architecture RTL of PUMP_VALVE_CONTROL_REGISTER is
     signal   mode_regs          : std_logic_vector(MODE_BITS-1 downto 0);
     signal   stat_regs          : std_logic_vector(STAT_BITS-1 downto 0);
     -------------------------------------------------------------------------------
-    -- Flow Counter.
-    -------------------------------------------------------------------------------
-    signal   flow_counter       : unsigned(SIZE_BITS-1 downto 0);
-    signal   flow_negative      : boolean;
-    signal   flow_positive      : boolean;
-    signal   flow_zero          : boolean;
-    -------------------------------------------------------------------------------
     -- State Machine.
     -------------------------------------------------------------------------------
     type     STATE_TYPE     is  ( IDLE_STATE, REQ_STATE, ACK_STATE, TURN_AR, DONE_STATE);
     signal   curr_state         : STATE_TYPE;
-    -------------------------------------------------------------------------------
-    -- Other Flags.
-    -------------------------------------------------------------------------------
-    signal   push_last_flag     : boolean;
-    signal   pull_last_flag     : boolean;
+    signal   first_state        : std_logic_vector(1 downto 0);
+    signal   flag_clear         : boolean;
 begin
     -------------------------------------------------------------------------------
     -- 
@@ -223,30 +179,34 @@ begin
         variable next_state : STATE_TYPE;
     begin
         if    (RST = '1') then
-                curr_state <= IDLE_STATE;
-                reset_bit  <= '0';
-                start_bit  <= '0';
-                stop_bit   <= '0';
-                pause_bit  <= '0';
-                first_bit  <= '0';
-                last_bit   <= '0';
-                done_bit   <= '0';
-                error_bit  <= '0';
-                mode_regs  <= (others => '0');
-                stat_regs  <= (others => '0');
+                curr_state  <= IDLE_STATE;
+                first_state <= "00";
+                reset_bit   <= '0';
+                start_bit   <= '0';
+                stop_bit    <= '0';
+                pause_bit   <= '0';
+                first_bit   <= '0';
+                last_bit    <= '0';
+                done_bit    <= '0';
+                error_bit   <= '0';
+                mode_regs   <= (others => '0');
+                stat_regs   <= (others => '0');
+                flag_clear  <= TRUE;
         elsif (CLK'event and CLK = '1') then
             if (CLR   = '1') then
-                curr_state <= IDLE_STATE;
-                reset_bit  <= '0';
-                start_bit  <= '0';
-                stop_bit   <= '0';
-                pause_bit  <= '0';
-                first_bit  <= '0';
-                last_bit   <= '0';
-                done_bit   <= '0';
-                error_bit  <= '0';
-                mode_regs  <= (others => '0');
-                stat_regs  <= (others => '0');
+                curr_state  <= IDLE_STATE;
+                first_state <= "00";
+                reset_bit   <= '0';
+                start_bit   <= '0';
+                stop_bit    <= '0';
+                pause_bit   <= '0';
+                first_bit   <= '0';
+                last_bit    <= '0';
+                done_bit    <= '0';
+                error_bit   <= '0';
+                mode_regs   <= (others => '0');
+                stat_regs   <= (others => '0');
+                flag_clear  <= TRUE;
             else
                 -------------------------------------------------------------------
                 -- ステートマシン
@@ -262,7 +222,7 @@ begin
                         if    (REQ_READY = '0') then
                                 next_state := REQ_STATE;
                         elsif (ACK_VALID = '1') then
-                            if (ACK_NEXT = '1' or ACK_LAST = '1' or ACK_NONE = '1' or ACK_ERROR = '1' or ACK_STOP = '1') then
+                            if (ACK_NEXT = '1' or ACK_LAST = '1' or ACK_ERROR = '1' or ACK_STOP = '1') then
                                 next_state := DONE_STATE;
                             else
                                 next_state := TURN_AR;
@@ -272,7 +232,7 @@ begin
                         end if;
                     when ACK_STATE  =>
                         if (ACK_VALID = '1') then
-                            if (ACK_NEXT = '1' or ACK_LAST = '1' or ACK_NONE = '1' or ACK_ERROR = '1' or ACK_STOP = '1') then
+                            if (ACK_NEXT = '1' or ACK_LAST = '1' or ACK_ERROR = '1' or ACK_STOP = '1') then
                                 next_state := DONE_STATE;
                             else
                                 next_state := TURN_AR;
@@ -293,13 +253,36 @@ begin
                     curr_state <= next_state;
                 end if;
                 -------------------------------------------------------------------
-                -- RESET BIT
+                -- flag_clear  : 
+                -------------------------------------------------------------------
+                flag_clear <= (next_state = DONE_STATE) and 
+                              (ACK_LAST = '1' or ACK_ERROR = '1' or ACK_STOP = '1');
+                -------------------------------------------------------------------
+                -- first_state : REQ_FIRST(最初の転送要求信号)を作るためのステートマシン.
+                -------------------------------------------------------------------
+                if    (reset_bit = '1') then
+                        first_state <= "00";
+                elsif (first_state = "00") then
+                    if (curr_state = IDLE_STATE and start_bit = '1' and first_bit = '1') then
+                        first_state <= "11";
+                    else
+                        first_state <= "00";
+                    end if;
+                elsif (ACK_VALID = '1') then
+                    if (ACK_LAST = '1' or ACK_ERROR = '1' or ACK_STOP = '1') then
+                        first_state <= "00";
+                    else
+                        first_state <= "10";
+                    end if;
+                end if;
+                -------------------------------------------------------------------
+                -- RESET BIT   :
                 -------------------------------------------------------------------
                 if    (RESET_WRITE = '1') then
                     reset_bit <= RESET_WDATA;
                 end if;
                 -------------------------------------------------------------------
-                -- START BIT
+                -- START BIT   :
                 -------------------------------------------------------------------
                 if    (reset_bit = '1') then
                     start_bit <= '0';
@@ -309,7 +292,7 @@ begin
                     start_bit <= '0';
                 end if;
                 -------------------------------------------------------------------
-                -- STOP BIT
+                -- STOP BIT    :
                 -------------------------------------------------------------------
                 if    (STOP_WRITE  = '1' and STOP_WDATA  = '1') then
                     stop_bit  <= '1';
@@ -317,25 +300,25 @@ begin
                     stop_bit  <= '0';
                 end if;
                 -------------------------------------------------------------------
-                -- PAUSE BIT
+                -- PAUSE BIT   :
                 -------------------------------------------------------------------
                 if    (PAUSE_WRITE = '1') then
                     pause_bit <= PAUSE_WDATA;
                 end if;
                 -------------------------------------------------------------------
-                -- FIRST BIT
+                -- FIRST BIT   :
                 -------------------------------------------------------------------
                 if    (FIRST_WRITE = '1') then
                     first_bit <= FIRST_WDATA;
                 end if;
                 -------------------------------------------------------------------
-                -- LAST BIT
+                -- LAST BIT    :
                 -------------------------------------------------------------------
                 if    (LAST_WRITE  = '1') then
                     last_bit  <= LAST_WDATA;
                 end if;
                 -------------------------------------------------------------------
-                -- DONE BIT
+                -- DONE BIT    :
                 -------------------------------------------------------------------
                 if    (reset_bit = '1') then
                     done_bit  <= '0';
@@ -345,7 +328,7 @@ begin
                     done_bit  <= '0';
                 end if;
                 -------------------------------------------------------------------
-                -- ERROR BIT
+                -- ERROR BIT   :
                 -------------------------------------------------------------------
                 if    (reset_bit = '1') then
                     error_bit <= '0';
@@ -375,7 +358,7 @@ begin
                     for i in stat_regs'range loop
                         if    (STAT_WRITE(i) = '1' and STAT_WDATA(i) = '0') then
                             stat_regs(i) <= '0';
-                        elsif (STAT_IN(i) = '1') then
+                        elsif (STAT(i) = '1') then
                             stat_regs(i) <= '1';
                         end if;
                     end loop;
@@ -386,125 +369,26 @@ begin
     -------------------------------------------------------------------------------
     -- Register Output Signals.
     -------------------------------------------------------------------------------
-    RESET_RDATA <= reset_bit;
-    START_RDATA <= start_bit;
-    STOP_RDATA  <= stop_bit;
-    PAUSE_RDATA <= pause_bit;
-    FIRST_RDATA <= first_bit;
-    LAST_RDATA  <= last_bit;
-    DONE_RDATA  <= done_bit;
-    ERROR_RDATA <= error_bit;
-    MODE_RDATA  <= mode_regs;
-    STAT_RDATA  <= stat_regs;
+    RESET_RDATA  <= reset_bit;
+    START_RDATA  <= start_bit;
+    STOP_RDATA   <= stop_bit;
+    PAUSE_RDATA  <= pause_bit;
+    FIRST_RDATA  <= first_bit;
+    LAST_RDATA   <= last_bit;
+    DONE_RDATA   <= done_bit;
+    ERROR_RDATA  <= error_bit;
+    MODE_RDATA   <= mode_regs;
+    STAT_RDATA   <= stat_regs;
     -------------------------------------------------------------------------------
     -- Status
     -------------------------------------------------------------------------------
-    RUNNING     <= start_bit;
-    DONE        <= '1' when (curr_state = DONE_STATE) else '0';
+    XFER_RUNNING <= start_bit;
+    XFER_DONE    <= '1' when (curr_state = DONE_STATE) else '0';
+    VALVE_OPEN   <= first_state(1);
     -------------------------------------------------------------------------------
     -- Transaction Command Request Signals.
     -------------------------------------------------------------------------------
-    REQ_VALID   <= '1' when (curr_state = REQ_STATE ) else '0';
-    REQ_FIRST   <= first_bit;
-    REQ_LAST    <= last_bit;
-    -------------------------------------------------------------------------------
-    -- Flow Counter.
-    -------------------------------------------------------------------------------
-    process (CLK, RST)
-        variable next_counter : unsigned(SIZE_BITS downto 0);
-    begin
-        if    (RST = '1') then
-                flow_counter  <= (others => '0');
-                flow_positive <= FALSE;
-                flow_negative <= FALSE;
-                flow_zero     <= TRUE;
-        elsif (CLK'event and CLK = '1') then
-            if (CLR   = '1' or reset_bit = '1') then
-                flow_counter  <= (others => '0');
-                flow_positive <= FALSE;
-                flow_negative <= FALSE;
-                flow_zero     <= TRUE;
-            else
-                next_counter := "0" & flow_counter;
-                if (PUSH_VAL = '1') then
-                    next_counter := next_counter + unsigned(PUSH_SIZE);
-                end if;
-                if (PULL_VAL = '1') then
-                    next_counter := next_counter - unsigned(PULL_SIZE);
-                end if;
-                if    (next_counter(next_counter'high) = '1') then
-                    flow_positive <= FALSE;
-                    flow_negative <= TRUE;
-                    flow_zero     <= FALSE;
-                    next_counter  := (others => '0');
-                elsif (next_counter > 0) then
-                    flow_positive <= TRUE;
-                    flow_negative <= FALSE;
-                    flow_zero     <= FALSE;
-                else
-                    flow_positive <= FALSE;
-                    flow_negative <= FALSE;
-                    flow_zero     <= TRUE;
-                end if;
-                flow_counter <= next_counter(flow_counter'range);
-            end if;
-        end if;
-    end process;
-    FLOW_COUNT <= std_logic_vector(flow_counter);
-    FLOW_NEG   <= '1' when (flow_negative) else '0';
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    process (CLK, RST) begin
-        if    (RST = '1') then
-                pull_last_flag <= FALSE;
-        elsif (CLK'event and CLK = '1') then
-            if (CLR   = '1' or reset_bit = '1' or curr_state = DONE_STATE) then
-                pull_last_flag <= FALSE;
-            elsif (PULL_VAL = '1' and PULL_LAST = '1') then
-                pull_last_flag <= TRUE;
-            end if;
-        end if;
-    end process;
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    process (CLK, RST) begin
-        if    (RST = '1') then
-                push_last_flag <= FALSE;
-        elsif (CLK'event and CLK = '1') then
-            if (CLR   = '1' or reset_bit = '1' or curr_state = DONE_STATE) then
-                push_last_flag <= FALSE;
-            elsif (PUSH_VAL = '1' and PUSH_LAST = '1') then
-                push_last_flag <= TRUE;
-            end if;
-        end if;
-    end process;
-    -------------------------------------------------------------------------------
-    -- Flow Control (Flow Sink Mode)
-    -------------------------------------------------------------------------------
-    FLOW_SINK_MODE : if (FLOW_SINK /= 0) generate
-        FLOW_STOP  <= '1' when (stop_bit  = '1') else '0';
-        FLOW_PAUSE <= '1' when (pause_bit = '1') or
-                               (to_01(flow_counter) > to_01(unsigned(THRESHOLD_SIZE))) else '0';
-        PAUSED     <= '1' when (pause_bit = '1') or
-                               (to_01(flow_counter) > to_01(unsigned(THRESHOLD_SIZE))) else '0';
-        FLOW_LAST  <= '0';
-        FLOW_SIZE  <= std_logic_vector(to_01(unsigned(BUFFER_SIZE)) - to_01(unsigned(THRESHOLD_SIZE)));
-    end generate;
-    -------------------------------------------------------------------------------
-    -- Flow Control (Flow Source Mode)
-    -------------------------------------------------------------------------------
-    FLOW_SOURCE_MODE : if (FLOW_SINK  = 0) generate
-        FLOW_STOP  <= '1' when (stop_bit  = '1') or
-                               (push_last_flag and flow_negative) else '0';
-        FLOW_PAUSE <= '1' when (pause_bit = '1') or
-                               (push_last_flag = TRUE  and flow_zero) or
-                               (push_last_flag = FALSE and to_01(flow_counter) <  to_01(unsigned(THRESHOLD_SIZE))) else '0';
-        PAUSED     <= '1' when (pause_bit = '1') or
-                               (push_last_flag = TRUE  and flow_zero) or
-                               (push_last_flag = FALSE and to_01(flow_counter) <  to_01(unsigned(THRESHOLD_SIZE))) else '0';
-        FLOW_LAST  <= '1' when (push_last_flag = TRUE  and to_01(flow_counter) <= to_01(unsigned(THRESHOLD_SIZE))) else '0';
-        FLOW_SIZE  <= std_logic_vector(flow_counter);
-    end generate;
+    REQ_VALID    <= '1' when (curr_state = REQ_STATE ) else '0';
+    REQ_FIRST    <= first_state(0);
+    REQ_LAST     <= last_bit;
 end RTL;

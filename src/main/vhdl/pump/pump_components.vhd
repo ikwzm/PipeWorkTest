@@ -2,7 +2,7 @@
 --!     @file    pump_components.vhd                                             --
 --!     @brief   PIPEWORK PUMP COMPONENTS LIBRARY DESCRIPTION                    --
 --!     @version 0.0.2                                                           --
---!     @date    2013/01/09                                                      --
+--!     @date    2013/01/14                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
@@ -203,19 +203,14 @@ component PUMP_COUNT_DOWN_REGISTER
     );
 end component;
 -----------------------------------------------------------------------------------
---! @brief PUMP_VALVE_CONTROL_REGISTER                                           --
+--! @brief PUMP_CONTROL_REGISTER                                                 --
 -----------------------------------------------------------------------------------
-component PUMP_VALVE_CONTROL_REGISTER
+component PUMP_CONTROL_REGISTER
     generic (
         MODE_BITS       : --! @brief MODE REGISTER BITS :
                           integer := 32;
         STAT_BITS       : --! @brief STATUS REGISTER BITS :
-                          integer := 32;
-        SIZE_BITS       : --! @brief COUNTER SIZE BITS :
-                          --! 各種サイズ信号のビット数を指定する.
-                          integer := 32;
-        FLOW_SINK       : --! @brief FLOW SINK MODE :
-                          integer := 0
+                          integer := 32
     );
     port (
     -------------------------------------------------------------------------------
@@ -290,6 +285,7 @@ component PUMP_VALVE_CONTROL_REGISTER
         STAT_WRITE      : in  std_logic_vector(STAT_BITS-1 downto 0);
         STAT_WDATA      : in  std_logic_vector(STAT_BITS-1 downto 0);
         STAT_RDATA      : out std_logic_vector(STAT_BITS-1 downto 0);
+        STAT            : in  std_logic_vector(STAT_BITS-1 downto 0);
     -------------------------------------------------------------------------------
     -- Transaction Command Request Signals.
     -------------------------------------------------------------------------------
@@ -307,17 +303,48 @@ component PUMP_VALVE_CONTROL_REGISTER
         ACK_STOP        : in  std_logic;
         ACK_NONE        : in  std_logic;
     -------------------------------------------------------------------------------
-    -- Flow Control Signals.
+    -- Status.
+    -------------------------------------------------------------------------------
+        VALVE_OPEN      : out std_logic;
+        XFER_RUNNING    : out std_logic;
+        XFER_DONE       : out std_logic
+    );
+end component;
+-----------------------------------------------------------------------------------
+--! @brief PUMP_IN_VALVE                                                         --
+-----------------------------------------------------------------------------------
+component PUMP_IN_VALVE
+    generic (
+        COUNT_BITS      : --! @brief COUNTER BITS :
+                          --! 内部カウンタのビット数を指定する.
+                          integer := 32;
+        SIZE_BITS       : --! @brief SIZE BITS :
+                          --! サイズ信号のビット数を指定する.
+                          integer := 32
+    );
+    port (
+    -------------------------------------------------------------------------------
+    -- Clock & Reset Signals.
+    -------------------------------------------------------------------------------
+        CLK             : --! @brief CLOCK :
+                          --! クロック信号
+                          in  std_logic; 
+        RST             : --! @brief ASYNCRONOUSE RESET :
+                          --! 非同期リセット信号.アクティブハイ.
+                          in  std_logic;
+        CLR             : --! @brief SYNCRONOUSE RESET :
+                          --! 同期リセット信号.アクティブハイ.
+                          in  std_logic;
+    -------------------------------------------------------------------------------
+    -- Control Signals.
     -------------------------------------------------------------------------------
         BUFFER_SIZE     : in  std_logic_vector(SIZE_BITS-1 downto 0);
         THRESHOLD_SIZE  : in  std_logic_vector(SIZE_BITS-1 downto 0);
-    -------------------------------------------------------------------------------
-    -- Flow Control Signals.
-    -------------------------------------------------------------------------------
-        FLOW_PAUSE      : out std_logic;
-        FLOW_STOP       : out std_logic;
-        FLOW_LAST       : out std_logic;
-        FLOW_SIZE       : out std_logic_vector(SIZE_BITS-1 downto 0);
+        I_OPEN          : in  std_logic;
+        O_OPEN          : in  std_logic;
+        RESET           : in  std_logic;
+        PAUSE           : in  std_logic;
+        STOP            : in  std_logic;
     -------------------------------------------------------------------------------
     -- Push Size Signals.
     -------------------------------------------------------------------------------
@@ -331,17 +358,79 @@ component PUMP_VALVE_CONTROL_REGISTER
         PULL_LAST       : in  std_logic;
         PULL_SIZE       : in  std_logic_vector(SIZE_BITS-1 downto 0);
     -------------------------------------------------------------------------------
+    -- Input Flow Control Signals.
+    -------------------------------------------------------------------------------
+        FLOW_PAUSE      : out std_logic;
+        FLOW_STOP       : out std_logic;
+        FLOW_LAST       : out std_logic;
+        FLOW_SIZE       : out std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
     -- Flow Counter.
     -------------------------------------------------------------------------------
-        FLOW_COUNT      : out std_logic_vector(SIZE_BITS-1 downto 0);
+        FLOW_COUNT      : out std_logic_vector(COUNT_BITS-1 downto 0);
         FLOW_NEG        : out std_logic;
+        PAUSED          : out std_logic
+    );
+end component;
+-----------------------------------------------------------------------------------
+--! @brief PUMP_OUT_VALVE                                                        --
+-----------------------------------------------------------------------------------
+component PUMP_OUT_VALVE
+    generic (
+        COUNT_BITS      : --! @brief COUNTER BITS :
+                          --! 内部カウンタのビット数を指定する.
+                          integer := 32;
+        SIZE_BITS       : --! @brief SIZE BITS :
+                          --! サイズ信号のビット数を指定する.
+                          integer := 32
+    );
+    port (
     -------------------------------------------------------------------------------
-    -- Status
+    -- Clock & Reset Signals.
     -------------------------------------------------------------------------------
-        STAT_IN         : in  std_logic_vector(STAT_BITS-1 downto 0);
-        PAUSED          : out std_logic;
-        DONE            : out std_logic;
-        RUNNING         : out std_logic
+        CLK             : --! @brief CLOCK :
+                          --! クロック信号
+                          in  std_logic; 
+        RST             : --! @brief ASYNCRONOUSE RESET :
+                          --! 非同期リセット信号.アクティブハイ.
+                          in  std_logic;
+        CLR             : --! @brief SYNCRONOUSE RESET :
+                          --! 同期リセット信号.アクティブハイ.
+                          in  std_logic;
+    -------------------------------------------------------------------------------
+    -- Control Signals.
+    -------------------------------------------------------------------------------
+        THRESHOLD_SIZE  : in  std_logic_vector(SIZE_BITS-1 downto 0);
+        I_OPEN          : in  std_logic;
+        O_OPEN          : in  std_logic;
+        RESET           : in  std_logic;
+        PAUSE           : in  std_logic;
+        STOP            : in  std_logic;
+    -------------------------------------------------------------------------------
+    -- Push Size Signals.
+    -------------------------------------------------------------------------------
+        PUSH_VAL        : in  std_logic;
+        PUSH_LAST       : in  std_logic;
+        PUSH_SIZE       : in  std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    -- Pull Size Signals.
+    -------------------------------------------------------------------------------
+        PULL_VAL        : in  std_logic;
+        PULL_LAST       : in  std_logic;
+        PULL_SIZE       : in  std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    -- Input Flow Control Signals.
+    -------------------------------------------------------------------------------
+        FLOW_PAUSE      : out std_logic;
+        FLOW_STOP       : out std_logic;
+        FLOW_LAST       : out std_logic;
+        FLOW_SIZE       : out std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    -- Flow Counter.
+    -------------------------------------------------------------------------------
+        FLOW_COUNT      : out std_logic_vector(COUNT_BITS-1 downto 0);
+        FLOW_NEG        : out std_logic;
+        PAUSED          : out std_logic
     );
 end component;
 end PUMP_COMPONENTS;

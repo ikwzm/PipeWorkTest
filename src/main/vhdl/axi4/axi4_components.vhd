@@ -2,7 +2,7 @@
 --!     @file    axi4_components.vhd                                             --
 --!     @brief   PIPEWORK AXI4 LIBRARY DESCRIPTION                               --
 --!     @version 0.0.6                                                           --
---!     @date    2013/01/10                                                      --
+--!     @date    2013/01/14                                                      --
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>                     --
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
@@ -313,16 +313,16 @@ component AXI4_MASTER_READ_INTERFACE
         -- Reserve Size Signals.
         ---------------------------------------------------------------------------
         RESV_VAL        : out   std_logic;
-        RESV_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         RESV_LAST       : out   std_logic;
         RESV_ERROR      : out   std_logic;
+        RESV_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         ---------------------------------------------------------------------------
         -- Push Size Signals.
         ---------------------------------------------------------------------------
         PUSH_VAL        : out   std_logic;
-        PUSH_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         PUSH_LAST       : out   std_logic;
         PUSH_ERROR      : out   std_logic;
+        PUSH_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------

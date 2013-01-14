@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_read_interface.vhd
 --!     @brief   AXI4 Master Read Interface
---!     @version 0.0.6
---!     @date    2013/1/9
+--!     @version 0.0.7
+--!     @date    2013/1/13
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -207,16 +207,16 @@ entity  AXI4_MASTER_READ_INTERFACE is
         -- Reserve Size Signals.
         ---------------------------------------------------------------------------
         RESV_VAL        : out   std_logic;
-        RESV_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         RESV_LAST       : out   std_logic;
         RESV_ERROR      : out   std_logic;
+        RESV_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         ---------------------------------------------------------------------------
         -- Push Size Signals.
         ---------------------------------------------------------------------------
         PUSH_VAL        : out   std_logic;
-        PUSH_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         PUSH_LAST       : out   std_logic;
         PUSH_ERROR      : out   std_logic;
+        PUSH_SIZE       : out   std_logic_vector(SIZE_BITS        -1 downto 0);
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
@@ -576,6 +576,12 @@ begin
         end if;
     end process;
     -------------------------------------------------------------------------------
+    -- XFER_BUSY      : 動作中である事を示すフラグ.
+    -------------------------------------------------------------------------------
+    XFER_BUSY    <= '1' when (curr_state = WAIT_RFIRST or
+                              curr_state = WAIT_RLAST  or
+                              xfer_queue_empty = '0' ) else '0';
+    -------------------------------------------------------------------------------
     -- xfer_running   : 動作中である事を示すフラグ.
     -------------------------------------------------------------------------------
     xfer_running <= '1' when (curr_state = WAIT_RFIRST or
@@ -678,15 +684,27 @@ begin
     -------------------------------------------------------------------------------
     RREADY <= '1' when (read_enable = '1' and read_data_ready = '1') else '0';
     -------------------------------------------------------------------------------
-    -- 
+    -- RESV_SIZE : 何バイト書き込む予定かを示す信号.
+    -- RESV_LAST : 最後のデータを書き込む予定であることを示す信号.
+    -- RESV_ERROR: エラーが発生したことを示す信号.
+    -- RESV_VAL  : RESV_LAST、RESV_ERROR、RESV_SIZE が有効であることを示す信号.
     -------------------------------------------------------------------------------
-    RESV_SIZE  <= (others => '0') when (read_data_error) else
-                  std_logic_vector(RESIZE(unsigned(xfer_ack_size), RESV_SIZE'length));
-    RESV_LAST  <= xfer_ack_last;
-    RESV_ERROR <= '1' when (read_data_error) else '0';
-    RESV_VAL   <= '1' when (curr_state = WAIT_RFIRST) and
-                           (read_data_valid = '1'   ) and
-                           (read_data_ready = '1'   ) else '0';
+    RESV: block
+        signal enable : boolean;
+        signal error  : boolean;
+        signal last   : boolean;
+        signal valid  : boolean;
+    begin
+        enable <= (curr_state = WAIT_RFIRST);
+        error  <= (enable and read_data_error = TRUE);
+        last   <= (enable and xfer_ack_last   = '1' );
+        valid  <= (enable and read_data_valid = '1' and read_data_ready = '1');
+        RESV_VAL   <= '1' when (valid) else '0';
+        RESV_LAST  <= '1' when (last ) else '0';
+        RESV_ERROR <= '1' when (error) else '0';
+        RESV_SIZE  <= (others => '0') when (enable = FALSE or error = TRUE) else
+                      std_logic_vector(RESIZE(unsigned(xfer_ack_size), RESV_SIZE'length));
+    end block;
     -------------------------------------------------------------------------------
     -- レシーブバッファ : 外部のリードバッファに書き込む前に、一旦このバッファで
     --                    受けて、バス幅の変換やバイトレーンの調整を行う.
@@ -813,24 +831,35 @@ begin
         end process;
     end block;
     -------------------------------------------------------------------------------
-    -- PUSH_SIZE : 何バイト書き込んだかを転送量カウンタに示す信号.
-    -- PUSH_TERM : 最後のデータ書き込みであることを転送量カウンタに示す信号.
-    -- PUSH_VAL  : PUSH_SIZE、PUSH_TERM が有効であることを示す信号.
+    -- PUSH_SIZE : 何バイト書き込んだかを示す信号.
+    -- PUSH_LAST : 最後のデータ書き込みであることを示す信号.
+    -- PUSH_ERROR: エラーが発生したことを示す信号.
+    -- PUSH_VAL  : PUSH_LAST、PUSH_ERROR、PUSH_SIZE が有効であることを示す信号.
     -------------------------------------------------------------------------------
-    PUSH_VAL   <= '1' when (buf_beat_valid = '1' and BUF_RDY       = '1') else '0';
-    PUSH_LAST  <= '1' when (buf_beat_valid = '1' and buf_beat_done = '1') else '0';
-    PUSH_ERROR <= '1' when (buf_beat_valid = '1' and buf_beat_done = '1' and response_error) else '0';
-    PUSH_SIZE  <= std_logic_vector(buf_beat_size);
+    PUSH: block
+        signal error  : boolean;
+        signal last   : boolean;
+        signal valid  : boolean;
+    begin
+        error  <= (buf_beat_valid = '1' and buf_beat_done = '1' and response_error);
+        last   <= (buf_beat_valid = '1' and buf_beat_done = '1');
+        valid  <= (buf_beat_valid = '1' and BUF_RDY       = '1');
+        PUSH_VAL   <= '1' when (valid) else '0';
+        PUSH_LAST  <= '1' when (last ) else '0';
+        PUSH_ERROR <= '1' when (error) else '0';
+        PUSH_SIZE  <= (others => '0') when (error) else
+                      std_logic_vector(buf_beat_size);
+    end block;
     -------------------------------------------------------------------------------
-    -- BUF_WEN  : 外部リードバッファへの書き込み信号.
+    -- BUF_WEN   : 外部リードバッファへの書き込み信号.
     -------------------------------------------------------------------------------
-    BUF_WEN   <= '1' when (buf_beat_valid = '1' and BUF_RDY = '1') else '0';
+    BUF_WEN    <= '1' when (buf_beat_valid = '1' and BUF_RDY = '1') else '0';
     -------------------------------------------------------------------------------
-    -- BUF_BEN  : 外部リードバッファへの書き込み信号.
+    -- BUF_BEN   : 外部リードバッファへの書き込み信号.
     -------------------------------------------------------------------------------
-    BUF_BEN   <= buf_beat_ben;
+    BUF_BEN    <= buf_beat_ben;
     -------------------------------------------------------------------------------
-    -- BUF_PTR  : 外部リードバッファへの書き込みポインタ.
+    -- BUF_PTR   : 外部リードバッファへの書き込みポインタ.
     -------------------------------------------------------------------------------
     process(CLK, RST) begin
         if (RST = '1') then

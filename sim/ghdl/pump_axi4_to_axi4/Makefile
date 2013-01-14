@@ -20,9 +20,11 @@ PIPEWORK_COMPONENTS = components                             \
                       sdpram                                 \
                       sdpram_model                           \
                       pump_components                        \
+                      pump_in_valve                          \
+                      pump_out_valve                         \
                       pump_count_up_register                 \
                       pump_count_down_register               \
-                      pump_valve_control_register            \
+                      pump_control_register                  \
                       axi4_types                             \
                       axi4_components                        \
                       axi4_master_address_channel_controller \
@@ -105,7 +107,13 @@ pump_count_up_register.o                 : $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_c
 pump_count_down_register.o               : $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_count_down_register.vhd
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
-pump_valve_control_register.o            : $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_valve_control_register.vhd
+pump_control_register.o                  : $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_control_register.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+
+pump_in_valve.o                          : $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_in_valve.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+
+pump_out_valve.o                         : $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_out_valve.vhd
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
 pump_axi4_to_axi4.o                      : $(SRC_PATH)/pump_axi4_to_axi4.vhd components.o axi4_components.o pump_components.o
@@ -134,6 +142,8 @@ $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_components.vhd :                            
 $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_components.vhd :                                  \
             $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_count_up_register.vhd                 \
             $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_count_down_register.vhd               \
-            $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_valve_control_register.vhd            \
+            $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_control_register.vhd                  \
+            $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_in_valve.vhd                          \
+            $(PIPEWORK_SRC_MAIN_PATH)/pump/pump_out_valve.vhd                         \
             $(END_LIST)
 	make -C  $(PIPEWORK_SRC_MAIN_PATH)/pump
