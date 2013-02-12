@@ -4,7 +4,7 @@ DUMMY_PLUG_SRC_PATH  = $(DUMMY_PLUG_PATH)/src/main/vhdl
 DUMMY_PLUG_WORK_PATH = $(DUMMY_PLUG_PATH)/sim/ghdl/dummy_plug
 DUMMY_PLUG_TOOL_PATH = $(DUMMY_PLUG_PATH)/tools
 MAKECOMPONENTPACKAGE = $(DUMMY_PLUG_TOOL_PATH)/MakeComponentPackage.rb
-PIPEWORK_SRC_MAIN_PATH = ../../../src/main/vhdl
+PIPEWORK_SRC_MAIN_PATH = ../../../PipeWork/src
 SRC_TEST_PATH          = ../../../src/test/vhdl/axi4_register_interface
 SCENARIO_PATH          = ../../../src/test/scenarios/axi4_register_interface
 
@@ -36,7 +36,7 @@ all: $(TEST_BENCH)
 clean:
 	rm -f *.o *.cf $(TEST_BENCH)
 
-                                                
+
 axi4_register_interface_test_bench_32_32    : axi4_register_interface_test_bench_32_32.o axi4_register_interface_test_bench_32_32.snr
 	 $(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@

@@ -41,11 +41,11 @@
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_UNROUTES" xil_pn:name="AXI4_REGISTER_INTERFACE.unroutes" xil_pn:subbranch="Par"/>
     <file xil_pn:fileType="FILE_XPI" xil_pn:name="AXI4_REGISTER_INTERFACE.xpi"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST" xil_pn:name="AXI4_REGISTER_INTERFACE.xst"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_beh.prj"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_isim_beh.exe"/>
+    <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_isim_beh.wdb"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_stx_beh.prj"/>
-    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_beh.prj"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_isim_beh.exe"/>
-    <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_isim_beh.wdb"/>
     <file xil_pn:fileType="FILE_HTML" xil_pn:name="AXI4_REGISTER_INTERFACE_envsettings.html"/>
     <file xil_pn:fileType="FILE_NCD" xil_pn:name="AXI4_REGISTER_INTERFACE_guide.ncd" xil_pn:origination="imported"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_MAP_REPORT" xil_pn:name="AXI4_REGISTER_INTERFACE_map.map" xil_pn:subbranch="Map"/>
@@ -82,7 +82,7 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1357061595" xil_pn:in_ck="-7895734104798549095" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1357061594">
+    <transform xil_pn:end_ts="1360685884" xil_pn:in_ck="-1481745175410328403" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1360685883">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_channel_player.vhd"/>
@@ -98,28 +98,28 @@
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/sync.vhd"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/util.vhd"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/vocal.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/axi4/axi4_components.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/axi4/axi4_register_interface.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/axi4/axi4_register_read_interface.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/axi4/axi4_register_write_interface.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/axi4/axi4_types.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/chopper.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/components.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/queue_arbiter.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/queue_arbiter_integer_arch.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/reducer.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/sdpram.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/sdpram_model.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_register_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_register_read_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_register_write_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_types.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/chopper.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/queue_arbiter.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/queue_arbiter_integer_arch.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/reducer.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/sdpram.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/sdpram_model.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_32_32.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_32_64.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_64_32.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1357061595" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-4681455359079106420" xil_pn:start_ts="1357061595">
+    <transform xil_pn:end_ts="1360684055" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-5525160456960287545" xil_pn:start_ts="1360684054">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1357061595" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="-4838914730400504566" xil_pn:start_ts="1357061595">
+    <transform xil_pn:end_ts="1360684055" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="49902099993780037" xil_pn:start_ts="1360684055">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
@@ -127,7 +127,7 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1357061595" xil_pn:in_ck="-7895734104798549095" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1357061595">
+    <transform xil_pn:end_ts="1360685884" xil_pn:in_ck="-1481745175410328403" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1360685884">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_channel_player.vhd"/>
@@ -143,43 +143,41 @@
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/sync.vhd"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/util.vhd"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/vocal.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/axi4/axi4_components.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/axi4/axi4_register_interface.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/axi4/axi4_register_read_interface.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/axi4/axi4_register_write_interface.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/axi4/axi4_types.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/chopper.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/components.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/queue_arbiter.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/queue_arbiter_integer_arch.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/reducer.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/sdpram.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/sdpram_model.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_register_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_register_read_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_register_write_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_types.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/chopper.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/queue_arbiter.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/queue_arbiter_integer_arch.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/reducer.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/sdpram.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/sdpram_model.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_32_32.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_32_64.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_64_32.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1357061620" xil_pn:in_ck="-7895734104798549095" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="2997412613787958018" xil_pn:start_ts="1357061595">
+    <transform xil_pn:end_ts="1360685908" xil_pn:in_ck="-1481745175410328403" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="3172832362339592536" xil_pn:start_ts="1360685884">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_beh.prj"/>
-      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_isim_beh.exe"/>
+      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_beh.prj"/>
+      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_isim_beh.exe"/>
       <outfile xil_pn:name="fuse.log"/>
       <outfile xil_pn:name="isim"/>
       <outfile xil_pn:name="isim.log"/>
       <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
-    <transform xil_pn:end_ts="1357061622" xil_pn:in_ck="6421135297265042019" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-4892608755493903356" xil_pn:start_ts="1357061620">
+    <transform xil_pn:end_ts="1360685910" xil_pn:in_ck="6421135297265042019" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="8014600651792380090" xil_pn:start_ts="1360685908">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_isim_beh.wdb"/>
+      <outfile xil_pn:name="AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_isim_beh.wdb"/>
       <outfile xil_pn:name="isim.cmd"/>
       <outfile xil_pn:name="isim.log"/>
     </transform>

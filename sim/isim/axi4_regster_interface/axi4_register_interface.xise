@@ -15,62 +15,62 @@
   <version xil_pn:ise_version="14.2" xil_pn:schema_version="2"/>
 
   <files>
-    <file xil_pn:name="../../../src/main/vhdl/components/chopper.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/components/chopper.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="10"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="4"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/components/components.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/components/components.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="9"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="3"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/components/queue_arbiter.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/components/queue_arbiter.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="8"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="2"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/components/queue_arbiter_integer_arch.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/components/queue_arbiter_integer_arch.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="14"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="6"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/components/reducer.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/components/reducer.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="7"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="1"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/components/sdpram.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/components/sdpram.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="13"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/components/sdpram_model.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/components/sdpram_model.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="19"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/axi4/axi4_components.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/axi4/axi4_components.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="17"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="9"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/axi4/axi4_register_interface.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/axi4/axi4_register_interface.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="20"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="10"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/axi4/axi4_register_read_interface.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/axi4/axi4_register_read_interface.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="16"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="8"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/axi4/axi4_register_write_interface.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/axi4/axi4_register_write_interface.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="15"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="7"/>
       <library xil_pn:name="PipeWork"/>
     </file>
-    <file xil_pn:name="../../../src/main/vhdl/axi4/axi4_types.vhd" xil_pn:type="FILE_VHDL">
+    <file xil_pn:name="../../../PipeWork/src/axi4/axi4_types.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="11"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="5"/>
       <library xil_pn:name="PipeWork"/>
@@ -80,7 +80,7 @@
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
     <file xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_32_32.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="26"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
     <file xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/core.vhd" xil_pn:type="FILE_VHDL">
@@ -149,7 +149,7 @@
       <library xil_pn:name="Dummy_Plug"/>
     </file>
     <file xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_32_64.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="26"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="80"/>
     </file>
     <file xil_pn:name="../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench_64_32.vhd" xil_pn:type="FILE_VHDL">
@@ -273,7 +273,7 @@
     <property xil_pn:name="Ignore User Timing Constraints Map" xil_pn:value="false" xil_pn:valueState="default"/>
     <property xil_pn:name="Ignore User Timing Constraints Par" xil_pn:value="false" xil_pn:valueState="default"/>
     <property xil_pn:name="Implementation Top" xil_pn:value="Architecture|AXI4_REGISTER_INTERFACE|RTL" xil_pn:valueState="non-default"/>
-    <property xil_pn:name="Implementation Top File" xil_pn:value="../../../src/main/vhdl/axi4/axi4_register_interface.vhd" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="Implementation Top File" xil_pn:value="../../../PipeWork/src/axi4/axi4_register_interface.vhd" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Implementation Top Instance Path" xil_pn:value="/AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32/TB/DUT" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Include 'uselib Directive in Verilog File" xil_pn:value="false" xil_pn:valueState="default"/>
     <property xil_pn:name="Include SIMPRIM Models in Verilog File" xil_pn:value="false" xil_pn:valueState="default"/>
@@ -400,8 +400,8 @@
     <property xil_pn:name="Run for Specified Time Translate" xil_pn:value="true" xil_pn:valueState="default"/>
     <property xil_pn:name="Safe Implementation" xil_pn:value="No" xil_pn:valueState="default"/>
     <property xil_pn:name="Security" xil_pn:value="Enable Readback and Reconfiguration" xil_pn:valueState="default"/>
-    <property xil_pn:name="Selected Module Instance Name" xil_pn:value="/AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64" xil_pn:valueState="non-default"/>
-    <property xil_pn:name="Selected Simulation Root Source Node Behavioral" xil_pn:value="work.AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="Selected Module Instance Name" xil_pn:value="/AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="Selected Simulation Root Source Node Behavioral" xil_pn:value="work.AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Selected Simulation Root Source Node Post-Map" xil_pn:value="" xil_pn:valueState="default"/>
     <property xil_pn:name="Selected Simulation Root Source Node Post-Route" xil_pn:value="" xil_pn:valueState="default"/>
     <property xil_pn:name="Selected Simulation Root Source Node Post-Translate" xil_pn:value="" xil_pn:valueState="default"/>
@@ -419,7 +419,7 @@
     <property xil_pn:name="Simulator" xil_pn:value="ISim (VHDL/Verilog)" xil_pn:valueState="default"/>
     <property xil_pn:name="Slice Utilization Ratio" xil_pn:value="100" xil_pn:valueState="default"/>
     <property xil_pn:name="Specify 'define Macro Name and Value" xil_pn:value="" xil_pn:valueState="default"/>
-    <property xil_pn:name="Specify Top Level Instance Names Behavioral" xil_pn:value="work.AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64" xil_pn:valueState="default"/>
+    <property xil_pn:name="Specify Top Level Instance Names Behavioral" xil_pn:value="work.AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32" xil_pn:valueState="default"/>
     <property xil_pn:name="Specify Top Level Instance Names Post-Map" xil_pn:value="Default" xil_pn:valueState="default"/>
     <property xil_pn:name="Specify Top Level Instance Names Post-Route" xil_pn:value="Default" xil_pn:valueState="default"/>
     <property xil_pn:name="Specify Top Level Instance Names Post-Translate" xil_pn:value="Default" xil_pn:valueState="default"/>
@@ -469,7 +469,7 @@
     <!--                                                                                  -->
     <!-- The following properties are for internal use only. These should not be modified.-->
     <!--                                                                                  -->
-    <property xil_pn:name="PROP_BehavioralSimTop" xil_pn:value="Architecture|AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64|MODEL" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="PROP_BehavioralSimTop" xil_pn:value="Architecture|AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32|MODEL" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_DesignName" xil_pn:value="axi4_register_interface" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_DevFamilyPMName" xil_pn:value="spartan6" xil_pn:valueState="default"/>
     <property xil_pn:name="PROP_FPGAConfiguration" xil_pn:value="FPGAConfiguration" xil_pn:valueState="default"/>
