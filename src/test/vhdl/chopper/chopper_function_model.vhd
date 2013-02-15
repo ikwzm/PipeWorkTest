@@ -90,6 +90,7 @@ architecture MODEL of CHOPPER_FUNCTION_MODEL is
     constant    HEX             : STRING(1 to 16) := "0123456789ABCDEF";
     constant    PERIOD          : time    := 10 ns;
     constant    DELAY           : time    :=  2 ns;
+    constant    TIMEOUT_CYCLE   : integer := 1000000;
     signal      SCENARIO        : STRING(1 to 5);
     signal      clock           : std_logic;
     function    MESSAGE_TAG return STRING is
@@ -248,7 +249,8 @@ begin
             UPDATE;
         end procedure;
         procedure TEST(A,S,W:integer) is
-            variable count_enable : boolean;
+            variable count_enable  : boolean;
+            variable timeout_count : integer;
         begin
             INIT(A,S,W);
             ADDR <= std_logic_vector(TO_UNSIGNED(A,ADDR_BITS));
@@ -268,8 +270,13 @@ begin
             wait for DELAY;
             if (none_piece = FALSE) then
                 CHOP <= '1'; count_enable := TRUE;
+                timeout_count := TIMEOUT_CYCLE;
                 while (none_piece = FALSE) loop
                     wait until (clock'event and clock = '1');
+                    assert (timeout_count > 0) 
+                       report MESSAGE_TAG & "Time Out"
+                       severity ERROR;
+                    timeout_count := timeout_count - 1;
                     CHECK_CURR_SIGS;
                     if (count_enable) then
                         UPDATE;

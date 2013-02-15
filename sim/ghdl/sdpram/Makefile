@@ -4,7 +4,7 @@ GHDLRUNFLAGS=--mb-comments
 WORK=work
 
 DUMMY_PLUG_SRC_PATH    = ../../../Dummy_Plug/src/main/vhdl
-PIPEWORK_SRC_MAIN_PATH = ../../../src/main/vhdl
+PIPEWORK_SRC_MAIN_PATH = ../../../PipeWork/src
 PIPEWORK_SRC_TEST_PATH = ../../../src/test/vhdl
 
 TEST_BENCH = sdpram_test_bench_depth08_rd3_wd3_we0 \

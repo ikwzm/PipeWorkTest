@@ -586,6 +586,115 @@ begin
         );
 end MODEL;
 -----------------------------------------------------------------------------------
+-- CHOPPER_TEST_BENCH_6_9_9
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  CHOPPER_TEST_BENCH_6_9_9 is
+    generic (AUTO_FINISH :     integer:= 1);
+    port    (FINISH      : out std_logic  );
+end     CHOPPER_TEST_BENCH_6_9_9;
+library ieee;
+use     ieee.std_logic_1164.all;
+library PIPEWORK;
+use     PIPEWORK.COMPONENTS.CHOPPER;
+use     WORK.COMPONENTS.CHOPPER_FUNCTION_MODEL;
+use     WORK.COMPONENTS.CHOPPER_TEST_BENCH;
+architecture MODEL of CHOPPER_TEST_BENCH_6_9_9 is
+    constant    BURST           : integer :=  1;
+    constant    MIN_PIECE       : integer :=  6;
+    constant    MAX_PIECE       : integer :=  9;
+    constant    MAX_SIZE        : integer :=  9;
+    constant    ADDR_BITS       : integer :=  9;
+    constant    SIZE_BITS       : integer :=  9;
+    constant    COUNT_BITS      : integer :=  9;
+    constant    PSIZE_BITS      : integer :=  9;
+    signal      CLK             : std_logic;
+    signal      RST             : std_logic;
+    signal      CLR             : std_logic;
+    signal      LOAD            : std_logic;
+    signal      CHOP            : std_logic;
+    signal      ADDR            : std_logic_vector(ADDR_BITS-1 downto 0);
+    signal      SIZE            : std_logic_vector(SIZE_BITS-1 downto 0);
+    signal      SEL             : std_logic_vector(MAX_PIECE downto MIN_PIECE);
+    signal      COUNT           : std_logic_vector(COUNT_BITS-1 downto 0);
+    signal      NONE            : std_logic;
+    signal      LAST            : std_logic;
+    signal      NEXT_NONE       : std_logic;
+    signal      NEXT_LAST       : std_logic;
+    signal      PSIZE           : std_logic_vector(PSIZE_BITS-1 downto 0);
+    signal      NEXT_PSIZE      : std_logic_vector(PSIZE_BITS-1 downto 0);
+    signal      VALID           : std_logic_vector(2**(MAX_PIECE)-1 downto 0);
+    signal      NEXT_VALID      : std_logic_vector(2**(MAX_PIECE)-1 downto 0);
+begin
+    U: CHOPPER
+        generic map (
+            BURST         => BURST,
+            MIN_PIECE     => MIN_PIECE,
+            MAX_PIECE     => MAX_PIECE,
+            MAX_SIZE      => MAX_SIZE,
+            ADDR_BITS     => ADDR_BITS,
+            SIZE_BITS     => SIZE_BITS,
+            COUNT_BITS    => COUNT_BITS,
+            PSIZE_BITS    => PSIZE_BITS,
+            GEN_VALID     => 1
+        )
+        port map (
+            CLK           => CLK,
+            RST           => RST,
+            CLR           => CLR,
+            ADDR          => ADDR,
+            SIZE          => SIZE,
+            SEL           => SEL,
+            LOAD          => LOAD,
+            CHOP          => CHOP,
+            COUNT         => COUNT,
+            NONE          => NONE,
+            LAST          => LAST,
+            NEXT_NONE     => NEXT_NONE,
+            NEXT_LAST     => NEXT_LAST,
+            PSIZE         => PSIZE,
+            NEXT_PSIZE    => NEXT_PSIZE,
+            VALID         => VALID,
+            NEXT_VALID    => NEXT_VALID
+        );
+
+    M: CHOPPER_FUNCTION_MODEL
+        generic map (
+            BURST         => BURST,
+            MIN_PIECE     => MIN_PIECE,
+            MAX_PIECE     => MAX_PIECE,
+            MAX_SIZE      => MAX_SIZE,
+            ADDR_BITS     => ADDR_BITS,
+            SIZE_BITS     => SIZE_BITS,
+            COUNT_BITS    => COUNT_BITS,
+            PSIZE_BITS    => PSIZE_BITS,
+            GEN_VALID     => 1,
+            VERBOSE       => 0,
+            AUTO_FINISH   => AUTO_FINISH
+        )
+        port map (
+            CLK           => CLK,
+            RST           => RST,
+            CLR           => CLR,
+            ADDR          => ADDR,
+            SIZE          => SIZE,
+            SEL           => SEL,
+            LOAD          => LOAD,
+            CHOP          => CHOP,
+            COUNT         => COUNT,
+            NONE          => NONE,
+            LAST          => LAST,
+            NEXT_NONE     => NEXT_NONE,
+            NEXT_LAST     => NEXT_LAST,
+            PSIZE         => PSIZE,
+            NEXT_PSIZE    => NEXT_PSIZE,
+            VALID         => VALID,
+            NEXT_VALID    => NEXT_VALID,
+            FINISH        => FINISH
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
 -- CHOPPER_TEST_BENCH_5_5_5_NO_BURST
 -----------------------------------------------------------------------------------
 library ieee;

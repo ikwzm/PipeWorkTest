@@ -1,7 +1,7 @@
 GHDL=ghdl
 GHDLFLAGS=--mb-comments -P../pipework
 
-SRC_MAIN_PATH = ../../../src/main/vhdl/components
+SRC_MAIN_PATH = ../../../PipeWork/src/components
 SRC_TEST_PATH = ../../../src/test/vhdl/reducer
 
 TEST_BENCH = reducer_test_bench_dwc_w08_i1_o1_q0_j0 \

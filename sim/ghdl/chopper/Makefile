@@ -2,13 +2,14 @@ GHDL=ghdl
 GHDLFLAGS=--mb-comments
 
 DUMMY_PLUG_SRC_PATH    = ../../../Dummy_Plug/src/main/vhdl
-PIPEWORK_SRC_MAIN_PATH = ../../../src/main/vhdl
+PIPEWORK_SRC_MAIN_PATH = ../../../PipeWork/src
 PIPEWORK_SRC_TEST_PATH = ../../../src/test/vhdl
 
 TEST_BENCH = chopper_test_bench_all            \
              chopper_test_bench_3_6_6          \
              chopper_test_bench_5_5_5          \
              chopper_test_bench_5_5_5_no_burst \
+             chopper_test_bench_6_9_9          \
              $(END_LIST)
 
 all: $(TEST_BENCH)
@@ -33,6 +34,10 @@ chopper_test_bench_5_5_5          : chopper_test_bench.o
 	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
 chopper_test_bench_5_5_5_no_burst : chopper_test_bench.o
+	 $(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+
+chopper_test_bench_6_9_9          : chopper_test_bench.o
 	 $(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 

@@ -40,9 +40,9 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/util.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/components.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/delay_adjuster.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/delay_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/delay_adjuster.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/delay_register.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/delay_register/delay_register_test_bench.vhd"/>
     </transform>
     <transform xil_pn:end_ts="1346077708" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-7984149974394242557" xil_pn:start_ts="1346077708">
@@ -61,9 +61,9 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/util.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/components.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/delay_adjuster.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/delay_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/delay_adjuster.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/delay_register.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/delay_register/delay_register_test_bench.vhd"/>
     </transform>
     <transform xil_pn:end_ts="1346077735" xil_pn:in_ck="-8007289944466818533" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="-6111712191818886771" xil_pn:start_ts="1346077721">

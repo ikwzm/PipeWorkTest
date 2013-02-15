@@ -42,8 +42,8 @@
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/tinymt32.vhd"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/util.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/components.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/queue_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/queue_register.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/queue_register/queue_register_test_bench.vhd"/>
     </transform>
     <transform xil_pn:end_ts="1346166333" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-6224331359004816031" xil_pn:start_ts="1346166333">
@@ -63,8 +63,8 @@
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/tinymt32.vhd"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/util.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/components.vhd"/>
-      <outfile xil_pn:name="../../../src/main/vhdl/components/queue_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/queue_register.vhd"/>
       <outfile xil_pn:name="../../../src/test/vhdl/queue_register/queue_register_test_bench.vhd"/>
     </transform>
     <transform xil_pn:end_ts="1346237179" xil_pn:in_ck="7476068249958220620" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="5228060667323090091" xil_pn:start_ts="1346237168">
