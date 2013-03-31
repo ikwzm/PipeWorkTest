@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    reducer_test_model.vhd
 --!     @brief   TEST MODEL for REDUCER :
---!     @version 1.0.0
---!     @date    2012/4/3
+--!     @version 1.5.0
+--!     @date    2013/4/1
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012 Ichiro Kawazome
+--      Copyright (C) 2012,2013 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ package RANDOM_DATA_TABLE is
             SIZE    : in  integer;
             LEN     : out integer;
             DATA    : out std_logic_vector;
-            ENBL    : out std_logic_vector;
+            STRB    : out std_logic_vector;
             DONE    : out std_logic);
     constant  TABLE_SIZE : integer := 4096;
     constant  ERROR_CODE : std_logic_vector(7 downto 0) := "11001100";
@@ -88,28 +88,28 @@ package body RANDOM_DATA_TABLE is
                      SIZE     : in    integer;
                      LEN      : out   integer;
                      DATA     : out   std_logic_vector;
-                     ENBL     : out   std_logic_vector;
+                     STRB     : out   std_logic_vector;
                      DONE     : out   std_logic) is
             variable o_data   :       std_logic_vector(8*WIDTH-1 downto 0);
-            variable o_enbl   :       std_logic_vector(  WIDTH-1 downto 0);
-            variable f_enbl   :       std_logic_vector(  WIDTH-1 downto 0);
-            variable l_enbl   :       std_logic_vector(  WIDTH-1 downto 0);
+            variable o_strb   :       std_logic_vector(  WIDTH-1 downto 0);
+            variable f_strb   :       std_logic_vector(  WIDTH-1 downto 0);
+            variable l_strb   :       std_logic_vector(  WIDTH-1 downto 0);
             variable length   :       integer;
             variable addr_end :       integer range 0 to TABLE_SIZE-1;
         begin
             addr_end := OFFSET + SIZE - 1;
-            for i in f_enbl'range loop
+            for i in f_strb'range loop
                 if (i >= OFFSET) then
-                    f_enbl(i) := '1';
+                    f_strb(i) := '1';
                 else
-                    f_enbl(i) := '0';
+                    f_strb(i) := '0';
                 end if;
             end loop;
-            for i in l_enbl'range loop
+            for i in l_strb'range loop
                 if (i <= addr_end) then
-                    l_enbl(i) := '1';
+                    l_strb(i) := '1';
                 else
-                    l_enbl(i) := '0';
+                    l_strb(i) := '0';
                 end if;
             end loop;
             if (addr_end < WIDTH) then
@@ -117,10 +117,10 @@ package body RANDOM_DATA_TABLE is
             else
                 DONE := '0';
             end if;
-            o_enbl := f_enbl and l_enbl;
+            o_strb := f_strb and l_strb;
             length := 0;
-            for i in o_enbl'range loop
-                if (o_enbl(i) = '1') then
+            for i in o_strb'range loop
+                if (o_strb(i) = '1') then
                     length := length + 1;
                     o_data((i+1)*8-1 downto i*8) := DATA_TABLE(ADDR-OFFSET+i);
                 else
@@ -128,7 +128,7 @@ package body RANDOM_DATA_TABLE is
                 end if;
             end loop;
             DATA := o_data;
-            ENBL := o_enbl;
+            STRB := o_strb;
             LEN  := length;
         end GET;
 end     RANDOM_DATA_TABLE;
@@ -156,14 +156,16 @@ entity  REDUCER_TEST_MODEL is
         OFFSET        : out std_logic_vector(O_WIDTH-1 downto 0);
         DONE          : out std_logic;
         FLUSH         : out std_logic;
+        I_ENABLE      : out std_logic;
         I_DATA        : out std_logic_vector(I_WIDTH*(WORD_BITS  )-1 downto 0);
-        I_ENBL        : out std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
+        I_STRB        : out std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
         I_FLUSH       : out std_logic;
         I_DONE        : out std_logic;
         I_VAL         : out std_logic;
         I_RDY         : in  std_logic := '0';
+        O_ENABLE      : out std_logic;
         O_DATA        : in  std_logic_vector(O_WIDTH*(WORD_BITS  )-1 downto 0) := (others => '0');
-        O_ENBL        : in  std_logic_vector(O_WIDTH*(WORD_BITS/8)-1 downto 0) := (others => '1');
+        O_STRB        : in  std_logic_vector(O_WIDTH*(WORD_BITS/8)-1 downto 0) := (others => '1');
         O_FLUSH       : in  std_logic := '0';
         O_DONE        : in  std_logic := '0';
         O_VAL         : in  std_logic := '0';
@@ -273,7 +275,7 @@ begin
         ---------------------------------------------------------------------------
         procedure OUTPUT(ADDR,SIZE:integer;INITIALIZE,LAST,FLUSH:boolean) is
             variable data         : std_logic_vector(I_DATA'range);
-            variable enbl         : std_logic_vector(I_ENBL'range);
+            variable strb         : std_logic_vector(I_STRB'range);
             variable valid        : std_logic;
             variable end_of_data  : std_logic;
             variable pos          : integer;
@@ -296,29 +298,29 @@ begin
             bytes := SIZE;
             while (bytes > 0) loop
                 lo_pos := pos rem I_BYTES;
-                RANDOM_DATA_TABLE.GET(I_BYTES,lo_pos,pos,bytes,len,data,enbl,end_of_data);
+                RANDOM_DATA_TABLE.GET(I_BYTES,lo_pos,pos,bytes,len,data,strb,end_of_data);
                 pos    := pos   + len;
                 bytes  := bytes - len;
-                if (I_JUSTIFIED > 0 and enbl(0) = '0') then
+                if (I_JUSTIFIED > 0 and strb(0) = '0') then
                     num := 1;
-                    for i in 1 to enbl'high loop
-                        if (enbl(i) = '1') then
+                    for i in 1 to strb'high loop
+                        if (strb(i) = '1') then
                             num := i;
                             exit;
                         end if;
                     end loop;
-                    for i in enbl'low to enbl'high loop
-                        if (i+num > enbl'high) then
+                    for i in strb'low to strb'high loop
+                        if (i+num > strb'high) then
                             I_DATA(8*(i+1)-1 downto 8*i) <= (others => '0');
-                            I_ENBL(                   i) <= '0';
+                            I_STRB(                   i) <= '0';
                         else
                             I_DATA(8*(i+1)-1 downto 8*i) <= data(8*(i+1+num)-1 downto 8*(i+num));
-                            I_ENBL(                   i) <= enbl(i+num);
+                            I_STRB(                   i) <= strb(i+num);
                         end if;
                     end loop;
                 else
                     I_DATA <= data;
-                    I_ENBL <= enbl;
+                    I_STRB <= strb;
                 end if;
                 if (LAST) then
                     I_DONE  <= end_of_data;
@@ -340,7 +342,7 @@ begin
                 I_DONE  <= '0';
                 I_FLUSH <= '0';
                 I_DATA  <= (others => '1');
-                I_ENBL  <= (others => '1');
+                I_STRB  <= (others => '1');
             end loop;
         end procedure;
         ---------------------------------------------------------------------------
@@ -402,11 +404,13 @@ begin
                        DONE     <= '0';
                        FLUSH    <= '0';
                        I_DATA   <= (others => '0');
-                       I_ENBL   <= (others => '0');
+                       I_STRB   <= (others => '0');
                        I_FLUSH  <= '0';
                        I_DONE   <= '0';
                        I_VAL    <= '0';
                        i_valid  <= '0';
+                       I_ENABLE <= '1';
+                       O_ENABLE <= '1';
         WAIT_CLK( 4);  RST      <= '0';
                        CLR      <= '0';
         WAIT_CLK( 4);
@@ -562,7 +566,7 @@ begin
         variable len         : integer;
         variable lo_pos      : integer;
         variable data        : std_logic_vector(O_DATA'range);
-        variable enbl        : std_logic_vector(O_ENBL'range);
+        variable strb        : std_logic_vector(O_STRB'range);
         variable end_of_data : std_logic;
         variable data_ok     : boolean;
     begin
@@ -596,13 +600,13 @@ begin
                     wait until (CLK'event and CLK = '1' and O_VAL = '1');
                 end if;
                 lo_pos := addr rem O_BYTES;
-                RANDOM_DATA_TABLE.GET(O_BYTES,lo_pos,addr,size,len,data,enbl,end_of_data);
+                RANDOM_DATA_TABLE.GET(O_BYTES,lo_pos,addr,size,len,data,strb,end_of_data);
                 addr   := addr + len;
                 size   := size - len;
-                assert (O_ENBL = enbl) report NAME & " Mismatch O_ENBL" severity FAILURE;
+                assert (O_STRB = strb) report NAME & " Mismatch O_STRB" severity FAILURE;
                 data_ok := TRUE;
-                for i in O_ENBL'range loop
-                    if (O_ENBL(i) = '1') then
+                for i in O_STRB'range loop
+                    if (O_STRB(i) = '1') then
                         if (O_DATA((i+1)*8-1 downto i*8) /= data((i+1)*8-1 downto i*8)) then
                             data_ok := FALSE;
                         end if;
@@ -695,14 +699,16 @@ package COMPONENTS is
             OFFSET      : out std_logic_vector(O_WIDTH-1 downto 0);
             DONE        : out std_logic;
             FLUSH       : out std_logic;
+            I_ENABLE    : out std_logic;
             I_DATA      : out std_logic_vector(I_WIDTH*(WORD_BITS  )-1 downto 0);
-            I_ENBL      : out std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
+            I_STRB      : out std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
             I_FLUSH     : out std_logic;
             I_DONE      : out std_logic;
             I_VAL       : out std_logic;
             I_RDY       : in  std_logic := '0';
+            O_ENABLE    : out std_logic;
             O_DATA      : in  std_logic_vector(O_WIDTH*(WORD_BITS  )-1 downto 0) := (others => '0');
-            O_ENBL      : in  std_logic_vector(O_WIDTH*(WORD_BITS/8)-1 downto 0) := (others => '1');
+            O_STRB      : in  std_logic_vector(O_WIDTH*(WORD_BITS/8)-1 downto 0) := (others => '1');
             O_FLUSH     : in  std_logic := '0';
             O_DONE      : in  std_logic := '0';
             O_VAL       : in  std_logic := '0';

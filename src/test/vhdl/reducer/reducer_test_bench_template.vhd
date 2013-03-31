@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    test_bench_template.vhd
 --!     @brief   TEST MODEL for REDUCER :
---!     @version 1.0.0
---!     @date    2012/4/3
+--!     @version 1.5.0
+--!     @date    2013/4/1
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 library ieee;
@@ -31,14 +31,16 @@ architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J is
     signal     DONE           : std_logic;
     signal     FLUSH          : std_logic;
     signal     BUSY           : std_logic;
+    signal     I_ENABLE       : std_logic;
     signal     I_DATA         : std_logic_vector(I_WIDTH*(WORD_BITS  )-1 downto 0);
-    signal     I_ENBL         : std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
+    signal     I_STRB         : std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
     signal     I_DONE         : std_logic;
     signal     I_FLUSH        : std_logic;
     signal     I_VAL          : std_logic;
     signal     I_RDY          : std_logic;
+    signal     O_ENABLE       : std_logic;
     signal     O_DATA         : std_logic_vector(O_WIDTH*(WORD_BITS  )-1 downto 0);
-    signal     O_ENBL         : std_logic_vector(O_WIDTH*(WORD_BITS/8)-1 downto 0);
+    signal     O_STRB         : std_logic_vector(O_WIDTH*(WORD_BITS/8)-1 downto 0);
     signal     O_DONE         : std_logic;
     signal     O_FLUSH        : std_logic;
     signal     O_VAL          : std_logic;
@@ -48,7 +50,7 @@ begin
     U:REDUCER
         generic map (
             WORD_BITS     => WORD_BITS,
-            ENBL_BITS     => WORD_BITS/8,
+            STRB_BITS     => WORD_BITS/8,
             I_WIDTH       => I_WIDTH,
             O_WIDTH       => O_WIDTH,
             QUEUE_SIZE    => QUEUE_SIZE,
@@ -65,14 +67,16 @@ begin
             OFFSET        => OFFSET,
             DONE          => DONE,
             FLUSH         => FLUSH,
+            I_ENABLE      => I_ENABLE,
             I_DATA        => I_DATA,
-            I_ENBL        => I_ENBL,
+            I_STRB        => I_STRB,
             I_FLUSH       => I_FLUSH,
             I_DONE        => I_DONE,
             I_VAL         => I_VAL,
             I_RDY         => I_RDY,
+            O_ENABLE      => O_ENABLE,
             O_DATA        => O_DATA,
-            O_ENBL        => O_ENBL,
+            O_STRB        => O_STRB,
             O_FLUSH       => O_FLUSH,
             O_DONE        => O_DONE,
             O_VAL         => O_VAL,
@@ -101,14 +105,16 @@ begin
             DONE          => DONE      ,
             FLUSH         => FLUSH     ,
             BUSY          => BUSY      ,
+            I_ENABLE      => I_ENABLE  ,
             I_DATA        => I_DATA    ,
-            I_ENBL        => I_ENBL    ,
+            I_STRB        => I_STRB    ,
             I_DONE        => I_DONE    ,
             I_FLUSH       => I_FLUSH   ,
             I_VAL         => I_VAL     ,
             I_RDY         => I_RDY     ,
+            O_ENABLE      => O_ENABLE  ,
             O_DATA        => O_DATA    ,
-            O_ENBL        => O_ENBL    ,
+            O_STRB        => O_STRB    ,
             O_DONE        => O_DONE    ,
             O_FLUSH       => O_FLUSH   ,
             O_VAL         => O_VAL     ,
