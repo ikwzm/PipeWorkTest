@@ -37,17 +37,24 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-use     std.textio.all;
-library DUMMY_PLUG;
-use     DUMMY_PLUG.AXI4_TYPES.all;
-use     DUMMY_PLUG.AXI4_MODELS.AXI4_MASTER_PLAYER;
-use     DUMMY_PLUG.AXI4_MODELS.AXI4_SLAVE_PLAYER;
-use     DUMMY_PLUG.AXI4_MODELS.AXI4_SIGNAL_PRINTER;
-use     DUMMY_PLUG.SYNC.all;
-use     DUMMY_PLUG.CORE.MARCHAL;
-use     DUMMY_PLUG.CORE.REPORT_STATUS_TYPE;
-use     DUMMY_PLUG.CORE.REPORT_STATUS_VECTOR;
-use     DUMMY_PLUG.CORE.MARGE_REPORT_STATUS;
-library PIPEWORK;
-use     PIPEWORK.COMPONENTS.SDPRAM;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  AXI4_ADAPTER_TEST_BENCH_32_32_4096_ASYNC is
+end     AXI4_ADAPTER_TEST_BENCH_32_32_4096_ASYNC;
+use     WORK.AXI4_ADAPTER_TEST_BENCH_COMPONENTS.AXI4_ADAPTER_TEST_BENCH;
+architecture MODEL of AXI4_ADAPTER_TEST_BENCH_32_32_4096_ASYNC is
+begin
+    TB: AXI4_ADAPTER_TEST_BENCH generic map (
+        NAME            => string'("AXI4_ADAPTER_TEST_BENCH_32_32_4096_ASYNC"),
+        SCENARIO_FILE   => string'("axi4_adapter_test_bench.snr"),
+        T_CLK_RATE      => 0,
+        T_CLK_PERIOD    => 10 ns,
+        M_CLK_RATE      => 0,
+        M_CLK_PERIOD    => 14 ns,
+        T_DATA_WIDTH    => 32,
+        M_DATA_WIDTH    => 32,
+        M_MAX_XFER_SIZE => 12
+    );
+end MODEL;
 
