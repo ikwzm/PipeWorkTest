@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_write_adapter.vhd
 --!     @brief   AXI4_WRITE_ADPATER
---!     @version 0.0.1
---!     @date    2013/4/14
+--!     @version 0.0.2
+--!     @date    2013/4/16
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -180,7 +180,9 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     --
     -------------------------------------------------------------------------------
     constant  MODE_LO           : integer := 0;
-    constant  MODE_ABURST_LO    : integer := MODE_LO;
+    constant  MODE_ID_LO        : integer := MODE_LO;
+    constant  MODE_ID_HI        : integer := MODE_ID_LO     + AXI4_ID_WIDTH     - 1;
+    constant  MODE_ABURST_LO    : integer := MODE_ID_HI     + 1;
     constant  MODE_ABURST_HI    : integer := MODE_ABURST_LO + AXI4_ABURST_WIDTH - 1;
     constant  MODE_ALOCK_LO     : integer := MODE_ABURST_HI + 1;
     constant  MODE_ALOCK_HI     : integer := MODE_ALOCK_LO  + AXI4_ALOCK_WIDTH  - 1;
@@ -195,7 +197,7 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     constant  MODE_AUSER_LO     : integer := MODE_AREGION_HI+ 1;
     constant  MODE_AUSER_HI     : integer := MODE_AUSER_LO  + AXI4_AUSER_WIDTH  - 1;
     constant  MODE_HI           : integer := MODE_AUSER_HI;
-    constant  MODE_BITS         : integer := MODE_HI + 1;
+    constant  MODE_BITS         : integer := MODE_HI        + 1;
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -264,6 +266,7 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     signal    t_o_flow_stop     : std_logic;
     signal    t_o_flow_last     : std_logic;
     signal    t_o_flow_size     : std_logic_vector(SIZE_BITS-1 downto 0);
+    signal    t_o_pool_rdy      : std_logic;
     constant  t_o_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
     constant  t_o_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
     constant  t_pull_fin_val    : std_logic := '0';
@@ -274,7 +277,6 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     constant  t_pull_rsv_last   : std_logic := '0';
     constant  t_pull_rsv_err    : std_logic := '0';
     constant  t_pull_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    signal    t_pool_rdy        : std_logic;
     signal    t_pool_write      : std_logic;
     signal    t_pool_ben        : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
     signal    t_pool_we         : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
@@ -433,8 +435,9 @@ begin
             BUF_BEN             => t_pool_ben          , -- Out :
             BUF_DATA            => t_pool_wdata        , -- Out :
             BUF_PTR             => t_pool_wptr         , -- Out :
-            BUF_RDY             => t_pool_rdy            -- In  :
+            BUF_RDY             => t_i_pool_rdy          -- In  :
         );
+    t_req_mode(MODE_ID_HI      downto MODE_ID_LO     ) <= t_req_id;
     t_req_mode(MODE_ABURST_HI  downto MODE_ABURST_LO ) <= t_req_burst;
     t_req_mode(MODE_ALOCK_HI   downto MODE_ALOCK_LO  ) <= T_AWLOCK;
     t_req_mode(MODE_ACACHE_HI  downto MODE_ACACHE_LO ) <= T_AWCACHE;
@@ -533,7 +536,7 @@ begin
             T_O_FLOW_STOP       => t_o_flow_stop       , -- Out :
             T_O_FLOW_LAST       => t_o_flow_last       , -- Out :
             T_O_FLOW_SIZE       => t_o_flow_size       , -- Out :
-            T_O_POOL_RDY        => t_pool_rdy          , -- Out :
+            T_O_POOL_RDY        => t_o_pool_rdy        , -- Out :
             T_O_FLOW_RDY_LVL    => t_o_flow_rdy_lvl    , -- In  :
             T_O_POOL_RDY_LVL    => t_o_pool_rdy_lvl    , -- In  :
             T_PULL_FIN_VAL      => t_pull_fin_val      , -- In  :
@@ -612,6 +615,7 @@ begin
             M_PULL_RSV_ERR      => m_pull_rsv_err      , -- In  :
             M_PULL_RSV_SIZE     => m_pull_rsv_size       -- In  :
         );
+    m_req_id     <= m_req_mode(MODE_ID_HI      downto MODE_ID_LO     );
     m_req_burst  <= m_req_mode(MODE_ABURST_HI  downto MODE_ABURST_LO );
     m_req_lock   <= m_req_mode(MODE_ALOCK_HI   downto MODE_ALOCK_LO  );
     m_req_cache  <= m_req_mode(MODE_ACACHE_HI  downto MODE_ACACHE_LO );
