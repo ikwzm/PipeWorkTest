@@ -13,6 +13,8 @@ COPY       = cp
 GHDL       = ghdl
 GHDLFLAGS  = --mb-comments -P$(DUMMY_PLUG_WORK_PATH) -P$(PIPEWORK_WORK_PATH)
 
+all: axi4_adapter_test_bench_4096_32_32
+
 pipework:
 	$(PIPEWORK_TOOL_PATH)/MakeSerializedPackageList.rb \
             --library PipeWork \

@@ -15,12 +15,16 @@ GHDLFLAGS  = --mb-comments -P$(DUMMY_PLUG_WORK_PATH)
 PIPEWORK_COMPONENTS = components                             \
                       chopper                                \
                       reducer                                \
+                      pool_outlet_port                       \
+                      queue_register                         \
                       queue_arbiter                          \
                       queue_arbiter_integer_arch             \
                       sdpram                                 \
                       sdpram_model                           \
                       axi4_types                             \
                       axi4_components                        \
+                      axi4_data_port                         \
+                      axi4_data_outlet_port                  \
                       axi4_register_write_interface          \
                       axi4_register_read_interface           \
                       axi4_register_interface                \
@@ -87,6 +91,12 @@ axi4_register_read_interface.o             : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4
 axi4_register_interface.o                  : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_register_interface.vhd
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
+axi4_data_port.o                           : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_data_port.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+
+axi4_data_outlet_port.o                    : $(PIPEWORK_SRC_MAIN_PATH)/axi4/axi4_data_outlet_port.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+
 components.o                               : $(PIPEWORK_SRC_MAIN_PATH)/components/components.vhd
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
@@ -106,5 +116,11 @@ queue_arbiter.o                            : $(PIPEWORK_SRC_MAIN_PATH)/component
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
 queue_arbiter_integer_arch.o               : $(PIPEWORK_SRC_MAIN_PATH)/components/queue_arbiter_integer_arch.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+
+queue_register.o                           : $(PIPEWORK_SRC_MAIN_PATH)/components/queue_register.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+
+pool_outlet_port.o                         : $(PIPEWORK_SRC_MAIN_PATH)/components/pool_outlet_port.vhd
 	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
