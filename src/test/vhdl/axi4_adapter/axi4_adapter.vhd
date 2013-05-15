@@ -186,6 +186,9 @@ end AXI4_ADAPTER;
 library ieee;
 use     ieee.std_logic_1164.all;
 architecture RTL of AXI4_ADAPTER is
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     component AXI4_WRITE_ADAPTER
         generic (
             AXI4_ID_WIDTH       : integer range 1 to AXI4_ID_MAX_WIDTH;
@@ -251,6 +254,69 @@ architecture RTL of AXI4_ADAPTER is
             M_BRESP             : in    AXI4_RESP_TYPE;
             M_BVALID            : in    std_logic;
             M_BREADY            : out   std_logic
+        );
+    end component;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    component AXI4_READ_ADAPTER
+        generic (
+            AXI4_ID_WIDTH       : integer range 1 to AXI4_ID_MAX_WIDTH;
+            AXI4_AUSER_WIDTH    : integer := 1;
+            AXI4_ADDR_WIDTH     : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
+            T_CLK_RATE          : integer :=  1;
+            T_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
+            M_CLK_RATE          : integer :=  1;
+            M_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
+            M_MAX_XFER_SIZE     : integer := 12;
+            BUF_DEPTH           : integer := 12
+        );
+        port(
+            RST                 : in    std_logic;
+            T_CLK               : in    std_logic;
+            T_CKE               : in    std_logic;
+            T_CLR               : in    std_logic;
+            T_ARID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
+            T_ARUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
+            T_ARADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
+            T_ARLEN             : in    AXI4_ALEN_TYPE;
+            T_ARSIZE            : in    AXI4_ASIZE_TYPE;
+            T_ARBURST           : in    AXI4_ABURST_TYPE;
+            T_ARLOCK            : in    AXI4_ALOCK_TYPE;
+            T_ARCACHE           : in    AXI4_ACACHE_TYPE;
+            T_ARPROT            : in    AXI4_APROT_TYPE;
+            T_ARQOS             : in    AXI4_AQOS_TYPE;
+            T_ARREGION          : in    AXI4_AREGION_TYPE;
+            T_ARVALID           : in    std_logic;
+            T_ARREADY           : out   std_logic;
+            T_RID               : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
+            T_RDATA             : out   std_logic_vector(T_DATA_WIDTH    -1 downto 0);
+            T_RRESP             : out   AXI4_RESP_TYPE;
+            T_RLAST             : out   std_logic;
+            T_RVALID            : out   std_logic;
+            T_RREADY            : in    std_logic;
+            M_CLK               : in    std_logic;
+            M_CKE               : in    std_logic;
+            M_CLR               : in    std_logic;
+            M_ARID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
+            M_ARUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
+            M_ARADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
+            M_ARLEN             : out   AXI4_ALEN_TYPE;
+            M_ARSIZE            : out   AXI4_ASIZE_TYPE;
+            M_ARBURST           : out   AXI4_ABURST_TYPE;
+            M_ARLOCK            : out   AXI4_ALOCK_TYPE;
+            M_ARCACHE           : out   AXI4_ACACHE_TYPE;
+            M_ARPROT            : out   AXI4_APROT_TYPE;
+            M_ARQOS             : out   AXI4_AQOS_TYPE;
+            M_ARREGION          : out   AXI4_AREGION_TYPE;
+            M_ARVALID           : out   std_logic;
+            M_ARREADY           : in    std_logic;
+            M_RID               : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
+            M_RDATA             : in    std_logic_vector(M_DATA_WIDTH    -1 downto 0);
+            M_RRESP             : in    AXI4_RESP_TYPE;
+            M_RLAST             : in    std_logic;
+            M_RVALID            : in    std_logic;
+            M_RREADY            : out   std_logic
         );
     end component;
 begin
@@ -320,26 +386,63 @@ begin
             M_BVALID            => M_BVALID            , -- In  :
             M_BREADY            => M_BREADY              -- Out :
         );
-    R: block
-    begin
-        T_ARREADY <= '0';
-        T_RID     <= (others => '0');
-        T_RDATA   <= (others => '0');
-        T_RRESP   <= (others => '0');
-        T_RLAST   <= '0';
-        T_RVALID  <= '0';
-        M_ARID    <= (others => '0');
-        M_ARUSER  <= (others => '0');
-        M_ARADDR  <= (others => '0');
-        M_ARLEN   <= (others => '0');
-        M_ARSIZE  <= (others => '0');
-        M_ARBURST <= (others => '0');
-        M_ARLOCK  <= (others => '0');
-        M_ARCACHE <= (others => '0');
-        M_ARPROT  <= (others => '0');
-        M_ARQOS   <= (others => '0');
-        M_ARREGION<= (others => '0');
-        M_ARVALID <= '0';
-        M_RREADY  <= '0';
-    end block;
+    R: AXI4_READ_ADAPTER
+        generic map (
+            AXI4_ID_WIDTH       => AXI4_ID_WIDTH       , -- 
+            AXI4_AUSER_WIDTH    => AXI4_AUSER_WIDTH    , -- 
+            AXI4_ADDR_WIDTH     => AXI4_ADDR_WIDTH     , -- 
+            T_CLK_RATE          => T_CLK_RATE          , -- 
+            T_DATA_WIDTH        => T_DATA_WIDTH        , -- 
+            M_CLK_RATE          => M_CLK_RATE          , -- 
+            M_DATA_WIDTH        => M_DATA_WIDTH        , -- 
+            M_MAX_XFER_SIZE     => M_MAX_XFER_SIZE     , -- 
+            BUF_DEPTH           => BUF_DEPTH             -- 
+        )                                                -- 
+        port map (                                       -- 
+            RST                 => RST                 , -- In  :
+            T_CLK               => T_CLK               , -- In  :
+            T_CKE               => T_CKE               , -- In  :
+            T_CLR               => T_CLR               , -- In  :
+            T_ARID              => T_ARID              , -- In  :
+            T_ARUSER            => T_ARUSER            , -- In  :
+            T_ARADDR            => T_ARADDR            , -- In  :
+            T_ARLEN             => T_ARLEN             , -- In  :
+            T_ARSIZE            => T_ARSIZE            , -- In  :
+            T_ARBURST           => T_ARBURST           , -- In  :
+            T_ARLOCK            => T_ARLOCK            , -- In  :
+            T_ARCACHE           => T_ARCACHE           , -- In  :
+            T_ARPROT            => T_ARPROT            , -- In  :
+            T_ARQOS             => T_ARQOS             , -- In  :
+            T_ARREGION          => T_ARREGION          , -- In  :
+            T_ARVALID           => T_ARVALID           , -- In  :
+            T_ARREADY           => T_ARREADY           , -- Out :
+            T_RID               => T_RID               , -- Out :
+            T_RDATA             => T_RDATA             , -- Out :
+            T_RRESP             => T_RRESP             , -- Out :
+            T_RLAST             => T_RLAST             , -- Out :
+            T_RVALID            => T_RVALID            , -- Out :
+            T_RREADY            => T_RREADY            , -- In  :
+            M_CLK               => M_CLK               , -- In  :
+            M_CKE               => M_CKE               , -- In  :
+            M_CLR               => M_CLR               , -- In  :
+            M_ARID              => M_ARID              , -- Out :
+            M_ARUSER            => M_ARUSER            , -- Out :
+            M_ARADDR            => M_ARADDR            , -- Out :
+            M_ARLEN             => M_ARLEN             , -- Out :
+            M_ARSIZE            => M_ARSIZE            , -- Out :
+            M_ARBURST           => M_ARBURST           , -- Out :
+            M_ARLOCK            => M_ARLOCK            , -- Out :
+            M_ARCACHE           => M_ARCACHE           , -- Out :
+            M_ARPROT            => M_ARPROT            , -- Out :
+            M_ARQOS             => M_ARQOS             , -- Out :
+            M_ARREGION          => M_ARREGION          , -- Out :
+            M_ARVALID           => M_ARVALID           , -- Out :
+            M_ARREADY           => M_ARREADY           , -- In  :
+            M_RID               => M_RID               , -- In  :
+            M_RDATA             => M_RDATA             , -- In  :
+            M_RRESP             => M_RRESP             , -- In  :
+            M_RLAST             => M_RLAST             , -- In  :
+            M_RVALID            => M_RVALID            , -- In  :
+            M_RREADY            => M_RREADY              -- Out :
+        );
 end RTL;

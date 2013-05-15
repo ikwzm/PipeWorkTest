@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
---!     @file    aix4_write_adapter.vhd
---!     @brief   AXI4_WRITE_ADPATER
---!     @version 0.0.2
---!     @date    2013/4/16
+--!     @file    aix4_read_adapter.vhd
+--!     @brief   AXI4_READ_ADPATER
+--!     @version 0.0.1
+--!     @date    2013/4/15
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -39,9 +39,9 @@ use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.AXI4_TYPES.all;
 -----------------------------------------------------------------------------------
---! @brief   AXI4-AXI4 Write Adapter
+--! @brief   AXI4-AXI4 Read Adapter
 -----------------------------------------------------------------------------------
-entity  AXI4_WRITE_ADAPTER is
+entity  AXI4_READ_ADAPTER is
     -------------------------------------------------------------------------------
     -- ジェネリック変数.
     -------------------------------------------------------------------------------
@@ -89,59 +89,52 @@ entity  AXI4_WRITE_ADAPTER is
         T_CLK               : in    std_logic;
         T_CKE               : in    std_logic;
         T_CLR               : in    std_logic;
-        T_AWID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
-        T_AWUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
-        T_AWADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-        T_AWLEN             : in    AXI4_ALEN_TYPE;
-        T_AWSIZE            : in    AXI4_ASIZE_TYPE;
-        T_AWBURST           : in    AXI4_ABURST_TYPE;
-        T_AWLOCK            : in    AXI4_ALOCK_TYPE;
-        T_AWCACHE           : in    AXI4_ACACHE_TYPE;
-        T_AWPROT            : in    AXI4_APROT_TYPE;
-        T_AWQOS             : in    AXI4_AQOS_TYPE;
-        T_AWREGION          : in    AXI4_AREGION_TYPE;
-        T_AWVALID           : in    std_logic;
-        T_AWREADY           : out   std_logic;
-        T_WDATA             : in    std_logic_vector(T_DATA_WIDTH    -1 downto 0);
-        T_WSTRB             : in    std_logic_vector(T_DATA_WIDTH/8  -1 downto 0);
-        T_WLAST             : in    std_logic;
-        T_WVALID            : in    std_logic;
-        T_WREADY            : out   std_logic;
-        T_BID               : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
-        T_BRESP             : out   AXI4_RESP_TYPE;
-        T_BVALID            : out   std_logic;
-        T_BREADY            : in    std_logic;
+        T_ARID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
+        T_ARUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
+        T_ARADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
+        T_ARLEN             : in    AXI4_ALEN_TYPE;
+        T_ARSIZE            : in    AXI4_ASIZE_TYPE;
+        T_ARBURST           : in    AXI4_ABURST_TYPE;
+        T_ARLOCK            : in    AXI4_ALOCK_TYPE;
+        T_ARCACHE           : in    AXI4_ACACHE_TYPE;
+        T_ARPROT            : in    AXI4_APROT_TYPE;
+        T_ARQOS             : in    AXI4_AQOS_TYPE;
+        T_ARREGION          : in    AXI4_AREGION_TYPE;
+        T_ARVALID           : in    std_logic;
+        T_ARREADY           : out   std_logic;
+        T_RID               : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
+        T_RDATA             : out   std_logic_vector(T_DATA_WIDTH    -1 downto 0);
+        T_RRESP             : out   AXI4_RESP_TYPE;
+        T_RLAST             : out   std_logic;
+        T_RVALID            : out   std_logic;
+        T_RREADY            : in    std_logic;
     ------------------------------------------------------------------------------
     -- Requester Signals.
     ------------------------------------------------------------------------------
         M_CLK               : in    std_logic;
         M_CKE               : in    std_logic;
         M_CLR               : in    std_logic;
-        M_AWID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
-        M_AWUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
-        M_AWADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-        M_AWLEN             : out   AXI4_ALEN_TYPE;
-        M_AWSIZE            : out   AXI4_ASIZE_TYPE;
-        M_AWBURST           : out   AXI4_ABURST_TYPE;
-        M_AWLOCK            : out   AXI4_ALOCK_TYPE;
-        M_AWCACHE           : out   AXI4_ACACHE_TYPE;
-        M_AWPROT            : out   AXI4_APROT_TYPE;
-        M_AWQOS             : out   AXI4_AQOS_TYPE;
-        M_AWREGION          : out   AXI4_AREGION_TYPE;
-        M_AWVALID           : out   std_logic;
-        M_AWREADY           : in    std_logic;
-        M_WID               : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
-        M_WDATA             : out   std_logic_vector(M_DATA_WIDTH    -1 downto 0);
-        M_WSTRB             : out   std_logic_vector(M_DATA_WIDTH/8  -1 downto 0);
-        M_WLAST             : out   std_logic;
-        M_WVALID            : out   std_logic;
-        M_WREADY            : in    std_logic;
-        M_BID               : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
-        M_BRESP             : in    AXI4_RESP_TYPE;
-        M_BVALID            : in    std_logic;
-        M_BREADY            : out   std_logic
+        M_ARID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
+        M_ARUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
+        M_ARADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
+        M_ARLEN             : out   AXI4_ALEN_TYPE;
+        M_ARSIZE            : out   AXI4_ASIZE_TYPE;
+        M_ARBURST           : out   AXI4_ABURST_TYPE;
+        M_ARLOCK            : out   AXI4_ALOCK_TYPE;
+        M_ARCACHE           : out   AXI4_ACACHE_TYPE;
+        M_ARPROT            : out   AXI4_APROT_TYPE;
+        M_ARQOS             : out   AXI4_AQOS_TYPE;
+        M_ARREGION          : out   AXI4_AREGION_TYPE;
+        M_ARVALID           : out   std_logic;
+        M_ARREADY           : in    std_logic;
+        M_RID               : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
+        M_RDATA             : in    std_logic_vector(M_DATA_WIDTH    -1 downto 0);
+        M_RRESP             : in    AXI4_RESP_TYPE;
+        M_RLAST             : in    std_logic;
+        M_RVALID            : in    std_logic;
+        M_RREADY            : out   std_logic
     );
-end AXI4_WRITE_ADAPTER;
+end AXI4_READ_ADAPTER;
 -----------------------------------------------------------------------------------
 -- 
 -----------------------------------------------------------------------------------
@@ -151,9 +144,9 @@ use     ieee.numeric_std.all;
 library PIPEWORK;
 use     PIPEWORK.COMPONENTS.SDPRAM;
 use     PIPEWORK.PIPE_COMPONENTS.PIPE_CORE_UNIT;
-use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_WRITE_INTERFACE;
-use     PIPEWORK.AXI4_COMPONENTS.AXI4_SLAVE_WRITE_INTERFACE;
-architecture RTL of AXI4_WRITE_ADAPTER is
+use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_READ_INTERFACE;
+use     PIPEWORK.AXI4_COMPONENTS.AXI4_SLAVE_READ_INTERFACE;
+architecture RTL of AXI4_READ_ADAPTER is
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -232,7 +225,7 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     signal    t_req_buf_ptr     : std_logic_vector(BUF_DEPTH-1 downto 0);
     signal    t_req_mode        : std_logic_vector(MODE_BITS-1 downto 0);
     signal    t_req_burst       : AXI4_ABURST_TYPE;
-    constant  t_req_dir         : std_logic := '1';
+    constant  t_req_dir         : std_logic := '0';
     signal    t_req_first       : std_logic;
     signal    t_req_last        : std_logic;
     signal    t_req_valid       : std_logic;
@@ -243,7 +236,7 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     signal    t_ack_error       : std_logic;
     signal    t_ack_stop        : std_logic;
     signal    t_ack_size        : std_logic_vector(SIZE_BITS-1 downto 0);
-    signal    t_i_valve_open    : std_logic;
+    constant  t_i_valve_open    : std_logic := '1';
     signal    t_i_flow_rdy      : std_logic;
     signal    t_i_flow_pause    : std_logic;
     signal    t_i_flow_stop     : std_logic;
@@ -252,36 +245,37 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     signal    t_i_pool_rdy      : std_logic;
     constant  t_i_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
     constant  t_i_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    signal    t_push_fin_val    : std_logic;
-    signal    t_push_fin_last   : std_logic;
-    signal    t_push_fin_err    : std_logic;
-    signal    t_push_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0);
-    signal    t_push_rsv_val    : std_logic;
-    signal    t_push_rsv_last   : std_logic;
-    signal    t_push_rsv_err    : std_logic;
-    signal    t_push_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0);
-    constant  t_o_valve_open    : std_logic := '0';
+    constant  t_push_fin_val    : std_logic := '0';
+    constant  t_push_fin_last   : std_logic := '0';
+    constant  t_push_fin_err    : std_logic := '0';
+    constant  t_push_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    constant  t_push_rsv_val    : std_logic := '0';
+    constant  t_push_rsv_last   : std_logic := '0';
+    constant  t_push_rsv_err    : std_logic := '0';
+    constant  t_push_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    signal    t_o_valve_open    : std_logic;
     signal    t_o_flow_rdy      : std_logic;
     signal    t_o_flow_pause    : std_logic;
     signal    t_o_flow_stop     : std_logic;
     signal    t_o_flow_last     : std_logic;
     signal    t_o_flow_size     : std_logic_vector(SIZE_BITS-1 downto 0);
     signal    t_o_pool_rdy      : std_logic;
-    constant  t_o_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    constant  t_o_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    constant  t_pull_fin_val    : std_logic := '0';
-    constant  t_pull_fin_last   : std_logic := '0';
-    constant  t_pull_fin_err    : std_logic := '0';
-    constant  t_pull_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    constant  t_pull_rsv_val    : std_logic := '0';
-    constant  t_pull_rsv_last   : std_logic := '0';
-    constant  t_pull_rsv_err    : std_logic := '0';
-    constant  t_pull_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    signal    t_pool_write      : std_logic;
+    constant  t_o_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
+                               := std_logic_vector(to_unsigned(2**M_MAX_XFER_SIZE, SIZE_BITS));
+    constant  t_o_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
+                               := std_logic_vector(to_unsigned(      M_DATA_WIDTH, SIZE_BITS));
+    signal    t_pull_fin_val    : std_logic;
+    signal    t_pull_fin_last   : std_logic;
+    signal    t_pull_fin_err    : std_logic;
+    signal    t_pull_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0);
+    signal    t_pull_rsv_val    : std_logic;
+    signal    t_pull_rsv_last   : std_logic;
+    signal    t_pull_rsv_err    : std_logic;
+    signal    t_pull_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0);
+    signal    t_pool_read       : std_logic;
     signal    t_pool_ben        : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
-    signal    t_pool_we         : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
-    signal    t_pool_wdata      : std_logic_vector(2**(BUF_WIDTH  )-1 downto 0);
-    signal    t_pool_wptr       : std_logic_vector(BUF_DEPTH-1 downto 0);
+    signal    t_pool_rdata      : std_logic_vector(2**(BUF_WIDTH  )-1 downto 0);
+    signal    t_pool_rptr       : std_logic_vector(BUF_DEPTH-1 downto 0);
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -317,42 +311,45 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     signal    m_i_flow_size     : std_logic_vector(SIZE_BITS-1 downto 0);
     signal    m_i_flow_rdy      : std_logic;
     signal    m_i_pool_rdy      : std_logic;
-    constant  m_i_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    constant  m_i_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    constant  m_push_fin_val    : std_logic := '0';
-    constant  m_push_fin_last   : std_logic := '0';
-    constant  m_push_fin_err    : std_logic := '0';
-    constant  m_push_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    constant  m_push_rsv_val    : std_logic := '0';
-    constant  m_push_rsv_last   : std_logic := '0';
-    constant  m_push_rsv_err    : std_logic := '0';
-    constant  m_push_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    constant  m_i_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
+                               := std_logic_vector(to_unsigned(2**M_MAX_XFER_SIZE, SIZE_BITS));
+    constant  m_i_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
+                               := std_logic_vector(to_unsigned(      M_DATA_WIDTH, SIZE_BITS));
+    signal    m_push_fin_val    : std_logic;
+    signal    m_push_fin_last   : std_logic;
+    signal    m_push_fin_err    : std_logic;
+    signal    m_push_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0);
+    signal    m_push_rsv_val    : std_logic;
+    signal    m_push_rsv_last   : std_logic;
+    signal    m_push_rsv_err    : std_logic;
+    signal    m_push_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0);
     signal    m_o_flow_pause    : std_logic;
     signal    m_o_flow_stop     : std_logic;
     signal    m_o_flow_last     : std_logic;
     signal    m_o_flow_size     : std_logic_vector(SIZE_BITS-1 downto 0);
     signal    m_o_flow_rdy      : std_logic;
-    constant  m_o_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(2**M_MAX_XFER_SIZE, SIZE_BITS));
-    constant  m_o_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(      M_DATA_WIDTH, SIZE_BITS));
-    signal    m_pull_fin_val    : std_logic;
-    signal    m_pull_fin_last   : std_logic;
-    signal    m_pull_fin_err    : std_logic;
-    signal    m_pull_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0);
-    signal    m_pull_rsv_val    : std_logic;
-    signal    m_pull_rsv_last   : std_logic;
-    signal    m_pull_rsv_err    : std_logic;
-    signal    m_pull_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0);
+    signal    m_o_pool_rdy      : std_logic;
+    constant  m_o_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    constant  m_o_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    constant  m_pull_fin_val    : std_logic := '0';
+    constant  m_pull_fin_last   : std_logic := '0';
+    constant  m_pull_fin_err    : std_logic := '0';
+    constant  m_pull_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    constant  m_pull_rsv_val    : std_logic := '0';
+    constant  m_pull_rsv_last   : std_logic := '0';
+    constant  m_pull_rsv_err    : std_logic := '0';
+    constant  m_pull_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
     signal    m_pool_rdy        : std_logic;
-    signal    m_pool_read       : std_logic;
-    signal    m_pool_rdata      : std_logic_vector(2**(BUF_WIDTH  )-1 downto 0);
-    signal    m_pool_rptr       : std_logic_vector(BUF_DEPTH-1 downto 0);
+    signal    m_pool_write      : std_logic;
+    signal    m_pool_wdata      : std_logic_vector(2**(BUF_WIDTH  )-1 downto 0);
+    signal    m_pool_ben        : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
+    signal    m_pool_we         : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
+    signal    m_pool_wptr       : std_logic_vector(BUF_DEPTH-1 downto 0);
 begin
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
-    T_IF: AXI4_SLAVE_WRITE_INTERFACE                     -- 
+    T_IF: AXI4_SLAVE_READ_INTERFACE                      -- 
         generic map (                                    -- 
             AXI4_ADDR_WIDTH     => AXI4_ADDR_WIDTH     , -- 
             AXI4_ID_WIDTH       => AXI4_ID_WIDTH       , -- 
@@ -371,26 +368,24 @@ begin
         ---------------------------------------------------------------------------
         -- AXI4 Write Signals.
         ---------------------------------------------------------------------------
-            AWID                => T_AWID              , -- In  :
-            AWADDR              => T_AWADDR            , -- In  :
-            AWLEN               => T_AWLEN             , -- In  :
-            AWSIZE              => T_AWSIZE            , -- In  :
-            AWBURST             => T_AWBURST           , -- In  :
-            AWVALID             => T_AWVALID           , -- In  :
-            AWREADY             => T_AWREADY           , -- Out :
-            WDATA               => T_WDATA             , -- In  :
-            WSTRB               => T_WSTRB             , -- In  :
-            WLAST               => T_WLAST             , -- In  :
-            WVALID              => T_WVALID            , -- In  :
-            WREADY              => T_WREADY            , -- Out :
-            BID                 => T_BID               , -- Out :
-            BRESP               => T_BRESP             , -- Out :
-            BVALID              => T_BVALID            , -- Out :
-            BREADY              => T_BREADY            , -- In  :
+            ARID                => T_ARID              , -- In  :
+            ARADDR              => T_ARADDR            , -- In  :
+            ARLEN               => T_ARLEN             , -- In  :
+            ARSIZE              => T_ARSIZE            , -- In  :
+            ARBURST             => T_ARBURST           , -- In  :
+            ARVALID             => T_ARVALID           , -- In  :
+            ARREADY             => T_ARREADY           , -- Out :
+            RID                 => T_RID               , -- Out :
+            RDATA               => T_RDATA             , -- Out :
+            RRESP               => T_RRESP             , -- Out :
+            RLAST               => T_RLAST             , -- Out :
+            RVALID              => T_RVALID            , -- Out :
+            RREADY              => T_RREADY            , -- In  :
         ---------------------------------------------------------------------------
         -- Command Request Signals.
         ---------------------------------------------------------------------------
             REQ_ADDR            => t_req_addr          , -- Out :
+            REQ_SIZE            => t_req_size          , -- Out :
             REQ_ID              => t_req_id            , -- Out :
             REQ_BURST           => t_req_burst         , -- Out :
             REQ_BUF_PTR         => t_req_buf_ptr       , -- Out :
@@ -413,65 +408,65 @@ begin
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
-            VALVE_OPEN          => t_i_valve_open      , -- Out :
+            VALVE_OPEN          => t_o_valve_open      , -- Out :
         ---------------------------------------------------------------------------
         -- Reserve Size Signals.
         ---------------------------------------------------------------------------
-            RESV_VAL            => t_push_rsv_val      , -- Out :
-            RESV_LAST           => t_push_rsv_last     , -- Out :
-            RESV_ERROR          => t_push_rsv_err      , -- Out :
-            RESV_SIZE           => t_push_rsv_size     , -- Out :
+            RESV_VAL            => t_pull_rsv_val      , -- Out :
+            RESV_LAST           => t_pull_rsv_last     , -- Out :
+            RESV_ERROR          => t_pull_rsv_err      , -- Out :
+            RESV_SIZE           => t_pull_rsv_size     , -- Out :
         ---------------------------------------------------------------------------
         -- Push Size Signals.
         ---------------------------------------------------------------------------
-            PUSH_VAL            => t_push_fin_val      , -- Out :
-            PUSH_LAST           => t_push_fin_last     , -- Out :
-            PUSH_ERROR          => t_push_fin_err      , -- Out :
-            PUSH_SIZE           => t_push_fin_size     , -- Out :
+            PULL_VAL            => t_pull_fin_val      , -- Out :
+            PULL_LAST           => t_pull_fin_last     , -- Out :
+            PULL_ERROR          => t_pull_fin_err      , -- Out :
+            PULL_SIZE           => t_pull_fin_size     , -- Out :
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
-            BUF_WEN             => t_pool_write        , -- Out :
+            BUF_REN             => t_pool_read         , -- Out :
             BUF_BEN             => t_pool_ben          , -- Out :
-            BUF_DATA            => t_pool_wdata        , -- Out :
-            BUF_PTR             => t_pool_wptr         , -- Out :
-            BUF_RDY             => t_i_pool_rdy          -- In  :
+            BUF_DATA            => t_pool_rdata        , -- In  :
+            BUF_PTR             => t_pool_rptr         , -- Out :
+            BUF_RDY             => t_o_pool_rdy          -- In  :
         );
     t_req_mode(MODE_ID_HI      downto MODE_ID_LO     ) <= t_req_id;
     t_req_mode(MODE_ABURST_HI  downto MODE_ABURST_LO ) <= t_req_burst;
-    t_req_mode(MODE_ALOCK_HI   downto MODE_ALOCK_LO  ) <= T_AWLOCK;
-    t_req_mode(MODE_ACACHE_HI  downto MODE_ACACHE_LO ) <= T_AWCACHE;
-    t_req_mode(MODE_APROT_HI   downto MODE_APROT_LO  ) <= T_AWPROT;
-    t_req_mode(MODE_AQOS_HI    downto MODE_AQOS_LO   ) <= T_AWQOS;
-    t_req_mode(MODE_AREGION_HI downto MODE_AREGION_LO) <= T_AWREGION;
-    t_req_mode(MODE_AUSER_HI   downto MODE_AUSER_LO  ) <= T_AWUSER;
+    t_req_mode(MODE_ALOCK_HI   downto MODE_ALOCK_LO  ) <= T_ARLOCK;
+    t_req_mode(MODE_ACACHE_HI  downto MODE_ACACHE_LO ) <= T_ARCACHE;
+    t_req_mode(MODE_APROT_HI   downto MODE_APROT_LO  ) <= T_ARPROT;
+    t_req_mode(MODE_AQOS_HI    downto MODE_AQOS_LO   ) <= T_ARQOS;
+    t_req_mode(MODE_AREGION_HI downto MODE_AREGION_LO) <= T_ARREGION;
+    t_req_mode(MODE_AUSER_HI   downto MODE_AUSER_LO  ) <= T_ARUSER;
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
     PIPE: PIPE_CORE_UNIT                                 -- 
         generic map (                                    -- 
-            PUSH_VALID          => 1                   , --
-            PULL_VALID          => 0                   , --
+            PUSH_VALID          => 0                   , --
+            PULL_VALID          => 1                   , --
             T_CLK_RATE          => T_CLK_RATE          , --
             M_CLK_RATE          => M_CLK_RATE          , --
             ADDR_BITS           => AXI4_ADDR_WIDTH     , --
             ADDR_VALID          => 1                   , --
             SIZE_BITS           => SIZE_BITS           , --
-            SIZE_VALID          => 0                   , --
+            SIZE_VALID          => 1                   , --
             MODE_BITS           => MODE_BITS           , --
             BUF_DEPTH           => BUF_DEPTH           , --
             M_COUNT_BITS        => SIZE_BITS           , --
             T_COUNT_BITS        => SIZE_BITS           , --
-            M_O_VALVE_FIXED     => 0                   , --
+            M_O_VALVE_FIXED     => 1                   , --
             M_O_VALVE_PRECEDE   => 0                   , --
-            M_I_VALVE_FIXED     => 1                   , --
+            M_I_VALVE_FIXED     => 0                   , --
             M_I_VALVE_PRECEDE   => 0                   , --
-            T_O_VALVE_FIXED     => 1                   , --
+            T_O_VALVE_FIXED     => 0                   , --
             T_O_VALVE_PRECEDE   => 0                   , --
-            T_I_VALVE_FIXED     => 2                   , --
+            T_I_VALVE_FIXED     => 1                   , --
             T_I_VALVE_PRECEDE   => 0                   , --
-            T2M_PUSH_FIN_DELAY  => 0                   , --
-            M2T_PUSH_FIN_DELAY  => 1                   , --
+            T2M_PUSH_FIN_DELAY  => 1                   , --
+            M2T_PUSH_FIN_DELAY  => 0                   , --
             T_XFER_MAX_SIZE     => T_MAX_XFER_SIZE       --
         )                                                --
         port map (                                       --
@@ -583,7 +578,7 @@ begin
             M_I_FLOW_LAST       => m_i_flow_last       , -- Out :
             M_I_FLOW_SIZE       => m_i_flow_size       , -- Out :
             M_I_FLOW_RDY        => m_i_flow_rdy        , -- Out :
-            M_I_POOL_RDY        => m_i_pool_rdy        , -- Out :
+            M_I_POOL_RDY        => m_pool_rdy          , -- Out :
             M_I_FLOW_RDY_LVL    => m_i_flow_rdy_lvl    , -- In  :
             M_I_POOL_RDY_LVL    => m_i_pool_rdy_lvl    , -- In  :
             M_I_POOL_SIZE       => POOL_SIZE           , -- In  :
@@ -603,7 +598,7 @@ begin
             M_O_FLOW_LAST       => m_o_flow_last       , -- Out :
             M_O_FLOW_SIZE       => m_o_flow_size       , -- Out :
             M_O_FLOW_RDY        => m_o_flow_rdy        , -- Out :
-            M_O_POOL_RDY        => m_pool_rdy          , -- Out :
+            M_O_POOL_RDY        => m_o_pool_rdy        , -- Out :
             M_O_FLOW_RDY_LVL    => m_o_flow_rdy_lvl    , -- In  :
             M_O_POOL_RDY_LVL    => m_o_pool_rdy_lvl    , -- In  :
             M_PULL_FIN_VAL      => m_pull_fin_val      , -- In  :
@@ -622,7 +617,7 @@ begin
     m_req_prot   <= m_req_mode(MODE_APROT_HI   downto MODE_APROT_LO  );
     m_req_qos    <= m_req_mode(MODE_AQOS_HI    downto MODE_AQOS_LO   );
     m_req_region <= m_req_mode(MODE_AREGION_HI downto MODE_AREGION_LO);
-    M_AWUSER     <= m_req_mode(MODE_AUSER_HI   downto MODE_AUSER_LO  );
+    M_ARUSER     <= m_req_mode(MODE_AUSER_HI   downto MODE_AUSER_LO  );
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -635,19 +630,19 @@ begin
             ID      => 0                                 --
         )                                                --
         port map (                                       --
-            WCLK    => T_CLK                           , -- In  :
-            WE      => t_pool_we                       , -- In  :
-            WADDR   => t_pool_wptr(BUF_DEPTH-1 downto BUF_WIDTH-3), 
-            WDATA   => t_pool_wdata                    , -- In  :
-            RCLK    => M_CLK                           , -- In  :
-            RADDR   => m_pool_rptr(BUF_DEPTH-1 downto BUF_WIDTH-3),
-            RDATA   => m_pool_rdata                      -- Out :
+            WCLK    => M_CLK                           , -- In  :
+            WE      => m_pool_we                       , -- In  :
+            WADDR   => m_pool_wptr(BUF_DEPTH-1 downto BUF_WIDTH-3), 
+            WDATA   => m_pool_wdata                    , -- In  :
+            RCLK    => T_CLK                           , -- In  :
+            RADDR   => t_pool_rptr(BUF_DEPTH-1 downto BUF_WIDTH-3),
+            RDATA   => t_pool_rdata                      -- Out :
         );
-    t_pool_we <= t_pool_ben when (t_pool_write = '1') else (others => '0');
+    m_pool_we <= m_pool_ben when (m_pool_write = '1') else (others => '0');
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
-    M_IF: AXI4_MASTER_WRITE_INTERFACE                    -- 
+    M_IF: AXI4_MASTER_READ_INTERFACE                     -- 
         generic map (                                    -- 
             AXI4_ADDR_WIDTH     => AXI4_ADDR_WIDTH     , -- 
             AXI4_ID_WIDTH       => AXI4_ID_WIDTH       , -- 
@@ -655,7 +650,7 @@ begin
             VAL_BITS            => 1                   , -- 
             SIZE_BITS           => SIZE_BITS           , -- 
             REQ_SIZE_BITS       => SIZE_BITS           , -- 
-            REQ_SIZE_VALID      => 0                   , -- 
+            REQ_SIZE_VALID      => 1                   , -- 
             FLOW_VALID          => 1                   , -- 
             BUF_DATA_WIDTH      => 2**BUF_WIDTH        , -- 
             BUF_PTR_BITS        => BUF_DEPTH           , -- 
@@ -673,28 +668,24 @@ begin
         ---------------------------------------------------------------------------
         -- AXI4 Write Signals.
         ---------------------------------------------------------------------------
-            AWID                => M_AWID              , -- Out :
-            AWADDR              => M_AWADDR            , -- Out :
-            AWLEN               => M_AWLEN             , -- Out :
-            AWSIZE              => M_AWSIZE            , -- Out :
-            AWBURST             => M_AWBURST           , -- Out :
-            AWLOCK              => M_AWLOCK            , -- Out :
-            AWCACHE             => M_AWCACHE           , -- Out :
-            AWPROT              => M_AWPROT            , -- Out :
-            AWQOS               => M_AWQOS             , -- Out :
-            AWREGION            => M_AWREGION          , -- Out :
-            AWVALID             => M_AWVALID           , -- Out :
-            AWREADY             => M_AWREADY           , -- In  :
-            WID                 => M_WID               , -- Out :
-            WDATA               => M_WDATA             , -- Out :
-            WSTRB               => M_WSTRB             , -- Out :
-            WLAST               => M_WLAST             , -- Out :
-            WVALID              => M_WVALID            , -- Out :
-            WREADY              => M_WREADY            , -- In  :
-            BID                 => M_BID               , -- In  :
-            BRESP               => M_BRESP             , -- In  :
-            BVALID              => M_BVALID            , -- In  :
-            BREADY              => M_BREADY            , -- Out :
+            ARID                => M_ARID              , -- Out :
+            ARADDR              => M_ARADDR            , -- Out :
+            ARLEN               => M_ARLEN             , -- Out :
+            ARSIZE              => M_ARSIZE            , -- Out :
+            ARBURST             => M_ARBURST           , -- Out :
+            ARLOCK              => M_ARLOCK            , -- Out :
+            ARCACHE             => M_ARCACHE           , -- Out :
+            ARPROT              => M_ARPROT            , -- Out :
+            ARQOS               => M_ARQOS             , -- Out :
+            ARREGION            => M_ARREGION          , -- Out :
+            ARVALID             => M_ARVALID           , -- Out :
+            ARREADY             => M_ARREADY           , -- In  :
+            RID                 => M_RID               , -- In  :
+            RDATA               => M_RDATA             , -- In  :
+            RRESP               => M_RRESP             , -- In  :
+            RLAST               => M_RLAST             , -- In  :
+            RVALID              => M_RVALID            , -- In  :
+            RREADY              => M_RREADY            , -- Out :
         ---------------------------------------------------------------------------
         -- Command Request Signals.
         ---------------------------------------------------------------------------
@@ -732,30 +723,31 @@ begin
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
-            FLOW_STOP           => m_o_flow_stop       , -- In  :
-            FLOW_PAUSE          => m_o_flow_pause      , -- In  :
-            FLOW_LAST           => m_o_flow_last       , -- In  :
-            FLOW_SIZE           => m_o_flow_size       , -- In  :
+            FLOW_STOP           => m_i_flow_stop       , -- In  :
+            FLOW_PAUSE          => m_i_flow_pause      , -- In  :
+            FLOW_LAST           => m_i_flow_last       , -- In  :
+            FLOW_SIZE           => m_i_flow_size       , -- In  :
         ---------------------------------------------------------------------------
         -- Reserve Size Signals.
         ---------------------------------------------------------------------------
-            RESV_VAL(0)         => m_pull_rsv_val      , -- Out :
-            RESV_LAST           => m_pull_rsv_last     , -- Out :
-            RESV_ERROR          => m_pull_rsv_err      , -- Out :
-            RESV_SIZE           => m_pull_rsv_size     , -- Out :
+            RESV_VAL(0)         => m_push_rsv_val      , -- Out :
+            RESV_LAST           => m_push_rsv_last     , -- Out :
+            RESV_ERROR          => m_push_rsv_err      , -- Out :
+            RESV_SIZE           => m_push_rsv_size     , -- Out :
         ---------------------------------------------------------------------------
         -- Pull Size Signals.
         ---------------------------------------------------------------------------
-            PULL_VAL(0)         => m_pull_fin_val      , -- Out :
-            PULL_LAST           => m_pull_fin_last     , -- Out :
-            PULL_ERROR          => m_pull_fin_err      , -- Out :
-            PULL_SIZE           => m_pull_fin_size     , -- Out :
+            PUSH_VAL(0)         => m_push_fin_val      , -- Out :
+            PUSH_LAST           => m_push_fin_last     , -- Out :
+            PUSH_ERROR          => m_push_fin_err      , -- Out :
+            PUSH_SIZE           => m_push_fin_size     , -- Out :
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
-            BUF_REN(0)          => m_pool_read         , -- Out :
-            BUF_DATA            => m_pool_rdata        , -- In  :
-            BUF_PTR             => m_pool_rptr         , -- Out :
+            BUF_WEN(0)          => m_pool_write        , -- Out :
+            BUF_BEN             => m_pool_ben          , -- Out :
+            BUF_DATA            => m_pool_wdata        , -- Out :
+            BUF_PTR             => m_pool_wptr         , -- Out :
             BUF_RDY             => m_pool_rdy            -- In  :
         );
 end RTL;

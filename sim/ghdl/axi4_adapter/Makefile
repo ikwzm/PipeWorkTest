@@ -24,7 +24,7 @@ pipework:
             $(PIPEWORK_SRC_PATH)
 
 
-axi4_adapter_test_bench_4096_32_32   : axi4_adapter_test_bench_4096_32_32.o axi4_adapter.o axi4_write_adapter.o axi4_adapter_test_bench_4096.snr
+axi4_adapter_test_bench_4096_32_32   : axi4_adapter_test_bench_4096_32_32.o axi4_adapter.o axi4_write_adapter.o axi4_read_adapter.o axi4_adapter_test_bench_4096.snr
 	 $(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
@@ -35,6 +35,9 @@ axi4_adapter_test_bench.o            : $(SRC_TEST_PATH)/axi4_adapter_test_bench.
 	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_write_adapter.o                 : $(SRC_TEST_PATH)/axi4_write_adapter.vhd
+	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+
+axi4_read_adapter.o                  : $(SRC_TEST_PATH)/axi4_read_adapter.vhd
 	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_adapter.o                       : $(SRC_TEST_PATH)/axi4_adapter.vhd
