@@ -2,7 +2,7 @@
 --!     @file    aix4_read_adapter.vhd
 --!     @brief   AXI4_READ_ADPATER
 --!     @version 0.0.1
---!     @date    2013/4/15
+--!     @date    2013/5/16
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -263,7 +263,7 @@ architecture RTL of AXI4_READ_ADAPTER is
     constant  t_o_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
                                := std_logic_vector(to_unsigned(2**M_MAX_XFER_SIZE, SIZE_BITS));
     constant  t_o_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(      M_DATA_WIDTH, SIZE_BITS));
+                               := std_logic_vector(to_unsigned(M_DATA_WIDTH      , SIZE_BITS));
     signal    t_pull_fin_val    : std_logic;
     signal    t_pull_fin_last   : std_logic;
     signal    t_pull_fin_err    : std_logic;
@@ -312,9 +312,9 @@ architecture RTL of AXI4_READ_ADAPTER is
     signal    m_i_flow_rdy      : std_logic;
     signal    m_i_pool_rdy      : std_logic;
     constant  m_i_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(2**M_MAX_XFER_SIZE, SIZE_BITS));
+                               := std_logic_vector(to_unsigned(2**BUF_DEPTH-2**M_MAX_XFER_SIZE, SIZE_BITS));
     constant  m_i_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(      M_DATA_WIDTH, SIZE_BITS));
+                               := std_logic_vector(to_unsigned(2**BUF_DEPTH-M_DATA_WIDTH      , SIZE_BITS));
     signal    m_push_fin_val    : std_logic;
     signal    m_push_fin_last   : std_logic;
     signal    m_push_fin_err    : std_logic;
@@ -462,7 +462,7 @@ begin
             M_I_VALVE_FIXED     => 0                   , --
             M_I_VALVE_PRECEDE   => 0                   , --
             T_O_VALVE_FIXED     => 0                   , --
-            T_O_VALVE_PRECEDE   => 0                   , --
+            T_O_VALVE_PRECEDE   => 1                   , --
             T_I_VALVE_FIXED     => 1                   , --
             T_I_VALVE_PRECEDE   => 0                   , --
             T2M_PUSH_FIN_DELAY  => 1                   , --
