@@ -2,7 +2,7 @@
 --!     @file    aix4_read_adapter.vhd
 --!     @brief   AXI4_READ_ADPATER
 --!     @version 0.0.1
---!     @date    2013/5/16
+--!     @date    2013/5/19
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -230,48 +230,88 @@ architecture RTL of AXI4_READ_ADAPTER is
     signal    t_req_last        : std_logic;
     signal    t_req_valid       : std_logic;
     signal    t_req_ready       : std_logic;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     signal    t_ack_valid       : std_logic;
     signal    t_ack_next        : std_logic;
     signal    t_ack_last        : std_logic;
     signal    t_ack_error       : std_logic;
     signal    t_ack_stop        : std_logic;
     signal    t_ack_size        : std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     constant  t_i_valve_open    : std_logic := '1';
     signal    t_i_flow_rdy      : std_logic;
     signal    t_i_flow_pause    : std_logic;
     signal    t_i_flow_stop     : std_logic;
     signal    t_i_flow_last     : std_logic;
     signal    t_i_flow_size     : std_logic_vector(SIZE_BITS-1 downto 0);
-    signal    t_i_pool_rdy      : std_logic;
-    constant  t_i_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    constant  t_i_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    constant  t_i_flow_level    : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     constant  t_push_fin_val    : std_logic := '0';
     constant  t_push_fin_last   : std_logic := '0';
     constant  t_push_fin_err    : std_logic := '0';
     constant  t_push_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     constant  t_push_rsv_val    : std_logic := '0';
     constant  t_push_rsv_last   : std_logic := '0';
     constant  t_push_rsv_err    : std_logic := '0';
     constant  t_push_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    constant  t_push_buf_level  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    constant  t_push_buf_reset  : std_logic := '0';
+    constant  t_push_buf_val    : std_logic := '0';
+    constant  t_push_buf_last   : std_logic := '0';
+    constant  t_push_buf_err    : std_logic := '0';
+    constant  t_push_buf_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    signal    t_push_buf_rdy    : std_logic := '0';
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    constant  t_o_flow_level    : std_logic_vector(SIZE_BITS-1 downto 0)
+                               := std_logic_vector(to_unsigned(2**M_MAX_XFER_SIZE, SIZE_BITS));
     signal    t_o_valve_open    : std_logic;
     signal    t_o_flow_rdy      : std_logic;
     signal    t_o_flow_pause    : std_logic;
     signal    t_o_flow_stop     : std_logic;
     signal    t_o_flow_last     : std_logic;
     signal    t_o_flow_size     : std_logic_vector(SIZE_BITS-1 downto 0);
-    signal    t_o_pool_rdy      : std_logic;
-    constant  t_o_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(2**M_MAX_XFER_SIZE, SIZE_BITS));
-    constant  t_o_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(M_DATA_WIDTH      , SIZE_BITS));
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     signal    t_pull_fin_val    : std_logic;
     signal    t_pull_fin_last   : std_logic;
     signal    t_pull_fin_err    : std_logic;
     signal    t_pull_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     signal    t_pull_rsv_val    : std_logic;
     signal    t_pull_rsv_last   : std_logic;
     signal    t_pull_rsv_err    : std_logic;
     signal    t_pull_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    constant  t_pull_buf_level  : std_logic_vector(SIZE_BITS-1 downto 0)
+                               := std_logic_vector(to_unsigned(M_DATA_WIDTH      , SIZE_BITS));
+    signal    t_pull_buf_reset  : std_logic;
+    signal    t_pull_buf_val    : std_logic;
+    signal    t_pull_buf_last   : std_logic;
+    signal    t_pull_buf_err    : std_logic;
+    signal    t_pull_buf_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    signal    t_pull_buf_rdy    : std_logic;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     signal    t_pool_read       : std_logic;
     signal    t_pool_ben        : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
     signal    t_pool_rdata      : std_logic_vector(2**(BUF_WIDTH  )-1 downto 0);
@@ -298,6 +338,9 @@ architecture RTL of AXI4_READ_ADAPTER is
     signal    m_req_last        : std_logic;
     signal    m_req_valid       : std_logic;
     signal    m_req_ready       : std_logic;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     signal    m_ack_valid       : std_logic;
     signal    m_ack_next        : std_logic;
     signal    m_ack_last        : std_logic;
@@ -305,41 +348,77 @@ architecture RTL of AXI4_READ_ADAPTER is
     signal    m_ack_stop        : std_logic;
     signal    m_ack_none        : std_logic;
     signal    m_ack_size        : std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    constant  m_i_flow_level    : std_logic_vector(SIZE_BITS-1 downto 0)
+                               := std_logic_vector(to_unsigned(2**BUF_DEPTH-2**M_MAX_XFER_SIZE, SIZE_BITS));
     signal    m_i_flow_pause    : std_logic;
     signal    m_i_flow_stop     : std_logic;
     signal    m_i_flow_last     : std_logic;
     signal    m_i_flow_size     : std_logic_vector(SIZE_BITS-1 downto 0);
     signal    m_i_flow_rdy      : std_logic;
-    signal    m_i_pool_rdy      : std_logic;
-    constant  m_i_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(2**BUF_DEPTH-2**M_MAX_XFER_SIZE, SIZE_BITS));
-    constant  m_i_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(2**BUF_DEPTH-M_DATA_WIDTH      , SIZE_BITS));
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     signal    m_push_fin_val    : std_logic;
     signal    m_push_fin_last   : std_logic;
     signal    m_push_fin_err    : std_logic;
     signal    m_push_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     signal    m_push_rsv_val    : std_logic;
     signal    m_push_rsv_last   : std_logic;
     signal    m_push_rsv_err    : std_logic;
     signal    m_push_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    constant  m_push_buf_level  : std_logic_vector(SIZE_BITS-1 downto 0)
+                               := std_logic_vector(to_unsigned(2**BUF_DEPTH-M_DATA_WIDTH      , SIZE_BITS));
+    signal    m_push_buf_reset  : std_logic;
+    signal    m_push_buf_val    : std_logic;
+    signal    m_push_buf_last   : std_logic;
+    signal    m_push_buf_err    : std_logic;
+    signal    m_push_buf_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    signal    m_push_buf_rdy    : std_logic;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    constant  m_o_flow_level    : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
     signal    m_o_flow_pause    : std_logic;
     signal    m_o_flow_stop     : std_logic;
     signal    m_o_flow_last     : std_logic;
     signal    m_o_flow_size     : std_logic_vector(SIZE_BITS-1 downto 0);
     signal    m_o_flow_rdy      : std_logic;
-    signal    m_o_pool_rdy      : std_logic;
-    constant  m_o_flow_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    constant  m_o_pool_rdy_lvl  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     constant  m_pull_fin_val    : std_logic := '0';
     constant  m_pull_fin_last   : std_logic := '0';
     constant  m_pull_fin_err    : std_logic := '0';
     constant  m_pull_fin_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     constant  m_pull_rsv_val    : std_logic := '0';
     constant  m_pull_rsv_last   : std_logic := '0';
     constant  m_pull_rsv_err    : std_logic := '0';
     constant  m_pull_rsv_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
-    signal    m_pool_rdy        : std_logic;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    constant  m_pull_buf_level  : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    constant  m_pull_buf_reset  : std_logic := '0';
+    constant  m_pull_buf_val    : std_logic := '0';
+    constant  m_pull_buf_last   : std_logic := '0';
+    constant  m_pull_buf_err    : std_logic := '0';
+    constant  m_pull_buf_size   : std_logic_vector(SIZE_BITS-1 downto 0) := (others => '0');
+    signal    m_pull_buf_rdy    : std_logic;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     signal    m_pool_write      : std_logic;
     signal    m_pool_wdata      : std_logic_vector(2**(BUF_WIDTH  )-1 downto 0);
     signal    m_pool_ben        : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
@@ -410,27 +489,35 @@ begin
         ---------------------------------------------------------------------------
             VALVE_OPEN          => t_o_valve_open      , -- Out :
         ---------------------------------------------------------------------------
-        -- Reserve Size Signals.
+        -- Pull Reserve Size Signals.
         ---------------------------------------------------------------------------
-            RESV_VAL            => t_pull_rsv_val      , -- Out :
-            RESV_LAST           => t_pull_rsv_last     , -- Out :
-            RESV_ERROR          => t_pull_rsv_err      , -- Out :
-            RESV_SIZE           => t_pull_rsv_size     , -- Out :
+            PULL_RSV_VAL        => t_pull_rsv_val      , -- Out :
+            PULL_RSV_LAST       => t_pull_rsv_last     , -- Out :
+            PULL_RSV_ERROR      => t_pull_rsv_err      , -- Out :
+            PULL_RSV_SIZE       => t_pull_rsv_size     , -- Out :
         ---------------------------------------------------------------------------
-        -- Push Size Signals.
+        -- Pull Final Size Signals.
         ---------------------------------------------------------------------------
-            PULL_VAL            => t_pull_fin_val      , -- Out :
-            PULL_LAST           => t_pull_fin_last     , -- Out :
-            PULL_ERROR          => t_pull_fin_err      , -- Out :
-            PULL_SIZE           => t_pull_fin_size     , -- Out :
+            PULL_FIN_VAL        => t_pull_fin_val      , -- Out :
+            PULL_FIN_LAST       => t_pull_fin_last     , -- Out :
+            PULL_FIN_ERROR      => t_pull_fin_err      , -- Out :
+            PULL_FIN_SIZE       => t_pull_fin_size     , -- Out :
+        ---------------------------------------------------------------------------
+        -- Pull Buffer Size Signals.
+        ---------------------------------------------------------------------------
+            PULL_BUF_RESET      => t_pull_buf_reset    , -- Out :
+            PULL_BUF_VAL        => t_pull_buf_val      , -- Out :
+            PULL_BUF_LAST       => t_pull_buf_last     , -- Out :
+            PULL_BUF_ERROR      => t_pull_buf_err      , -- Out :
+            PULL_BUF_SIZE       => t_pull_buf_size     , -- Out :
+            PULL_BUF_RDY        => t_pull_buf_rdy      , -- In  :
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
             BUF_REN             => t_pool_read         , -- Out :
             BUF_BEN             => t_pool_ben          , -- Out :
             BUF_DATA            => t_pool_rdata        , -- In  :
-            BUF_PTR             => t_pool_rptr         , -- Out :
-            BUF_RDY             => t_o_pool_rdy          -- In  :
+            BUF_PTR             => t_pool_rptr           -- Out :
         );
     t_req_mode(MODE_ID_HI      downto MODE_ID_LO     ) <= t_req_id;
     t_req_mode(MODE_ABURST_HI  downto MODE_ABURST_LO ) <= t_req_burst;
@@ -445,8 +532,6 @@ begin
     -------------------------------------------------------------------------------
     PIPE: PIPE_CORE_UNIT                                 -- 
         generic map (                                    -- 
-            PUSH_VALID          => 0                   , --
-            PULL_VALID          => 1                   , --
             T_CLK_RATE          => T_CLK_RATE          , --
             M_CLK_RATE          => M_CLK_RATE          , --
             ADDR_BITS           => AXI4_ADDR_WIDTH     , --
@@ -457,17 +542,37 @@ begin
             BUF_DEPTH           => BUF_DEPTH           , --
             M_COUNT_BITS        => SIZE_BITS           , --
             T_COUNT_BITS        => SIZE_BITS           , --
-            M_O_VALVE_FIXED     => 1                   , --
-            M_O_VALVE_PRECEDE   => 0                   , --
-            M_I_VALVE_FIXED     => 0                   , --
-            M_I_VALVE_PRECEDE   => 0                   , --
-            T_O_VALVE_FIXED     => 0                   , --
-            T_O_VALVE_PRECEDE   => 1                   , --
-            T_I_VALVE_FIXED     => 1                   , --
-            T_I_VALVE_PRECEDE   => 0                   , --
-            T2M_PUSH_FIN_DELAY  => 1                   , --
-            M2T_PUSH_FIN_DELAY  => 0                   , --
-            T_XFER_MAX_SIZE     => T_MAX_XFER_SIZE       --
+            T_XFER_MAX_SIZE     => T_MAX_XFER_SIZE     , --
+            -----------------------------------------------------------------------
+            -- PUSH
+            -----------------------------------------------------------------------
+            PUSH_VALID          => 0                   , --
+            M_O_FIXED_CLOSE     => 1                   , --
+            M_O_FIXED_FLOW_OPEN => 0                   , --
+            M_O_FIXED_POOL_OPEN => 0                   , --
+            T_I_FIXED_CLOSE     => 1                   , --
+            T_I_FIXED_FLOW_OPEN => 0                   , --
+            T_I_FIXED_POOL_OPEN => 0                   , --
+            M2T_PULL_RSV_VALID  => 0                   , --
+            M2T_PULL_BUF_VALID  => 0                   , --
+            T2M_PUSH_RSV_VALID  => 0                   , --
+            T2M_PUSH_BUF_VALID  => 0                   , --
+            T2M_PUSH_FIN_DELAY  => 0                   , --
+            -----------------------------------------------------------------------
+            -- PULL
+            -----------------------------------------------------------------------
+            PULL_VALID          => 1                   , --
+            M_I_FIXED_CLOSE     => 0                   , --
+            M_I_FIXED_FLOW_OPEN => 1                   , --
+            M_I_FIXED_POOL_OPEN => 1                   , --
+            T_O_FIXED_CLOSE     => 0                   , --
+            T_O_FIXED_FLOW_OPEN => 0                   , --
+            T_O_FIXED_POOL_OPEN => 0                   , --
+            M2T_PUSH_RSV_VALID  => 1                   , --
+            M2T_PUSH_BUF_VALID  => 0                   , --
+            T2M_PULL_RSV_VALID  => 1                   , --
+            T2M_PULL_BUF_VALID  => 1                   , --
+            M2T_PUSH_FIN_DELAY  => 1                     --
         )                                                --
         port map (                                       --
         ---------------------------------------------------------------------------
@@ -504,44 +609,54 @@ begin
         ---------------------------------------------------------------------------
         -- レスポンダ側からデータ入力のフロー制御信号入出力.
         ---------------------------------------------------------------------------
+            T_I_FLOW_LEVEL      => t_i_flow_level      , -- In  :
+            T_I_BUF_SIZE        => POOL_SIZE           , -- In  :
             T_I_VALVE_OPEN      => t_i_valve_open      , -- In  :
-            T_I_FLOW_RDY        => t_i_flow_rdy        , -- Out :
+            T_I_FLOW_READY      => t_i_flow_rdy        , -- Out :
             T_I_FLOW_PAUSE      => t_i_flow_pause      , -- Out :
             T_I_FLOW_STOP       => t_i_flow_stop       , -- Out :
             T_I_FLOW_LAST       => t_i_flow_last       , -- Out :
             T_I_FLOW_SIZE       => t_i_flow_size       , -- Out :
-            T_I_POOL_RDY        => t_i_pool_rdy        , -- Out :
-            T_I_FLOW_RDY_LVL    => t_i_flow_rdy_lvl    , -- In  :
-            T_I_POOL_RDY_LVL    => t_i_pool_rdy_lvl    , -- In  :
-            T_I_POOL_SIZE       => POOL_SIZE           , -- In  :
-            T_PUSH_FIN_VAL      => t_push_fin_val      , -- In  :
+            T_PUSH_FIN_VALID    => t_push_fin_val      , -- In  :
             T_PUSH_FIN_LAST     => t_push_fin_last     , -- In  :
-            T_PUSH_FIN_ERR      => t_push_fin_err      , -- In  :
+            T_PUSH_FIN_ERROR    => t_push_fin_err      , -- In  :
             T_PUSH_FIN_SIZE     => t_push_fin_size     , -- In  :
-            T_PUSH_RSV_VAL      => t_push_rsv_val      , -- In  :
+            T_PUSH_RSV_VALID    => t_push_rsv_val      , -- In  :
             T_PUSH_RSV_LAST     => t_push_rsv_last     , -- In  :
-            T_PUSH_RSV_ERR      => t_push_rsv_err      , -- In  :
+            T_PUSH_RSV_ERROR    => t_push_rsv_err      , -- In  :
             T_PUSH_RSV_SIZE     => t_push_rsv_size     , -- In  :
+            T_PUSH_BUF_LEVEL    => t_push_buf_level    , -- In  :
+            T_PUSH_BUF_RESET    => t_push_buf_reset    , -- In  :
+            T_PUSH_BUF_VALID    => t_push_buf_val      , -- In  :
+            T_PUSH_BUF_LAST     => t_push_buf_last     , -- In  :
+            T_PUSH_BUF_ERROR    => t_push_buf_err      , -- In  :
+            T_PUSH_BUF_SIZE     => t_push_buf_size     , -- In  :
+            T_PUSH_BUF_READY    => t_push_buf_rdy      , -- Out :
         ---------------------------------------------------------------------------
         -- レスポンダ側へのデータ出力のフロー制御信号入出力
         ---------------------------------------------------------------------------
+            T_O_FLOW_LEVEL      => t_o_flow_level      , -- In  :
             T_O_VALVE_OPEN      => t_o_valve_open      , -- In  :
-            T_O_FLOW_RDY        => t_o_flow_rdy        , -- Out :
+            T_O_FLOW_READY      => t_o_flow_rdy        , -- Out :
             T_O_FLOW_PAUSE      => t_o_flow_pause      , -- Out :
             T_O_FLOW_STOP       => t_o_flow_stop       , -- Out :
             T_O_FLOW_LAST       => t_o_flow_last       , -- Out :
             T_O_FLOW_SIZE       => t_o_flow_size       , -- Out :
-            T_O_POOL_RDY        => t_o_pool_rdy        , -- Out :
-            T_O_FLOW_RDY_LVL    => t_o_flow_rdy_lvl    , -- In  :
-            T_O_POOL_RDY_LVL    => t_o_pool_rdy_lvl    , -- In  :
-            T_PULL_FIN_VAL      => t_pull_fin_val      , -- In  :
+            T_PULL_FIN_VALID    => t_pull_fin_val      , -- In  :
             T_PULL_FIN_LAST     => t_pull_fin_last     , -- In  :
-            T_PULL_FIN_ERR      => t_pull_fin_err      , -- In  :
+            T_PULL_FIN_ERROR    => t_pull_fin_err      , -- In  :
             T_PULL_FIN_SIZE     => t_pull_fin_size     , -- In  :
-            T_PULL_RSV_VAL      => t_pull_rsv_val      , -- In  :
+            T_PULL_RSV_VALID    => t_pull_rsv_val      , -- In  :
             T_PULL_RSV_LAST     => t_pull_rsv_last     , -- In  :
-            T_PULL_RSV_ERR      => t_pull_rsv_err      , -- In  :
+            T_PULL_RSV_ERROR    => t_pull_rsv_err      , -- In  :
             T_PULL_RSV_SIZE     => t_pull_rsv_size     , -- In  :
+            T_PULL_BUF_LEVEL    => t_pull_buf_level    , -- In  :
+            T_PULL_BUF_RESET    => t_pull_buf_reset    , -- In  :
+            T_PULL_BUF_VALID    => t_pull_buf_val      , -- In  :
+            T_PULL_BUF_LAST     => t_pull_buf_last     , -- In  :
+            T_PULL_BUF_ERROR    => t_pull_buf_err      , -- In  :
+            T_PULL_BUF_SIZE     => t_pull_buf_size     , -- In  :
+            T_PULL_BUF_READY    => t_pull_buf_rdy      , -- Out :
         ---------------------------------------------------------------------------
         -- リクエスト側クロック.
         ---------------------------------------------------------------------------
@@ -573,23 +688,28 @@ begin
         ---------------------------------------------------------------------------
         -- リクエスタ側からデータ入力のフロー制御信号入出力.
         ---------------------------------------------------------------------------
+            M_I_BUF_SIZE        => POOL_SIZE           , -- In  :
             M_I_FLOW_PAUSE      => m_i_flow_pause      , -- Out :
             M_I_FLOW_STOP       => m_i_flow_stop       , -- Out :
             M_I_FLOW_LAST       => m_i_flow_last       , -- Out :
             M_I_FLOW_SIZE       => m_i_flow_size       , -- Out :
-            M_I_FLOW_RDY        => m_i_flow_rdy        , -- Out :
-            M_I_POOL_RDY        => m_pool_rdy          , -- Out :
-            M_I_FLOW_RDY_LVL    => m_i_flow_rdy_lvl    , -- In  :
-            M_I_POOL_RDY_LVL    => m_i_pool_rdy_lvl    , -- In  :
-            M_I_POOL_SIZE       => POOL_SIZE           , -- In  :
-            M_PUSH_FIN_VAL      => m_push_fin_val      , -- In  :
+            M_I_FLOW_READY      => m_i_flow_rdy        , -- Out :
+            M_I_FLOW_LEVEL      => m_i_flow_level      , -- In  :
+            M_PUSH_FIN_VALID    => m_push_fin_val      , -- In  :
             M_PUSH_FIN_LAST     => m_push_fin_last     , -- In  :
-            M_PUSH_FIN_ERR      => m_push_fin_err      , -- In  :
+            M_PUSH_FIN_ERROR    => m_push_fin_err      , -- In  :
             M_PUSH_FIN_SIZE     => m_push_fin_size     , -- In  :
-            M_PUSH_RSV_VAL      => m_push_rsv_val      , -- In  :
+            M_PUSH_RSV_VALID    => m_push_rsv_val      , -- In  :
             M_PUSH_RSV_LAST     => m_push_rsv_last     , -- In  :
-            M_PUSH_RSV_ERR      => m_push_rsv_err      , -- In  :
+            M_PUSH_RSV_ERROR    => m_push_rsv_err      , -- In  :
             M_PUSH_RSV_SIZE     => m_push_rsv_size     , -- In  :
+            M_PUSH_BUF_RESET    => m_push_buf_reset    , -- In  :
+            M_PUSH_BUF_VALID    => m_push_buf_val      , -- In  :
+            M_PUSH_BUF_LAST     => m_push_buf_last     , -- In  :
+            M_PUSH_BUF_ERROR    => m_push_buf_err      , -- In  :
+            M_PUSH_BUF_SIZE     => m_push_buf_size     , -- In  :
+            M_PUSH_BUF_READY    => m_push_buf_rdy      , -- Out :
+            M_PUSH_BUF_LEVEL    => m_push_buf_level    , -- In  :
         ---------------------------------------------------------------------------
         -- リクエスタ側へのデータ出力のフロー制御信号入出力
         ---------------------------------------------------------------------------
@@ -597,18 +717,23 @@ begin
             M_O_FLOW_STOP       => m_o_flow_stop       , -- Out :
             M_O_FLOW_LAST       => m_o_flow_last       , -- Out :
             M_O_FLOW_SIZE       => m_o_flow_size       , -- Out :
-            M_O_FLOW_RDY        => m_o_flow_rdy        , -- Out :
-            M_O_POOL_RDY        => m_o_pool_rdy        , -- Out :
-            M_O_FLOW_RDY_LVL    => m_o_flow_rdy_lvl    , -- In  :
-            M_O_POOL_RDY_LVL    => m_o_pool_rdy_lvl    , -- In  :
-            M_PULL_FIN_VAL      => m_pull_fin_val      , -- In  :
+            M_O_FLOW_READY      => m_o_flow_rdy        , -- Out :
+            M_O_FLOW_LEVEL      => m_o_flow_level      , -- In  :
+            M_PULL_FIN_VALID    => m_pull_fin_val      , -- In  :
             M_PULL_FIN_LAST     => m_pull_fin_last     , -- In  :
-            M_PULL_FIN_ERR      => m_pull_fin_err      , -- In  :
+            M_PULL_FIN_ERROR    => m_pull_fin_err      , -- In  :
             M_PULL_FIN_SIZE     => m_pull_fin_size     , -- In  :
-            M_PULL_RSV_VAL      => m_pull_rsv_val      , -- In  :
+            M_PULL_RSV_VALID    => m_pull_rsv_val      , -- In  :
             M_PULL_RSV_LAST     => m_pull_rsv_last     , -- In  :
-            M_PULL_RSV_ERR      => m_pull_rsv_err      , -- In  :
-            M_PULL_RSV_SIZE     => m_pull_rsv_size       -- In  :
+            M_PULL_RSV_ERROR    => m_pull_rsv_err      , -- In  :
+            M_PULL_RSV_SIZE     => m_pull_rsv_size     , -- In  :
+            M_PULL_BUF_LEVEL    => m_pull_buf_level    , -- In  :
+            M_PULL_BUF_RESET    => m_pull_buf_reset    , -- In  :
+            M_PULL_BUF_VALID    => m_pull_buf_val      , -- In  :
+            M_PULL_BUF_LAST     => m_pull_buf_last     , -- In  :
+            M_PULL_BUF_ERROR    => m_pull_buf_err      , -- In  :
+            M_PULL_BUF_SIZE     => m_pull_buf_size     , -- In  :
+            M_PULL_BUF_READY    => m_pull_buf_rdy        -- Out :
         );
     m_req_id     <= m_req_mode(MODE_ID_HI      downto MODE_ID_LO     );
     m_req_burst  <= m_req_mode(MODE_ABURST_HI  downto MODE_ABURST_LO );
@@ -728,26 +853,34 @@ begin
             FLOW_LAST           => m_i_flow_last       , -- In  :
             FLOW_SIZE           => m_i_flow_size       , -- In  :
         ---------------------------------------------------------------------------
-        -- Reserve Size Signals.
+        -- Push Reserve Size Signals.
         ---------------------------------------------------------------------------
-            RESV_VAL(0)         => m_push_rsv_val      , -- Out :
-            RESV_LAST           => m_push_rsv_last     , -- Out :
-            RESV_ERROR          => m_push_rsv_err      , -- Out :
-            RESV_SIZE           => m_push_rsv_size     , -- Out :
+            PUSH_RSV_VAL(0)     => m_push_rsv_val      , -- Out :
+            PUSH_RSV_LAST       => m_push_rsv_last     , -- Out :
+            PUSH_RSV_ERROR      => m_push_rsv_err      , -- Out :
+            PUSH_RSV_SIZE       => m_push_rsv_size     , -- Out :
         ---------------------------------------------------------------------------
-        -- Pull Size Signals.
+        -- Push Final Size Signals.
         ---------------------------------------------------------------------------
-            PUSH_VAL(0)         => m_push_fin_val      , -- Out :
-            PUSH_LAST           => m_push_fin_last     , -- Out :
-            PUSH_ERROR          => m_push_fin_err      , -- Out :
-            PUSH_SIZE           => m_push_fin_size     , -- Out :
+            PUSH_FIN_VAL(0)     => m_push_fin_val      , -- Out :
+            PUSH_FIN_LAST       => m_push_fin_last     , -- Out :
+            PUSH_FIN_ERROR      => m_push_fin_err      , -- Out :
+            PUSH_FIN_SIZE       => m_push_fin_size     , -- Out :
+        ---------------------------------------------------------------------------
+        -- Push Buffer Size Signals.
+        ---------------------------------------------------------------------------
+            PUSH_BUF_RESET(0)   => m_push_buf_reset    , -- Out :
+            PUSH_BUF_VAL(0)     => m_push_buf_val      , -- Out :
+            PUSH_BUF_LAST       => m_push_buf_last     , -- Out :
+            PUSH_BUF_ERROR      => m_push_buf_err      , -- Out :
+            PUSH_BUF_SIZE       => m_push_buf_size     , -- Out :
+            PUSH_BUF_RDY(0)     => m_push_buf_rdy      , -- In  :
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
             BUF_WEN(0)          => m_pool_write        , -- Out :
             BUF_BEN             => m_pool_ben          , -- Out :
-            BUF_DATA            => m_pool_wdata        , -- Out :
             BUF_PTR             => m_pool_wptr         , -- Out :
-            BUF_RDY             => m_pool_rdy            -- In  :
+            BUF_DATA            => m_pool_wdata          -- Out :
         );
 end RTL;
