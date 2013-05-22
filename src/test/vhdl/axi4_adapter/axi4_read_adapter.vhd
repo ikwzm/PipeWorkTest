@@ -242,7 +242,11 @@ architecture RTL of AXI4_READ_ADAPTER is
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
-    constant  t_i_valve_open    : std_logic := '1';
+    signal    t_xfer_busy       : std_logic;
+    signal    t_xfer_done       : std_logic;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     signal    t_i_flow_rdy      : std_logic;
     signal    t_i_flow_pause    : std_logic;
     signal    t_i_flow_stop     : std_logic;
@@ -278,7 +282,6 @@ architecture RTL of AXI4_READ_ADAPTER is
     -------------------------------------------------------------------------------
     constant  t_o_flow_level    : std_logic_vector(SIZE_BITS-1 downto 0)
                                := std_logic_vector(to_unsigned(2**M_MAX_XFER_SIZE, SIZE_BITS));
-    signal    t_o_valve_open    : std_logic;
     signal    t_o_flow_rdy      : std_logic;
     signal    t_o_flow_pause    : std_logic;
     signal    t_o_flow_stop     : std_logic;
@@ -348,6 +351,11 @@ architecture RTL of AXI4_READ_ADAPTER is
     signal    m_ack_stop        : std_logic;
     signal    m_ack_none        : std_logic;
     signal    m_ack_size        : std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    signal    m_xfer_busy       : std_logic;
+    signal    m_xfer_done       : std_logic;
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -483,11 +491,8 @@ begin
         ---------------------------------------------------------------------------
         -- Transfer Status Signal.
         ---------------------------------------------------------------------------
-            XFER_BUSY           => open                , -- Out :
-        ---------------------------------------------------------------------------
-        -- Flow Control Signals.
-        ---------------------------------------------------------------------------
-            VALVE_OPEN          => t_o_valve_open      , -- Out :
+            XFER_BUSY           => t_xfer_busy         , -- Out :
+            XFER_DONE           => t_xfer_done         , -- Out :
         ---------------------------------------------------------------------------
         -- Pull Reserve Size Signals.
         ---------------------------------------------------------------------------
@@ -607,11 +612,15 @@ begin
             T_ACK_STOP          => t_ack_stop          , -- Out :
             T_ACK_SIZE          => t_ack_size          , -- Out :
         ---------------------------------------------------------------------------
+        -- レスポンダ側からのステータス信号入力.
+        ---------------------------------------------------------------------------
+            T_XFER_BUSY         => t_xfer_busy         , -- In  :
+            T_XFER_DONE         => t_xfer_done         , -- In  :
+        ---------------------------------------------------------------------------
         -- レスポンダ側からデータ入力のフロー制御信号入出力.
         ---------------------------------------------------------------------------
             T_I_FLOW_LEVEL      => t_i_flow_level      , -- In  :
             T_I_BUF_SIZE        => POOL_SIZE           , -- In  :
-            T_I_VALVE_OPEN      => t_i_valve_open      , -- In  :
             T_I_FLOW_READY      => t_i_flow_rdy        , -- Out :
             T_I_FLOW_PAUSE      => t_i_flow_pause      , -- Out :
             T_I_FLOW_STOP       => t_i_flow_stop       , -- Out :
@@ -636,7 +645,6 @@ begin
         -- レスポンダ側へのデータ出力のフロー制御信号入出力
         ---------------------------------------------------------------------------
             T_O_FLOW_LEVEL      => t_o_flow_level      , -- In  :
-            T_O_VALVE_OPEN      => t_o_valve_open      , -- In  :
             T_O_FLOW_READY      => t_o_flow_rdy        , -- Out :
             T_O_FLOW_PAUSE      => t_o_flow_pause      , -- Out :
             T_O_FLOW_STOP       => t_o_flow_stop       , -- Out :
@@ -685,6 +693,11 @@ begin
             M_ACK_STOP          => m_ack_stop          , -- In  :
             M_ACK_NONE          => m_ack_none          , -- In  :
             M_ACK_SIZE          => m_ack_size          , -- In  :
+        ---------------------------------------------------------------------------
+        -- リクエスタ側からのステータス信号入力.
+        ---------------------------------------------------------------------------
+            M_XFER_BUSY         => m_xfer_busy         , -- In  :
+            M_XFER_DONE         => m_xfer_done         , -- In  :
         ---------------------------------------------------------------------------
         -- リクエスタ側からデータ入力のフロー制御信号入出力.
         ---------------------------------------------------------------------------
@@ -844,7 +857,8 @@ begin
         ---------------------------------------------------------------------------
         -- Transfer Status Signal.
         ---------------------------------------------------------------------------
-            XFER_BUSY           => open                , -- Out :
+            XFER_BUSY           => m_xfer_busy         , -- Out :
+            XFER_DONE           => m_xfer_done         , -- Out :
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
