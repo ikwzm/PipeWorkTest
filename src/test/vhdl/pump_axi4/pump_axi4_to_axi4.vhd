@@ -305,6 +305,8 @@ entity  PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
     -- Interrupt Request Signals.
     -------------------------------------------------------------------------------
+        I_IRQ           : out   std_logic;
+        O_IRQ           : out   std_logic;
         IRQ             : out   std_logic
     );
 end PUMP_AXI4_TO_AXI4;
@@ -851,8 +853,8 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal   i_irq              : std_logic;
-    signal   o_irq              : std_logic;
+    signal   i_interrupt        : std_logic;
+    signal   o_interrupt        : std_logic;
     -------------------------------------------------------------------------------
     -- PUMP_AXI4_TO_AXI4_CORE のコンポーネント宣言.
     -------------------------------------------------------------------------------
@@ -1706,6 +1708,8 @@ begin
                     M_BUF_DATA      => mr_buf_wdata      , -- In  :
                     M_BUF_PTR       => mr_buf_wptr       , -- In  :
                     M_BUF_RDY       => po_buf_wrdy       , -- Out :
+                    M_XFER_BUSY     => mr_xfer_busy      , -- In  :
+                    M_XFER_DONE     => mr_xfer_done      , -- In  :
                 -------------------------------------------------------------------
                 -- Control Status Register Interface Signals.
                 -------------------------------------------------------------------
@@ -1802,14 +1806,14 @@ begin
             -----------------------------------------------------------------------
             process (ACLOCK, RST) begin
                 if (RST = '1') then
-                        o_irq <= '0';
+                        o_interrupt <= '0';
                 elsif (ACLOCK'event and ACLOCK = '1') then
                     if (regs_rbit(CO_MODE_DONE_POS ) = '1' and regs_rbit(CO_STAT_DONE_POS ) = '1') or
                        (regs_rbit(PO_MODE_END_POS  ) = '1' and regs_rbit(PO_STAT_END_POS  ) = '1') or
                        (regs_rbit(PO_MODE_FETCH_POS) = '1' and regs_rbit(PO_STAT_FETCH_POS) = '1') then
-                        o_irq <= '1';
+                        o_interrupt <= '1';
                     else
-                        o_irq <= '0';
+                        o_interrupt <= '0';
                     end if;
                 end if;
             end process;
@@ -1877,6 +1881,8 @@ begin
                     M_BUF_DATA      => mr_buf_wdata      , -- In  :
                     M_BUF_PTR       => mr_buf_wptr       , -- In  :
                     M_BUF_RDY       => pi_buf_wrdy       , -- Out :
+                    M_XFER_BUSY     => mr_xfer_busy      , -- In  :
+                    M_XFER_DONE     => mr_xfer_done      , -- In  :
                 -------------------------------------------------------------------
                 -- Control Status Register Interface Signals.
                 -------------------------------------------------------------------
@@ -1975,14 +1981,14 @@ begin
             pi_stat_end <= regs_rbit(PI_STAT_END_POS  );
             process (ACLOCK, RST) begin
                 if (RST = '1') then
-                        i_irq <= '0';
+                        i_interrupt <= '0';
                 elsif (ACLOCK'event and ACLOCK = '1') then
                     if (regs_rbit(CI_MODE_DONE_POS ) = '1' and regs_rbit(CI_STAT_DONE_POS ) = '1') or
                        (regs_rbit(PI_MODE_END_POS  ) = '1' and regs_rbit(PI_STAT_END_POS  ) = '1') or
                        (regs_rbit(PI_MODE_FETCH_POS) = '1' and regs_rbit(PI_STAT_FETCH_POS) = '1') then
-                        i_irq <= '1';
+                        i_interrupt <= '1';
                     else
-                        i_irq <= '0';
+                        i_interrupt <= '0';
                     end if;
                 end if;
             end process;
@@ -1997,13 +2003,13 @@ begin
         pump_wbit(CO_REGS_HI downto CO_REGS_LO) <= regs_wbit(CO_REGS_HI downto CO_REGS_LO);
         process (ACLOCK, RST) begin
             if (RST = '1') then
-                    o_irq <= '0';
+                    o_interrupt <= '0';
             elsif (ACLOCK'event and ACLOCK = '1') then
                 if (regs_rbit(CO_MODE_DONE_POS ) = '1' and regs_rbit(CO_STAT_DONE_POS ) = '1') or
                    (regs_rbit(CO_MODE_ERROR_POS) = '1' and regs_rbit(CO_STAT_ERROR_POS) = '1') then
-                    o_irq <= '1';
+                    o_interrupt <= '1';
                 else
-                    o_irq <= '0';
+                    o_interrupt <= '0';
                 end if;
             end if;
         end process;
@@ -2017,13 +2023,13 @@ begin
         pump_wbit(CI_REGS_HI downto CI_REGS_LO) <= regs_wbit(CI_REGS_HI downto CI_REGS_LO);
         process (ACLOCK, RST) begin
             if (RST = '1') then
-                    i_irq <= '0';
+                    i_interrupt <= '0';
             elsif (ACLOCK'event and ACLOCK = '1') then
                 if (regs_rbit(CI_MODE_DONE_POS ) = '1' and regs_rbit(CI_STAT_DONE_POS ) = '1') or
                    (regs_rbit(CI_MODE_ERROR_POS) = '1' and regs_rbit(CI_STAT_ERROR_POS) = '1') then
-                    i_irq <= '1';
+                    i_interrupt <= '1';
                 else
-                    i_irq <= '0';
+                    i_interrupt <= '0';
                 end if;
             end if;
         end process;
@@ -2303,5 +2309,7 @@ begin
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
-    IRQ <= i_irq or o_irq;
+    IRQ   <= i_interrupt or o_interrupt;
+    I_IRQ <= i_interrupt;
+    O_IRQ <= o_interrupt;
 end RTL;
