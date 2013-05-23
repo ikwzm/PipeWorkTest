@@ -2,7 +2,7 @@
 --!     @file    aix4_write_adapter.vhd
 --!     @brief   AXI4_WRITE_ADPATER
 --!     @version 1.5.0
---!     @date    2013/5/19
+--!     @date    2013/5/24
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -157,15 +157,27 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
+    function  MAX(A,B:integer) return integer is begin
+        if (A > B) then return A;
+        else            return B;
+        end if;
+    end function;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    function  MIN(A,B:integer) return integer is begin
+        if (A < B) then return A;
+        else            return B;
+        end if;
+    end function;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     function  CALC_BUF_WIDTH return integer is
         variable bits  : integer;
         variable width : integer;
     begin
-        if (M_DATA_WIDTH > T_DATA_WIDTH) then
-            bits := M_DATA_WIDTH;
-        else
-            bits := T_DATA_WIDTH;
-        end if;
+        bits := MAX(T_DATA_WIDTH, M_DATA_WIDTH);
         width := 0;
         while (2**width < bits) loop
             width := width + 1;
@@ -176,6 +188,11 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     --
     -------------------------------------------------------------------------------
     constant  BUF_WIDTH         : integer := CALC_BUF_WIDTH;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+ -- constant  ALIGNMENT_BITS    : integer := MIN(T_DATA_WIDTH, M_DATA_WIDTH);
+    constant  ALIGNMENT_BITS    : integer := 8;
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -448,7 +465,8 @@ begin
             AXI4_DATA_WIDTH     => T_DATA_WIDTH        , -- 
             SIZE_BITS           => SIZE_BITS           , -- 
             BUF_DATA_WIDTH      => 2**BUF_WIDTH        , -- 
-            BUF_PTR_BITS        => BUF_DEPTH             -- 
+            BUF_PTR_BITS        => BUF_DEPTH           , -- 
+            ALIGNMENT_BITS      => ALIGNMENT_BITS        -- 
         )                                                -- 
         port map(                                        -- 
         ---------------------------------------------------------------------------
@@ -799,6 +817,7 @@ begin
             FLOW_VALID          => 1                   , -- 
             BUF_DATA_WIDTH      => 2**BUF_WIDTH        , -- 
             BUF_PTR_BITS        => BUF_DEPTH           , -- 
+            ALIGNMENT_BITS      => ALIGNMENT_BITS      , -- 
             XFER_MIN_SIZE       => M_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => M_MAX_XFER_SIZE     , -- 
             QUEUE_SIZE          => 1                     -- 
