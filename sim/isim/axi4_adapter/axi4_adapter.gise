@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<generated_project xmlns="http://www.xilinx.com/XMLSchema" xmlns:xil_pn="http://www.xilinx.com/XMLSchema">
+
+  <!--                                                          -->
+
+  <!--             For tool use only. Do not edit.              -->
+
+  <!--                                                          -->
+
+  <!-- ProjectNavigator created generated project file.         -->
+
+  <!-- For use in tracking generated file and other information -->
+
+  <!-- allowing preservation of process status.                 -->
+
+  <!--                                                          -->
+
+  <!-- Copyright (c) 1995-2012 Xilinx, Inc.  All rights reserved. -->
+
+  <version xmlns="http://www.xilinx.com/XMLSchema">11.1</version>
+
+  <sourceproject xmlns="http://www.xilinx.com/XMLSchema" xil_pn:fileType="FILE_XISE" xil_pn:name="axi4_adapter.xise"/>
+
+  <files xmlns="http://www.xilinx.com/XMLSchema">
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="AXI4_ADAPTER_TEST_BENCH_32_32_4096_ASYNC_isim_beh.exe"/>
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="AXI4_ADAPTER_TEST_BENCH_4096_32_32_ASYNC_isim_beh.exe"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="AXI4_ADAPTER_TEST_BENCH_4096_32_32_beh.prj"/>
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="AXI4_ADAPTER_TEST_BENCH_4096_32_32_isim_beh.exe"/>
+    <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="AXI4_ADAPTER_TEST_BENCH_4096_32_32_isim_beh.wdb"/>
+    <file xil_pn:fileType="FILE_LOG" xil_pn:name="fuse.log"/>
+    <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="isim"/>
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_CMD" xil_pn:name="isim.cmd"/>
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_LOG" xil_pn:name="isim.log"/>
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_INI" xil_pn:name="xilinxsim.ini"/>
+  </files>
+
+  <transforms xmlns="http://www.xilinx.com/XMLSchema">
+    <transform xil_pn:end_ts="1369324916" xil_pn:name="TRAN_copyInitialToAbstractSimulation" xil_pn:start_ts="1369324914">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1369485526" xil_pn:in_ck="3068424474816591445" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1369485526">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_channel_player.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_core.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_master_player.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_models.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_signal_printer.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_slave_player.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_types.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/core.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/marchal.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/reader.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/sync.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/util.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/vocal.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_data_outlet_port.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_data_port.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_master_address_channel_controller.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_master_read_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_master_write_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_slave_read_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_slave_write_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_types.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/chopper.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/count_down_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/count_up_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/delay_adjuster.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/delay_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/float_intake_manifold_valve.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/float_intake_valve.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/float_outlet_manifold_valve.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/float_outlet_valve.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/pool_intake_port.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/pool_outlet_port.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/queue_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/reducer.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/sdpram.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/sdpram_model.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/syncronizer.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/syncronizer_input_pending_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pipe/pipe_components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pipe/pipe_core_unit.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pipe/pipe_flow_syncronizer.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pipe/pipe_requester_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pipe/pipe_responder_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pump/pump_components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pump/pump_control_register.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_adapter.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench_4096_32_32.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench_4096_32_32_async.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_read_adapter.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_write_adapter.vhd"/>
+    </transform>
+    <transform xil_pn:end_ts="1369485727" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="3481416361961507397" xil_pn:start_ts="1369485726">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1369485727" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="2228373820761049283" xil_pn:start_ts="1369485727">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1369485526" xil_pn:name="TRAN_regenerateCoresSim" xil_pn:prop_ck="1681977034211665603" xil_pn:start_ts="1369485526">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1369485527" xil_pn:in_ck="3068424474816591445" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1369485526">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_channel_player.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_core.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_master_player.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_models.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_signal_printer.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_slave_player.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_types.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/core.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/marchal.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/reader.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/sync.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/util.vhd"/>
+      <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/vocal.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_data_outlet_port.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_data_port.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_master_address_channel_controller.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_master_read_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_master_write_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_slave_read_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_slave_write_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/axi4/axi4_types.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/chopper.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/count_down_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/count_up_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/delay_adjuster.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/delay_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/float_intake_manifold_valve.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/float_intake_valve.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/float_outlet_manifold_valve.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/float_outlet_valve.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/pool_intake_port.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/pool_outlet_port.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/queue_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/reducer.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/sdpram.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/sdpram_model.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/syncronizer.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/components/syncronizer_input_pending_register.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pipe/pipe_components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pipe/pipe_core_unit.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pipe/pipe_flow_syncronizer.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pipe/pipe_requester_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pipe/pipe_responder_interface.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pump/pump_components.vhd"/>
+      <outfile xil_pn:name="../../../PipeWork/src/pump/pump_control_register.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_adapter.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench_4096_32_32.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench_4096_32_32_async.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_read_adapter.vhd"/>
+      <outfile xil_pn:name="../../../src/test/vhdl/axi4_adapter/axi4_write_adapter.vhd"/>
+    </transform>
+    <transform xil_pn:end_ts="1369485785" xil_pn:in_ck="3068424474816591445" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="-8769735361579805495" xil_pn:start_ts="1369485727">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="OutputChanged"/>
+      <outfile xil_pn:name="AXI4_ADAPTER_TEST_BENCH_4096_32_32_beh.prj"/>
+      <outfile xil_pn:name="AXI4_ADAPTER_TEST_BENCH_4096_32_32_isim_beh.exe"/>
+      <outfile xil_pn:name="fuse.log"/>
+      <outfile xil_pn:name="isim"/>
+      <outfile xil_pn:name="isim.log"/>
+      <outfile xil_pn:name="xilinxsim.ini"/>
+    </transform>
+    <transform xil_pn:end_ts="1369485786" xil_pn:in_ck="3476762913254895793" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="3793669924266138294" xil_pn:start_ts="1369485785">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="OutputChanged"/>
+      <outfile xil_pn:name="AXI4_ADAPTER_TEST_BENCH_4096_32_32_isim_beh.wdb"/>
+      <outfile xil_pn:name="isim.cmd"/>
+      <outfile xil_pn:name="isim.log"/>
+    </transform>
+  </transforms>
+
+</generated_project>

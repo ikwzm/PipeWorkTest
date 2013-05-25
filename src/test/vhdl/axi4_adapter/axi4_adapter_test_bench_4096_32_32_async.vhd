@@ -40,14 +40,14 @@ use     ieee.numeric_std.all;
 -----------------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------------
-entity  AXI4_ADAPTER_TEST_BENCH_32_32_4096_ASYNC is
-end     AXI4_ADAPTER_TEST_BENCH_32_32_4096_ASYNC;
+entity  AXI4_ADAPTER_TEST_BENCH_4096_32_32_ASYNC is
+end     AXI4_ADAPTER_TEST_BENCH_4096_32_32_ASYNC;
 use     WORK.AXI4_ADAPTER_TEST_BENCH_COMPONENTS.AXI4_ADAPTER_TEST_BENCH;
-architecture MODEL of AXI4_ADAPTER_TEST_BENCH_32_32_4096_ASYNC is
+architecture MODEL of AXI4_ADAPTER_TEST_BENCH_4096_32_32_ASYNC is
 begin
     TB: AXI4_ADAPTER_TEST_BENCH generic map (
-        NAME            => string'("AXI4_ADAPTER_TEST_BENCH_32_32_4096_ASYNC"),
-        SCENARIO_FILE   => string'("axi4_adapter_test_bench.snr"),
+        NAME            => string'("AXI4_ADAPTER_TEST_BENCH_4096_32_32_ASYNC"),
+        SCENARIO_FILE   => string'("axi4_adapter_test_bench_4096.snr"),
         T_CLK_RATE      => 0,
         T_CLK_PERIOD    => 10 ns,
         M_CLK_RATE      => 0,
