@@ -164,49 +164,45 @@ architecture RTL of AXI4_READ_ADAPTER is
         end if;
     end function;
     -------------------------------------------------------------------------------
-    --
+    -- データバスのビット数の２のべき乗値を計算する.
     -------------------------------------------------------------------------------
-    function  CALC_BUF_WIDTH return integer is
-        variable bits  : integer;
-        variable width : integer;
+    function  CALC_DATA_SIZE(WIDTH:integer) return integer is
+        variable value : integer;
     begin
-        bits := MAX(T_DATA_WIDTH, M_DATA_WIDTH);
-        width := 0;
-        while (2**width < bits) loop
-            width := width + 1;
+        value := 0;
+        while (2**(value) < WIDTH) loop
+            value := value + 1;
         end loop;
-        return width;
+        return value;
     end function;
+    ------------------------------------------------------------------------------
+    -- バッファのデータ幅は T_DATA_WIDTH と M_DATA_WIDTH の大きい方を選択する.
+    ------------------------------------------------------------------------------
+    constant  BUF_DATA_BITS     : integer := MAX(T_DATA_WIDTH, M_DATA_WIDTH);
+    ------------------------------------------------------------------------------
+    -- バッファのデータ幅のビット数(２のべき乗値).
+    ------------------------------------------------------------------------------
+    constant  BUF_DATA_BIT_SIZE : integer := CALC_DATA_SIZE(BUF_DATA_BITS);
+    ------------------------------------------------------------------------------
+    -- バッファのデータ幅をバイト数.
+    ------------------------------------------------------------------------------
+    constant  BUF_DATA_BYTES    : integer := BUF_DATA_BITS/8;
     -------------------------------------------------------------------------------
-    --
+    -- バッファのデータ幅のバイト数(２のべき乗値).
     -------------------------------------------------------------------------------
-    constant  BUF_WIDTH         : integer := CALC_BUF_WIDTH;
+    constant  BUF_DATA_BYTE_SIZE: integer := BUF_DATA_BIT_SIZE-3;
     -------------------------------------------------------------------------------
-    --
+    -- アライメントの単位は T_DATA_WIDTH と M_DATA_WIDTH の小さい方を選択する.
     -------------------------------------------------------------------------------
     constant  ALIGNMENT_BITS    : integer := MIN(T_DATA_WIDTH, M_DATA_WIDTH);
     -------------------------------------------------------------------------------
-    --
+    -- 
     -------------------------------------------------------------------------------
-    constant  MODE_LO           : integer := 0;
-    constant  MODE_ID_LO        : integer := MODE_LO;
-    constant  MODE_ID_HI        : integer := MODE_ID_LO     + AXI4_ID_WIDTH     - 1;
-    constant  MODE_ABURST_LO    : integer := MODE_ID_HI     + 1;
-    constant  MODE_ABURST_HI    : integer := MODE_ABURST_LO + AXI4_ABURST_WIDTH - 1;
-    constant  MODE_ALOCK_LO     : integer := MODE_ABURST_HI + 1;
-    constant  MODE_ALOCK_HI     : integer := MODE_ALOCK_LO  + AXI4_ALOCK_WIDTH  - 1;
-    constant  MODE_ACACHE_LO    : integer := MODE_ALOCK_HI  + 1;
-    constant  MODE_ACACHE_HI    : integer := MODE_ACACHE_LO + AXI4_ACACHE_WIDTH - 1;
-    constant  MODE_APROT_LO     : integer := MODE_ACACHE_HI + 1;
-    constant  MODE_APROT_HI     : integer := MODE_APROT_LO  + AXI4_APROT_WIDTH  - 1;
-    constant  MODE_AQOS_LO      : integer := MODE_APROT_HI  + 1;
-    constant  MODE_AQOS_HI      : integer := MODE_AQOS_LO   + AXI4_AQOS_WIDTH   - 1;
-    constant  MODE_AREGION_LO   : integer := MODE_AQOS_HI   + 1;
-    constant  MODE_AREGION_HI   : integer := MODE_AREGION_LO+ AXI4_AREGION_WIDTH- 1;
-    constant  MODE_AUSER_LO     : integer := MODE_AREGION_HI+ 1;
-    constant  MODE_AUSER_HI     : integer := MODE_AUSER_LO  + AXI4_AUSER_WIDTH  - 1;
-    constant  MODE_HI           : integer := MODE_AUSER_HI;
-    constant  MODE_BITS         : integer := MODE_HI        + 1;
+    constant  M_DATA_BYTES      : integer := M_DATA_WIDTH/8;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    constant  T_DATA_BYTES      : integer := T_DATA_WIDTH/8;
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -232,6 +228,28 @@ architecture RTL of AXI4_READ_ADAPTER is
         return pool_size;
     end function;
     constant  POOL_SIZE         : std_logic_vector(SIZE_BITS-1 downto 0) := MAKE_POOL_SIZE;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    constant  MODE_LO           : integer := 0;
+    constant  MODE_ID_LO        : integer := MODE_LO;
+    constant  MODE_ID_HI        : integer := MODE_ID_LO     + AXI4_ID_WIDTH     - 1;
+    constant  MODE_ABURST_LO    : integer := MODE_ID_HI     + 1;
+    constant  MODE_ABURST_HI    : integer := MODE_ABURST_LO + AXI4_ABURST_WIDTH - 1;
+    constant  MODE_ALOCK_LO     : integer := MODE_ABURST_HI + 1;
+    constant  MODE_ALOCK_HI     : integer := MODE_ALOCK_LO  + AXI4_ALOCK_WIDTH  - 1;
+    constant  MODE_ACACHE_LO    : integer := MODE_ALOCK_HI  + 1;
+    constant  MODE_ACACHE_HI    : integer := MODE_ACACHE_LO + AXI4_ACACHE_WIDTH - 1;
+    constant  MODE_APROT_LO     : integer := MODE_ACACHE_HI + 1;
+    constant  MODE_APROT_HI     : integer := MODE_APROT_LO  + AXI4_APROT_WIDTH  - 1;
+    constant  MODE_AQOS_LO      : integer := MODE_APROT_HI  + 1;
+    constant  MODE_AQOS_HI      : integer := MODE_AQOS_LO   + AXI4_AQOS_WIDTH   - 1;
+    constant  MODE_AREGION_LO   : integer := MODE_AQOS_HI   + 1;
+    constant  MODE_AREGION_HI   : integer := MODE_AREGION_LO+ AXI4_AREGION_WIDTH- 1;
+    constant  MODE_AUSER_LO     : integer := MODE_AREGION_HI+ 1;
+    constant  MODE_AUSER_HI     : integer := MODE_AUSER_LO  + AXI4_AUSER_WIDTH  - 1;
+    constant  MODE_HI           : integer := MODE_AUSER_HI;
+    constant  MODE_BITS         : integer := MODE_HI        + 1;
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -321,7 +339,7 @@ architecture RTL of AXI4_READ_ADAPTER is
     --
     -------------------------------------------------------------------------------
     constant  t_pull_buf_level  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(M_DATA_WIDTH      , SIZE_BITS));
+                               := std_logic_vector(to_unsigned(M_DATA_BYTES, SIZE_BITS));
     signal    t_pull_buf_reset  : std_logic;
     signal    t_pull_buf_val    : std_logic;
     signal    t_pull_buf_last   : std_logic;
@@ -332,9 +350,8 @@ architecture RTL of AXI4_READ_ADAPTER is
     --
     -------------------------------------------------------------------------------
     signal    t_pool_read       : std_logic;
-    signal    t_pool_ben        : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
-    signal    t_pool_rdata      : std_logic_vector(2**(BUF_WIDTH  )-1 downto 0);
-    signal    t_pool_rptr       : std_logic_vector(BUF_DEPTH-1 downto 0);
+    signal    t_pool_rdata      : std_logic_vector(BUF_DATA_BITS-1 downto 0);
+    signal    t_pool_rptr       : std_logic_vector(BUF_DEPTH    -1 downto 0);
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -400,7 +417,7 @@ architecture RTL of AXI4_READ_ADAPTER is
     --
     -------------------------------------------------------------------------------
     constant  m_push_buf_level  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(2**BUF_DEPTH-M_DATA_WIDTH      , SIZE_BITS));
+                               := std_logic_vector(to_unsigned(2**BUF_DEPTH-M_DATA_BYTES, SIZE_BITS));
     signal    m_push_buf_reset  : std_logic;
     signal    m_push_buf_val    : std_logic;
     signal    m_push_buf_last   : std_logic;
@@ -444,10 +461,10 @@ architecture RTL of AXI4_READ_ADAPTER is
     --
     -------------------------------------------------------------------------------
     signal    m_pool_write      : std_logic;
-    signal    m_pool_wdata      : std_logic_vector(2**(BUF_WIDTH  )-1 downto 0);
-    signal    m_pool_ben        : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
-    signal    m_pool_we         : std_logic_vector(2**(BUF_WIDTH-3)-1 downto 0);
-    signal    m_pool_wptr       : std_logic_vector(BUF_DEPTH-1 downto 0);
+    signal    m_pool_wdata      : std_logic_vector(BUF_DATA_BITS -1 downto 0);
+    signal    m_pool_ben        : std_logic_vector(BUF_DATA_BYTES-1 downto 0);
+    signal    m_pool_we         : std_logic_vector(BUF_DATA_BYTES-1 downto 0);
+    signal    m_pool_wptr       : std_logic_vector(BUF_DEPTH     -1 downto 0);
 begin
     -------------------------------------------------------------------------------
     --
@@ -458,7 +475,7 @@ begin
             AXI4_ID_WIDTH       => AXI4_ID_WIDTH       , -- 
             AXI4_DATA_WIDTH     => T_DATA_WIDTH        , -- 
             SIZE_BITS           => SIZE_BITS           , -- 
-            BUF_DATA_WIDTH      => 2**BUF_WIDTH        , -- 
+            BUF_DATA_WIDTH      => BUF_DATA_BITS       , -- 
             BUF_PTR_BITS        => BUF_DEPTH           , -- 
             ALIGNMENT_BITS      => ALIGNMENT_BITS        -- 
         )                                                -- 
@@ -537,7 +554,6 @@ begin
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
             BUF_REN             => t_pool_read         , -- Out :
-            BUF_BEN             => t_pool_ben          , -- Out :
             BUF_DATA            => t_pool_rdata        , -- In  :
             BUF_PTR             => t_pool_rptr           -- Out :
         );
@@ -779,18 +795,18 @@ begin
     POOL: SDPRAM                                         --
         generic map (                                    --
             DEPTH   => BUF_DEPTH+3                     , --
-            RWIDTH  => BUF_WIDTH                       , --
-            WWIDTH  => BUF_WIDTH                       , --
-            WEBIT   => BUF_WIDTH-3                     , --
+            RWIDTH  => BUF_DATA_BIT_SIZE               , --
+            WWIDTH  => BUF_DATA_BIT_SIZE               , --
+            WEBIT   => BUF_DATA_BYTE_SIZE              , --
             ID      => 0                                 --
         )                                                --
         port map (                                       --
             WCLK    => M_CLK                           , -- In  :
             WE      => m_pool_we                       , -- In  :
-            WADDR   => m_pool_wptr(BUF_DEPTH-1 downto BUF_WIDTH-3), 
+            WADDR   => m_pool_wptr(BUF_DEPTH-1 downto BUF_DATA_BYTE_SIZE), 
             WDATA   => m_pool_wdata                    , -- In  :
             RCLK    => T_CLK                           , -- In  :
-            RADDR   => t_pool_rptr(BUF_DEPTH-1 downto BUF_WIDTH-3),
+            RADDR   => t_pool_rptr(BUF_DEPTH-1 downto BUF_DATA_BYTE_SIZE),
             RDATA   => t_pool_rdata                      -- Out :
         );
     m_pool_we <= m_pool_ben when (m_pool_write = '1') else (others => '0');
@@ -807,7 +823,7 @@ begin
             REQ_SIZE_BITS       => SIZE_BITS           , -- 
             REQ_SIZE_VALID      => 1                   , -- 
             FLOW_VALID          => 1                   , -- 
-            BUF_DATA_WIDTH      => 2**BUF_WIDTH        , -- 
+            BUF_DATA_WIDTH      => BUF_DATA_BITS       , -- 
             BUF_PTR_BITS        => BUF_DEPTH           , -- 
             ALIGNMENT_BITS      => ALIGNMENT_BITS      , -- 
             XFER_MIN_SIZE       => M_MAX_XFER_SIZE     , -- 
