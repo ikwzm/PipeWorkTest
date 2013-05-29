@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_write_adapter_test_bench.vhd
 --!     @brief   TEST BENCH for AXI4_WRITE_ADPATER
---!     @version 0.0.1
---!     @date    2013/4/14
+--!     @version 1.5.0
+--!     @date    2013/5/29
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -104,10 +104,12 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
                                  ID          => AXI4_ID_WIDTH,
                                  AWADDR      => AXI4_ADDR_WIDTH,
                                  ARADDR      => AXI4_ADDR_WIDTH,
+                                 AWUSER      => AXI4_AUSER_WIDTH,
+                                 ARUSER      => AXI4_AUSER_WIDTH,
+                                 ALEN        => AXI4_ALEN_WIDTH,
+                                 ALOCK       => AXI4_ALOCK_WIDTH,
                                  WDATA       => M_DATA_WIDTH,
                                  RDATA       => M_DATA_WIDTH,
-                                 ARUSER      => AXI4_AUSER_WIDTH,
-                                 AWUSER      => AXI4_AUSER_WIDTH,
                                  WUSER       => 1,
                                  RUSER       => 1,
                                  BUSER       => 1);
@@ -115,10 +117,12 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
                                  ID          => AXI4_ID_WIDTH,
                                  AWADDR      => AXI4_ADDR_WIDTH,
                                  ARADDR      => AXI4_ADDR_WIDTH,
+                                 AWUSER      => AXI4_AUSER_WIDTH,
+                                 ARUSER      => AXI4_AUSER_WIDTH,
+                                 ALEN        => AXI4_ALEN_WIDTH,
+                                 ALOCK       => AXI4_ALOCK_WIDTH,
                                  WDATA       => T_DATA_WIDTH,
                                  RDATA       => T_DATA_WIDTH,
-                                 ARUSER      => AXI4_AUSER_WIDTH,
-                                 AWUSER      => AXI4_AUSER_WIDTH,
                                  WUSER       => 1,
                                  RUSER       => 1,
                                  BUSER       => 1);
@@ -141,10 +145,10 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
     ------------------------------------------------------------------------------
     signal   M_ARADDR        : std_logic_vector(M_WIDTH.ARADDR -1 downto 0);
     signal   M_ARWRITE       : std_logic;
-    signal   M_ARLEN         : AXI4_ALEN_TYPE;
+    signal   M_ARLEN         : std_logic_vector(M_WIDTH.ALEN   -1 downto 0);
     signal   M_ARSIZE        : AXI4_ASIZE_TYPE;
     signal   M_ARBURST       : AXI4_ABURST_TYPE;
-    signal   M_ARLOCK        : AXI4_ALOCK_TYPE;
+    signal   M_ARLOCK        : std_logic_vector(M_WIDTH.ALOCK  -1 downto 0);
     signal   M_ARCACHE       : AXI4_ACACHE_TYPE;
     signal   M_ARPROT        : AXI4_APROT_TYPE;
     signal   M_ARQOS         : AXI4_AQOS_TYPE;
@@ -167,10 +171,10 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
     -- ライトアドレスチャネルシグナル.
     -------------------------------------------------------------------------------
     signal   M_AWADDR        : std_logic_vector(M_WIDTH.AWADDR -1 downto 0);
-    signal   M_AWLEN         : AXI4_ALEN_TYPE;
+    signal   M_AWLEN         : std_logic_vector(M_WIDTH.ALEN   -1 downto 0);
     signal   M_AWSIZE        : AXI4_ASIZE_TYPE;
     signal   M_AWBURST       : AXI4_ABURST_TYPE;
-    signal   M_AWLOCK        : AXI4_ALOCK_TYPE;
+    signal   M_AWLOCK        : std_logic_vector(M_WIDTH.ALOCK  -1 downto 0);
     signal   M_AWCACHE       : AXI4_ACACHE_TYPE;
     signal   M_AWPROT        : AXI4_APROT_TYPE;
     signal   M_AWQOS         : AXI4_AQOS_TYPE;
@@ -201,11 +205,10 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
     -- リードアドレスチャネルシグナル.
     ------------------------------------------------------------------------------
     signal   T_ARADDR        : std_logic_vector(T_WIDTH.ARADDR -1 downto 0);
-    signal   T_ARWRITE       : std_logic;
-    signal   T_ARLEN         : AXI4_ALEN_TYPE;
+    signal   T_ARLEN         : std_logic_vector(T_WIDTH.ALEN   -1 downto 0);
     signal   T_ARSIZE        : AXI4_ASIZE_TYPE;
     signal   T_ARBURST       : AXI4_ABURST_TYPE;
-    signal   T_ARLOCK        : AXI4_ALOCK_TYPE;
+    signal   T_ARLOCK        : std_logic_vector(T_WIDTH.ALOCK  -1 downto 0);
     signal   T_ARCACHE       : AXI4_ACACHE_TYPE;
     signal   T_ARPROT        : AXI4_APROT_TYPE;
     signal   T_ARQOS         : AXI4_AQOS_TYPE;
@@ -228,10 +231,10 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
     -- ライトアドレスチャネルシグナル.
     -------------------------------------------------------------------------------
     signal   T_AWADDR        : std_logic_vector(T_WIDTH.AWADDR -1 downto 0);
-    signal   T_AWLEN         : AXI4_ALEN_TYPE;
+    signal   T_AWLEN         : std_logic_vector(T_WIDTH.ALEN   -1 downto 0);
     signal   T_AWSIZE        : AXI4_ASIZE_TYPE;
     signal   T_AWBURST       : AXI4_ABURST_TYPE;
-    signal   T_AWLOCK        : AXI4_ALOCK_TYPE;
+    signal   T_AWLOCK        : std_logic_vector(T_WIDTH.ALOCK  -1 downto 0);
     signal   T_AWCACHE       : AXI4_ACACHE_TYPE;
     signal   T_AWPROT        : AXI4_APROT_TYPE;
     signal   T_AWQOS         : AXI4_AQOS_TYPE;
@@ -301,10 +304,10 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
             T_AWID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
             T_AWUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
             T_AWADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-            T_AWLEN             : in    AXI4_ALEN_TYPE;
+            T_AWLEN             : in    std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
             T_AWSIZE            : in    AXI4_ASIZE_TYPE;
             T_AWBURST           : in    AXI4_ABURST_TYPE;
-            T_AWLOCK            : in    AXI4_ALOCK_TYPE;
+            T_AWLOCK            : in    std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
             T_AWCACHE           : in    AXI4_ACACHE_TYPE;
             T_AWPROT            : in    AXI4_APROT_TYPE;
             T_AWQOS             : in    AXI4_AQOS_TYPE;
@@ -323,10 +326,10 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
             T_ARID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
             T_ARUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
             T_ARADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-            T_ARLEN             : in    AXI4_ALEN_TYPE;
+            T_ARLEN             : in    std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
             T_ARSIZE            : in    AXI4_ASIZE_TYPE;
             T_ARBURST           : in    AXI4_ABURST_TYPE;
-            T_ARLOCK            : in    AXI4_ALOCK_TYPE;
+            T_ARLOCK            : in    std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
             T_ARCACHE           : in    AXI4_ACACHE_TYPE;
             T_ARPROT            : in    AXI4_APROT_TYPE;
             T_ARQOS             : in    AXI4_AQOS_TYPE;
@@ -345,10 +348,10 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
             M_AWID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
             M_AWUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
             M_AWADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-            M_AWLEN             : out   AXI4_ALEN_TYPE;
+            M_AWLEN             : out   std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
             M_AWSIZE            : out   AXI4_ASIZE_TYPE;
             M_AWBURST           : out   AXI4_ABURST_TYPE;
-            M_AWLOCK            : out   AXI4_ALOCK_TYPE;
+            M_AWLOCK            : out   std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
             M_AWCACHE           : out   AXI4_ACACHE_TYPE;
             M_AWPROT            : out   AXI4_APROT_TYPE;
             M_AWQOS             : out   AXI4_AQOS_TYPE;
@@ -368,10 +371,10 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
             M_ARID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
             M_ARUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
             M_ARADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-            M_ARLEN             : out   AXI4_ALEN_TYPE;
+            M_ARLEN             : out   std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
             M_ARSIZE            : out   AXI4_ASIZE_TYPE;
             M_ARBURST           : out   AXI4_ABURST_TYPE;
-            M_ARLOCK            : out   AXI4_ALOCK_TYPE;
+            M_ARLOCK            : out   std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
             M_ARCACHE           : out   AXI4_ACACHE_TYPE;
             M_ARPROT            : out   AXI4_APROT_TYPE;
             M_ARQOS             : out   AXI4_AQOS_TYPE;

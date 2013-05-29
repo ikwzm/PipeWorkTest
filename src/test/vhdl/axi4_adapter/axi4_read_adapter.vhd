@@ -92,10 +92,10 @@ entity  AXI4_READ_ADAPTER is
         T_ARID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
         T_ARUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
         T_ARADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-        T_ARLEN             : in    AXI4_ALEN_TYPE;
+        T_ARLEN             : in    std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
         T_ARSIZE            : in    AXI4_ASIZE_TYPE;
         T_ARBURST           : in    AXI4_ABURST_TYPE;
-        T_ARLOCK            : in    AXI4_ALOCK_TYPE;
+        T_ARLOCK            : in    std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
         T_ARCACHE           : in    AXI4_ACACHE_TYPE;
         T_ARPROT            : in    AXI4_APROT_TYPE;
         T_ARQOS             : in    AXI4_AQOS_TYPE;
@@ -117,10 +117,10 @@ entity  AXI4_READ_ADAPTER is
         M_ARID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
         M_ARUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
         M_ARADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-        M_ARLEN             : out   AXI4_ALEN_TYPE;
+        M_ARLEN             : out   std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
         M_ARSIZE            : out   AXI4_ASIZE_TYPE;
         M_ARBURST           : out   AXI4_ABURST_TYPE;
-        M_ARLOCK            : out   AXI4_ALOCK_TYPE;
+        M_ARLOCK            : out   std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
         M_ARCACHE           : out   AXI4_ACACHE_TYPE;
         M_ARPROT            : out   AXI4_APROT_TYPE;
         M_ARQOS             : out   AXI4_AQOS_TYPE;
@@ -364,7 +364,7 @@ architecture RTL of AXI4_READ_ADAPTER is
     signal    m_req_buf_ptr     : std_logic_vector(BUF_DEPTH-1 downto 0);
     signal    m_req_mode        : std_logic_vector(MODE_BITS-1 downto 0);
     signal    m_req_burst       : AXI4_ABURST_TYPE;
-    signal    m_req_lock        : AXI4_ALOCK_TYPE;
+    signal    m_req_lock        : std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
     signal    m_req_cache       : AXI4_ACACHE_TYPE;
     signal    m_req_prot        : AXI4_APROT_TYPE;
     signal    m_req_qos         : AXI4_AQOS_TYPE;

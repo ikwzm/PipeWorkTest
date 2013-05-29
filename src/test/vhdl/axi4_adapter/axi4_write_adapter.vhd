@@ -92,10 +92,10 @@ entity  AXI4_WRITE_ADAPTER is
         T_AWID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
         T_AWUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
         T_AWADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-        T_AWLEN             : in    AXI4_ALEN_TYPE;
+        T_AWLEN             : in    std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
         T_AWSIZE            : in    AXI4_ASIZE_TYPE;
         T_AWBURST           : in    AXI4_ABURST_TYPE;
-        T_AWLOCK            : in    AXI4_ALOCK_TYPE;
+        T_AWLOCK            : in    std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
         T_AWCACHE           : in    AXI4_ACACHE_TYPE;
         T_AWPROT            : in    AXI4_APROT_TYPE;
         T_AWQOS             : in    AXI4_AQOS_TYPE;
@@ -120,10 +120,10 @@ entity  AXI4_WRITE_ADAPTER is
         M_AWID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
         M_AWUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
         M_AWADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-        M_AWLEN             : out   AXI4_ALEN_TYPE;
+        M_AWLEN             : out   std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
         M_AWSIZE            : out   AXI4_ASIZE_TYPE;
         M_AWBURST           : out   AXI4_ABURST_TYPE;
-        M_AWLOCK            : out   AXI4_ALOCK_TYPE;
+        M_AWLOCK            : out   std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
         M_AWCACHE           : out   AXI4_ACACHE_TYPE;
         M_AWPROT            : out   AXI4_APROT_TYPE;
         M_AWQOS             : out   AXI4_AQOS_TYPE;
@@ -373,7 +373,7 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     signal    m_req_buf_ptr     : std_logic_vector(BUF_DEPTH-1 downto 0);
     signal    m_req_mode        : std_logic_vector(MODE_BITS-1 downto 0);
     signal    m_req_burst       : AXI4_ABURST_TYPE;
-    signal    m_req_lock        : AXI4_ALOCK_TYPE;
+    signal    m_req_lock        : std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
     signal    m_req_cache       : AXI4_ACACHE_TYPE;
     signal    m_req_prot        : AXI4_APROT_TYPE;
     signal    m_req_qos         : AXI4_AQOS_TYPE;
