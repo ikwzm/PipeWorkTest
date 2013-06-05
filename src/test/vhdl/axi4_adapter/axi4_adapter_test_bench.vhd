@@ -2,7 +2,7 @@
 --!     @file    aix4_write_adapter_test_bench.vhd
 --!     @brief   TEST BENCH for AXI4_WRITE_ADPATER
 --!     @version 1.5.0
---!     @date    2013/5/29
+--!     @date    2013/6/5
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -519,7 +519,7 @@ begin
             WRITE_ENABLE    => TRUE            ,
             OUTPUT_DELAY    => M_DELAY         ,
             WIDTH           => M_WIDTH         ,
-            SYNC_PLUG_NUM   => 2               ,
+            SYNC_PLUG_NUM   => 3               ,
             SYNC_WIDTH      => SYNC_WIDTH      ,
             GPI_WIDTH       => GPI_WIDTH       ,
             GPO_WIDTH       => GPO_WIDTH       ,
@@ -729,10 +729,10 @@ begin
     ASYNC: if (M_CLK_RATE = 0 and T_CLK_RATE = 0) generate
         process begin
             M_CLK <= '1'; wait for M_CLK_PERIOD/2;
-            T_CLK <= '0'; wait for T_CLK_PERIOD/2;
+            M_CLK <= '0'; wait for M_CLK_PERIOD/2;
         end process;
         process begin
-            M_CLK <= '1'; wait for M_CLK_PERIOD/2;
+            T_CLK <= '1'; wait for T_CLK_PERIOD/2;
             T_CLK <= '0'; wait for T_CLK_PERIOD/2;
         end process;
         M_CKE <= '1';

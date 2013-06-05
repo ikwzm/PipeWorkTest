@@ -12,7 +12,7 @@
     <!-- Copyright (c) 1995-2012 Xilinx, Inc.  All rights reserved. -->
   </header>
 
-  <version xil_pn:ise_version="14.2" xil_pn:schema_version="2"/>
+  <version xil_pn:ise_version="14.5" xil_pn:schema_version="2"/>
 
   <files>
     <file xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/core.vhd" xil_pn:type="FILE_VHDL">
@@ -28,11 +28,6 @@
     <file xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/reader.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="24"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="3"/>
-      <library xil_pn:name="Dummy_Plug"/>
-    </file>
-    <file xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/sync.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="23"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="4"/>
       <library xil_pn:name="Dummy_Plug"/>
     </file>
     <file xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/util.vhd" xil_pn:type="FILE_VHDL">
@@ -274,6 +269,11 @@
       <association xil_pn:name="Implementation" xil_pn:seqID="62"/>
       <library xil_pn:name="PipeWork"/>
     </file>
+    <file xil_pn:name="../../../Dummy_Plug/src/main/vhdl/core/sync.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="23"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="65"/>
+      <library xil_pn:name="Dummy_Plug"/>
+    </file>
   </files>
 
   <properties>
@@ -305,7 +305,7 @@
     <property xil_pn:name="Compile SIMPRIM (Timing) Simulation Library" xil_pn:value="true" xil_pn:valueState="default"/>
     <property xil_pn:name="Compile UNISIM (Functional) Simulation Library" xil_pn:value="true" xil_pn:valueState="default"/>
     <property xil_pn:name="Compile XilinxCoreLib (CORE Generator) Simulation Library" xil_pn:value="true" xil_pn:valueState="default"/>
-    <property xil_pn:name="Compile for HDL Debugging" xil_pn:value="true" xil_pn:valueState="default"/>
+    <property xil_pn:name="Compile for HDL Debugging" xil_pn:value="false" xil_pn:valueState="non-default"/>
     <property xil_pn:name="Configuration Clk (Configuration Pins)" xil_pn:value="Pull Up" xil_pn:valueState="default"/>
     <property xil_pn:name="Configuration Pin Done" xil_pn:value="Pull Up" xil_pn:valueState="default"/>
     <property xil_pn:name="Configuration Pin M0" xil_pn:value="Pull Up" xil_pn:valueState="default"/>
