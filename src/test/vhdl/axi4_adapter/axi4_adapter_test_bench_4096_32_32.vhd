@@ -47,7 +47,7 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH_4096_32_32 is
 begin
     TB: AXI4_ADAPTER_TEST_BENCH generic map (
         NAME            => string'("AXI4_ADAPTER_TEST_BENCH_4096_32_32"),
-        SCENARIO_FILE   => string'("axi4_adapter_test_bench_4096.snr"),
+        SCENARIO_FILE   => string'("axi4_adapter_test_bench_4096_32_32.snr"),
         T_CLK_RATE      => 1,
         T_CLK_PERIOD    => 10 ns,
         M_CLK_RATE      => 1,
