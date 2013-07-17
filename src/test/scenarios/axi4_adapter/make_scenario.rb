@@ -4,6 +4,7 @@
 require 'optparse'
 require 'pp'
 require_relative "../../../../Dummy_Plug/tools/Dummy_Plug/ScenarioWriter/axi4"
+require_relative "../../../../Dummy_Plug/tools/Dummy_Plug/ScenarioWriter/number-generater"
 class ScenarioGenerater
 
   def initialize
@@ -37,44 +38,78 @@ class ScenarioGenerater
     @opt.parse(argv)
   end
 
+  def data_size_array(width)
+    return (0..12).to_a.select{|i| 8*(2**i) <= width}
+  end
+
+  def gen_write(io, address, data, t_size, t_seq, m_seq)
+    t_tran  = @t_model.write_transaction.clone({:Address => address, :Data => data, :DataSize => t_size})
+    m_tran  = @m_model.write_transaction.clone({:Address => address, :Data => data})
+    io.print @t_model.execute(t_tran, t_seq)
+    io.print @m_model.execute(m_tran, m_seq)
+  end
+
+  def gen_read(io, address, data, t_size, t_seq, m_seq)
+    t_tran  = @t_model.read_transaction.clone({:Address => address, :Data => data, :DataSize => t_size})
+    if (@t_axi4_data_width > @m_axi4_data_width) then
+      t_req_size = t_tran.estimate_request_size
+      m_dmy_size = t_req_size - data.size
+      m_data = data + Array.new(m_dmy_size, 0xFF)
+    else
+      m_data = data
+    end
+    m_tran  = @m_model.read_transaction.clone({:Address => address, :Data => m_data})
+    io.print @t_model.execute(t_tran, t_seq)
+    io.print @m_model.execute(m_tran, m_seq)
+  end
+
   def test_1(io)
-    test_num = 0
-    (1..200).each {|num|  
-      title   = @name.to_s + ".1." + num.to_s
+    read_write_select  = Dummy_Plug::ScenarioWriter::RandomNumberGenerater.new([0,1])
+    t_data_size_select = Dummy_Plug::ScenarioWriter::RandomNumberGenerater.new(data_size_array(@t_axi4_data_width))
+    (1..1000).each {|num|  
+      title   = sprintf("%s.1.%-5d", @name.to_s, num)
       address = rand(@t_max_xfer_size)
-      size    = rand(@t_max_xfer_size) % 256
+      size    = rand(255)+1
       if ((address % @t_max_xfer_size) + size) > @t_max_xfer_size then
         size = @t_max_xfer_size - (address % @t_max_xfer_size)
       end
       data    = (1..size).collect{rand(256)}
-      t_tran  = @t_model.read_transaction.clone({:Address => address, :Data => data})
-      m_tran  = @m_model.read_transaction.clone({:Address => address, :Data => data})
-      io.print "---\n"
-      io.print "- MARCHAL : \n"
-      io.print "  - SAY : ", title, "\n"
-      io.print @t_model.execute(t_tran)
-      io.print @m_model.execute(m_tran)
+      t_size  = t_data_size_select.next
+      t_seq   = @t_model.default_sequence.clone({})
+      m_seq   = @m_model.default_sequence.clone({})
+      if read_write_select.next == 1 then
+        io.print "---\n"
+        io.print "- N : \n"
+        io.print "  - SAY : ", title, sprintf(" WRITE ADDR=0x%08X, SIZE=%-3d, DATA_SIZE=%d\n", address, size, 2**t_size)
+        gen_write(io, address, data, t_size, t_seq, m_seq)
+      else
+        io.print "---\n"
+        io.print "- N : \n"
+        io.print "  - SAY : ", title, sprintf(" READ  ADDR=0x%08X, SIZE=%-3d, DATA_SIZE=%d\n", address, size, 2**t_size)
+        gen_read(io, address, data, t_size, t_seq, m_seq)
+      end
     }
     io.print "---\n"
   end
 
   def test_2(io)
-    test_num = 0
-    (1..200).each {|num|  
-      title   = @name.to_s + ".1." + num.to_s
+    (1..500).each {|num|  
+      title   = @name.to_s + ".2." + num.to_s
       address = rand(@t_max_xfer_size)
-      size    = rand(@t_max_xfer_size) % 256
+      size    = rand(255)+1
       if ((address % @t_max_xfer_size) + size) > @t_max_xfer_size then
         size = @t_max_xfer_size - (address % @t_max_xfer_size)
       end
       data    = (1..size).collect{rand(256)}
+      t_seq   = @t_model.default_sequence.clone({})
       t_tran  = @t_model.write_transaction.clone({:Address => address, :Data => data})
+      m_seq   = @m_model.default_sequence.clone({})
       m_tran  = @m_model.write_transaction.clone({:Address => address, :Data => data})
       io.print "---\n"
-      io.print "- MARCHAL : \n"
-      io.print "  - SAY : ", title, "\n"
-      io.print @t_model.execute(t_tran)
-      io.print @m_model.execute(m_tran)
+      io.print "- N : \n"
+      io.print "  - SAY : ", title, sprintf(" WRITE ADDR=0x%08X, SIZE=%d\n", address, size)
+      io.print @t_model.execute(t_tran, t_seq)
+      io.print @m_model.execute(m_tran, m_seq)
     }
     io.print "---\n"
   end
@@ -106,11 +141,11 @@ class ScenarioGenerater
                 " T_MAX_XFER_SIZE=" + @t_max_xfer_size.to_s   +
                 " M_MAX_XFER_SIZE=" + @m_max_xfer_size.to_s
     io.print "---\n"
-    io.print "- MARCHAL : \n"
+    io.print "- N : \n"
     io.print "  - SAY : ", title, "\n"
     @test_items.each {|item|
         test_1(io) if (item == 1)
-        test_2(io) if (item == 2)
+     #  test_2(io) if (item == 2)
      #  test_3(io) if (item == 3)
      #  test_4(io) if (item == 4)
      #  test_5(io) if (item == 5)
