@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_write_adapter_test_bench.vhd
---!     @brief   TEST BENCH for AXI4_WRITE_ADPATER
---!     @version 0.0.1
---!     @date    2013/4/14
+--!     @brief   TEST BENCH for AXI4_ADPATER
+--!     @version 1.5.0
+--!     @date    2013/7/17
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -47,7 +47,7 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH_4096_32_32 is
 begin
     TB: AXI4_ADAPTER_TEST_BENCH generic map (
         NAME            => string'("AXI4_ADAPTER_TEST_BENCH_4096_32_32"),
-        SCENARIO_FILE   => string'("axi4_adapter_test_bench_4096.snr"),
+        SCENARIO_FILE   => string'("axi4_adapter_test_bench_4096_32_32.snr"),
         T_CLK_RATE      => 1,
         T_CLK_PERIOD    => 10 ns,
         M_CLK_RATE      => 1,

@@ -79,6 +79,8 @@ architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH is
                                  ARADDR      => AXI4_ADDR_WIDTH,
                                  WDATA       => AXI4_DATA_WIDTH,
                                  RDATA       => AXI4_DATA_WIDTH,
+                                 ALEN        => AXI4_ALEN_WIDTH,
+                                 ALOCK       => AXI4_ALOCK_WIDTH,
                                  ARUSER      => 1,
                                  AWUSER      => 1,
                                  WUSER       => 1,
@@ -99,10 +101,10 @@ architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH is
     ------------------------------------------------------------------------------
     signal   ARADDR          : std_logic_vector(WIDTH.ARADDR -1 downto 0);
     signal   ARWRITE         : std_logic;
-    signal   ARLEN           : AXI4_ALEN_TYPE;
+    signal   ARLEN           : std_logic_vector(WIDTH.ALEN   -1 downto 0);
     signal   ARSIZE          : AXI4_ASIZE_TYPE;
     signal   ARBURST         : AXI4_ABURST_TYPE;
-    signal   ARLOCK          : AXI4_ALOCK_TYPE;
+    signal   ARLOCK          : std_logic_vector(WIDTH.ALOCK  -1 downto 0);
     signal   ARCACHE         : AXI4_ACACHE_TYPE;
     signal   ARPROT          : AXI4_APROT_TYPE;
     signal   ARQOS           : AXI4_AQOS_TYPE;
@@ -125,10 +127,10 @@ architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH is
     -- ライトアドレスチャネルシグナル.
     -------------------------------------------------------------------------------
     signal   AWADDR          : std_logic_vector(WIDTH.AWADDR -1 downto 0);
-    signal   AWLEN           : AXI4_ALEN_TYPE;
+    signal   AWLEN           : std_logic_vector(WIDTH.ALEN   -1 downto 0);
     signal   AWSIZE          : AXI4_ASIZE_TYPE;
     signal   AWBURST         : AXI4_ABURST_TYPE;
-    signal   AWLOCK          : AXI4_ALOCK_TYPE;
+    signal   AWLOCK          : std_logic_vector(WIDTH.ALOCK  -1 downto 0);
     signal   AWCACHE         : AXI4_ACACHE_TYPE;
     signal   AWPROT          : AXI4_APROT_TYPE;
     signal   AWQOS           : AXI4_AQOS_TYPE;

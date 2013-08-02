@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_adapter.vhd
 --!     @brief   AXI4_ADPATER
---!     @version 0.0.1
---!     @date    2013/4/15
+--!     @version 1.5.0
+--!     @date    2013/6/5
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -49,7 +49,7 @@ entity  AXI4_ADAPTER is
         AXI4_ID_WIDTH       : --! @brief AXI4 ID WIDTH :
                               --! AXI4 アドレスチャネルおよびライトレスポンスチャネ
                               --! ルのID信号のビット幅.
-                              integer range 1 to AXI4_ID_MAX_WIDTH;
+                              integer range 1 to AXI4_ID_MAX_WIDTH := 4;
         AXI4_AUSER_WIDTH    : --! @brief AXI4 ADDRESS USER WIDTH :
                               --! AXI4 アドレスチャネルおよびライトレスポンスチャネ
                               --! ルのAUSER信号のビット幅.
@@ -92,10 +92,10 @@ entity  AXI4_ADAPTER is
         T_AWID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
         T_AWUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
         T_AWADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-        T_AWLEN             : in    AXI4_ALEN_TYPE;
+        T_AWLEN             : in    std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
         T_AWSIZE            : in    AXI4_ASIZE_TYPE;
         T_AWBURST           : in    AXI4_ABURST_TYPE;
-        T_AWLOCK            : in    AXI4_ALOCK_TYPE;
+        T_AWLOCK            : in    std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
         T_AWCACHE           : in    AXI4_ACACHE_TYPE;
         T_AWPROT            : in    AXI4_APROT_TYPE;
         T_AWQOS             : in    AXI4_AQOS_TYPE;
@@ -114,10 +114,10 @@ entity  AXI4_ADAPTER is
         T_ARID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
         T_ARUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
         T_ARADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-        T_ARLEN             : in    AXI4_ALEN_TYPE;
+        T_ARLEN             : in    std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
         T_ARSIZE            : in    AXI4_ASIZE_TYPE;
         T_ARBURST           : in    AXI4_ABURST_TYPE;
-        T_ARLOCK            : in    AXI4_ALOCK_TYPE;
+        T_ARLOCK            : in    std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
         T_ARCACHE           : in    AXI4_ACACHE_TYPE;
         T_ARPROT            : in    AXI4_APROT_TYPE;
         T_ARQOS             : in    AXI4_AQOS_TYPE;
@@ -139,10 +139,10 @@ entity  AXI4_ADAPTER is
         M_AWID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
         M_AWUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
         M_AWADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-        M_AWLEN             : out   AXI4_ALEN_TYPE;
+        M_AWLEN             : out   std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
         M_AWSIZE            : out   AXI4_ASIZE_TYPE;
         M_AWBURST           : out   AXI4_ABURST_TYPE;
-        M_AWLOCK            : out   AXI4_ALOCK_TYPE;
+        M_AWLOCK            : out   std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
         M_AWCACHE           : out   AXI4_ACACHE_TYPE;
         M_AWPROT            : out   AXI4_APROT_TYPE;
         M_AWQOS             : out   AXI4_AQOS_TYPE;
@@ -162,10 +162,10 @@ entity  AXI4_ADAPTER is
         M_ARID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
         M_ARUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
         M_ARADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-        M_ARLEN             : out   AXI4_ALEN_TYPE;
+        M_ARLEN             : out   std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
         M_ARSIZE            : out   AXI4_ASIZE_TYPE;
         M_ARBURST           : out   AXI4_ABURST_TYPE;
-        M_ARLOCK            : out   AXI4_ALOCK_TYPE;
+        M_ARLOCK            : out   std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
         M_ARCACHE           : out   AXI4_ACACHE_TYPE;
         M_ARPROT            : out   AXI4_APROT_TYPE;
         M_ARQOS             : out   AXI4_AQOS_TYPE;
@@ -209,10 +209,10 @@ architecture RTL of AXI4_ADAPTER is
             T_AWID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
             T_AWUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
             T_AWADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-            T_AWLEN             : in    AXI4_ALEN_TYPE;
+            T_AWLEN             : in    std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
             T_AWSIZE            : in    AXI4_ASIZE_TYPE;
             T_AWBURST           : in    AXI4_ABURST_TYPE;
-            T_AWLOCK            : in    AXI4_ALOCK_TYPE;
+            T_AWLOCK            : in    std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
             T_AWCACHE           : in    AXI4_ACACHE_TYPE;
             T_AWPROT            : in    AXI4_APROT_TYPE;
             T_AWQOS             : in    AXI4_AQOS_TYPE;
@@ -234,10 +234,10 @@ architecture RTL of AXI4_ADAPTER is
             M_AWID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
             M_AWUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
             M_AWADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-            M_AWLEN             : out   AXI4_ALEN_TYPE;
+            M_AWLEN             : out   std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
             M_AWSIZE            : out   AXI4_ASIZE_TYPE;
             M_AWBURST           : out   AXI4_ABURST_TYPE;
-            M_AWLOCK            : out   AXI4_ALOCK_TYPE;
+            M_AWLOCK            : out   std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
             M_AWCACHE           : out   AXI4_ACACHE_TYPE;
             M_AWPROT            : out   AXI4_APROT_TYPE;
             M_AWQOS             : out   AXI4_AQOS_TYPE;
@@ -279,10 +279,10 @@ architecture RTL of AXI4_ADAPTER is
             T_ARID              : in    std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
             T_ARUSER            : in    std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
             T_ARADDR            : in    std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-            T_ARLEN             : in    AXI4_ALEN_TYPE;
+            T_ARLEN             : in    std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
             T_ARSIZE            : in    AXI4_ASIZE_TYPE;
             T_ARBURST           : in    AXI4_ABURST_TYPE;
-            T_ARLOCK            : in    AXI4_ALOCK_TYPE;
+            T_ARLOCK            : in    std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
             T_ARCACHE           : in    AXI4_ACACHE_TYPE;
             T_ARPROT            : in    AXI4_APROT_TYPE;
             T_ARQOS             : in    AXI4_AQOS_TYPE;
@@ -301,10 +301,10 @@ architecture RTL of AXI4_ADAPTER is
             M_ARID              : out   std_logic_vector(AXI4_ID_WIDTH   -1 downto 0);
             M_ARUSER            : out   std_logic_vector(AXI4_AUSER_WIDTH-1 downto 0);
             M_ARADDR            : out   std_logic_vector(AXI4_ADDR_WIDTH -1 downto 0);
-            M_ARLEN             : out   AXI4_ALEN_TYPE;
+            M_ARLEN             : out   std_logic_vector(AXI4_ALEN_WIDTH -1 downto 0);
             M_ARSIZE            : out   AXI4_ASIZE_TYPE;
             M_ARBURST           : out   AXI4_ABURST_TYPE;
-            M_ARLOCK            : out   AXI4_ALOCK_TYPE;
+            M_ARLOCK            : out   std_logic_vector(AXI4_ALOCK_WIDTH-1 downto 0);
             M_ARCACHE           : out   AXI4_ACACHE_TYPE;
             M_ARPROT            : out   AXI4_APROT_TYPE;
             M_ARQOS             : out   AXI4_AQOS_TYPE;
