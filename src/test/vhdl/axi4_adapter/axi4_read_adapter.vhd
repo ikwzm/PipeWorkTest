@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_read_adapter.vhd
 --!     @brief   AXI4_READ_ADPATER
---!     @version 1.5.0
---!     @date    2013/5/24
+--!     @version 1.5.1
+--!     @date    2013/8/24
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -49,7 +49,7 @@ entity  AXI4_READ_ADAPTER is
         AXI4_ID_WIDTH       : --! @brief AXI4 ID WIDTH :
                               --! AXI4 アドレスチャネルおよびライトレスポンスチャネ
                               --! ルのID信号のビット幅.
-                              integer range 1 to AXI4_ID_MAX_WIDTH;
+                              integer := 4;
         AXI4_AUSER_WIDTH    : --! @brief AXI4 ADDRESS USER WIDTH :
                               --! AXI4 アドレスチャネルおよびライトレスポンスチャネ
                               --! ルのAUSER信号のビット幅.

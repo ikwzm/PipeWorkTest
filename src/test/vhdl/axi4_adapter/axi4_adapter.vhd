@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_adapter.vhd
 --!     @brief   AXI4_ADPATER
---!     @version 1.5.0
---!     @date    2013/6/5
+--!     @version 1.5.1
+--!     @date    2013/8/24
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -49,7 +49,7 @@ entity  AXI4_ADAPTER is
         AXI4_ID_WIDTH       : --! @brief AXI4 ID WIDTH :
                               --! AXI4 アドレスチャネルおよびライトレスポンスチャネ
                               --! ルのID信号のビット幅.
-                              integer range 1 to AXI4_ID_MAX_WIDTH := 4;
+                              integer := 4;
         AXI4_AUSER_WIDTH    : --! @brief AXI4 ADDRESS USER WIDTH :
                               --! AXI4 アドレスチャネルおよびライトレスポンスチャネ
                               --! ルのAUSER信号のビット幅.
@@ -191,7 +191,7 @@ architecture RTL of AXI4_ADAPTER is
     -------------------------------------------------------------------------------
     component AXI4_WRITE_ADAPTER
         generic (
-            AXI4_ID_WIDTH       : integer range 1 to AXI4_ID_MAX_WIDTH;
+            AXI4_ID_WIDTH       : integer := 4;
             AXI4_AUSER_WIDTH    : integer := 1;
             AXI4_ADDR_WIDTH     : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             T_CLK_RATE          : integer :=  1;
@@ -261,7 +261,7 @@ architecture RTL of AXI4_ADAPTER is
     -------------------------------------------------------------------------------
     component AXI4_READ_ADAPTER
         generic (
-            AXI4_ID_WIDTH       : integer range 1 to AXI4_ID_MAX_WIDTH;
+            AXI4_ID_WIDTH       : integer ;
             AXI4_AUSER_WIDTH    : integer := 1;
             AXI4_ADDR_WIDTH     : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             T_CLK_RATE          : integer :=  1;
