@@ -48,16 +48,16 @@ entity  PUMP_AXI4_TO_AXI4 is
     generic (
         C_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
         C_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        C_ID_WIDTH      : integer range 1 to AXI4_ID_MAX_WIDTH   := AXI4_ID_MAX_WIDTH;
+        C_ID_WIDTH      : integer                                :=  4;
         M_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
         M_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        M_ID_WIDTH      : integer range 1 to AXI4_ID_MAX_WIDTH   := AXI4_ID_MAX_WIDTH;
+        M_ID_WIDTH      : integer                                :=  4;
         M_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
         M_AXI_ID        : integer                                :=  1;
         I_AXI_ID        : integer                                :=  1;
         I_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
         I_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        I_ID_WIDTH      : integer range 1 to AXI4_ID_MAX_WIDTH   := AXI4_ID_MAX_WIDTH;
+        I_ID_WIDTH      : integer                                :=  4;
         I_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
         I_RUSER_WIDTH   : integer range 1 to 32                  :=  4;
         I_WUSER_WIDTH   : integer range 1 to 32                  :=  4;
@@ -67,7 +67,7 @@ entity  PUMP_AXI4_TO_AXI4 is
         O_AXI_ID        : integer                                :=  2;
         O_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
         O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        O_ID_WIDTH      : integer range 1 to AXI4_ID_MAX_WIDTH   := AXI4_ID_MAX_WIDTH;
+        O_ID_WIDTH      : integer                                :=  4;
         O_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
         O_RUSER_WIDTH   : integer range 1 to 32                  :=  4;
         O_WUSER_WIDTH   : integer range 1 to 32                  :=  4;
@@ -863,7 +863,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             I_CLK_RATE      : integer                                :=  1;
             I_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             I_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-            I_ID_WIDTH      : integer range 1 to AXI4_ID_MAX_WIDTH   := AXI4_ID_MAX_WIDTH;
+            I_ID_WIDTH      : integer                                :=  4;
             I_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
             I_RUSER_WIDTH   : integer range 1 to 32                  :=  4;
             I_AXI_ID        : integer                                :=  1;
@@ -876,7 +876,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             O_CLK_RATE      : integer                                :=  1;
             O_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-            O_ID_WIDTH      : integer range 1 to AXI4_ID_MAX_WIDTH   := AXI4_ID_MAX_WIDTH;
+            O_ID_WIDTH      : integer                                :=  4;
             O_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
             O_WUSER_WIDTH   : integer range 1 to 32                  :=  4;
             O_BUSER_WIDTH   : integer range 1 to 32                  :=  4;
