@@ -5,9 +5,6 @@ DUMMY_PLUG_SRC_PATH    = ../../../Dummy_Plug/src/main/vhdl
 PIPEWORK_SRC_MAIN_PATH = ../../../PipeWork/src
 PIPEWORK_SRC_TEST_PATH = ../../../src/test/vhdl
 
-clean:
-	rm -f *.o *.cf test_bench_all
-
 test_bench_all: test_bench.o 
 	 $(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
