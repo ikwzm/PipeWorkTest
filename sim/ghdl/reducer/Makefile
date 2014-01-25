@@ -1,5 +1,5 @@
 GHDL=ghdl
-GHDLFLAGS=--mb-comments -P../../../PipeWork/sim/ghdl
+GHDLFLAGS=--mb-comments -P../../../PipeWork/sim/ghdl -P../../../Dummy_Plug/sim/ghdl/dummy_plug
 
 SRC_MAIN_PATH = ../../../PipeWork/src/components
 SRC_TEST_PATH = ../../../src/test/vhdl/reducer
