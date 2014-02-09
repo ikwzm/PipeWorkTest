@@ -20,6 +20,8 @@ architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J is
     constant   QUEUE_SIZE     : integer := %Q;
     constant   FLUSH_ENABLE   : integer :=  1;
     constant   I_JUSTIFIED    : integer := %J;
+    constant   O_SHIFT_MAX    : integer := O_WIDTH;
+    constant   O_SHIFT_MIN    : integer := 0;
     constant   NAME           : string(1 to 19) := "DWC_W%W_I%I_O%O_Q%Q_J%J";
     constant   PERIOD         : time    := 10 ns;
     constant   DELAY          : time    :=  1 ns;
@@ -45,6 +47,7 @@ architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J is
     signal     O_FLUSH        : std_logic;
     signal     O_VAL          : std_logic;
     signal     O_RDY          : std_logic;
+    signal     O_SHIFT        : std_logic_vector(O_SHIFT_MAX downto O_SHIFT_MIN);
     constant   gnd            : std_logic_vector(O_WIDTH-1 downto 0) := (others => '0');
 begin
     U:REDUCER
@@ -56,6 +59,8 @@ begin
             QUEUE_SIZE    => QUEUE_SIZE,
             VALID_MIN     => 0,
             VALID_MAX     => 0,
+            O_SHIFT_MAX   => O_SHIFT_MAX,
+            O_SHIFT_MIN   => O_SHIFT_MIN,
             I_JUSTIFIED   => I_JUSTIFIED,
             FLUSH_ENABLE  => FLUSH_ENABLE
         )
@@ -81,6 +86,7 @@ begin
             O_DONE        => O_DONE,
             O_VAL         => O_VAL,
             O_RDY         => O_RDY,
+            O_SHIFT       => O_SHIFT,
             BUSY          => BUSY ,
             VALID         => open
         );
@@ -92,6 +98,8 @@ begin
             WORD_BITS     => WORD_BITS,
             I_WIDTH       => I_WIDTH,
             O_WIDTH       => O_WIDTH,
+            O_SHIFT_MAX   => O_SHIFT_MAX,
+            O_SHIFT_MIN   => O_SHIFT_MIN,
             I_JUSTIFIED   => I_JUSTIFIED,
             FLUSH_ENABLE  => FLUSH_ENABLE
         )
@@ -118,7 +126,8 @@ begin
             O_DONE        => O_DONE    ,
             O_FLUSH       => O_FLUSH   ,
             O_VAL         => O_VAL     ,
-            O_RDY         => O_RDY     
+            O_RDY         => O_RDY     ,
+            O_SHIFT       => O_SHIFT
         );
     process begin
         CLK <= '1'; wait for PERIOD/2;
