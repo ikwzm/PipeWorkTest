@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_read_adapter.vhd
 --!     @brief   AXI4_READ_ADPATER
---!     @version 1.5.1
---!     @date    2013/8/24
+--!     @version 1.5.4
+--!     @date    2014/2/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012,2013 Ichiro Kawazome
+--      Copyright (C) 2012-2014 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -273,6 +273,11 @@ architecture RTL of AXI4_READ_ADAPTER is
     signal    t_ack_error       : std_logic;
     signal    t_ack_stop        : std_logic;
     signal    t_ack_size        : std_logic_vector(SIZE_BITS-1 downto 0);
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    constant  t_req_stop        : std_logic := '0';
+    constant  t_req_pause       : std_logic := '0';
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -578,8 +583,7 @@ begin
             SIZE_VALID          => 1                   , --
             MODE_BITS           => MODE_BITS           , --
             BUF_DEPTH           => BUF_DEPTH           , --
-            M_COUNT_BITS        => SIZE_BITS           , --
-            T_COUNT_BITS        => SIZE_BITS           , --
+            COUNT_BITS          => SIZE_BITS           , --
             T_XFER_MAX_SIZE     => T_MAX_XFER_SIZE     , --
             -----------------------------------------------------------------------
             -- PUSH
@@ -644,6 +648,11 @@ begin
             T_ACK_ERROR         => t_ack_error         , -- Out :
             T_ACK_STOP          => t_ack_stop          , -- Out :
             T_ACK_SIZE          => t_ack_size          , -- Out :
+        ---------------------------------------------------------------------------
+        -- レスポンダ側からの制御信号入力(未使用).
+        ---------------------------------------------------------------------------
+            T_REQ_STOP          => t_req_stop          , -- In  :
+            T_REQ_PAUSE         => t_req_pause         , -- In  :
         ---------------------------------------------------------------------------
         -- レスポンダ側からのステータス信号入力.
         ---------------------------------------------------------------------------
