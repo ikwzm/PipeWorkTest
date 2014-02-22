@@ -592,7 +592,8 @@ begin
             SIZE_VALID          => 0                   , --
             MODE_BITS           => MODE_BITS           , --
             BUF_DEPTH           => BUF_DEPTH           , --
-            COUNT_BITS          => SIZE_BITS           , --
+            XFER_SIZE_BITS      => SIZE_BITS           , --
+            XFER_COUNT_BITS     => SIZE_BITS           , --
             T_XFER_MAX_SIZE     => T_MAX_XFER_SIZE     , --
             -----------------------------------------------------------------------
             -- PUSH
