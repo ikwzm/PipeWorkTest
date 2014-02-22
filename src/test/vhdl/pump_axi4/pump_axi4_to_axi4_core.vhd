@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4_core.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4)
---!     @version 0.1.0
---!     @date    2013/2/11
+--!     @version 0.2.0
+--!     @date    2014/2/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012,2013 Ichiro Kawazome
+--      Copyright (C) 2012-2014 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -537,12 +537,12 @@ begin
             AXI4_DATA_WIDTH     => I_DATA_WIDTH        , -- 
             AXI4_ID_WIDTH       => I_ID_WIDTH          , -- 
             VAL_BITS            => 1                   , -- 
-            SIZE_BITS           => SIZE_BITS           , -- 
             REQ_SIZE_BITS       => I_REG_SIZE_BITS     , -- 
             REQ_SIZE_VALID      => I_REQ_SIZE_VALID    , -- 
             FLOW_VALID          => I_FLOW_VALID        , -- 
             BUF_DATA_WIDTH      => BUF_DATA_WIDTH      , -- 
             BUF_PTR_BITS        => BUF_DEPTH           , -- 
+            XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => I_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => I_MAX_XFER_SIZE     , -- 
             QUEUE_SIZE          => I_RES_QUEUE           -- 
@@ -662,12 +662,12 @@ begin
             AXI4_DATA_WIDTH     => O_DATA_WIDTH        , -- 
             AXI4_ID_WIDTH       => O_ID_WIDTH          , -- 
             VAL_BITS            => 1                   , -- 
-            SIZE_BITS           => SIZE_BITS           , -- 
             REQ_SIZE_BITS       => O_REG_SIZE_BITS     , -- 
             REQ_SIZE_VALID      => O_REQ_SIZE_VALID    , -- 
             FLOW_VALID          => O_FLOW_VALID        , -- 
             BUF_DATA_WIDTH      => BUF_DATA_WIDTH      , -- 
             BUF_PTR_BITS        => BUF_DEPTH           , -- 
+            XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => O_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => O_MAX_XFER_SIZE     , -- 
             QUEUE_SIZE          => O_RES_QUEUE           -- 

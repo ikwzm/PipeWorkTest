@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4.vhd
 --!     @brief   Pump Sample Module (AXI4 to AXI4)
---!     @version 0.1.0
---!     @date    2013/2/11
+--!     @version 0.2.0
+--!     @date    2014/2/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012,2013 Ichiro Kawazome
+--      Copyright (C) 2012-2014 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -1324,12 +1324,12 @@ begin
                 AXI4_DATA_WIDTH => M_DATA_WIDTH      , -- 
                 AXI4_ID_WIDTH   => M_ID_WIDTH        , -- 
                 VAL_BITS        => 2                 , -- 
-                SIZE_BITS       => MR_SIZE_BITS      , -- 
                 REQ_SIZE_BITS   => MR_SIZE_BITS      , -- 
                 REQ_SIZE_VALID  => 1                 , -- 
                 FLOW_VALID      => 0                 , -- 
                 BUF_DATA_WIDTH  => 2**MR_BUF_WIDTH   , -- 
                 BUF_PTR_BITS    => MR_BUF_SIZE       , -- 
+                XFER_SIZE_BITS  => MR_SIZE_BITS      , -- 
                 XFER_MIN_SIZE   => MR_MAX_XFER_SIZE  , -- 
                 XFER_MAX_SIZE   => MR_MAX_XFER_SIZE  , -- 
                 QUEUE_SIZE      => MR_RES_QUEUE        -- 
@@ -1445,12 +1445,12 @@ begin
                 AXI4_DATA_WIDTH => M_DATA_WIDTH      , -- 
                 AXI4_ID_WIDTH   => M_ID_WIDTH        , -- 
                 VAL_BITS        => 2                 , -- 
-                SIZE_BITS       => MW_SIZE_BITS      , -- 
                 REQ_SIZE_BITS   => MW_SIZE_BITS      , -- 
                 REQ_SIZE_VALID  => 1                 , -- 
                 FLOW_VALID      => 0                 , -- 
                 BUF_DATA_WIDTH  => 2**MW_BUF_WIDTH   , -- 
                 BUF_PTR_BITS    => MW_BUF_SIZE       , -- 
+                XFER_SIZE_BITS  => MW_SIZE_BITS      , -- 
                 XFER_MIN_SIZE   => MW_MAX_XFER_SIZE  , -- 
                 XFER_MAX_SIZE   => MW_MAX_XFER_SIZE  , -- 
                 QUEUE_SIZE      => MW_RES_QUEUE        -- 

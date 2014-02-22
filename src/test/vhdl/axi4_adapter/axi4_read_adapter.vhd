@@ -2,7 +2,7 @@
 --!     @file    aix4_read_adapter.vhd
 --!     @brief   AXI4_READ_ADPATER
 --!     @version 1.5.4
---!     @date    2014/2/20
+--!     @date    2014/2/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -829,13 +829,13 @@ begin
             AXI4_ID_WIDTH       => AXI4_ID_WIDTH       , -- 
             AXI4_DATA_WIDTH     => M_DATA_WIDTH        , -- 
             VAL_BITS            => 1                   , -- 
-            SIZE_BITS           => SIZE_BITS           , -- 
             REQ_SIZE_BITS       => SIZE_BITS           , -- 
             REQ_SIZE_VALID      => 1                   , -- 
             FLOW_VALID          => 1                   , -- 
             BUF_DATA_WIDTH      => BUF_DATA_BITS       , -- 
             BUF_PTR_BITS        => BUF_DEPTH           , -- 
             ALIGNMENT_BITS      => ALIGNMENT_BITS      , -- 
+            XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => M_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => M_MAX_XFER_SIZE     , -- 
             QUEUE_SIZE          => 1                     -- 
