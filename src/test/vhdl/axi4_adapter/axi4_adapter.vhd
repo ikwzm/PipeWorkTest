@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_adapter.vhd
 --!     @brief   AXI4_ADPATER
---!     @version 1.5.1
---!     @date    2013/8/24
+--!     @version 1.5.4
+--!     @date    2014/2/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012,2013 Ichiro Kawazome
+--      Copyright (C) 2012-2014 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without

@@ -144,6 +144,8 @@ entity  REDUCER_TEST_MODEL is
         WORD_BITS     : integer := 32;
         I_WIDTH       : integer :=  1;
         O_WIDTH       : integer :=  4;
+        O_SHIFT_MIN   : integer :=  4;
+        O_SHIFT_MAX   : integer :=  4;
         I_JUSTIFIED   : integer :=  0;
         FLUSH_ENABLE  : integer :=  0;
         AUTO_FINISH   : integer :=  1
@@ -170,6 +172,7 @@ entity  REDUCER_TEST_MODEL is
         O_DONE        : in  std_logic := '0';
         O_VAL         : in  std_logic := '0';
         O_RDY         : out std_logic;
+        O_SHIFT       : out std_logic_vector(O_SHIFT_MAX downto O_SHIFT_MIN);
         BUSY          : in  std_logic;
         FINISH        : out std_logic
     );
@@ -182,54 +185,60 @@ use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
 use     std.textio.all;
 use     WORK.RANDOM_DATA_TABLE;
+library Dummy_Plug;
+use     Dummy_Plug.util.BIN_TO_STRING;
+use     Dummy_Plug.util.HEX_TO_STRING;
+use     Dummy_Plug.util.INTEGER_TO_STRING;
 architecture MODEL of REDUCER_TEST_MODEL is
     constant   I_BYTES        : integer := I_WIDTH*WORD_BITS/8;
     constant   O_BYTES        : integer := O_WIDTH*WORD_BITS/8;
     constant   HEX            : STRING(1 to 16) := "0123456789ABCDEF";
-    signal     SCENARIO       : STRING(1 to 5);
+    signal     SCENARIO       : STRING(1 to 5)  := "NONE.";
     signal     RECV_REQ       : boolean;
     signal     RECV_ACK       : boolean;
+    signal     RECV_DONE      : boolean;
     signal     RECV_FLUSH     : boolean;
     signal     RECV_EOD       : boolean;
     signal     RECV_ADDR      : integer;
     signal     RECV_SIZE      : integer;
     signal     RECV_MODE      : integer;
+    signal     RECV_SHIFT     : integer;
     signal     i_valid        : std_logic;
     signal     o_ready        : std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    -- function INT_TO_STRING(arg:integer;len:integer;space:character) return STRING is
-    --     variable str   : STRING(1 to len);
-    --     variable value : integer;
-    -- begin
-    --     value  := arg;
-    --     for i in str'right downto str'left loop
-    --         if (value > 0) then
-    --             case (value mod 10) is
-    --                 when 0      => str(i) := '0';
-    --                 when 1      => str(i) := '1';
-    --                 when 2      => str(i) := '2';
-    --                 when 3      => str(i) := '3';
-    --                 when 4      => str(i) := '4';
-    --                 when 5      => str(i) := '5';
-    --                 when 6      => str(i) := '6';
-    --                 when 7      => str(i) := '7';
-    --                 when 8      => str(i) := '8';
-    --                 when 9      => str(i) := '9';
-    --                 when others => str(i) := 'X';
-    --             end case;
-    --         else
-    --             if (i = str'right) then
-    --                 str(i) := '0';
-    --             else
-    --                 str(i) := space;
-    --             end if;
-    --         end if;
-    --         value := value / 10;
-    --     end loop;
-    --     return str;
-    -- end INT_TO_STRING;
+    function INT_TO_STRING(arg:integer;len:integer;space:character) return STRING is
+        variable str   : STRING(1 to len);
+        variable value : integer;
+    begin
+        value  := arg;
+        for i in str'right downto str'left loop
+            if (value > 0) then
+                case (value mod 10) is
+                    when 0      => str(i) := '0';
+                    when 1      => str(i) := '1';
+                    when 2      => str(i) := '2';
+                    when 3      => str(i) := '3';
+                    when 4      => str(i) := '4';
+                    when 5      => str(i) := '5';
+                    when 6      => str(i) := '6';
+                    when 7      => str(i) := '7';
+                    when 8      => str(i) := '8';
+                    when 9      => str(i) := '9';
+                    when others => str(i) := 'X';
+                end case;
+            else
+                if (i = str'right) then
+                    str(i) := '0';
+                else
+                    str(i) := space;
+                end if;
+            end if;
+            value := value / 10;
+        end loop;
+        return str;
+    end INT_TO_STRING;
 begin
     -------------------------------------------------------------------------------
     -- 
@@ -250,7 +259,7 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        procedure RECV_START (ADDR,SIZE,MODE:integer;FLUSH,EOD:boolean) is
+        procedure RECV_START (ADDR,SIZE,MODE,SHIFT:integer;FLUSH,EOD:boolean) is
         begin
             RECV_REQ  <= TRUE;
             RECV_ADDR <= ADDR;
@@ -258,6 +267,7 @@ begin
             RECV_MODE <= MODE;
             RECV_FLUSH<= FLUSH;
             RECV_EOD  <= EOD;
+            RECV_SHIFT<= SHIFT;
             wait until (CLK'event and CLK = '1' and RECV_ACK = TRUE);
             wait for DELAY;
             RECV_REQ  <= FALSE;
@@ -417,11 +427,11 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        SCENARIO <= "1.0.0";
+        SCENARIO <= "1.0.0";wait for 0 ns;
         for size in 1 to max_size loop
             for pos in 0 to max_addr loop
                 addr := pos*max_addr+pos;
-                RECV_START(addr,size,0,FALSE,TRUE);
+                RECV_START(addr,size,0,O_WIDTH,FALSE,TRUE);
                 OUTPUT    (addr,size  );
                 RECV_END;
             end loop;
@@ -429,11 +439,11 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        SCENARIO <= "2.0.0";
+        SCENARIO <= "2.0.0";wait for 0 ns;
         for size in 1 to max_size loop
             for pos in 0 to max_addr loop
                 addr := pos*max_addr+pos;
-                RECV_START(addr,size,1,FALSE,TRUE);
+                RECV_START(addr,size,1,O_WIDTH,FALSE,TRUE);
                 OUTPUT    (addr,size  );
                 RECV_END;
             end loop;
@@ -441,11 +451,11 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        SCENARIO <= "3.0.0";
+        SCENARIO <= "3.0.0";wait for 0 ns;
         for size in 1 to max_size loop
             for pos in 0 to max_addr loop
                 addr := pos*max_addr+pos;
-                RECV_START(addr,size,2,FALSE,TRUE);
+                RECV_START(addr,size,2,O_WIDTH,FALSE,TRUE);
                 OUTPUT    (addr,size  );
                 RECV_END;
             end loop;
@@ -453,13 +463,13 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        SCENARIO <= "4.0.0";
+        SCENARIO <= "4.0.0";wait for 0 ns;
         if (WORD_BITS = 8 and I_WIDTH > 1) then
             for size in 8 to 33 loop
                 for block_size in 1 to 11 loop
                     addr := 0;
                     remain_size := size;
-                    RECV_START(addr,size,0,FALSE,TRUE);
+                    RECV_START(addr,size,0,O_WIDTH,FALSE,TRUE);
                     initialize := TRUE;
                     while (remain_size > 0) loop
                         if (remain_size <= block_size) then
@@ -480,14 +490,14 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        SCENARIO <= "5.0.0";
+        SCENARIO <= "5.0.0";wait for 0 ns;
         if (WORD_BITS = 8 and I_WIDTH > 1) then
             for size in 8 to 15 loop
                 for block_size in 1 to 11 loop
                     for wait_count in 0 to 3 loop
                         addr := 0;
                         remain_size := size;
-                        RECV_START(addr,size,0,FALSE,FALSE);
+                        RECV_START(addr,size,0,O_WIDTH,FALSE,FALSE);
                         initialize := TRUE;
                         while (remain_size > 0) loop
                             if (remain_size <= block_size) then
@@ -519,19 +529,19 @@ begin
                     remain_size := size;
                     initialize := TRUE;
                     while (remain_size > 0) loop
-                     -- assert false report NAME & ":" & SCENARIO &
-                     --     " addr="        & INT_TO_STRING(addr,4,'0') &
-                     --     " size="        & INT_TO_STRING(size,4,'0') &
-                     --     " remain_size=" & INT_TO_STRING(remain_size,4,'0') &
-                     --     " block_size="  & INT_TO_STRING(block_size ,4,'0') severity note;
+                        assert false report NAME & ":" & SCENARIO &
+                            " addr="        & INTEGER_TO_STRING(addr       ) &
+                            " size="        & INTEGER_TO_STRING(size       ) &
+                            " remain_size=" & INTEGER_TO_STRING(remain_size) &
+                            " block_size="  & INTEGER_TO_STRING(block_size ) severity note;
                         if (remain_size <= block_size) then
-                            RECV_START(addr,remain_size,0,FALSE,TRUE);
+                            RECV_START(addr,remain_size,0,O_WIDTH,FALSE,TRUE);
                             OUTPUT(addr,remain_size,initialize, TRUE ,FALSE);
                             RECV_END;
                             addr := addr + remain_size;
                             remain_size := 0;
                         else
-                            RECV_START(addr,block_size, 0,TRUE, TRUE);
+                            RECV_START(addr,block_size, 0,O_WIDTH,TRUE, TRUE);
                             OUTPUT(addr,block_size ,initialize, FALSE,TRUE );
                             RECV_END;
                             addr := addr + block_size;
@@ -542,6 +552,29 @@ begin
                 end loop;
             end loop;
         end if;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        SCENARIO <= "7.0.0";wait for 0 ns;
+        for mode in 0 to 2 loop
+            for size in 1 to max_size loop
+                for pos in 0 to max_addr loop
+                 -- SCENARIO(3 to 3) <= INT_TO_STRING(pos,1,'0');
+                    for sft in O_WIDTH downto 1 loop
+                     -- SCENARIO(5 to 5) <= INT_TO_STRING(sft,1,'0');
+                        addr := pos*max_addr+pos;
+                     -- assert false report NAME & ":" & SCENARIO &
+                     --     " addr=" & INTEGER_TO_STRING(addr) &
+                     --     " size=" & INTEGER_TO_STRING(size) &
+                     --     " pos="  & INTEGER_TO_STRING(pos ) &
+                     --     " sft="  & INTEGER_TO_STRING(sft ) severity note;
+                        RECV_START(addr,size,mode,sft,FALSE,TRUE);
+                        OUTPUT    (addr,size  );
+                        RECV_END;
+                    end loop;
+                end loop;
+            end loop;
+        end loop;
         ---------------------------------------------------------------------------
         -- シミュレーション終了
         ---------------------------------------------------------------------------
@@ -569,14 +602,40 @@ begin
         variable strb        : std_logic_vector(O_STRB'range);
         variable end_of_data : std_logic;
         variable data_ok     : boolean;
+        variable first       : boolean;
+        variable shift_words : integer;
+        variable shift_bytes : integer;
+        variable o_size      : integer;
+        function gen_o_shift(n:integer) return std_logic_vector is
+            variable result  : std_logic_vector(O_SHIFT_MAX downto O_SHIFT_MIN);
+        begin
+            for i in result'range loop
+                if (i < n) then
+                    result(i) := '1';
+                else
+                    result(i) := '0';
+                end if;
+            end loop;
+            return result;
+        end function;
     begin
-        RECV_ACK <= FALSE;
-        O_RDY    <= '0';
-        o_ready  <= '0';
+        RECV_ACK  <= FALSE;
+        RECV_DONE <= FALSE;
+        O_SHIFT   <= (others => '0');
+        O_RDY     <= '0';
+        o_ready   <= '0';
         RECV_LOOP: loop
             wait until (CLK'event and CLK = '1' and RECV_REQ = TRUE);
             wait for DELAY;
+            first       := TRUE;
+            addr        := RECV_ADDR;
+            size        := RECV_SIZE;
+            shift_words := RECV_SHIFT;
+            shift_bytes := shift_words*(WORD_BITS/8);
+            lo_pos      := addr rem O_BYTES;
             RECV_ACK <= TRUE;
+            RECV_DONE<= FALSE;
+            O_SHIFT  <= gen_o_shift(shift_words);
             if (RECV_MODE = 0) then
                 O_RDY   <= '1';
                 o_ready <= '1';
@@ -584,8 +643,6 @@ begin
                 O_RDY   <= '0';
                 o_ready <= '0';
             end if;
-            addr  := RECV_ADDR;
-            size  := RECV_SIZE;
             CHK_LOOP: loop
                 wait until (CLK'event and CLK = '1' and O_VAL = '1');
                 if (RECV_MODE > 0) then
@@ -599,11 +656,22 @@ begin
                     o_ready <= '1';
                     wait until (CLK'event and CLK = '1' and O_VAL = '1');
                 end if;
-                lo_pos := addr rem O_BYTES;
                 RANDOM_DATA_TABLE.GET(O_BYTES,lo_pos,addr,size,len,data,strb,end_of_data);
-                addr   := addr + len;
-                size   := size - len;
-                assert (O_STRB = strb) report NAME & " Mismatch O_STRB" severity FAILURE;
+                if (lo_pos >= shift_bytes) then
+                    o_size := 0;
+                    lo_pos := lo_pos - shift_bytes;
+                else
+                    o_size := shift_bytes - lo_pos;
+                    lo_pos := 0;
+                end if;
+                if (len < o_size) then
+                    addr   := addr + len;
+                    size   := size - len;
+                else
+                    addr   := addr + o_size;
+                    size   := size - o_size;
+                end if;
+                assert (O_STRB = strb) report NAME & ":" & SCENARIO & " Mismatch O_STRB=" & BIN_TO_STRING(O_STRB) & " /= " & BIN_TO_STRING(strb) severity FAILURE;
                 data_ok := TRUE;
                 for i in O_STRB'range loop
                     if (O_STRB(i) = '1') then
@@ -612,23 +680,24 @@ begin
                         end if;
                     end if;
                 end loop;
-                assert (data_ok) report NAME & " Mismatch O_DATA" severity FAILURE;
+                assert (data_ok) report NAME & ":" & SCENARIO & " Mismatch O_DATA=" & HEX_TO_STRING(O_DATA) & " /= " & HEX_TO_STRING(data) severity FAILURE;
                 if (RECV_EOD = TRUE) then
                     if (FLUSH_ENABLE > 0 and RECV_FLUSH) then
                         assert (O_FLUSH = end_of_data)
-                            report NAME & " Mismatch O_FLUSH" severity FAILURE;
+                            report NAME & ":" & SCENARIO & " Mismatch O_FLUSH" severity FAILURE;
                     else
                         assert (O_DONE  = end_of_data)
-                            report NAME & " Mismatch O_DONE"  severity FAILURE;
+                            report NAME & ":" & SCENARIO & " Mismatch O_DONE"  severity FAILURE;
                     end if;
                 end if;
-                exit CHK_LOOP when  (end_of_data = '1');
+                exit CHK_LOOP when  (size <= 0);
                 wait for DELAY;
                 if (RECV_MODE > 0) then
                     O_RDY   <= '0';
                     o_ready <= '0';
                 end if;
             end loop;
+            RECV_DONE<= TRUE;
             if (RECV_EOD = FALSE) then
                 if (FLUSH_ENABLE > 0 and RECV_FLUSH) then
                     if (O_FLUSH = '0') then
@@ -642,6 +711,7 @@ begin
             end if;
             wait for DELAY;
             RECV_ACK <= FALSE;
+            RECV_DONE<= FALSE;
             O_RDY    <= '0';
             o_ready  <= '0';
         end loop;
@@ -655,23 +725,41 @@ begin
             CHK_LOOP_0: loop
                 wait until (CLK'event and CLK = '1');
                 assert (BUSY = '0') 
-                    report NAME & " Mismatch BUSY /= '0'" severity FAILURE;
+                    report NAME & ":" & SCENARIO & " Mismatch BUSY /= '0'" severity FAILURE;
                 exit CHK_LOOP_0 when (i_valid = '1' and I_RDY = '1');
             end loop;
             CHK_LOOP_1: loop
                 wait until (CLK'event and CLK = '1');
                 assert (BUSY = '1') 
-                    report NAME & " Mismatch BUSY /= '1'" severity FAILURE;
+                    report NAME & ":" & SCENARIO & " Mismatch BUSY /= '1'" severity FAILURE;
                 exit CHK_LOOP_1 when (O_VAL = '1' and o_ready = '1' and O_DONE  = '1') or
                                      (O_VAL = '1' and o_ready = '1' and O_FLUSH = '1');
             end loop;
             CHK_LOOP_2: loop
                 wait until (CLK'event and CLK = '1');
-                assert (BUSY = '0') 
-                    report NAME & " Mismatch BUSY /= '0'" severity FAILURE;
+                if (O_DONE = '1' or O_FLUSH = '1') then
+                    assert (BUSY = '1') 
+                        report NAME & ":" & SCENARIO & " Mismatch BUSY /= '1'" severity FAILURE;
+                else
+                    assert (BUSY = '0') 
+                        report NAME & ":" & SCENARIO & " Mismatch(1->0) BUSY /= '0'" severity FAILURE;
+                end if;
                 exit CHK_LOOP_2 when (RECV_ACK = FALSE);
             end loop;
         end loop;
+    end process;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    process (SCENARIO) begin
+        case SCENARIO is
+            when "NONE." | "START" =>
+                null;
+            when "DONE." =>
+                assert FALSE report NAME & " Scenario All Done..." severity NOTE;
+            when others  =>
+                assert FALSE report NAME & ":" & SCENARIO & " Start..." severity NOTE;
+        end case;
     end process;
 end MODEL;
 -----------------------------------------------------------------------------------
@@ -687,6 +775,8 @@ package COMPONENTS is
             WORD_BITS   : integer;
             I_WIDTH     : integer;
             O_WIDTH     : integer;
+            O_SHIFT_MIN : integer;
+            O_SHIFT_MAX : integer;
             I_JUSTIFIED : integer;
             FLUSH_ENABLE: integer;
             AUTO_FINISH : integer
@@ -713,6 +803,7 @@ package COMPONENTS is
             O_DONE      : in  std_logic := '0';
             O_VAL       : in  std_logic := '0';
             O_RDY       : out std_logic;
+            O_SHIFT     : out std_logic_vector(O_SHIFT_MAX downto O_SHIFT_MIN);
             BUSY        : in  std_logic;
             FINISH      : out std_logic
         );

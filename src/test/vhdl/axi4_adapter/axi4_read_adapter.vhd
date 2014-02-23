@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_read_adapter.vhd
 --!     @brief   AXI4_READ_ADPATER
---!     @version 1.5.1
---!     @date    2013/8/24
+--!     @version 1.5.4
+--!     @date    2014/2/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012,2013 Ichiro Kawazome
+--      Copyright (C) 2012-2014 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -196,6 +196,10 @@ architecture RTL of AXI4_READ_ADAPTER is
     -------------------------------------------------------------------------------
     constant  ALIGNMENT_BITS    : integer := MIN(T_DATA_WIDTH, M_DATA_WIDTH);
     -------------------------------------------------------------------------------
+    -- アライメントのバイト数を２のべき乗値で示す.
+    -------------------------------------------------------------------------------
+    constant  ALIGNMENT_SIZE    : integer := CALC_DATA_SIZE(ALIGNMENT_BITS/8);
+    -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     constant  M_DATA_BYTES      : integer := M_DATA_WIDTH/8;
@@ -256,14 +260,15 @@ architecture RTL of AXI4_READ_ADAPTER is
     signal    t_req_id          : std_logic_vector(AXI4_ID_WIDTH  -1 downto 0);
     signal    t_req_addr        : std_logic_vector(AXI4_ADDR_WIDTH-1 downto 0);
     signal    t_req_size        : std_logic_vector(SIZE_BITS-1 downto 0);
-    signal    t_req_buf_ptr     : std_logic_vector(BUF_DEPTH-1 downto 0);
     signal    t_req_mode        : std_logic_vector(MODE_BITS-1 downto 0);
     signal    t_req_burst       : AXI4_ABURST_TYPE;
-    constant  t_req_dir         : std_logic := '0';
-    signal    t_req_first       : std_logic;
-    signal    t_req_last        : std_logic;
     signal    t_req_valid       : std_logic;
+    signal    t_req_start       : std_logic;
     signal    t_req_ready       : std_logic;
+    signal    t_req_buf_ptr     : std_logic_vector(BUF_DEPTH-1 downto 0);
+    constant  t_req_dir         : std_logic := '0';
+    constant  t_req_first       : std_logic := '1';
+    constant  t_req_last        : std_logic := '1';
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -276,6 +281,12 @@ architecture RTL of AXI4_READ_ADAPTER is
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
+    constant  t_req_stop        : std_logic := '0';
+    constant  t_req_pause       : std_logic := '0';
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    constant  t_xfer_select     : std_logic_vector(0 downto 0) := "1";
     signal    t_xfer_busy       : std_logic;
     signal    t_xfer_done       : std_logic;
     -------------------------------------------------------------------------------
@@ -474,7 +485,8 @@ begin
             AXI4_ADDR_WIDTH     => AXI4_ADDR_WIDTH     , -- 
             AXI4_ID_WIDTH       => AXI4_ID_WIDTH       , -- 
             AXI4_DATA_WIDTH     => T_DATA_WIDTH        , -- 
-            SIZE_BITS           => SIZE_BITS           , -- 
+            XFER_SIZE_BITS      => SIZE_BITS           , --
+            VAL_BITS            => 1                   , --
             BUF_DATA_WIDTH      => BUF_DATA_BITS       , -- 
             BUF_PTR_BITS        => BUF_DEPTH           , -- 
             ALIGNMENT_BITS      => ALIGNMENT_BITS        -- 
@@ -509,10 +521,8 @@ begin
             REQ_SIZE            => t_req_size          , -- Out :
             REQ_ID              => t_req_id            , -- Out :
             REQ_BURST           => t_req_burst         , -- Out :
-            REQ_BUF_PTR         => t_req_buf_ptr       , -- Out :
-            REQ_FIRST           => t_req_first         , -- Out :
-            REQ_LAST            => t_req_last          , -- Out :
             REQ_VAL             => t_req_valid         , -- Out :
+            REQ_START           => t_req_start         , -- Out :
             REQ_RDY             => t_req_ready         , -- In  :
         ---------------------------------------------------------------------------
         -- Command Acknowledge Signals.
@@ -523,37 +533,44 @@ begin
             ACK_ERROR           => t_ack_error         , -- In  :
             ACK_SIZE            => t_ack_size          , -- In  :
         ---------------------------------------------------------------------------
+        -- Transfer Control Singal.
+        ---------------------------------------------------------------------------
+            XFER_START          => t_req_start         , -- In  :
+            XFER_LAST           => t_req_last          , -- In  :
+            XFER_SEL            => t_xfer_select       , -- In  :
+            XFER_BUF_PTR        => t_req_buf_ptr       , -- In  :
+        ---------------------------------------------------------------------------
         -- Transfer Status Signal.
         ---------------------------------------------------------------------------
-            XFER_BUSY           => t_xfer_busy         , -- Out :
-            XFER_DONE           => t_xfer_done         , -- Out :
+            XFER_BUSY(0)        => t_xfer_busy         , -- Out :
+            XFER_DONE(0)        => t_xfer_done         , -- Out :
         ---------------------------------------------------------------------------
         -- Pull Reserve Size Signals.
         ---------------------------------------------------------------------------
-            PULL_RSV_VAL        => t_pull_rsv_val      , -- Out :
+            PULL_RSV_VAL(0)     => t_pull_rsv_val      , -- Out :
             PULL_RSV_LAST       => t_pull_rsv_last     , -- Out :
             PULL_RSV_ERROR      => t_pull_rsv_err      , -- Out :
             PULL_RSV_SIZE       => t_pull_rsv_size     , -- Out :
         ---------------------------------------------------------------------------
         -- Pull Final Size Signals.
         ---------------------------------------------------------------------------
-            PULL_FIN_VAL        => t_pull_fin_val      , -- Out :
+            PULL_FIN_VAL(0)     => t_pull_fin_val      , -- Out :
             PULL_FIN_LAST       => t_pull_fin_last     , -- Out :
             PULL_FIN_ERROR      => t_pull_fin_err      , -- Out :
             PULL_FIN_SIZE       => t_pull_fin_size     , -- Out :
         ---------------------------------------------------------------------------
         -- Pull Buffer Size Signals.
         ---------------------------------------------------------------------------
-            PULL_BUF_RESET      => t_pull_buf_reset    , -- Out :
-            PULL_BUF_VAL        => t_pull_buf_val      , -- Out :
+            PULL_BUF_RESET(0)   => t_pull_buf_reset    , -- Out :
+            PULL_BUF_VAL(0)     => t_pull_buf_val      , -- Out :
             PULL_BUF_LAST       => t_pull_buf_last     , -- Out :
             PULL_BUF_ERROR      => t_pull_buf_err      , -- Out :
             PULL_BUF_SIZE       => t_pull_buf_size     , -- Out :
-            PULL_BUF_RDY        => t_pull_buf_rdy      , -- In  :
+            PULL_BUF_RDY(0)     => t_pull_buf_rdy      , -- In  :
         ---------------------------------------------------------------------------
         -- Read Buffer Interface Signals.
         ---------------------------------------------------------------------------
-            BUF_REN             => t_pool_read         , -- Out :
+            BUF_REN(0)          => t_pool_read         , -- Out :
             BUF_DATA            => t_pool_rdata        , -- In  :
             BUF_PTR             => t_pool_rptr           -- Out :
         );
@@ -568,6 +585,18 @@ begin
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
+    process (t_req_addr) begin
+        for i in t_req_buf_ptr'range loop
+            if (i < ALIGNMENT_SIZE) then
+                t_req_buf_ptr(i) <= t_req_addr(i);
+            else
+                t_req_buf_ptr(i) <= '0';
+            end if;
+        end loop;
+    end process;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     PIPE: PIPE_CORE_UNIT                                 -- 
         generic map (                                    -- 
             T_CLK_RATE          => T_CLK_RATE          , --
@@ -578,8 +607,8 @@ begin
             SIZE_VALID          => 1                   , --
             MODE_BITS           => MODE_BITS           , --
             BUF_DEPTH           => BUF_DEPTH           , --
-            M_COUNT_BITS        => SIZE_BITS           , --
-            T_COUNT_BITS        => SIZE_BITS           , --
+            XFER_SIZE_BITS      => SIZE_BITS           , --
+            XFER_COUNT_BITS     => SIZE_BITS           , --
             T_XFER_MAX_SIZE     => T_MAX_XFER_SIZE     , --
             -----------------------------------------------------------------------
             -- PUSH
@@ -644,6 +673,11 @@ begin
             T_ACK_ERROR         => t_ack_error         , -- Out :
             T_ACK_STOP          => t_ack_stop          , -- Out :
             T_ACK_SIZE          => t_ack_size          , -- Out :
+        ---------------------------------------------------------------------------
+        -- レスポンダ側からの制御信号入力(未使用).
+        ---------------------------------------------------------------------------
+            T_REQ_STOP          => t_req_stop          , -- In  :
+            T_REQ_PAUSE         => t_req_pause         , -- In  :
         ---------------------------------------------------------------------------
         -- レスポンダ側からのステータス信号入力.
         ---------------------------------------------------------------------------
@@ -819,13 +853,13 @@ begin
             AXI4_ID_WIDTH       => AXI4_ID_WIDTH       , -- 
             AXI4_DATA_WIDTH     => M_DATA_WIDTH        , -- 
             VAL_BITS            => 1                   , -- 
-            SIZE_BITS           => SIZE_BITS           , -- 
             REQ_SIZE_BITS       => SIZE_BITS           , -- 
             REQ_SIZE_VALID      => 1                   , -- 
             FLOW_VALID          => 1                   , -- 
             BUF_DATA_WIDTH      => BUF_DATA_BITS       , -- 
             BUF_PTR_BITS        => BUF_DEPTH           , -- 
             ALIGNMENT_BITS      => ALIGNMENT_BITS      , -- 
+            XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => M_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => M_MAX_XFER_SIZE     , -- 
             QUEUE_SIZE          => 1                     -- 
@@ -891,8 +925,8 @@ begin
         ---------------------------------------------------------------------------
         -- Transfer Status Signal.
         ---------------------------------------------------------------------------
-            XFER_BUSY           => m_xfer_busy         , -- Out :
-            XFER_DONE           => m_xfer_done         , -- Out :
+            XFER_BUSY(0)        => m_xfer_busy         , -- Out :
+            XFER_DONE(0)        => m_xfer_done         , -- Out :
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
