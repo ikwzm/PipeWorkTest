@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4.vhd
 --!     @brief   Pump Sample Module (AXI4 to AXI4)
---!     @version 0.2.0
---!     @date    2014/2/22
+--!     @version 0.2.1
+--!     @date    2014/2/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -1220,8 +1220,8 @@ begin
         signal   mr_req_last        : std_logic;
         signal   mr_req_valid       : std_logic_vector(1 downto 0);
         signal   mr_req_ready       : std_logic;
-        signal   mr_xfer_busy       : std_logic;
-        signal   mr_xfer_done       : std_logic;
+        signal   mr_xfer_busy       : std_logic_vector(1 downto 0);
+        signal   mr_xfer_done       : std_logic_vector(1 downto 0);
         signal   mr_ack_valid       : std_logic_vector(1 downto 0);
         signal   mr_ack_error       : std_logic;
         signal   mr_ack_next        : std_logic;
@@ -1229,14 +1229,10 @@ begin
         signal   mr_ack_stop        : std_logic;
         signal   mr_ack_none        : std_logic;
         signal   mr_ack_size        : std_logic_vector(MR_SIZE_BITS  -1 downto 0);
-        signal   mr_flow_pause      : std_logic;
-        signal   mr_flow_stop       : std_logic;
-        signal   mr_flow_last       : std_logic;
-        signal   mr_flow_size       : std_logic_vector(MR_SIZE_BITS  -1 downto 0);
-        signal   mr_push_valid      : std_logic_vector(1 downto 0);
-        signal   mr_push_size       : std_logic_vector(MR_SIZE_BITS  -1 downto 0);
-        signal   mr_push_last       : std_logic;
-        signal   mr_push_error      : std_logic;
+        constant mr_flow_pause      : std_logic := '0';
+        constant mr_flow_stop       : std_logic := '0';
+        constant mr_flow_last       : std_logic := '0';
+        constant mr_flow_size       : std_logic_vector(MR_SIZE_BITS  -1 downto 0) := (others => '1');
         signal   mr_buf_wen         : std_logic_vector(1 downto 0);
         signal   mr_buf_ben         : std_logic_vector(2**(MR_BUF_WIDTH-3)-1 downto 0);
         signal   mr_buf_wdata       : std_logic_vector(2**(MR_BUF_WIDTH  )-1 downto 0);
@@ -1268,8 +1264,8 @@ begin
         constant mw_req_last        : std_logic := '0';
         constant mw_req_valid       : std_logic_vector(1 downto 0) := (others => '0');
         signal   mw_req_ready       : std_logic;
-        signal   mw_xfer_busy       : std_logic;
-        signal   mw_xfer_done       : std_logic;
+        signal   mw_xfer_busy       : std_logic_vector(1 downto 0);
+        signal   mw_xfer_done       : std_logic_vector(1 downto 0);
         signal   mw_ack_valid       : std_logic_vector(1 downto 0);
         signal   mw_ack_error       : std_logic;
         signal   mw_ack_next        : std_logic;
@@ -1281,10 +1277,6 @@ begin
         constant mw_flow_stop       : std_logic := '0';
         constant mw_flow_last       : std_logic := '0';
         constant mw_flow_size       : std_logic_vector(MW_SIZE_BITS  -1 downto 0) := (others => '0');
-        signal   mw_pull_valid      : std_logic_vector(1 downto 0);
-        signal   mw_pull_size       : std_logic_vector(MW_SIZE_BITS  -1 downto 0);
-        signal   mw_pull_last       : std_logic;
-        signal   mw_pull_error      : std_logic;
         constant mw_buf_rdata       : std_logic_vector(2**(MW_BUF_WIDTH)-1 downto 0) := (others => '0');
         signal   mw_buf_rptr        : std_logic_vector(MW_BUF_SIZE   -1 downto 0);
         constant mw_buf_rready      : std_logic_vector(1 downto 0) := "00";
@@ -1297,9 +1289,6 @@ begin
         signal   po_req_first       : std_logic;
         signal   po_req_last        : std_logic;
         signal   po_req_valid       : std_logic;
-        signal   po_ack_valid       : std_logic;
-        signal   po_buf_wen         : std_logic;
-        signal   po_buf_wrdy        : std_logic;
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
@@ -1309,9 +1298,6 @@ begin
         signal   pi_req_first       : std_logic;
         signal   pi_req_last        : std_logic;
         signal   pi_req_valid       : std_logic;
-        signal   pi_ack_valid       : std_logic;
-        signal   pi_buf_wen         : std_logic;
-        signal   pi_buf_wrdy        : std_logic;
         signal   pi_mode_end        : std_logic;
         signal   pi_stat_end        : std_logic;
     begin
@@ -1400,10 +1386,10 @@ begin
             -----------------------------------------------------------------------
             -- Flow Control Signals.
             -----------------------------------------------------------------------
-                FLOW_PAUSE      => mr_flow_pause     , -- In  :
-                FLOW_STOP       => mr_flow_stop      , -- In  :
-                FLOW_LAST       => mr_flow_last      , -- In  :
-                FLOW_SIZE       => mr_flow_size      , -- In  :
+                FLOW_PAUSE      => mr_flow_pause     , -- In  : 未使用
+                FLOW_STOP       => mr_flow_stop      , -- In  : 未使用
+                FLOW_LAST       => mr_flow_last      , -- In  : 未使用
+                FLOW_SIZE       => mr_flow_size      , -- In  : 未使用
             -----------------------------------------------------------------------
             -- Push Reserve Size Signals.
             -----------------------------------------------------------------------
@@ -1414,10 +1400,10 @@ begin
             -----------------------------------------------------------------------
             -- Push Final Size Signals.
             -----------------------------------------------------------------------
-                PUSH_FIN_VAL    => mr_push_valid     , -- Out :
-                PUSH_FIN_SIZE   => mr_push_size      , -- Out :
-                PUSH_FIN_LAST   => mr_push_last      , -- Out :
-                PUSH_FIN_ERROR  => mr_push_error     , -- Out :
+                PUSH_FIN_VAL    => open              , -- Out :
+                PUSH_FIN_SIZE   => open              , -- Out :
+                PUSH_FIN_LAST   => open              , -- Out :
+                PUSH_FIN_ERROR  => open              , -- Out :
             -----------------------------------------------------------------------
             -- Push Buffer Signals.
             -----------------------------------------------------------------------
@@ -1528,10 +1514,10 @@ begin
             -----------------------------------------------------------------------
             -- Flow Control Signals.
             -----------------------------------------------------------------------
-                FLOW_PAUSE      => mw_flow_pause     , -- In  :
-                FLOW_STOP       => mw_flow_stop      , -- In  :
-                FLOW_LAST       => mw_flow_last      , -- In  :
-                FLOW_SIZE       => mw_flow_size      , -- In  :
+                FLOW_PAUSE      => mw_flow_pause     , -- In  : 未使用
+                FLOW_STOP       => mw_flow_stop      , -- In  : 未使用
+                FLOW_LAST       => mw_flow_last      , -- In  : 未使用
+                FLOW_SIZE       => mw_flow_size      , -- In  : 未使用
             -----------------------------------------------------------------------
             -- Pull Reserve Size Signals.
             -----------------------------------------------------------------------
@@ -1542,10 +1528,10 @@ begin
             -----------------------------------------------------------------------
             -- Pull Final Size Signals.
             -----------------------------------------------------------------------
-                PULL_FIN_VAL    => mw_pull_valid     , -- Out :
-                PULL_FIN_SIZE   => mw_pull_size      , -- Out :
-                PULL_FIN_LAST   => mw_pull_last      , -- Out :
-                PULL_FIN_ERROR  => mw_pull_error     , -- Out :
+                PULL_FIN_VAL    => open              , -- Out :
+                PULL_FIN_SIZE   => open              , -- Out :
+                PULL_FIN_LAST   => open              , -- Out :
+                PULL_FIN_ERROR  => open              , -- Out :
             -----------------------------------------------------------------------
             -- Pull Buffer Size Signals.
             -----------------------------------------------------------------------
@@ -1593,20 +1579,14 @@ begin
                     SHIFT       => shift           -- In  :
                 );
             request(0)      <= po_req_valid;
-            mr_req_valid(0) <= grant(0) and po_req_valid;
-            po_ack_valid    <= mr_ack_valid(0);
-            po_buf_wen      <= mr_buf_wen(0);
             request(1)      <= pi_req_valid;
+            mr_req_valid(0) <= grant(0) and po_req_valid;
             mr_req_valid(1) <= grant(1) and pi_req_valid;
-            pi_ack_valid    <= mr_ack_valid(1);
-            pi_buf_wen      <= mr_buf_wen(1);
             mr_req_addr     <= pi_req_addr  when (num = 1) else po_req_addr;
             mr_req_size     <= pi_req_size  when (num = 1) else po_req_size;
             mr_req_ptr      <= pi_req_ptr   when (num = 1) else po_req_ptr;
             mr_req_first    <= pi_req_first when (num = 1) else po_req_first;
             mr_req_last     <= pi_req_first when (num = 1) else po_req_last;
-            mr_buf_wready(0)<= po_buf_wrdy;
-            mr_buf_wready(1)<= pi_buf_wrdy;
             mr_cache        <= regs_rbit(PI_MODE_CACHE_HI downto PI_MODE_CACHE_LO) when (num = 1) else
                                regs_rbit(PO_MODE_CACHE_HI downto PO_MODE_CACHE_LO);
             shift <= '1' when (mr_ack_valid /= ALL0) else '0';
@@ -1622,11 +1602,8 @@ begin
             mr_req_ptr      <= po_req_ptr;
             mr_req_first    <= po_req_first;
             mr_req_last     <= po_req_last;
-            mr_buf_wready(0)<= po_buf_wrdy;
             mr_buf_wready(1)<= '0';
             mr_cache        <= regs_rbit(PO_MODE_CACHE_HI downto PO_MODE_CACHE_LO);
-            po_ack_valid    <= mr_ack_valid(0);
-            po_buf_wen      <= mr_buf_wen(0);
         end generate;
         ---------------------------------------------------------------------------
         -- 
@@ -1640,10 +1617,7 @@ begin
             mr_req_first    <= pi_req_first;
             mr_req_last     <= pi_req_last;
             mr_buf_wready(0)<= '0';
-            mr_buf_wready(1)<= pi_buf_wrdy;
             mr_cache        <= regs_rbit(PI_MODE_CACHE_HI downto PI_MODE_CACHE_LO);
-            pi_ack_valid    <= mr_ack_valid(1);
-            pi_buf_wen      <= mr_buf_wen(1);
         end generate;
         ---------------------------------------------------------------------------
         -- 
@@ -1696,20 +1670,20 @@ begin
                     M_REQ_FIRST     => po_req_first      , -- Out :
                     M_REQ_LAST      => po_req_last       , -- Out :
                     M_REQ_READY     => mr_req_ready      , -- In  :
-                    M_ACK_VALID     => po_ack_valid      , -- In  :
+                    M_ACK_VALID     => mr_ack_valid(0)   , -- In  :
                     M_ACK_ERROR     => mr_ack_error      , -- In  :
                     M_ACK_NEXT      => mr_ack_next       , -- In  :
                     M_ACK_LAST      => mr_ack_last       , -- In  :
                     M_ACK_STOP      => mr_ack_stop       , -- In  :
                     M_ACK_NONE      => mr_ack_none       , -- In  :
                     M_ACK_SIZE      => mr_ack_size       , -- In  :
-                    M_BUF_WE        => po_buf_wen        , -- In  :
+                    M_BUF_WE        => mr_buf_wen(0)     , -- In  :
                     M_BUF_BEN       => mr_buf_ben        , -- In  :
                     M_BUF_DATA      => mr_buf_wdata      , -- In  :
                     M_BUF_PTR       => mr_buf_wptr       , -- In  :
-                    M_BUF_RDY       => po_buf_wrdy       , -- Out :
-                    M_XFER_BUSY     => mr_xfer_busy      , -- In  :
-                    M_XFER_DONE     => mr_xfer_done      , -- In  :
+                    M_BUF_RDY       => mr_buf_wready(0)  , -- Out :
+                    M_XFER_BUSY     => mr_xfer_busy(0)   , -- In  :
+                    M_XFER_DONE     => mr_xfer_done(0)   , -- In  :
                 -------------------------------------------------------------------
                 -- Control Status Register Interface Signals.
                 -------------------------------------------------------------------
@@ -1869,20 +1843,20 @@ begin
                     M_REQ_FIRST     => pi_req_first      , -- Out :
                     M_REQ_LAST      => pi_req_last       , -- Out :
                     M_REQ_READY     => mr_req_ready      , -- In  :
-                    M_ACK_VALID     => pi_ack_valid      , -- In  :
+                    M_ACK_VALID     => mr_ack_valid(1)   , -- In  :
                     M_ACK_ERROR     => mr_ack_error      , -- In  :
                     M_ACK_NEXT      => mr_ack_next       , -- In  :
                     M_ACK_LAST      => mr_ack_last       , -- In  :
                     M_ACK_STOP      => mr_ack_stop       , -- In  :
                     M_ACK_NONE      => mr_ack_none       , -- In  :
                     M_ACK_SIZE      => mr_ack_size       , -- In  :
-                    M_BUF_WE        => pi_buf_wen        , -- In  :
+                    M_BUF_WE        => mr_buf_wen(1)     , -- In  :
                     M_BUF_BEN       => mr_buf_ben        , -- In  :
                     M_BUF_DATA      => mr_buf_wdata      , -- In  :
                     M_BUF_PTR       => mr_buf_wptr       , -- In  :
-                    M_BUF_RDY       => pi_buf_wrdy       , -- Out :
-                    M_XFER_BUSY     => mr_xfer_busy      , -- In  :
-                    M_XFER_DONE     => mr_xfer_done      , -- In  :
+                    M_BUF_RDY       => mr_buf_wready(1)  , -- Out :
+                    M_XFER_BUSY     => mr_xfer_busy(1)   , -- In  :
+                    M_XFER_DONE     => mr_xfer_done(1)   , -- In  :
                 -------------------------------------------------------------------
                 -- Control Status Register Interface Signals.
                 -------------------------------------------------------------------
