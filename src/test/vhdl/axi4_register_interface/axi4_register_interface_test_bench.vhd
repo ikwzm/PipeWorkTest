@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_register_interface_test_bench.vhd
 --!     @brief   TEST BENCH for AXI4_REGISTER_INTERFACE
---!     @version 0.0.1
---!     @date    2013/1/2
+--!     @version 1.5.5
+--!     @date    2014/3/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012,2013 Ichiro Kawazome
+--      Copyright (C) 2012-2014 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -50,6 +50,7 @@ use     DUMMY_PLUG.CORE.REPORT_STATUS_VECTOR;
 use     DUMMY_PLUG.CORE.MARGE_REPORT_STATUS;
 library PIPEWORK;
 use     PIPEWORK.COMPONENTS.SDPRAM;
+use     PIPEWORK.COMPONENTS.REGISTER_ACCESS_SYNCRONIZER;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_REGISTER_INTERFACE;
 -----------------------------------------------------------------------------------
 --
@@ -96,6 +97,7 @@ architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH is
     signal   ARESETn         : std_logic;
     signal   RESET           : std_logic;
     constant CLEAR           : std_logic := '0';
+    constant ACKE            : std_logic := '1';
     ------------------------------------------------------------------------------
     -- リードアドレスチャネルシグナル.
     ------------------------------------------------------------------------------
@@ -176,6 +178,20 @@ architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
+    constant I_SEL           : std_logic := '1';
+    signal   I_REQ           : std_logic;
+    signal   I_WRITE         : std_logic;
+    signal   I_ACK           : std_logic;
+    signal   I_ERR           : std_logic;
+    signal   I_ADDR          : std_logic_vector(REGS_ADDR_WIDTH  -1 downto 0);
+    signal   I_BEN           : std_logic_vector(REGS_DATA_WIDTH/8-1 downto 0);
+    signal   I_WDATA         : std_logic_vector(REGS_DATA_WIDTH  -1 downto 0);
+    signal   I_RDATA         : std_logic_vector(REGS_DATA_WIDTH  -1 downto 0);
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    signal   REGS_CLK        : std_logic;
+    constant REGS_CKE        : std_logic := '1';
     signal   REGS_REQ        : std_logic;
     signal   REGS_WRITE      : std_logic;
     signal   REGS_ACK        : std_logic;
@@ -469,22 +485,74 @@ begin
         ---------------------------------------------------------------------------
         -- Register Write Interface.
         ---------------------------------------------------------------------------
-            REGS_REQ        => REGS_REQ        ,
-            REGS_WRITE      => REGS_WRITE      ,
-            REGS_ACK        => REGS_ACK        ,
-            REGS_ERR        => REGS_ERR        ,
-            REGS_ADDR       => REGS_ADDR       ,
-            REGS_BEN        => REGS_BEN        ,
-            REGS_WDATA      => REGS_WDATA      ,
-            REGS_RDATA      => REGS_RDATA      
+            REGS_REQ        => I_REQ           ,
+            REGS_WRITE      => I_WRITE         ,
+            REGS_ACK        => I_ACK           ,
+            REGS_ERR        => I_ERR           ,
+            REGS_ADDR       => I_ADDR          ,
+            REGS_BEN        => I_BEN           ,
+            REGS_WDATA      => I_WDATA         ,
+            REGS_RDATA      => I_RDATA      
+        );
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    REGS_SYNC: REGISTER_ACCESS_SYNCRONIZER
+        generic map (
+            ADDR_WIDTH      => REGS_ADDR_WIDTH ,
+            DATA_WIDTH      => REGS_DATA_WIDTH ,
+            I_CLK_RATE      => 0               ,
+            O_CLK_RATE      => 0               ,
+            O_CLK_REGS      => 0
+        )
+        port map (
+        ---------------------------------------------------------------------------
+        -- リセット信号
+        ---------------------------------------------------------------------------
+            RST             => RESET           , 
+        ---------------------------------------------------------------------------
+        -- 入力側のクロック信号/同期リセット信号
+        ---------------------------------------------------------------------------
+            I_CLK           => ACLK            ,
+            I_CLR           => CLEAR           ,
+            I_CKE           => ACKE            ,
+        ---------------------------------------------------------------------------
+        -- 入力側のレジスタアクセスインターフェース
+        ---------------------------------------------------------------------------
+            I_REQ           => I_REQ           ,
+            I_SEL           => I_SEL           ,
+            I_WRITE         => I_WRITE         ,
+            I_ADDR          => I_ADDR          ,
+            I_BEN           => I_BEN           ,
+            I_WDATA         => I_WDATA         ,
+            I_RDATA         => I_RDATA         ,
+            I_ACK           => I_ACK           ,
+            I_ERR           => I_ERR           ,
+        ---------------------------------------------------------------------------
+        -- 出力側のクロック信号/同期リセット信号
+        ---------------------------------------------------------------------------
+            O_CLK           => REGS_CLK        ,
+            O_CLR           => CLEAR           ,
+            O_CKE           => REGS_CKE        ,
+        ---------------------------------------------------------------------------
+        -- 出力側のレジスタアクセスインターフェース
+        ---------------------------------------------------------------------------
+            O_REQ           => REGS_REQ        ,
+            O_WRITE         => REGS_WRITE      ,
+            O_ADDR          => REGS_ADDR       ,
+            O_BEN           => REGS_BEN        ,
+            O_WDATA         => REGS_WDATA      ,
+            O_RDATA         => REGS_RDATA      ,
+            O_ACK           => REGS_ACK        ,
+            O_ERR           => REGS_ERR
         );
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    process (ACLK, RESET) begin
+    process (REGS_CLK, RESET) begin
         if (RESET = '1') then
             regs_state <= "00";
-        elsif (ACLK'event and ACLK = '1') then
+        elsif (REGS_CLK'event and REGS_CLK = '1') then
             case regs_state is
                 when "00" =>
                     if (REGS_REQ = '1' and REGS_WRITE = '0') then
@@ -523,11 +591,11 @@ begin
             ID              => 0
         ) 
         port map (
-            WCLK            => ACLK            ,
+            WCLK            => REGS_CLK        ,
             WE              => RAM_WE          ,
             WADDR           => RAM_ADDR        ,
             WDATA           => REGS_WDATA      ,
-            RCLK            => ACLK            ,
+            RCLK            => REGS_CLK        ,
             RADDR           => RAM_ADDR        ,
             RDATA           => RAM_RDATA
         );
@@ -536,9 +604,11 @@ begin
     -- 
     -------------------------------------------------------------------------------
     process begin
-        ACLK <= '0';
+        ACLK     <= '0';
+        REGS_CLK <= '0';
         wait for PERIOD / 2;
-        ACLK <= '1';
+        ACLK     <= '1';
+        REGS_CLK <= '1';
         wait for PERIOD / 2;
     end process;
 
