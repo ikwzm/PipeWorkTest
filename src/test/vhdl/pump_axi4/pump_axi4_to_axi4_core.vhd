@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4_core.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4)
---!     @version 0.2.1
---!     @date    2014/2/23
+--!     @version 0.2.2
+--!     @date    2014/3/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -85,8 +85,8 @@ entity  PUMP_AXI4_TO_AXI4_CORE is
                           --! PUMP INTAKE の最大転送バイト数を２のべき乗値で指定す
                           --! る.
                           integer :=  8;
-        I_RES_QUEUE     : --! @brief PUMP INTAKE RESPONSE QUEUE SIZE :
-                          --! PUMP INTAKE のレスポンスキューの大きさを指定する.
+        I_REQ_QUEUE     : --! @brief PUMP INTAKE REQUEST QUEUE SIZE :
+                          --! PUMP INTAKE のリクエストキューの大きさを指定する.
                           --! 詳細は PipeWork.Components の AXI4_MASTER_READ_INTERFACE を参照.
                           integer :=  1;
         O_CLK_RATE      : --! @brief OUTPUT CLOCK RATE :
@@ -545,7 +545,7 @@ begin
             XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => I_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => I_MAX_XFER_SIZE     , -- 
-            QUEUE_SIZE          => I_RES_QUEUE           -- 
+            QUEUE_SIZE          => I_REQ_QUEUE           -- 
         )                                                -- 
         port map (                                       -- 
         --------------------------------------------------------------------------
