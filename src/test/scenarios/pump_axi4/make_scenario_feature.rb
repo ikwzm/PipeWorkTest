@@ -166,6 +166,32 @@ class ScenarioGenerater
   #-------------------------------------------------------------------------------
   # 
   #-------------------------------------------------------------------------------
+  def  gen_pipeline_write(io, model, address, data, resp)
+    pos           = 0
+    max_xfer_size = model.read_transaction.max_transaction_size
+    data_xfer_pattern = Dummy_Plug::ScenarioWriter::GenericNumberGenerater.new([3,0])
+    while (pos < data.length)
+      len = max_xfer_size - (address % max_xfer_size)
+      if (pos + len > data.length)
+          len = data.length - pos
+      end
+      io.print model.write( {
+               :Address           => address, 
+               :Data              => data[pos..pos+len-1], 
+               :Response          => resp, 
+               :DataStartEvent    => (pos == 0) ? :ADDR_VALID    : :NO_WAIT,
+               :DataXferPattern   => data_xfer_pattern,
+               :ResponseStartEvent=> (pos == 0) ? :LAST_DATA_XFER: :NO_WAIT,
+               :ResponseDelayCycle=> (pos == 0) ? 40             : 20
+
+      })
+      pos     += len
+      address += len
+    end
+  end
+  #-------------------------------------------------------------------------------
+  # 
+  #-------------------------------------------------------------------------------
   def gen_ctrl_regs(arg)
     ctrl_regs  = 0
     ctrl_regs |= (0x80000000) if (arg.index(:Reset))
@@ -208,6 +234,9 @@ class ScenarioGenerater
     o_mode = gen_ctrl_regs([:Last,:First,:Done_Enable,:Error_Enable])
     done   = gen_ctrl_regs([:Done])
     start  = gen_ctrl_regs([:Start])
+    io.print "---\n"
+    io.print "- MARCHAL : \n"
+    io.print "  - SAY : ", title, "\n"
     io.print @c_model.write({
                :Address => 0x00000000, 
                :Data    => [sprintf("0x%08X", o_address)     ,
@@ -259,9 +288,12 @@ class ScenarioGenerater
     size   = i_size
     data   = (1..size).collect{rand(256)}
     i_mode = gen_ctrl_regs([:Last,:First,:Done_Enable,:Error_Enable,:Speculative])
-    o_mode = gen_ctrl_regs([:Last,:First,:Done_Enable,:Error_Enable])
+    o_mode = gen_ctrl_regs([:Last,:First,:Done_Enable,:Error_Enable,:Speculative])
     done   = gen_ctrl_regs([:Done])
     start  = gen_ctrl_regs([:Start])
+    io.print "---\n"
+    io.print "- MARCHAL : \n"
+    io.print "  - SAY : ", title, "\n"
     io.print @c_model.write({
                :Address => 0x00000000, 
                :Data    => [sprintf("0x%08X", o_address)     ,
@@ -303,8 +335,8 @@ class ScenarioGenerater
              })
     io.print "  - WAIT  : {GPI(0) : 0, GPI(1) : 0, TIMEOUT: ", @timeout.to_s, "}\n"
     io.print "  - SYNC  : {PORT : LOCAL}\n"
-    gen_pipeline_read(io, @i_model, i_address, data, "OKAY")
-    gen_simple_write( io, @o_model, o_address, data, "OKAY")
+    gen_pipeline_read( io, @i_model, i_address, data, "OKAY")
+    gen_pipeline_write(io, @o_model, o_address, data, "OKAY")
   end
   #-------------------------------------------------------------------------------
   # 
@@ -315,6 +347,14 @@ class ScenarioGenerater
     [250].each{|size|
       (0xFC00..0xFC00).each {|i_address|
       (0x1000..0x1000).each {|o_address|
+        title = @name.to_s + ".8." + test_num.to_s
+        pipeline_test(title, io, i_address, o_address, size, size)
+        test_num += 1
+      }}
+    }
+    [32,51,64,69,81,97,110,128,140,155,189,200,212,234,256].each{|size|
+      (0x7030..0x7033).each {|i_address|
+      (0x1020..0x1023).each {|o_address|
         title = @name.to_s + ".8." + test_num.to_s
         pipeline_test(title, io, i_address, o_address, size, size)
         test_num += 1
