@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4.vhd
 --!     @brief   Pump Sample Module (AXI4 to AXI4)
---!     @version 0.2.2
---!     @date    2014/3/13
+--!     @version 0.7.0
+--!     @date    2014/3/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -1211,6 +1211,7 @@ begin
         signal   mr_req_ready       : std_logic;
         signal   mr_xfer_busy       : std_logic_vector(1 downto 0);
         signal   mr_xfer_done       : std_logic_vector(1 downto 0);
+        signal   mr_xfer_error      : std_logic_vector(1 downto 0);
         signal   mr_ack_valid       : std_logic_vector(1 downto 0);
         signal   mr_ack_error       : std_logic;
         signal   mr_ack_next        : std_logic;
@@ -1255,6 +1256,7 @@ begin
         signal   mw_req_ready       : std_logic;
         signal   mw_xfer_busy       : std_logic_vector(1 downto 0);
         signal   mw_xfer_done       : std_logic_vector(1 downto 0);
+        signal   mw_xfer_error      : std_logic_vector(1 downto 0);
         signal   mw_ack_valid       : std_logic_vector(1 downto 0);
         signal   mw_ack_error       : std_logic;
         signal   mw_ack_next        : std_logic;
@@ -1362,6 +1364,7 @@ begin
                 XFER_SIZE_SEL   => MR_XFER_SIZE_SEL  , -- In  :
                 XFER_BUSY       => mr_xfer_busy      , -- Out :
                 XFER_DONE       => mr_xfer_done      , -- Out :
+                XFER_ERROR      => mr_xfer_error     , -- Out :
             -----------------------------------------------------------------------
             -- Response Signals.
             -----------------------------------------------------------------------
@@ -1490,6 +1493,7 @@ begin
                 XFER_SIZE_SEL   => MW_XFER_SIZE_SEL  , -- In  :
                 XFER_BUSY       => mw_xfer_busy      , -- Out :
                 XFER_DONE       => mw_xfer_done      , -- Out :
+                XFER_ERROR      => mw_xfer_error     , -- Out :
             -----------------------------------------------------------------------
             -- Response Signals.
             -----------------------------------------------------------------------
@@ -1673,6 +1677,7 @@ begin
                     M_BUF_RDY       => mr_buf_wready(0)  , -- Out :
                     M_XFER_BUSY     => mr_xfer_busy(0)   , -- In  :
                     M_XFER_DONE     => mr_xfer_done(0)   , -- In  :
+                    M_XFER_ERROR    => mr_xfer_error(0)  , -- In  :
                 -------------------------------------------------------------------
                 -- Control Status Register Interface Signals.
                 -------------------------------------------------------------------
@@ -1846,6 +1851,7 @@ begin
                     M_BUF_RDY       => mr_buf_wready(1)  , -- Out :
                     M_XFER_BUSY     => mr_xfer_busy(1)   , -- In  :
                     M_XFER_DONE     => mr_xfer_done(1)   , -- In  :
+                    M_XFER_ERROR    => mr_xfer_error(1)  , -- In  :
                 -------------------------------------------------------------------
                 -- Control Status Register Interface Signals.
                 -------------------------------------------------------------------

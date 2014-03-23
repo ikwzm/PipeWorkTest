@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4_core.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4)
---!     @version 0.2.2
---!     @date    2014/3/20
+--!     @version 0.7.0
+--!     @date    2014/3/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -443,6 +443,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4_CORE is
     signal   i_req_ready        : std_logic;
     signal   i_xfer_busy        : std_logic;
     signal   i_xfer_done        : std_logic;
+    signal   i_xfer_error       : std_logic;
     signal   i_ack_valid        : std_logic;
     signal   i_ack_error        : std_logic;
     signal   i_ack_next         : std_logic;
@@ -473,6 +474,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4_CORE is
     signal   o_req_ready        : std_logic;
     signal   o_xfer_busy        : std_logic;
     signal   o_xfer_done        : std_logic;
+    signal   o_xfer_error       : std_logic;
     signal   o_ack_valid        : std_logic;
     signal   o_ack_error        : std_logic;
     signal   o_ack_next         : std_logic;
@@ -613,6 +615,7 @@ begin
         ---------------------------------------------------------------------------
             XFER_BUSY(0)        => i_xfer_busy         , -- Out :
             XFER_DONE(0)        => i_xfer_done         , -- Out :
+            XFER_ERROR(0)       => i_xfer_error        , -- Out :
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
@@ -745,6 +748,7 @@ begin
         ---------------------------------------------------------------------------
             XFER_BUSY(0)        => o_xfer_busy         , -- Out :
             XFER_DONE(0)        => o_xfer_done         , -- Out :
+            XFER_ERROR(0)       => o_xfer_error        , -- Out :
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
@@ -959,6 +963,7 @@ begin
         ---------------------------------------------------------------------------
             I_XFER_BUSY         => i_xfer_busy     , -- In  :
             I_XFER_DONE         => i_xfer_done     , -- In  :
+            I_XFER_ERROR        => i_xfer_error    , -- In  :
         ---------------------------------------------------------------------------
         -- Intake Flow Control Signals.
         ---------------------------------------------------------------------------
@@ -1012,6 +1017,7 @@ begin
         ---------------------------------------------------------------------------
             O_XFER_BUSY         => o_xfer_busy     , -- In  :
             O_XFER_DONE         => o_xfer_done     , -- In  :
+            O_XFER_ERROR        => o_xfer_error    , -- In  :
         ---------------------------------------------------------------------------
         -- Outlet Flow Control Signals.
         ---------------------------------------------------------------------------
