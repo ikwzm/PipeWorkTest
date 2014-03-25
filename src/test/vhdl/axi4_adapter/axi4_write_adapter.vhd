@@ -2,7 +2,7 @@
 --!     @file    aix4_write_adapter.vhd
 --!     @brief   AXI4_WRITE_ADPATER
 --!     @version 1.5.5
---!     @date    2014/3/23
+--!     @date    2014/3/26
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -150,7 +150,7 @@ use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
 library PIPEWORK;
 use     PIPEWORK.COMPONENTS.SDPRAM;
-use     PIPEWORK.PIPE_COMPONENTS.PIPE_CORE_UNIT;
+use     PIPEWORK.PUMP_COMPONENTS.PIPE_CORE_UNIT;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_WRITE_INTERFACE;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_SLAVE_WRITE_INTERFACE;
 architecture RTL of AXI4_WRITE_ADAPTER is
