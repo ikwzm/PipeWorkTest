@@ -143,7 +143,7 @@ use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
 library PIPEWORK;
 use     PIPEWORK.COMPONENTS.SDPRAM;
-use     PIPEWORK.PUMP_COMPONENTS.PIPE_CORE_UNIT;
+use     PIPEWORK.PUMP_COMPONENTS.PIPE_CONTROLLER;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_READ_INTERFACE;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_SLAVE_READ_INTERFACE;
 architecture RTL of AXI4_READ_ADAPTER is
@@ -600,7 +600,7 @@ begin
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
-    PIPE: PIPE_CORE_UNIT                                 -- 
+    PIPE: PIPE_CONTROLLER                                -- 
         generic map (                                    -- 
             T_CLK_RATE          => T_CLK_RATE          , --
             M_CLK_RATE          => M_CLK_RATE          , --
