@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_write_adapter.vhd
 --!     @brief   AXI4_WRITE_ADPATER
---!     @version 1.5.4
---!     @date    2014/2/23
+--!     @version 1.5.5
+--!     @date    2014/3/26
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -150,7 +150,7 @@ use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
 library PIPEWORK;
 use     PIPEWORK.COMPONENTS.SDPRAM;
-use     PIPEWORK.PIPE_COMPONENTS.PIPE_CORE_UNIT;
+use     PIPEWORK.PUMP_COMPONENTS.PIPE_CONTROLLER;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_WRITE_INTERFACE;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_SLAVE_WRITE_INTERFACE;
 architecture RTL of AXI4_WRITE_ADAPTER is
@@ -296,6 +296,7 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     constant  t_xfer_select     : std_logic_vector(0 downto 0) := "1";
     signal    t_xfer_busy       : std_logic;
     signal    t_xfer_done       : std_logic;
+    signal    t_xfer_error      : std_logic;
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -408,6 +409,7 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     -------------------------------------------------------------------------------
     signal    m_xfer_busy       : std_logic;
     signal    m_xfer_done       : std_logic;
+    signal    m_xfer_error      : std_logic;
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
@@ -552,6 +554,7 @@ begin
         ---------------------------------------------------------------------------
             XFER_BUSY(0)        => t_xfer_busy         , -- Out :
             XFER_DONE(0)        => t_xfer_done         , -- Out :
+            XFER_ERROR(0)       => t_xfer_error        , -- Out :
         ---------------------------------------------------------------------------
         -- Push Reserve Size Signals.
         ---------------------------------------------------------------------------
@@ -606,7 +609,7 @@ begin
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
-    PIPE: PIPE_CORE_UNIT                                 -- 
+    PIPE: PIPE_CONTROLLER                                -- 
         generic map (                                    -- 
             T_CLK_RATE          => T_CLK_RATE          , --
             M_CLK_RATE          => M_CLK_RATE          , --
@@ -692,6 +695,7 @@ begin
         ---------------------------------------------------------------------------
             T_XFER_BUSY         => t_xfer_busy         , -- In  :
             T_XFER_DONE         => t_xfer_done         , -- In  :
+            T_XFER_ERROR        => t_xfer_error        , -- In  :
         ---------------------------------------------------------------------------
         -- レスポンダ側からデータ入力のフロー制御信号入出力.
         ---------------------------------------------------------------------------
@@ -774,6 +778,7 @@ begin
         ---------------------------------------------------------------------------
             M_XFER_BUSY         => m_xfer_busy         , -- In  :
             M_XFER_DONE         => m_xfer_done         , -- In  :
+            M_XFER_ERROR        => m_xfer_error        , -- In  :
         ---------------------------------------------------------------------------
         -- リクエスタ側からデータ入力のフロー制御信号入出力.
         ---------------------------------------------------------------------------
@@ -940,6 +945,7 @@ begin
         ---------------------------------------------------------------------------
             XFER_BUSY(0)        => m_xfer_busy         , -- Out :
             XFER_DONE(0)        => m_xfer_done         , -- Out :
+            XFER_ERROR(0)       => m_xfer_error        , -- Out :
         ---------------------------------------------------------------------------
         -- Flow Control Signals.
         ---------------------------------------------------------------------------
