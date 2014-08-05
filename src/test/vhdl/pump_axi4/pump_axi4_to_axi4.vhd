@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4.vhd
 --!     @brief   Pump Sample Module (AXI4 to AXI4)
---!     @version 0.7.0
---!     @date    2014/3/23
+--!     @version 0.8.0
+--!     @date    2014/5/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -495,6 +495,33 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     constant PI_MODE_LO         : integer :=  64;
     constant PI_ADDR_HI         : integer :=  63;
     constant PI_ADDR_LO         : integer :=   0;
+    -------------------------------------------------------------------------------
+    -- Operation Code(Co-Pro)
+    -------------------------------------------------------------------------------
+    --           31            24              16               8               0
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    --     +0x00 |                       Operand[31:00]                          |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    --     +0x04 |                       Operand[63:31]                          |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    --     +0x08 |                       Operand[95:64]                          |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    --     +0x0C |1|0|1|1|E|F|           Operand[121:96]                         |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -------------------------------------------------------------------------------
+    -- TYPE        = "1011"
+    -- End         = このビットが'1'の場合、オペレーション終了時にオペレーションプ
+    --               ロセッサのStatus[0]をセットすることを指定する.
+    -- Fetch       = このビットが'1'の場合、オペレーションコード読み込み時にオペレ
+    --               ーションプロセッサのStatus[1]をセットすることを指定する.
+    -- Operand     = 転送開始アドレス.
+    -------------------------------------------------------------------------------
+    constant PO_CPRO_CODE       : integer :=  11;
+    constant PO_CPRO_HI         : integer := 121;
+    constant PO_CPRO_LO         : integer :=   0;
+    constant PI_CPRO_CODE       : integer :=  11;
+    constant PI_CPRO_HI         : integer := 121;
+    constant PI_CPRO_LO         : integer :=   0;
     -------------------------------------------------------------------------------
     -- レジスタのアドレスマップ.
     -------------------------------------------------------------------------------
@@ -1572,8 +1599,8 @@ begin
                     SHIFT       => shift           -- In  :
                 );
             request(0)      <= po_req_valid;
-            request(1)      <= pi_req_valid;
             mr_req_valid(0) <= grant(0) and po_req_valid;
+            request(1)      <= pi_req_valid;
             mr_req_valid(1) <= grant(1) and pi_req_valid;
             mr_req_addr     <= pi_req_addr  when (num = 1) else po_req_addr;
             mr_req_size     <= pi_req_size  when (num = 1) else po_req_size;
@@ -1618,9 +1645,13 @@ begin
         O_PROC: if (O_PROC_VALID /= 0) generate
             signal   xfer_load      : std_logic_vector(CO_REGS_HI downto CO_REGS_LO);
             signal   xfer_wbit      : std_logic_vector(CO_REGS_HI downto CO_REGS_LO);
+            signal   proc_o_c_load  : std_logic_vector(PO_CPRO_HI downto PO_CPRO_LO);
+            signal   proc_o_c_data  : std_logic_vector(PO_CPRO_HI downto PO_CPRO_LO);
+            signal   proc_o_c_req   : std_logic;
             signal   proc_o_stat    : std_logic_vector(7 downto 0);
+            signal   proc_o_busy    : std_logic;
+            signal   proc_o_done    : std_logic;
             signal   proc_o_fetch   : std_logic;
-            signal   proc_o_end     : std_logic;
             signal   proc_o_error   : std_logic_vector(2 downto 0);
             signal   proc_o_mode    : boolean;
         begin
@@ -1631,7 +1662,9 @@ begin
                     M_BUF_WIDTH     => MR_BUF_WIDTH      , -- 
                     OP_BITS         => PO_BITS           , -- 
                     OP_XFER_LO      => PO_CORE_LO        , -- 
-                    OP_XFER_HI      => PO_CORE_HI        , -- 
+                    OP_XFER_HI      => PO_CORE_HI        , --
+                    OP_CPRO_LO      => PO_CPRO_LO        , --
+                    OP_CPRO_HI      => PO_CPRO_HI        , --
                     OP_ADDR_LO      => PO_ADDR_LO        , -- 
                     OP_ADDR_HI      => PO_ADDR_HI        , -- 
                     OP_MODE_LO      => PO_MODE_LO        , -- 
@@ -1643,6 +1676,7 @@ begin
                     OP_TYPE_LO      => PO_TYPE_LO        , --
                     OP_TYPE_HI      => PO_TYPE_HI        , --
                     OP_NONE_CODE    => PO_NONE_CODE      , --
+                    OP_CPRO_CODE    => PO_CPRO_CODE      , --
                     OP_XFER_CODE    => PO_XFER_CODE      , --
                     OP_LINK_CODE    => PO_LINK_CODE        -- 
                 )
@@ -1703,9 +1737,17 @@ begin
                     T_PAUSE_L       => regs_load(PO_CTRL_PAUSE_POS),
                     T_PAUSE_D       => regs_wbit(PO_CTRL_PAUSE_POS),
                     T_PAUSE_Q       => regs_rbit(PO_CTRL_PAUSE_POS),
-                    T_ERROR         => proc_o_error                ,
-                    T_END           => proc_o_end                  ,
+                    T_BUSY          => proc_o_busy                 ,
+                    T_DONE          => proc_o_done                 ,
                     T_FETCH         => proc_o_fetch                ,
+                    T_ERROR         => proc_o_error                ,
+                -------------------------------------------------------------------
+                -- Co-Processer Interface Signals.
+                -------------------------------------------------------------------
+                    C_OPERAND_L     => proc_o_c_load               ,
+                    C_OPERAND_D     => proc_o_c_data               ,
+                    C_REQ           => proc_o_c_req                ,
+                    C_ACK           => '1'                         ,
                 -------------------------------------------------------------------
                 -- Pump Control Register Interface Signals.
                 -------------------------------------------------------------------
@@ -1732,7 +1774,7 @@ begin
             --
             -----------------------------------------------------------------------
             regs_rbit(PO_CTRL_RESV_HI downto PO_CTRL_RESV_LO) <= (others => '0');
-            proc_o_stat(0)          <= proc_o_end;
+            proc_o_stat(0)          <= proc_o_done;
             proc_o_stat(1)          <= proc_o_fetch;
             proc_o_stat(4 downto 2) <= proc_o_error(2 downto 0);
             proc_o_stat(7 downto 5) <= (7 downto 5 => '0');
@@ -1792,9 +1834,13 @@ begin
         I_PROC: if (I_PROC_VALID /= 0) generate
             signal   xfer_load      : std_logic_vector(CI_REGS_HI downto CI_REGS_LO);
             signal   xfer_wbit      : std_logic_vector(CI_REGS_HI downto CI_REGS_LO);
+            signal   proc_i_c_load  : std_logic_vector(PI_CPRO_HI downto PI_CPRO_LO);
+            signal   proc_i_c_data  : std_logic_vector(PI_CPRO_HI downto PI_CPRO_LO);
+            signal   proc_i_c_req   : std_logic;
             signal   proc_i_stat    : std_logic_vector(7 downto 0);
+            signal   proc_i_busy    : std_logic;
+            signal   proc_i_done    : std_logic;
             signal   proc_i_fetch   : std_logic;
-            signal   proc_i_end     : std_logic;
             signal   proc_i_error   : std_logic_vector(2 downto 0);
             signal   proc_i_mode    : boolean;
         begin
@@ -1806,6 +1852,8 @@ begin
                     OP_BITS         => PI_BITS           , -- 
                     OP_XFER_LO      => PI_CORE_LO        , -- 
                     OP_XFER_HI      => PI_CORE_HI        , -- 
+                    OP_CPRO_LO      => PI_CPRO_LO        , --
+                    OP_CPRO_HI      => PI_CPRO_HI        , --
                     OP_ADDR_LO      => PI_ADDR_LO        , -- 
                     OP_ADDR_HI      => PI_ADDR_HI        , -- 
                     OP_MODE_LO      => PI_MODE_LO        , -- 
@@ -1817,6 +1865,7 @@ begin
                     OP_TYPE_LO      => PI_TYPE_LO        , --
                     OP_TYPE_HI      => PI_TYPE_HI        , --
                     OP_NONE_CODE    => PI_NONE_CODE      , --
+                    OP_CPRO_CODE    => PI_CPRO_CODE      , --
                     OP_XFER_CODE    => PI_XFER_CODE      , --
                     OP_LINK_CODE    => PI_LINK_CODE        -- 
                 )
@@ -1877,9 +1926,17 @@ begin
                     T_PAUSE_L       => regs_load(PI_CTRL_PAUSE_POS),
                     T_PAUSE_D       => regs_wbit(PI_CTRL_PAUSE_POS),
                     T_PAUSE_Q       => regs_rbit(PI_CTRL_PAUSE_POS),
-                    T_ERROR         => proc_i_error                ,
-                    T_END           => proc_i_end                  ,
+                    T_BUSY          => proc_i_busy                 ,
+                    T_DONE          => proc_i_done                 ,
                     T_FETCH         => proc_i_fetch                ,
+                    T_ERROR         => proc_i_error                ,
+                -------------------------------------------------------------------
+                -- Co-Processer Interface Signals.
+                -------------------------------------------------------------------
+                    C_OPERAND_L     => proc_i_c_load               ,
+                    C_OPERAND_D     => proc_i_c_data               ,
+                    C_REQ           => proc_i_c_req                ,
+                    C_ACK           => '1'                         ,
                 -------------------------------------------------------------------
                 -- Pump Control Register Interface Signals.
                 -------------------------------------------------------------------
@@ -1906,7 +1963,7 @@ begin
             --
             -----------------------------------------------------------------------
             regs_rbit(PI_CTRL_RESV_HI downto PI_CTRL_RESV_LO) <= (others => '0');
-            proc_i_stat(0)          <= proc_i_end;
+            proc_i_stat(0)          <= proc_i_done;
             proc_i_stat(1)          <= proc_i_fetch;
             proc_i_stat(4 downto 2) <= proc_i_error(2 downto 0);
             proc_i_stat(7 downto 5) <= (7 downto 5 => '0');
