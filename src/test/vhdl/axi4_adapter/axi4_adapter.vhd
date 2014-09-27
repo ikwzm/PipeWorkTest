@@ -73,10 +73,15 @@ entity  AXI4_ADAPTER is
         M_DATA_WIDTH        : --! @brief REQUESTER AXI4 WRITE DATA CHANNEL DATA WIDTH :
                               --! AXI4 ライトデータチャネルのWDATA信号のビット幅.
                               integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        M_MAX_XFER_SIZE     : integer := 12;
+        M_MAX_XFER_SIZE     : --! @brief TRANSFER MAXIMUM SIZE :
+                              --! 一回の転送サイズの最大バイト数を２のべき乗で指定する.
+                              integer := 12;
         BUF_DEPTH           : --! @brief Buffer Depth :
                               --! バッファの容量(バイト数)を２のべき乗値で指定する.
-                              integer := 12
+                              integer := 12;
+        RESP_REGS           : --! @brief RESPONSE REGISTER USE :
+                              --! レスポンスの入力側にレジスタを挿入する.
+                              integer := 0
     );
     port(
     ------------------------------------------------------------------------------
@@ -199,7 +204,8 @@ architecture RTL of AXI4_ADAPTER is
             M_CLK_RATE          : integer :=  1;
             M_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             M_MAX_XFER_SIZE     : integer := 12;
-            BUF_DEPTH           : integer := 12
+            BUF_DEPTH           : integer := 12;
+            RESP_REGS           : integer := 0
         );
         port(
             RST                 : in    std_logic;
@@ -330,7 +336,8 @@ begin
             M_CLK_RATE          => M_CLK_RATE          , --
             M_DATA_WIDTH        => M_DATA_WIDTH        , --
             M_MAX_XFER_SIZE     => M_MAX_XFER_SIZE     , --
-            BUF_DEPTH           => BUF_DEPTH             -- 
+            BUF_DEPTH           => BUF_DEPTH           , --
+            RESP_REGS           => RESP_REGS             -- 
         )                                                -- 
         port map(                                        -- 
             RST                 => RST                 , -- In  :

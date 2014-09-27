@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4_core.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4)
---!     @version 0.7.0
---!     @date    2014/3/23
+--!     @version 0.8.0
+--!     @date    2014/9/27
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -135,6 +135,10 @@ entity  PUMP_AXI4_TO_AXI4_CORE is
                           --! PUMP OUTLET のレスポンスキューの大きさを指定する.
                           --! 詳細は PipeWork.Components の AXI4_MASTER_WRITE_INTERFACE を参照.
                           integer :=  2;
+        O_RES_REGS      : --! @brief PUMP OUTLET RESPONSE REGISTER USE :
+                          --! レスポンスの入力側にレジスタを挿入する.
+                          --! 詳細は PipeWork.Components の AXI4_MASTER_WRITE_INTERFACE を参照.
+                          integer :=  1;
         BUF_DEPTH       : --! @brief BUFFER DEPTH :
                           --! バッファの大きさ(バイト数)を２のべき乗で指定する.
                           --! * バッファの大きさは I_MAX_XFER_SIZE で示される入力側
@@ -673,7 +677,8 @@ begin
             XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => O_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => O_MAX_XFER_SIZE     , -- 
-            QUEUE_SIZE          => O_RES_QUEUE           -- 
+            QUEUE_SIZE          => O_RES_QUEUE         , -- 
+            RESP_REGS           => O_RES_REGS            -- 
             )                                            -- 
         port map (                                       -- 
         --------------------------------------------------------------------------

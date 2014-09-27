@@ -915,6 +915,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             O_REG_STAT_BITS : integer                                :=  8;
             O_MAX_XFER_SIZE : integer                                :=  1;
             O_RES_QUEUE     : integer                                :=  2;
+            O_RES_REGS      : integer                                :=  1;
             BUF_DEPTH       : integer                                := 12
         );
         port(
@@ -2092,6 +2093,7 @@ begin
             O_REG_STAT_BITS => CO_STAT_RESV_BITS ,
             O_MAX_XFER_SIZE => O_MAX_XFER_SIZE   ,
             O_RES_QUEUE     => 2                 ,
+            O_RES_REGS      => 1                 ,
             BUF_DEPTH       => BUF_DEPTH       
         )
         port map (
