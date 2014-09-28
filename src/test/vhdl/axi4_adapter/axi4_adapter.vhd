@@ -79,6 +79,16 @@ entity  AXI4_ADAPTER is
         BUF_DEPTH           : --! @brief Buffer Depth :
                               --! バッファの容量(バイト数)を２のべき乗値で指定する.
                               integer := 12;
+        RDATA_REGS          : --! @brief RDATA REGISTER TYPE :
+                              --! RDATA/RRESP/RLAST/RVALID の入力をどうするか指定する.
+                              --! * RDATA_REGS=0 スルー入力(レジスタは通さない).
+                              --! * RDATA_REGS=1 １段だけレジスタを通す. 
+                              --!   ただしバースト転送時には１サイクル毎にウェイトが入る.
+                              --! * RDATA_REGS=2 ２段のレジスタを通す.
+                              --! * RDATA_REGS=3 ３段のレジスタを通す.
+                              --!   このモードの場合、必ずRDATA/RRESPは一つのレジスタ
+                              --!   で受けるので外部インターフェース向き.
+                              integer := 0;
         RESP_REGS           : --! @brief RESPONSE REGISTER USE :
                               --! レスポンスの入力側にレジスタを挿入する.
                               integer := 0
@@ -275,7 +285,8 @@ architecture RTL of AXI4_ADAPTER is
             M_CLK_RATE          : integer :=  1;
             M_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             M_MAX_XFER_SIZE     : integer := 12;
-            BUF_DEPTH           : integer := 12
+            BUF_DEPTH           : integer := 12;
+            RDATA_REGS          : integer := 0
         );
         port(
             RST                 : in    std_logic;
@@ -403,7 +414,8 @@ begin
             M_CLK_RATE          => M_CLK_RATE          , -- 
             M_DATA_WIDTH        => M_DATA_WIDTH        , -- 
             M_MAX_XFER_SIZE     => M_MAX_XFER_SIZE     , -- 
-            BUF_DEPTH           => BUF_DEPTH             -- 
+            BUF_DEPTH           => BUF_DEPTH           , --
+            RDATA_REGS          => RDATA_REGS            -- 
         )                                                -- 
         port map (                                       -- 
             RST                 => RST                 , -- In  :

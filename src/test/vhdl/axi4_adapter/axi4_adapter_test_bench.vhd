@@ -295,6 +295,7 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
             M_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             M_MAX_XFER_SIZE     : integer := 12;
             BUF_DEPTH           : integer := 12;
+            RDATA_REGS          : integer := 0;
             RESP_REGS           : integer := 0
         );
         port(
@@ -622,6 +623,7 @@ begin
             M_DATA_WIDTH        => M_DATA_WIDTH        ,
             M_MAX_XFER_SIZE     => M_MAX_XFER_SIZE     ,
             BUF_DEPTH           => 12                  ,
+            RDATA_REGS          => 3                   ,
             RESP_REGS           => 1
         )
         port map(

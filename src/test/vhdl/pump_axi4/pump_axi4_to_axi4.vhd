@@ -901,6 +901,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             I_REG_STAT_BITS : integer                                :=  8;
             I_MAX_XFER_SIZE : integer                                :=  8;
             I_REQ_QUEUE     : integer                                :=  1;
+            I_RDATA_REGS    : integer                                :=  0;
             O_CLK_RATE      : integer                                :=  1;
             O_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
@@ -2079,6 +2080,7 @@ begin
             I_REG_STAT_BITS => CI_STAT_RESV_BITS ,
             I_MAX_XFER_SIZE => I_MAX_XFER_SIZE   ,
             I_REQ_QUEUE     => 2                 ,
+            I_RDATA_REGS    => 3                 ,
             O_CLK_RATE      => 1                 ,
             O_ADDR_WIDTH    => O_ADDR_WIDTH      ,
             O_DATA_WIDTH    => O_DATA_WIDTH      ,
