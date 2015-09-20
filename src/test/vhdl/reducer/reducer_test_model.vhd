@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    reducer_test_model.vhd
 --!     @brief   TEST MODEL for REDUCER :
---!     @version 1.5.0
---!     @date    2013/4/1
+--!     @version 1.5.8
+--!     @date    2015/9/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -144,6 +144,7 @@ entity  REDUCER_TEST_MODEL is
         WORD_BITS     : integer := 32;
         I_WIDTH       : integer :=  1;
         O_WIDTH       : integer :=  4;
+        O_VAL_SIZE    : integer :=  4;
         O_SHIFT_MIN   : integer :=  4;
         O_SHIFT_MAX   : integer :=  4;
         I_JUSTIFIED   : integer :=  0;
@@ -775,6 +776,7 @@ package COMPONENTS is
             WORD_BITS   : integer;
             I_WIDTH     : integer;
             O_WIDTH     : integer;
+            O_VAL_SIZE  : integer;
             O_SHIFT_MIN : integer;
             O_SHIFT_MAX : integer;
             I_JUSTIFIED : integer;

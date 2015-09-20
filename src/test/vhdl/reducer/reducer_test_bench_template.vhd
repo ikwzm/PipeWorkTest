@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    test_bench_template.vhd
 --!     @brief   TEST MODEL for REDUCER :
---!     @version 1.5.0
---!     @date    2013/4/1
+--!     @version 1.5.8
+--!     @date    2015/9/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 library ieee;
@@ -10,10 +10,10 @@ use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.COMPONENTS.REDUCER;
 use     WORK.COMPONENTS.REDUCER_TEST_MODEL;
-entity  REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J is
+entity  REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V is
     generic(AUTO_FINISH:integer:=1);port(FINISH:out std_logic);
-end     REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J;
-architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J is
+end     REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V;
+architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V is
     constant   WORD_BITS      : integer := %W;
     constant   I_WIDTH        : integer := %I;
     constant   O_WIDTH        : integer := %O;
@@ -22,7 +22,8 @@ architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J is
     constant   I_JUSTIFIED    : integer := %J;
     constant   O_SHIFT_MAX    : integer := O_WIDTH;
     constant   O_SHIFT_MIN    : integer := 0;
-    constant   NAME           : string(1 to 19) := "DWC_W%W_I%I_O%O_Q%Q_J%J";
+    constant   O_VAL_SIZE     : integer := %V;
+    constant   NAME           : string(1 to 22) := "DWC_W%W_I%I_O%O_Q%Q_J%J_V%V";
     constant   PERIOD         : time    := 10 ns;
     constant   DELAY          : time    :=  1 ns;
     signal     CLK            : std_logic;
@@ -59,6 +60,7 @@ begin
             QUEUE_SIZE    => QUEUE_SIZE,
             VALID_MIN     => 0,
             VALID_MAX     => 0,
+            O_VAL_SIZE    => O_VAL_SIZE,
             O_SHIFT_MAX   => O_SHIFT_MAX,
             O_SHIFT_MIN   => O_SHIFT_MIN,
             I_JUSTIFIED   => I_JUSTIFIED,
@@ -98,6 +100,7 @@ begin
             WORD_BITS     => WORD_BITS,
             I_WIDTH       => I_WIDTH,
             O_WIDTH       => O_WIDTH,
+            O_VAL_SIZE    => O_VAL_SIZE,
             O_SHIFT_MAX   => O_SHIFT_MAX,
             O_SHIFT_MIN   => O_SHIFT_MIN,
             I_JUSTIFIED   => I_JUSTIFIED,
