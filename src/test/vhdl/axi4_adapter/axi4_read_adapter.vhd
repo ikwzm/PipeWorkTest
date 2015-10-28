@@ -76,7 +76,17 @@ entity  AXI4_READ_ADAPTER is
         M_MAX_XFER_SIZE     : integer := 12;
         BUF_DEPTH           : --! @brief Buffer Depth :
                               --! バッファの容量(バイト数)を２のべき乗値で指定する.
-                              integer := 12
+                              integer := 12;
+        RDATA_REGS          : --! @brief RDATA REGISTER TYPE :
+                              --! RDATA/RRESP/RLAST/RVALID の入力をどうするか指定する.
+                              --! * RDATA_REGS=0 スルー入力(レジスタは通さない).
+                              --! * RDATA_REGS=1 １段だけレジスタを通す. 
+                              --!   ただしバースト転送時には１サイクル毎にウェイトが入る.
+                              --! * RDATA_REGS=2 ２段のレジスタを通す.
+                              --! * RDATA_REGS=3 ３段のレジスタを通す.
+                              --!   このモードの場合、必ずRDATA/RRESPは一つのレジスタ
+                              --!   で受けるので外部インターフェース向き.
+                              integer := 0
     );
     port(
     ------------------------------------------------------------------------------
@@ -867,7 +877,8 @@ begin
             XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => M_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => M_MAX_XFER_SIZE     , -- 
-            QUEUE_SIZE          => 1                     -- 
+            QUEUE_SIZE          => 1                   , --
+            RDATA_REGS          => RDATA_REGS            -- 
         )                                                -- 
         port map(                                        -- 
         ---------------------------------------------------------------------------

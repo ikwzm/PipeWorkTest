@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4_core.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4)
---!     @version 0.7.0
---!     @date    2014/3/23
+--!     @version 1.0.0
+--!     @date    2015/5/6
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2014 Ichiro Kawazome
+--      Copyright (C) 2012-2015 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -89,6 +89,22 @@ entity  PUMP_AXI4_TO_AXI4_CORE is
                           --! PUMP INTAKE のリクエストキューの大きさを指定する.
                           --! 詳細は PipeWork.Components の AXI4_MASTER_READ_INTERFACE を参照.
                           integer :=  1;
+        I_RDATA_REGS    : --! @brief RDATA REGISTER TYPE :
+                          --! RDATA/RRESP/RLAST/RVALID の入力をどうするか指定する.
+                          --! * RDATA_REGS=0 スルー入力(レジスタは通さない).
+                          --! * RDATA_REGS=1 １段だけレジスタを通す. 
+                          --!   ただしバースト転送時には１サイクル毎にウェイトが入る.
+                          --! * RDATA_REGS=2 ２段のレジスタを通す.
+                          --! * RDATA_REGS=3 ３段のレジスタを通す.
+                          --!   このモードの場合、必ずRDATA/RRESPは一つのレジスタ
+                          --!   で受けるので外部インターフェース向き.
+                          integer := 0;
+        I_ACK_REGS      : --! @brief PUMP INTAKE ACKNOWLEDGE SIGNALS REGSITERED OUT :
+                          --! PUMP INTAKE 側の Acknowledge Signals の出力をレジスタ
+                          --! 出力にするか否かを指定する.
+                          --! * I_ACK_REGS=0で組み合わせ出力.
+                          --! * I_ACK_REGS=1でレジスタ出力.
+                          integer range 0 to 1 := 0;
         O_CLK_RATE      : --! @brief OUTPUT CLOCK RATE :
                           --! I_CLK_RATEとペアで入力側のクロック(I_CLK)と出力側の
                           --! クロック(O_CLK)との関係を指定する.
@@ -131,10 +147,28 @@ entity  PUMP_AXI4_TO_AXI4_CORE is
                           --! PUMP OUTLET の最大転送バイト数を２のべき乗値で指定す
                           --! る.
                           integer :=  8;
+        O_REQ_REGS      : --! @brief  PUMP OUTLET REQUEST REGISTER USE :
+                          --! ライトトランザクションの最初のデータ出力のタイミング
+                          --! を指定する.
+                          --! * REQ_REGS=0でアドレスの出力と同時にデータを出力する.
+                          --! * REQ_REGS=1でアドレスを出力してから１クロック後に
+                          --!   データを出力する.
+                          --! * REQ_REGS=1にすると動作周波数が向上する可能性がある.
+                          integer range 0 to 1 := 0;
+        O_ACK_REGS      : --! @brief PUMP OUTLET ACKNOWLEDGE SIGNALS REGSITERED OUT :
+                          --! PUMP OUTLET 側の Acknowledge Signals の出力をレジスタ
+                          --! 出力にするか否かを指定する.
+                          --! * O_ACK_REGS=0で組み合わせ出力.
+                          --! * O_ACK_REGS=1でレジスタ出力.
+                          integer range 0 to 1 := 0;
         O_RES_QUEUE     : --! @brief PUMP OUTLET RESPONSE QUEUE SIZE :
                           --! PUMP OUTLET のレスポンスキューの大きさを指定する.
                           --! 詳細は PipeWork.Components の AXI4_MASTER_WRITE_INTERFACE を参照.
                           integer :=  2;
+        O_RES_REGS      : --! @brief PUMP OUTLET RESPONSE REGISTER USE :
+                          --! レスポンスの入力側にレジスタを挿入する.
+                          --! 詳細は PipeWork.Components の AXI4_MASTER_WRITE_INTERFACE を参照.
+                          integer :=  1;
         BUF_DEPTH       : --! @brief BUFFER DEPTH :
                           --! バッファの大きさ(バイト数)を２のべき乗で指定する.
                           --! * バッファの大きさは I_MAX_XFER_SIZE で示される入力側
@@ -210,6 +244,7 @@ entity  PUMP_AXI4_TO_AXI4_CORE is
         I_PROT          : in  AXI4_APROT_TYPE  ;
         I_QOS           : in  AXI4_AQOS_TYPE   ;
         I_REGION        : in  AXI4_AREGION_TYPE;
+        I_AUSER         : in  std_logic_vector(I_AUSER_WIDTH  -1 downto 0);
     -------------------------------------------------------------------------------
     -- Pump Outlet Control Register I/F Signals.
     -------------------------------------------------------------------------------
@@ -261,11 +296,12 @@ entity  PUMP_AXI4_TO_AXI4_CORE is
         O_PROT          : in  AXI4_APROT_TYPE  ;
         O_QOS           : in  AXI4_AQOS_TYPE   ;
         O_REGION        : in  AXI4_AREGION_TYPE;
+        O_AUSER         : in  std_logic_vector(O_AUSER_WIDTH  -1 downto 0);
     -------------------------------------------------------------------------------
     -- Pump Intake AXI4 Read Address Channel Signals.
     -------------------------------------------------------------------------------
-        I_ARID          : out std_logic_vector(I_ID_WIDTH    -1 downto 0);
-        I_ARADDR        : out std_logic_vector(I_ADDR_WIDTH  -1 downto 0);
+        I_ARID          : out std_logic_vector(I_ID_WIDTH     -1 downto 0);
+        I_ARADDR        : out std_logic_vector(I_ADDR_WIDTH   -1 downto 0);
         I_ARLEN         : out AXI4_ALEN_TYPE;
         I_ARSIZE        : out AXI4_ASIZE_TYPE;
         I_ARBURST       : out AXI4_ABURST_TYPE;
@@ -274,24 +310,24 @@ entity  PUMP_AXI4_TO_AXI4_CORE is
         I_ARPROT        : out AXI4_APROT_TYPE;
         I_ARQOS         : out AXI4_AQOS_TYPE;
         I_ARREGION      : out AXI4_AREGION_TYPE;
-        I_ARUSER        : out std_logic_vector(I_AUSER_WIDTH -1 downto 0);
+        I_ARUSER        : out std_logic_vector(I_AUSER_WIDTH  -1 downto 0);
         I_ARVALID       : out std_logic;
         I_ARREADY       : in  std_logic;
     ------------------------------------------------------------------------------
     -- Pump Intake AXI4 Read Data Channel Signals.
     ------------------------------------------------------------------------------
-        I_RID           : in  std_logic_vector(I_ID_WIDTH    -1 downto 0);
-        I_RDATA         : in  std_logic_vector(I_DATA_WIDTH  -1 downto 0);
+        I_RID           : in  std_logic_vector(I_ID_WIDTH     -1 downto 0);
+        I_RDATA         : in  std_logic_vector(I_DATA_WIDTH   -1 downto 0);
         I_RRESP         : in  AXI4_RESP_TYPE;
         I_RLAST         : in  std_logic;
-        I_RUSER         : in  std_logic_vector(I_RUSER_WIDTH -1 downto 0);
+        I_RUSER         : in  std_logic_vector(I_RUSER_WIDTH  -1 downto 0);
         I_RVALID        : in  std_logic;
         I_RREADY        : out std_logic;
     ------------------------------------------------------------------------------
     -- Pump Outlet AXI4 Write Address Channel Signals.
     ------------------------------------------------------------------------------
-        O_AWID          : out std_logic_vector(O_ID_WIDTH    -1 downto 0);
-        O_AWADDR        : out std_logic_vector(O_ADDR_WIDTH  -1 downto 0);
+        O_AWID          : out std_logic_vector(O_ID_WIDTH     -1 downto 0);
+        O_AWADDR        : out std_logic_vector(O_ADDR_WIDTH   -1 downto 0);
         O_AWLEN         : out AXI4_ALEN_TYPE;
         O_AWSIZE        : out AXI4_ASIZE_TYPE;
         O_AWBURST       : out AXI4_ABURST_TYPE;
@@ -300,25 +336,25 @@ entity  PUMP_AXI4_TO_AXI4_CORE is
         O_AWPROT        : out AXI4_APROT_TYPE;
         O_AWQOS         : out AXI4_AQOS_TYPE;
         O_AWREGION      : out AXI4_AREGION_TYPE;
-        O_AWUSER        : out std_logic_vector(O_AUSER_WIDTH -1 downto 0);
+        O_AWUSER        : out std_logic_vector(O_AUSER_WIDTH  -1 downto 0);
         O_AWVALID       : out std_logic;
         O_AWREADY       : in  std_logic;
     ------------------------------------------------------------------------------
     -- Pump Outlet AXI4 Write Data Channel Signals.
     ------------------------------------------------------------------------------
-        O_WID           : out std_logic_vector(O_ID_WIDTH    -1 downto 0);
-        O_WDATA         : out std_logic_vector(O_DATA_WIDTH  -1 downto 0);
-        O_WSTRB         : out std_logic_vector(O_DATA_WIDTH/8-1 downto 0);
-        O_WUSER         : out std_logic_vector(O_WUSER_WIDTH -1 downto 0);
+        O_WID           : out std_logic_vector(O_ID_WIDTH     -1 downto 0);
+        O_WDATA         : out std_logic_vector(O_DATA_WIDTH   -1 downto 0);
+        O_WSTRB         : out std_logic_vector(O_DATA_WIDTH/8 -1 downto 0);
+        O_WUSER         : out std_logic_vector(O_WUSER_WIDTH  -1 downto 0);
         O_WLAST         : out std_logic;
         O_WVALID        : out std_logic;
         O_WREADY        : in  std_logic;
     ------------------------------------------------------------------------------
     -- Pump Outlet AXI4 Write Response Channel Signals.
     ------------------------------------------------------------------------------
-        O_BID           : in  std_logic_vector(O_ID_WIDTH    -1 downto 0);
+        O_BID           : in  std_logic_vector(O_ID_WIDTH     -1 downto 0);
         O_BRESP         : in  AXI4_RESP_TYPE;
-        O_BUSER         : in  std_logic_vector(O_BUSER_WIDTH -1 downto 0);
+        O_BUSER         : in  std_logic_vector(O_BUSER_WIDTH  -1 downto 0);
         O_BVALID        : in  std_logic;
         O_BREADY        : out std_logic;
     -------------------------------------------------------------------------------
@@ -547,7 +583,9 @@ begin
             XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => I_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => I_MAX_XFER_SIZE     , -- 
-            QUEUE_SIZE          => I_REQ_QUEUE           -- 
+            QUEUE_SIZE          => I_REQ_QUEUE         , --
+            RDATA_REGS          => I_RDATA_REGS        , --
+            ACK_REGS            => I_ACK_REGS            -- 
         )                                                -- 
         port map (                                       -- 
         --------------------------------------------------------------------------
@@ -654,7 +692,17 @@ begin
             BUF_DATA            => buf_wdata           , -- Out :
             BUF_PTR             => buf_wptr              -- Out :
         );
-    I_ARUSER         <= (others => '0');
+    process (I_CLK, RST) begin
+        if (RST = '1') then
+                I_ARUSER <= (others => '0');
+        elsif (I_CLK'event and I_CLK = '1') then
+            if (I_CLR = '1') then
+                I_ARUSER <= (others => '0');
+            elsif (i_req_valid = '1' and i_req_ready = '1') then
+                I_ARUSER <= I_AUSER;
+            end if;
+        end if;
+    end process;
     i_req_burst_type <= AXI4_ABURST_FIXED when (I_ADDR_FIX = '1') else AXI4_ABURST_INCR;
     ------------------------------------------------------------------------------
     -- 
@@ -673,8 +721,11 @@ begin
             XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => O_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => O_MAX_XFER_SIZE     , -- 
-            QUEUE_SIZE          => O_RES_QUEUE           -- 
-            )                                            -- 
+            REQ_REGS            => O_REQ_REGS          , -- 
+            ACK_REGS            => O_ACK_REGS          , -- 
+            QUEUE_SIZE          => O_RES_QUEUE         , -- 
+            RESP_REGS           => O_RES_REGS            -- 
+        )                                                -- 
         port map (                                       -- 
         --------------------------------------------------------------------------
         -- Clock and Reset Signals.
@@ -786,7 +837,17 @@ begin
             BUF_DATA            => buf_rdata           , -- In  :
             BUF_PTR             => buf_rptr              -- Out :
         );
-    O_AWUSER         <= (others => '0');
+    process (O_CLK, RST) begin
+        if (RST = '1') then
+                O_AWUSER <= (others => '0');
+        elsif (O_CLK'event and O_CLK = '1') then
+            if (O_CLR = '1') then
+                O_AWUSER <= (others => '0');
+            elsif (o_req_valid = '1' and o_req_ready = '1') then
+                O_AWUSER <= O_AUSER;
+            end if;
+        end if;
+    end process;
     O_WUSER          <= (others => '0');
     o_req_burst_type <= AXI4_ABURST_FIXED when (O_ADDR_FIX = '1') else AXI4_ABURST_INCR;
     -------------------------------------------------------------------------------

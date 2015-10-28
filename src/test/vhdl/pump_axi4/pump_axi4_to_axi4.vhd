@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4.vhd
 --!     @brief   Pump Sample Module (AXI4 to AXI4)
---!     @version 0.8.0
---!     @date    2014/5/22
+--!     @version 1.0.0
+--!     @date    2015/5/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2014 Ichiro Kawazome
+--      Copyright (C) 2012-2015 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,6 @@
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-library PipeWork;
-use     PipeWork.AXI4_TYPES.all;
 -----------------------------------------------------------------------------------
 --! @brief 
 -----------------------------------------------------------------------------------
@@ -46,50 +44,47 @@ entity  PUMP_AXI4_TO_AXI4 is
     -- 
     -------------------------------------------------------------------------------
     generic (
-        C_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
-        C_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        C_ID_WIDTH      : integer                                :=  4;
-        M_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
-        M_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        M_ID_WIDTH      : integer                                :=  4;
-        M_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
-        M_AXI_ID        : integer                                :=  1;
-        I_AXI_ID        : integer                                :=  1;
-        I_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
-        I_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        I_ID_WIDTH      : integer                                :=  4;
-        I_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
-        I_RUSER_WIDTH   : integer range 1 to 32                  :=  4;
-        I_WUSER_WIDTH   : integer range 1 to 32                  :=  4;
-        I_BUSER_WIDTH   : integer range 1 to 32                  :=  4;
-        I_MAX_XFER_SIZE : integer                                :=  8;
-        I_PROC_VALID    : integer                                :=  1;
-        O_AXI_ID        : integer                                :=  2;
-        O_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
-        O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        O_ID_WIDTH      : integer                                :=  4;
-        O_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
-        O_RUSER_WIDTH   : integer range 1 to 32                  :=  4;
-        O_WUSER_WIDTH   : integer range 1 to 32                  :=  4;
-        O_BUSER_WIDTH   : integer range 1 to 32                  :=  4;
-        O_MAX_XFER_SIZE : integer                                :=  8;
-        O_PROC_VALID    : integer                                :=  1;
-        BUF_DEPTH       : integer                                := 12
+        C_ADDR_WIDTH    : integer range 1 to   64 := 32;
+        C_DATA_WIDTH    : integer range 8 to 1024 := 32;
+        C_ID_WIDTH      : integer                 :=  8;
+        M_ADDR_WIDTH    : integer range 1 to   64 := 32;
+        M_DATA_WIDTH    : integer range 8 to 1024 := 32;
+        M_ID_WIDTH      : integer                 :=  8;
+        M_AUSER_WIDTH   : integer                 :=  4;
+        M_AXI_ID        : integer                 :=  1;
+        I_AXI_ID        : integer                 :=  1;
+        I_ADDR_WIDTH    : integer range 1 to   64 := 32;
+        I_DATA_WIDTH    : integer range 8 to 1024 := 32;
+        I_ID_WIDTH      : integer                 :=  8;
+        I_AUSER_WIDTH   : integer                 :=  4;
+        I_MAX_XFER_SIZE : integer                 :=  8;
+        I_PROC_VALID    : integer range 0 to    1 :=  1;
+        O_AXI_ID        : integer                 :=  2;
+        O_ADDR_WIDTH    : integer range 1 to   64 := 32;
+        O_DATA_WIDTH    : integer range 8 to 1024 := 32;
+        O_ID_WIDTH      : integer                 :=  8;
+        O_AUSER_WIDTH   : integer                 :=  4;
+        O_MAX_XFER_SIZE : integer                 :=  8;
+        O_PROC_VALID    : integer range 0 to    1 :=  1;
+        BUF_DEPTH       : integer                 := 12
     );
     port(
     -------------------------------------------------------------------------------
-    -- Clock and Reset Signals.
+    -- Reset Signals.
     -------------------------------------------------------------------------------
-        ACLOCK          : in    std_logic;
         ARESETn         : in    std_logic;
+    -------------------------------------------------------------------------------
+    -- Control Status Register I/F Clock.
+    -------------------------------------------------------------------------------
+        C_CLK           : in    std_logic;
     -------------------------------------------------------------------------------
     -- Control Status Register I/F AXI4 Read Address Channel Signals.
     -------------------------------------------------------------------------------
         C_ARID          : in    std_logic_vector(C_ID_WIDTH    -1 downto 0);
         C_ARADDR        : in    std_logic_vector(C_ADDR_WIDTH  -1 downto 0);
-        C_ARLEN         : in    AXI4_ALEN_TYPE;
-        C_ARSIZE        : in    AXI4_ASIZE_TYPE;
-        C_ARBURST       : in    AXI4_ABURST_TYPE;
+        C_ARLEN         : in    std_logic_vector(7 downto 0);
+        C_ARSIZE        : in    std_logic_vector(2 downto 0);
+        C_ARBURST       : in    std_logic_vector(1 downto 0);
         C_ARVALID       : in    std_logic;
         C_ARREADY       : out   std_logic;
     -------------------------------------------------------------------------------
@@ -97,7 +92,7 @@ entity  PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
         C_RID           : out   std_logic_vector(C_ID_WIDTH    -1 downto 0);
         C_RDATA         : out   std_logic_vector(C_DATA_WIDTH  -1 downto 0);
-        C_RRESP         : out   AXI4_RESP_TYPE;
+        C_RRESP         : out   std_logic_vector(1 downto 0);
         C_RLAST         : out   std_logic;
         C_RVALID        : out   std_logic;
         C_RREADY        : in    std_logic;
@@ -106,9 +101,9 @@ entity  PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
         C_AWID          : in    std_logic_vector(C_ID_WIDTH    -1 downto 0);
         C_AWADDR        : in    std_logic_vector(C_ADDR_WIDTH  -1 downto 0);
-        C_AWLEN         : in    AXI4_ALEN_TYPE;
-        C_AWSIZE        : in    AXI4_ASIZE_TYPE;
-        C_AWBURST       : in    AXI4_ABURST_TYPE;
+        C_AWLEN         : in    std_logic_vector(7 downto 0);
+        C_AWSIZE        : in    std_logic_vector(2 downto 0);
+        C_AWBURST       : in    std_logic_vector(1 downto 0);
         C_AWVALID       : in    std_logic;
         C_AWREADY       : out   std_logic;
     -------------------------------------------------------------------------------
@@ -123,22 +118,26 @@ entity  PUMP_AXI4_TO_AXI4 is
     -- Control Status Register I/F AXI4 Write Response Channel Signals.
     -------------------------------------------------------------------------------
         C_BID           : out   std_logic_vector(C_ID_WIDTH    -1 downto 0);
-        C_BRESP         : out   AXI4_RESP_TYPE;
+        C_BRESP         : out   std_logic_vector(1 downto 0);
         C_BVALID        : out   std_logic;
         C_BREADY        : in    std_logic;
+    -------------------------------------------------------------------------------
+    -- Operation Code Fetch I/F Clock.
+    -------------------------------------------------------------------------------
+        M_CLK           : in    std_logic;
     -------------------------------------------------------------------------------
     -- Operation Code Fetch I/F AXI4 Read Address Channel Signals.
     -------------------------------------------------------------------------------
         M_ARID          : out   std_logic_vector(M_ID_WIDTH    -1 downto 0);
         M_ARADDR        : out   std_logic_vector(M_ADDR_WIDTH  -1 downto 0);
-        M_ARLEN         : out   AXI4_ALEN_TYPE;
-        M_ARSIZE        : out   AXI4_ASIZE_TYPE;
-        M_ARBURST       : out   AXI4_ABURST_TYPE;
-        M_ARLOCK        : out   AXI4_ALOCK_TYPE;
-        M_ARCACHE       : out   AXI4_ACACHE_TYPE;
-        M_ARPROT        : out   AXI4_APROT_TYPE;
-        M_ARQOS         : out   AXI4_AQOS_TYPE;
-        M_ARREGION      : out   AXI4_AREGION_TYPE;
+        M_ARLEN         : out   std_logic_vector(7 downto 0);
+        M_ARSIZE        : out   std_logic_vector(2 downto 0);
+        M_ARBURST       : out   std_logic_vector(1 downto 0);
+        M_ARLOCK        : out   std_logic_vector(0 downto 0);
+        M_ARCACHE       : out   std_logic_vector(3 downto 0);
+        M_ARPROT        : out   std_logic_vector(2 downto 0);
+        M_ARQOS         : out   std_logic_vector(3 downto 0);
+        M_ARREGION      : out   std_logic_vector(3 downto 0);
         M_ARUSER        : out   std_logic_vector(M_AUSER_WIDTH -1 downto 0);
         M_ARVALID       : out   std_logic;
         M_ARREADY       : in    std_logic;
@@ -147,7 +146,7 @@ entity  PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
         M_RID           : in    std_logic_vector(M_ID_WIDTH    -1 downto 0);
         M_RDATA         : in    std_logic_vector(M_DATA_WIDTH  -1 downto 0);
-        M_RRESP         : in    AXI4_RESP_TYPE;
+        M_RRESP         : in    std_logic_vector(1 downto 0);
         M_RLAST         : in    std_logic;
         M_RVALID        : in    std_logic;
         M_RREADY        : out   std_logic;
@@ -156,14 +155,14 @@ entity  PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
         M_AWID          : out   std_logic_vector(M_ID_WIDTH    -1 downto 0);
         M_AWADDR        : out   std_logic_vector(M_ADDR_WIDTH  -1 downto 0);
-        M_AWLEN         : out   AXI4_ALEN_TYPE;
-        M_AWSIZE        : out   AXI4_ASIZE_TYPE;
-        M_AWBURST       : out   AXI4_ABURST_TYPE;
-        M_AWLOCK        : out   AXI4_ALOCK_TYPE;
-        M_AWCACHE       : out   AXI4_ACACHE_TYPE;
-        M_AWPROT        : out   AXI4_APROT_TYPE;
-        M_AWQOS         : out   AXI4_AQOS_TYPE;
-        M_AWREGION      : out   AXI4_AREGION_TYPE;
+        M_AWLEN         : out   std_logic_vector(7 downto 0);
+        M_AWSIZE        : out   std_logic_vector(2 downto 0);
+        M_AWBURST       : out   std_logic_vector(1 downto 0);
+        M_AWLOCK        : out   std_logic_vector(0 downto 0);
+        M_AWCACHE       : out   std_logic_vector(3 downto 0);
+        M_AWPROT        : out   std_logic_vector(2 downto 0);
+        M_AWQOS         : out   std_logic_vector(3 downto 0);
+        M_AWREGION      : out   std_logic_vector(3 downto 0);
         M_AWUSER        : out   std_logic_vector(M_AUSER_WIDTH -1 downto 0);
         M_AWVALID       : out   std_logic;
         M_AWREADY       : in    std_logic;
@@ -179,32 +178,34 @@ entity  PUMP_AXI4_TO_AXI4 is
     -- Operation Code Fetch I/F AXI4 Write Response Channel Signals.
     -------------------------------------------------------------------------------
         M_BID           : in    std_logic_vector(M_ID_WIDTH    -1 downto 0);
-        M_BRESP         : in    AXI4_RESP_TYPE;
+        M_BRESP         : in    std_logic_vector(1 downto 0);
         M_BVALID        : in    std_logic;
         M_BREADY        : out   std_logic;
+    -------------------------------------------------------------------------------
+    -- Pump Intake I/F Clock.
+    -------------------------------------------------------------------------------
+        I_CLK           : in    std_logic;
     -------------------------------------------------------------------------------
     -- Pump Intake I/F AXI4 Write Address Channel Signals.
     -------------------------------------------------------------------------------
         I_AWID          : out   std_logic_vector(I_ID_WIDTH    -1 downto 0);
         I_AWADDR        : out   std_logic_vector(I_ADDR_WIDTH  -1 downto 0);
-        I_AWLEN         : out   AXI4_ALEN_TYPE;
-        I_AWSIZE        : out   AXI4_ASIZE_TYPE;
-        I_AWBURST       : out   AXI4_ABURST_TYPE;
-        I_AWLOCK        : out   AXI4_ALOCK_TYPE;
-        I_AWCACHE       : out   AXI4_ACACHE_TYPE;
-        I_AWPROT        : out   AXI4_APROT_TYPE;
-        I_AWQOS         : out   AXI4_AQOS_TYPE;
-        I_AWREGION      : out   AXI4_AREGION_TYPE;
+        I_AWLEN         : out   std_logic_vector(7 downto 0);
+        I_AWSIZE        : out   std_logic_vector(2 downto 0);
+        I_AWBURST       : out   std_logic_vector(1 downto 0);
+        I_AWLOCK        : out   std_logic_vector(0 downto 0);
+        I_AWCACHE       : out   std_logic_vector(3 downto 0);
+        I_AWPROT        : out   std_logic_vector(2 downto 0);
+        I_AWQOS         : out   std_logic_vector(3 downto 0);
+        I_AWREGION      : out   std_logic_vector(3 downto 0);
         I_AWUSER        : out   std_logic_vector(I_AUSER_WIDTH -1 downto 0);
         I_AWVALID       : out   std_logic;
         I_AWREADY       : in    std_logic;
     -------------------------------------------------------------------------------
     -- Pump Intake I/F AXI4 Write Data Channel Signals.
     -------------------------------------------------------------------------------
-        I_WID           : out   std_logic_vector(I_ID_WIDTH    -1 downto 0);
         I_WDATA         : out   std_logic_vector(I_DATA_WIDTH  -1 downto 0);
         I_WSTRB         : out   std_logic_vector(I_DATA_WIDTH/8-1 downto 0);
-        I_WUSER         : out   std_logic_vector(I_WUSER_WIDTH -1 downto 0);
         I_WLAST         : out   std_logic;
         I_WVALID        : out   std_logic;
         I_WREADY        : in    std_logic;
@@ -212,8 +213,7 @@ entity  PUMP_AXI4_TO_AXI4 is
     -- Pump Intake I/F AXI4 Write Response Channel Signals.
     -------------------------------------------------------------------------------
         I_BID           : in    std_logic_vector(I_ID_WIDTH    -1 downto 0);
-        I_BRESP         : in    AXI4_RESP_TYPE;
-        I_BUSER         : in    std_logic_vector(I_BUSER_WIDTH -1 downto 0);
+        I_BRESP         : in    std_logic_vector(1 downto 0);
         I_BVALID        : in    std_logic;
         I_BREADY        : out   std_logic;
     -------------------------------------------------------------------------------
@@ -221,14 +221,14 @@ entity  PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
         I_ARID          : out   std_logic_vector(I_ID_WIDTH    -1 downto 0);
         I_ARADDR        : out   std_logic_vector(I_ADDR_WIDTH  -1 downto 0);
-        I_ARLEN         : out   AXI4_ALEN_TYPE;
-        I_ARSIZE        : out   AXI4_ASIZE_TYPE;
-        I_ARBURST       : out   AXI4_ABURST_TYPE;
-        I_ARLOCK        : out   AXI4_ALOCK_TYPE;
-        I_ARCACHE       : out   AXI4_ACACHE_TYPE;
-        I_ARPROT        : out   AXI4_APROT_TYPE;
-        I_ARQOS         : out   AXI4_AQOS_TYPE;
-        I_ARREGION      : out   AXI4_AREGION_TYPE;
+        I_ARLEN         : out   std_logic_vector(7 downto 0);
+        I_ARSIZE        : out   std_logic_vector(2 downto 0);
+        I_ARBURST       : out   std_logic_vector(1 downto 0);
+        I_ARLOCK        : out   std_logic_vector(0 downto 0);
+        I_ARCACHE       : out   std_logic_vector(3 downto 0);
+        I_ARPROT        : out   std_logic_vector(2 downto 0);
+        I_ARQOS         : out   std_logic_vector(3 downto 0);
+        I_ARREGION      : out   std_logic_vector(3 downto 0);
         I_ARUSER        : out   std_logic_vector(I_AUSER_WIDTH -1 downto 0);
         I_ARVALID       : out   std_logic;
         I_ARREADY       : in    std_logic;
@@ -237,24 +237,27 @@ entity  PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
         I_RID           : in    std_logic_vector(I_ID_WIDTH    -1 downto 0);
         I_RDATA         : in    std_logic_vector(I_DATA_WIDTH  -1 downto 0);
-        I_RRESP         : in    AXI4_RESP_TYPE;
+        I_RRESP         : in    std_logic_vector(1 downto 0);
         I_RLAST         : in    std_logic;
-        I_RUSER         : in    std_logic_vector(I_RUSER_WIDTH -1 downto 0);
         I_RVALID        : in    std_logic;
         I_RREADY        : out   std_logic;
+    -------------------------------------------------------------------------------
+    -- Pump Outlet I/F Clock.
+    -------------------------------------------------------------------------------
+        O_CLK           : in    std_logic;
     -------------------------------------------------------------------------------
     -- Pump Outlet I/F AXI4 Read Address Channel Signals.
     -------------------------------------------------------------------------------
         O_ARID          : out   std_logic_vector(O_ID_WIDTH    -1 downto 0);
         O_ARADDR        : out   std_logic_vector(O_ADDR_WIDTH  -1 downto 0);
-        O_ARLEN         : out   AXI4_ALEN_TYPE;
-        O_ARSIZE        : out   AXI4_ASIZE_TYPE;
-        O_ARBURST       : out   AXI4_ABURST_TYPE;
-        O_ARLOCK        : out   AXI4_ALOCK_TYPE;
-        O_ARCACHE       : out   AXI4_ACACHE_TYPE;
-        O_ARPROT        : out   AXI4_APROT_TYPE;
-        O_ARQOS         : out   AXI4_AQOS_TYPE;
-        O_ARREGION      : out   AXI4_AREGION_TYPE;
+        O_ARLEN         : out   std_logic_vector(7 downto 0);
+        O_ARSIZE        : out   std_logic_vector(2 downto 0);
+        O_ARBURST       : out   std_logic_vector(1 downto 0);
+        O_ARLOCK        : out   std_logic_vector(0 downto 0);
+        O_ARCACHE       : out   std_logic_vector(3 downto 0);
+        O_ARPROT        : out   std_logic_vector(2 downto 0);
+        O_ARQOS         : out   std_logic_vector(3 downto 0);
+        O_ARREGION      : out   std_logic_vector(3 downto 0);
         O_ARUSER        : out   std_logic_vector(O_AUSER_WIDTH -1 downto 0);
         O_ARVALID       : out   std_logic;
         O_ARREADY       : in    std_logic;
@@ -263,9 +266,8 @@ entity  PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
         O_RID           : in    std_logic_vector(O_ID_WIDTH    -1 downto 0);
         O_RDATA         : in    std_logic_vector(O_DATA_WIDTH  -1 downto 0);
-        O_RRESP         : in    AXI4_RESP_TYPE;
+        O_RRESP         : in    std_logic_vector(1 downto 0);
         O_RLAST         : in    std_logic;
-        O_RUSER         : in    std_logic_vector(O_RUSER_WIDTH -1 downto 0);
         O_RVALID        : in    std_logic;
         O_RREADY        : out   std_logic;
     -------------------------------------------------------------------------------
@@ -273,24 +275,22 @@ entity  PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
         O_AWID          : out   std_logic_vector(O_ID_WIDTH    -1 downto 0);
         O_AWADDR        : out   std_logic_vector(O_ADDR_WIDTH  -1 downto 0);
-        O_AWLEN         : out   AXI4_ALEN_TYPE;
-        O_AWSIZE        : out   AXI4_ASIZE_TYPE;
-        O_AWBURST       : out   AXI4_ABURST_TYPE;
-        O_AWLOCK        : out   AXI4_ALOCK_TYPE;
-        O_AWCACHE       : out   AXI4_ACACHE_TYPE;
-        O_AWPROT        : out   AXI4_APROT_TYPE;
-        O_AWQOS         : out   AXI4_AQOS_TYPE;
-        O_AWREGION      : out   AXI4_AREGION_TYPE;
+        O_AWLEN         : out   std_logic_vector(7 downto 0);
+        O_AWSIZE        : out   std_logic_vector(2 downto 0);
+        O_AWBURST       : out   std_logic_vector(1 downto 0);
+        O_AWLOCK        : out   std_logic_vector(0 downto 0);
+        O_AWCACHE       : out   std_logic_vector(3 downto 0);
+        O_AWPROT        : out   std_logic_vector(2 downto 0);
+        O_AWQOS         : out   std_logic_vector(3 downto 0);
+        O_AWREGION      : out   std_logic_vector(3 downto 0);
         O_AWUSER        : out   std_logic_vector(O_AUSER_WIDTH -1 downto 0);
         O_AWVALID       : out   std_logic;
         O_AWREADY       : in    std_logic;
     -------------------------------------------------------------------------------
     -- Pump Outlet I/F AXI4 Write Data Channel Signals.
     -------------------------------------------------------------------------------
-        O_WID           : out   std_logic_vector(O_ID_WIDTH    -1 downto 0);
         O_WDATA         : out   std_logic_vector(O_DATA_WIDTH  -1 downto 0);
         O_WSTRB         : out   std_logic_vector(O_DATA_WIDTH/8-1 downto 0);
-        O_WUSER         : out   std_logic_vector(O_WUSER_WIDTH -1 downto 0);
         O_WLAST         : out   std_logic;
         O_WVALID        : out   std_logic;
         O_WREADY        : in    std_logic;
@@ -298,8 +298,7 @@ entity  PUMP_AXI4_TO_AXI4 is
     -- Pump Outlet I/F AXI4 Write Response Channel Signals.
     -------------------------------------------------------------------------------
         O_BID           : in    std_logic_vector(O_ID_WIDTH    -1 downto 0);
-        O_BRESP         : in    AXI4_RESP_TYPE;
-        O_BUSER         : in    std_logic_vector(O_BUSER_WIDTH -1 downto 0);
+        O_BRESP         : in    std_logic_vector(1 downto 0);
         O_BVALID        : in    std_logic;
         O_BREADY        : out   std_logic;
     -------------------------------------------------------------------------------
@@ -353,6 +352,9 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     constant I_PROT             : AXI4_APROT_TYPE  := (others => '0');
     constant I_QOS              : AXI4_AQOS_TYPE   := (others => '0');
     constant I_REGION           : AXI4_AREGION_TYPE:= (others => '0');
+    constant I_ACK_REGS         : integer := 1;
+    constant I_REQ_QUEUE        : integer := 2;
+    constant I_RDATA_REGS       : integer := 3;
     -------------------------------------------------------------------------------
     -- 定数
     -------------------------------------------------------------------------------
@@ -361,6 +363,10 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     constant O_PROT             : AXI4_APROT_TYPE  := (others => '0');
     constant O_QOS              : AXI4_AQOS_TYPE   := (others => '0');
     constant O_REGION           : AXI4_AREGION_TYPE:= (others => '0');
+    constant O_REQ_REGS         : integer := 1;
+    constant O_ACK_REGS         : integer := 1;
+    constant O_RES_QUEUE        : integer := 2;
+    constant O_RES_REGS         : integer := 1;
     -------------------------------------------------------------------------------
     -- レジスタアクセス用の信号群.
     -------------------------------------------------------------------------------
@@ -445,7 +451,8 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     -- Mode[15]    = 1:AXI4 Master I/F をセイフティモードで動かすことを示す.
     -- Mode[14]    = 1:AXI4 Master I/F を投機モードで動かすことを示す.
     -- Mode[13]    = 1:AXI4 Master I/F をアドレス固定モードにすることを示す.
-    -- Mode[11:08] = AXI4 Master I/F のキャッシュモードを指定する.
+    -- Mode[12:08] = AXI4 Master I/F の ARUSER/AWUSER の値を指定する.
+    -- Mode[07:04] = AXI4 Master I/F のキャッシュモードを指定する.
     -- Mode[01]    = 1:エラー発生時(Status[1]='1')に割り込みを発生する.
     -- Mode[00]    = 1:転送終了時(Status[0]='1')に割り込みを発生する.
     -- Size[31:00] = 転送サイズ.
@@ -566,7 +573,8 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     -- Mode[15]    = 1:AXI4 Master Write I/F をセイフティモードで動かす.
     -- Mode[14]    = 1:AXI4 Master Write I/F を投機モードで動かす.
     -- Mode[13]    = 1:AXI4 Master Write I/F をアドレス固定モードにする.
-    -- Mode[11:08] = AXI4 Master Write I/F のキャッシュモードを指定する.
+    -- Mode[12:08] = AXI4 Master Write I/F の AWUSER の値を指定する.
+    -- Mode[07:04] = AXI4 Master Write I/F のキャッシュモードを指定する.
     -- Mode[01]    = 1:エラー発生時(Status[1]='1')に割り込みを発生する.
     -- Mode[00]    = 1:転送終了時(Status[0]='1')に割り込みを発生する.
     -------------------------------------------------------------------------------
@@ -577,8 +585,10 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     constant CO_MODE_SAFETY_POS : integer := 8*CO_MODE_REGS_ADDR + 15;
     constant CO_MODE_SPECUL_POS : integer := 8*CO_MODE_REGS_ADDR + 14;
     constant CO_MODE_AFIX_POS   : integer := 8*CO_MODE_REGS_ADDR + 13;
-    constant CO_MODE_CACHE_HI   : integer := 8*CO_MODE_REGS_ADDR + 11;
-    constant CO_MODE_CACHE_LO   : integer := 8*CO_MODE_REGS_ADDR +  8;
+    constant CO_MODE_AUSER_HI   : integer := 8*CO_MODE_REGS_ADDR + 12;
+    constant CO_MODE_AUSER_LO   : integer := 8*CO_MODE_REGS_ADDR +  8;
+    constant CO_MODE_CACHE_HI   : integer := 8*CO_MODE_REGS_ADDR +  7;
+    constant CO_MODE_CACHE_LO   : integer := 8*CO_MODE_REGS_ADDR +  4;
     constant CO_MODE_ERROR_POS  : integer := 8*CO_MODE_REGS_ADDR +  1;
     constant CO_MODE_DONE_POS   : integer := 8*CO_MODE_REGS_ADDR +  0;
     -------------------------------------------------------------------------------
@@ -663,7 +673,8 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     -- Mode[15]    = 1:AXI4 Master Read I/F をセイフティモードで動かす.
     -- Mode[14]    = 1:AXI4 Master Read I/F を投機モードで動かす.
     -- Mode[13]    = 1:AXI4 Master Read I/F をアドレス固定モードにする.
-    -- Mode[11:08] = AXI4 Master Read I/F のキャッシュモードを指定する.
+    -- Mode[11:08] = AXI4 Master Read I/F の ARUSER の値を指定する.
+    -- Mode[07:04] = AXI4 Master Read I/F のキャッシュモードを指定する.
     -- Mode[01]    = 1:エラー発生時(Status[1]='1')に割り込みを発生する.
     -- Mode[00]    = 1:転送終了時(Status[0]='1')に割り込みを発生する.
     -------------------------------------------------------------------------------
@@ -674,8 +685,10 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     constant CI_MODE_SAFETY_POS : integer := 8*CI_MODE_REGS_ADDR + 15;
     constant CI_MODE_SPECUL_POS : integer := 8*CI_MODE_REGS_ADDR + 14;
     constant CI_MODE_AFIX_POS   : integer := 8*CI_MODE_REGS_ADDR + 13;
-    constant CI_MODE_CACHE_HI   : integer := 8*CI_MODE_REGS_ADDR + 11;
-    constant CI_MODE_CACHE_LO   : integer := 8*CI_MODE_REGS_ADDR +  8;
+    constant CI_MODE_AUSER_HI   : integer := 8*CI_MODE_REGS_ADDR + 12;
+    constant CI_MODE_AUSER_LO   : integer := 8*CI_MODE_REGS_ADDR +  8;
+    constant CI_MODE_CACHE_HI   : integer := 8*CI_MODE_REGS_ADDR +  7;
+    constant CI_MODE_CACHE_LO   : integer := 8*CI_MODE_REGS_ADDR +  4;
     constant CI_MODE_ERROR_POS  : integer := 8*CI_MODE_REGS_ADDR +  1;
     constant CI_MODE_DONE_POS   : integer := 8*CI_MODE_REGS_ADDR +  0;
     -------------------------------------------------------------------------------
@@ -747,15 +760,18 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
     -- Pump Outlet Processor Mode Register
     -------------------------------------------------------------------------------
-    -- Mode[43:40] = AXI4 Master Read I/F のキャッシュモードを指定する.
+    -- Mode[44:40] = AXI4 Master Read I/F の ARUSER の値を指定する.
+    -- Mode[39:36] = AXI4 Master Read I/F のキャッシュモードを指定する.
     -- Mode[33]    = 1:Operation Code を読み込んだ時(Status[1]='1')に割り込みを発生する.
     -- Mode[32]    = 1:オペレーション終了時(Status[0]='1')に割り込みを発生する.
     -------------------------------------------------------------------------------
     constant PO_MODE_REGS_ADDR  : integer := PO_REGS_BASE_ADDR + 16#08#;
     constant PO_MODE_REGS_HI    : integer := 8*PO_REGS_BASE_ADDR + PO_MODE_HI;
     constant PO_MODE_REGS_LO    : integer := 8*PO_REGS_BASE_ADDR + PO_MODE_LO;
-    constant PO_MODE_CACHE_HI   : integer := 8*PO_REGS_BASE_ADDR + PO_MODE_LO + 43;
-    constant PO_MODE_CACHE_LO   : integer := 8*PO_REGS_BASE_ADDR + PO_MODE_LO + 40;
+    constant PO_MODE_AUSER_HI   : integer := 8*PO_REGS_BASE_ADDR + PO_MODE_LO + 44;
+    constant PO_MODE_AUSER_LO   : integer := 8*PO_REGS_BASE_ADDR + PO_MODE_LO + 40;
+    constant PO_MODE_CACHE_HI   : integer := 8*PO_REGS_BASE_ADDR + PO_MODE_LO + 39;
+    constant PO_MODE_CACHE_LO   : integer := 8*PO_REGS_BASE_ADDR + PO_MODE_LO + 36;
     constant PO_MODE_FETCH_POS  : integer := 8*PO_REGS_BASE_ADDR + PO_MODE_LO + 33;
     constant PO_MODE_END_POS    : integer := 8*PO_REGS_BASE_ADDR + PO_MODE_LO + 32;
     -------------------------------------------------------------------------------
@@ -819,15 +835,18 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
     -- Pump Intake Processor Mode Register
     -------------------------------------------------------------------------------
-    -- Mode[43:40] = AXI4 Master Read I/F のキャッシュモードを指定する.
+    -- Mode[44:40] = AXI4 Master Read I/F の ARUSER の値を指定する.
+    -- Mode[39:36] = AXI4 Master Read I/F のキャッシュモードを指定する.
     -- Mode[33]    = 1:Operation Code を読み込んだ時(Status[1]='1')に割り込みを発生する.
     -- Mode[32]    = 1:オペレーション終了時(Status[0]='1')に割り込みを発生する.
     -------------------------------------------------------------------------------
     constant PI_MODE_REGS_ADDR  : integer := PI_REGS_BASE_ADDR + 16#08#;
     constant PI_MODE_REGS_HI    : integer := 8*PI_REGS_BASE_ADDR + PI_MODE_HI;
     constant PI_MODE_REGS_LO    : integer := 8*PI_REGS_BASE_ADDR + PI_MODE_LO;
-    constant PI_MODE_CACHE_HI   : integer := 8*PI_REGS_BASE_ADDR + PI_MODE_LO + 43;
-    constant PI_MODE_CACHE_LO   : integer := 8*PI_REGS_BASE_ADDR + PI_MODE_LO + 40;
+    constant PI_MODE_AUSER_HI   : integer := 8*PI_REGS_BASE_ADDR + PI_MODE_LO + 44;
+    constant PI_MODE_AUSER_LO   : integer := 8*PI_REGS_BASE_ADDR + PI_MODE_LO + 40;
+    constant PI_MODE_CACHE_HI   : integer := 8*PI_REGS_BASE_ADDR + PI_MODE_LO + 39;
+    constant PI_MODE_CACHE_LO   : integer := 8*PI_REGS_BASE_ADDR + PI_MODE_LO + 36;
     constant PI_MODE_FETCH_POS  : integer := 8*PI_REGS_BASE_ADDR + PI_MODE_LO + 33;
     constant PI_MODE_END_POS    : integer := 8*PI_REGS_BASE_ADDR + PI_MODE_LO + 32;
     -------------------------------------------------------------------------------
@@ -870,6 +889,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   core_o_done        : std_logic;
     signal   core_o_error       : std_logic;
     signal   core_o_stat        : std_logic_vector(CO_STAT_RESV_HI downto CO_STAT_RESV_LO);
+    signal   core_o_auser       : std_logic_vector(O_AUSER_WIDTH-1 downto 0);
     -------------------------------------------------------------------------------
     -- Pump Core Intake signals.
     -------------------------------------------------------------------------------
@@ -878,11 +898,33 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     signal   core_i_done        : std_logic;
     signal   core_i_error       : std_logic;
     signal   core_i_stat        : std_logic_vector(CI_STAT_RESV_HI downto CI_STAT_RESV_LO);
+    signal   core_i_auser       : std_logic_vector(I_AUSER_WIDTH-1 downto 0);
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     signal   i_interrupt        : std_logic;
     signal   o_interrupt        : std_logic;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    constant i_ruser            : std_logic_vector(0 downto 0) := (others => '0');
+    constant o_buser            : std_logic_vector(0 downto 0) := (others => '0');
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    function resize(ARG:std_logic_vector;LEN:integer) return std_logic_vector is
+        variable val : std_logic_vector(LEN-1        downto 0);
+        alias    av  : std_logic_vector(ARG'length-1 downto 0) is ARG;
+    begin
+        for i in val'range loop
+            if (i > av'high) then
+                val(i) := '0';
+            else
+                val(i) := av(i);
+            end if;
+        end loop;
+        return val;
+    end function;
     -------------------------------------------------------------------------------
     -- PUMP_AXI4_TO_AXI4_CORE のコンポーネント宣言.
     -------------------------------------------------------------------------------
@@ -901,6 +943,8 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             I_REG_STAT_BITS : integer                                :=  8;
             I_MAX_XFER_SIZE : integer                                :=  8;
             I_REQ_QUEUE     : integer                                :=  1;
+            I_ACK_REGS      : integer range 0 to 1                   :=  0;
+            I_RDATA_REGS    : integer                                :=  0;
             O_CLK_RATE      : integer                                :=  1;
             O_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
@@ -914,7 +958,10 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             O_REG_MODE_BITS : integer                                := 16;
             O_REG_STAT_BITS : integer                                :=  8;
             O_MAX_XFER_SIZE : integer                                :=  1;
+            O_REQ_REGS      : integer range 0 to 1                   :=  0;
+            O_ACK_REGS      : integer range 0 to 1                   :=  0;
             O_RES_QUEUE     : integer                                :=  2;
+            O_RES_REGS      : integer                                :=  1;
             BUF_DEPTH       : integer                                := 12
         );
         port(
@@ -970,6 +1017,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             I_PROT          : in  AXI4_APROT_TYPE  ;
             I_QOS           : in  AXI4_AQOS_TYPE   ;
             I_REGION        : in  AXI4_AREGION_TYPE;
+            I_AUSER         : in  std_logic_vector(I_AUSER_WIDTH  -1 downto 0);
             O_CLK           : in  std_logic; 
             O_CLR           : in  std_logic;
             O_CKE           : in  std_logic;
@@ -1021,8 +1069,9 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             O_PROT          : in  AXI4_APROT_TYPE  ;
             O_QOS           : in  AXI4_AQOS_TYPE   ;
             O_REGION        : in  AXI4_AREGION_TYPE;
-            I_ARID          : out std_logic_vector(I_ID_WIDTH    -1 downto 0);
-            I_ARADDR        : out std_logic_vector(I_ADDR_WIDTH  -1 downto 0);
+            O_AUSER         : in  std_logic_vector(O_AUSER_WIDTH  -1 downto 0);
+            I_ARID          : out std_logic_vector(I_ID_WIDTH     -1 downto 0);
+            I_ARADDR        : out std_logic_vector(I_ADDR_WIDTH   -1 downto 0);
             I_ARLEN         : out AXI4_ALEN_TYPE;
             I_ARSIZE        : out AXI4_ASIZE_TYPE;
             I_ARBURST       : out AXI4_ABURST_TYPE;
@@ -1031,18 +1080,18 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             I_ARPROT        : out AXI4_APROT_TYPE;
             I_ARQOS         : out AXI4_AQOS_TYPE;
             I_ARREGION      : out AXI4_AREGION_TYPE;
-            I_ARUSER        : out std_logic_vector(I_AUSER_WIDTH -1 downto 0);
+            I_ARUSER        : out std_logic_vector(I_AUSER_WIDTH  -1 downto 0);
             I_ARVALID       : out std_logic;
             I_ARREADY       : in  std_logic;
-            I_RID           : in  std_logic_vector(I_ID_WIDTH    -1 downto 0);
-            I_RDATA         : in  std_logic_vector(I_DATA_WIDTH  -1 downto 0);
+            I_RID           : in  std_logic_vector(I_ID_WIDTH     -1 downto 0);
+            I_RDATA         : in  std_logic_vector(I_DATA_WIDTH   -1 downto 0);
             I_RRESP         : in  AXI4_RESP_TYPE;
             I_RLAST         : in  std_logic;
-            I_RUSER         : in  std_logic_vector(I_RUSER_WIDTH -1 downto 0);
+            I_RUSER         : in  std_logic_vector(I_RUSER_WIDTH  -1 downto 0);
             I_RVALID        : in  std_logic;
             I_RREADY        : out std_logic;
-            O_AWID          : out std_logic_vector(O_ID_WIDTH    -1 downto 0);
-            O_AWADDR        : out std_logic_vector(O_ADDR_WIDTH  -1 downto 0);
+            O_AWID          : out std_logic_vector(O_ID_WIDTH     -1 downto 0);
+            O_AWADDR        : out std_logic_vector(O_ADDR_WIDTH   -1 downto 0);
             O_AWLEN         : out AXI4_ALEN_TYPE;
             O_AWSIZE        : out AXI4_ASIZE_TYPE;
             O_AWBURST       : out AXI4_ABURST_TYPE;
@@ -1051,19 +1100,19 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             O_AWPROT        : out AXI4_APROT_TYPE;
             O_AWQOS         : out AXI4_AQOS_TYPE;
             O_AWREGION      : out AXI4_AREGION_TYPE;
-            O_AWUSER        : out std_logic_vector(O_AUSER_WIDTH -1 downto 0);
+            O_AWUSER        : out std_logic_vector(O_AUSER_WIDTH  -1 downto 0);
             O_AWVALID       : out std_logic;
             O_AWREADY       : in  std_logic;
-            O_WID           : out std_logic_vector(O_ID_WIDTH    -1 downto 0);
-            O_WDATA         : out std_logic_vector(O_DATA_WIDTH  -1 downto 0);
-            O_WSTRB         : out std_logic_vector(O_DATA_WIDTH/8-1 downto 0);
-            O_WUSER         : out std_logic_vector(O_WUSER_WIDTH -1 downto 0);
+            O_WID           : out std_logic_vector(O_ID_WIDTH     -1 downto 0);
+            O_WDATA         : out std_logic_vector(O_DATA_WIDTH   -1 downto 0);
+            O_WSTRB         : out std_logic_vector(O_DATA_WIDTH/8 -1 downto 0);
+            O_WUSER         : out std_logic_vector(O_WUSER_WIDTH  -1 downto 0);
             O_WLAST         : out std_logic;
             O_WVALID        : out std_logic;
             O_WREADY        : in  std_logic;
-            O_BID           : in  std_logic_vector(O_ID_WIDTH    -1 downto 0);
+            O_BID           : in  std_logic_vector(O_ID_WIDTH     -1 downto 0);
             O_BRESP         : in  AXI4_RESP_TYPE;
-            O_BUSER         : in  std_logic_vector(O_BUSER_WIDTH -1 downto 0);
+            O_BUSER         : in  std_logic_vector(O_BUSER_WIDTH  -1 downto 0);
             O_BVALID        : in  std_logic;
             O_BREADY        : out std_logic;
             I_OPEN          : out std_logic;
@@ -1094,11 +1143,11 @@ begin
         signal   regs_ben       : std_logic_vector(REGS_DATA_WIDTH/8-1 downto 0);
         signal   regs_wdata     : std_logic_vector(REGS_DATA_WIDTH  -1 downto 0);
         signal   regs_rdata     : std_logic_vector(REGS_DATA_WIDTH  -1 downto 0);
-    begin
+    begin 
         ---------------------------------------------------------------------------
         --
         ---------------------------------------------------------------------------
-        AXI4: AXI4_REGISTER_INTERFACE                  -- 
+        AXI4: AXI4_REGISTER_INTERFACE                  --
             generic map (                              -- 
                 AXI4_ADDR_WIDTH => C_ADDR_WIDTH      , --
                 AXI4_DATA_WIDTH => C_DATA_WIDTH      , --
@@ -1110,7 +1159,7 @@ begin
             -----------------------------------------------------------------------
             -- Clock and Reset Signals.
             -----------------------------------------------------------------------
-                CLK             => ACLOCK            , -- In  :
+                CLK             => C_CLK             , -- In  :
                 RST             => RST               , -- In  :
                 CLR             => CLR               , -- In  :
             -----------------------------------------------------------------------
@@ -1186,7 +1235,7 @@ begin
             )                                          -- 
             port map (                                 -- 
                 RST             => RST               , -- In  :
-                I_CLK           => ACLOCK            , -- In  :
+                I_CLK           => C_CLK             , -- In  :
                 I_CLR           => CLR               , -- In  :
                 I_CKE           => sig_1             , -- In  :
                 I_REQ           => regs_req          , -- In  :
@@ -1198,7 +1247,7 @@ begin
                 I_RDATA         => regs_rdata        , -- Out :
                 I_ACK           => regs_ack          , -- Out :
                 I_ERR           => regs_err          , -- Out :
-                O_CLK           => ACLOCK            , -- In  :
+                O_CLK           => C_CLK             , -- In  :
                 O_CLR           => CLR               , -- In  :
                 O_CKE           => sig_1             , -- In  :
                 O_WDATA         => regs_wbit         , -- Out :
@@ -1217,6 +1266,8 @@ begin
         constant MR_BUF_WIDTH       : integer := 5;
         constant MR_SIZE_BITS       : integer := MR_BUF_SIZE+1;
         constant MR_RES_QUEUE       : integer := 1;
+        constant MR_RDATA_REGS      : integer := 1;
+        constant MR_ACK_REGS        : integer := 1;
         constant MR_MAX_XFER_SIZE   : integer := 4;
         constant MR_ID              : std_logic_vector(M_ID_WIDTH -1 downto 0) := 
                                       std_logic_vector(to_unsigned(M_AXI_ID, M_ID_WIDTH));
@@ -1228,7 +1279,7 @@ begin
         constant MR_QOS             : AXI4_AQOS_TYPE   := (others => '0');
         constant MR_REGION          : AXI4_AREGION_TYPE:= (others => '0');
         signal   mr_cache           : AXI4_ACACHE_TYPE;
-        constant MR_AUSER           : std_logic_vector(M_AUSER_WIDTH -1 downto 0) := (others => '0');
+        signal   mr_auser           : std_logic_vector(4 downto 0);
         signal   mr_req_addr        : std_logic_vector(M_ADDR_WIDTH  -1 downto 0);
         signal   mr_req_size        : std_logic_vector(MR_SIZE_BITS  -1 downto 0);
         signal   mr_req_ptr         : std_logic_vector(MR_BUF_SIZE   -1 downto 0);
@@ -1262,6 +1313,9 @@ begin
         constant MW_BUF_WIDTH       : integer := 5;
         constant MW_SIZE_BITS       : integer := MR_BUF_SIZE+1;
         constant MW_RES_QUEUE       : integer := 1;
+        constant MW_REQ_REGS        : integer := 1;
+        constant MW_ACK_REGS        : integer := 1;
+        constant MW_RESP_REGS       : integer := 1;
         constant MW_MAX_XFER_SIZE   : integer := 4;
         constant MW_ID              : std_logic_vector(M_ID_WIDTH -1 downto 0) := 
                                       std_logic_vector(to_unsigned(M_AXI_ID, M_ID_WIDTH));
@@ -1336,13 +1390,15 @@ begin
                 XFER_SIZE_BITS  => MR_SIZE_BITS      , -- 
                 XFER_MIN_SIZE   => MR_MAX_XFER_SIZE  , -- 
                 XFER_MAX_SIZE   => MR_MAX_XFER_SIZE  , -- 
-                QUEUE_SIZE      => MR_RES_QUEUE        -- 
+                QUEUE_SIZE      => MR_RES_QUEUE      , -- 
+                RDATA_REGS      => MR_RDATA_REGS     , --
+                ACK_REGS        => MR_ACK_REGS         -- 
             )
             port map (
             -----------------------------------------------------------------------
             -- Clock and Reset Signals.
             -----------------------------------------------------------------------
-                CLK             => ACLOCK            , -- In  :
+                CLK             => M_CLK             , -- In  :
                 RST             => RST               , -- In  :
                 CLR             => CLR               , -- In  :
             -----------------------------------------------------------------------
@@ -1440,7 +1496,7 @@ begin
                 BUF_DATA        => mr_buf_wdata      , -- Out :
                 BUF_PTR         => mr_buf_wptr         -- Out :
             );
-        M_ARUSER <= MR_AUSER;
+        M_ARUSER <= resize(mr_auser, M_ARUSER'length);
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
@@ -1458,13 +1514,16 @@ begin
                 XFER_SIZE_BITS  => MW_SIZE_BITS      , -- 
                 XFER_MIN_SIZE   => MW_MAX_XFER_SIZE  , -- 
                 XFER_MAX_SIZE   => MW_MAX_XFER_SIZE  , -- 
-                QUEUE_SIZE      => MW_RES_QUEUE        -- 
+                REQ_REGS        => MW_REQ_REGS       , -- 
+                ACK_REGS        => MW_ACK_REGS       , -- 
+                QUEUE_SIZE      => MW_RES_QUEUE      , -- 
+                RESP_REGS       => MW_RESP_REGS        -- 
             )
             port map (
             -----------------------------------------------------------------------
             -- Clock and Reset Signals.
             -----------------------------------------------------------------------
-                CLK             => ACLOCK            , -- In  :
+                CLK             => M_CLK             , -- In  :
                 RST             => RST               , -- In  :
                 CLR             => CLR               , -- In  :
             -----------------------------------------------------------------------
@@ -1587,7 +1646,7 @@ begin
                     MAX_NUM     => 1               -- 
                 )                                  --
                 port map (                         -- 
-                    CLK         => ACLOCK       ,  -- In  :
+                    CLK         => M_CLK        ,  -- In  :
                     RST         => RST          ,  -- In  :
                     CLR         => CLR          ,  -- In  :
                     ENABLE      => ENABLE       ,  -- In  :
@@ -1609,6 +1668,19 @@ begin
             mr_req_last     <= pi_req_first when (num = 1) else po_req_last;
             mr_cache        <= regs_rbit(PI_MODE_CACHE_HI downto PI_MODE_CACHE_LO) when (num = 1) else
                                regs_rbit(PO_MODE_CACHE_HI downto PO_MODE_CACHE_LO);
+            process (M_CLK, RST) begin
+                if (RST = '1') then
+                        mr_auser <= (others => '0');
+                elsif (M_CLK'event and M_CLK = '1') then
+                    if (CLR = '1') then
+                        mr_auser <= (others => '0');
+                    elsif (mr_req_ready = '1' and mr_req_valid(0) = '1') then
+                        mr_auser <= regs_rbit(PO_MODE_AUSER_HI downto PO_MODE_AUSER_LO);
+                    elsif (mr_req_ready = '1' and mr_req_valid(1) = '1') then
+                        mr_auser <= regs_rbit(PI_MODE_AUSER_HI downto PI_MODE_AUSER_LO);
+                    end if;
+                end if;
+            end process;
             shift <= '1' when (mr_ack_valid /= ALL0) else '0';
         end generate;
         ---------------------------------------------------------------------------
@@ -1624,6 +1696,7 @@ begin
             mr_req_last     <= po_req_last;
             mr_buf_wready(1)<= '0';
             mr_cache        <= regs_rbit(PO_MODE_CACHE_HI downto PO_MODE_CACHE_LO);
+            mr_auser        <= regs_rbit(PO_MODE_AUSER_HI downto PO_MODE_AUSER_LO);
         end generate;
         ---------------------------------------------------------------------------
         -- 
@@ -1638,6 +1711,7 @@ begin
             mr_req_last     <= pi_req_last;
             mr_buf_wready(0)<= '0';
             mr_cache        <= regs_rbit(PI_MODE_CACHE_HI downto PI_MODE_CACHE_LO);
+            mr_auser        <= regs_rbit(PI_MODE_AUSER_HI downto PI_MODE_AUSER_LO);
         end generate;
         ---------------------------------------------------------------------------
         -- 
@@ -1662,7 +1736,7 @@ begin
                     M_BUF_WIDTH     => MR_BUF_WIDTH      , -- 
                     OP_BITS         => PO_BITS           , -- 
                     OP_XFER_LO      => PO_CORE_LO        , -- 
-                    OP_XFER_HI      => PO_CORE_HI        , --
+                    OP_XFER_HI      => PO_CORE_HI        , -- 
                     OP_CPRO_LO      => PO_CPRO_LO        , --
                     OP_CPRO_HI      => PO_CPRO_HI        , --
                     OP_ADDR_LO      => PO_ADDR_LO        , -- 
@@ -1684,7 +1758,7 @@ begin
                 -------------------------------------------------------------------
                 -- Clock & Reset Signals.
                 -------------------------------------------------------------------
-                    CLK             => ACLOCK            , -- In  :
+                    CLK             => C_CLK             , -- In  :
                     RST             => RST               , -- In  :
                     CLR             => CLR               , -- In  :
                 -------------------------------------------------------------------
@@ -1814,10 +1888,10 @@ begin
             -----------------------------------------------------------------------
             -- 
             -----------------------------------------------------------------------
-            process (ACLOCK, RST) begin
+            process (C_CLK, RST) begin
                 if (RST = '1') then
                         o_interrupt <= '0';
-                elsif (ACLOCK'event and ACLOCK = '1') then
+                elsif (C_CLK'event and C_CLK = '1') then
                     if (regs_rbit(CO_MODE_DONE_POS ) = '1' and regs_rbit(CO_STAT_DONE_POS ) = '1') or
                        (regs_rbit(PO_MODE_END_POS  ) = '1' and regs_rbit(PO_STAT_END_POS  ) = '1') or
                        (regs_rbit(PO_MODE_FETCH_POS) = '1' and regs_rbit(PO_STAT_FETCH_POS) = '1') then
@@ -1873,7 +1947,7 @@ begin
                 -------------------------------------------------------------------
                 -- Clock & Reset Signals.
                 -------------------------------------------------------------------
-                    CLK             => ACLOCK            , -- In  :
+                    CLK             => C_CLK             , -- In  :
                     RST             => RST               , -- In  :
                     CLR             => CLR               , -- In  :
                 -------------------------------------------------------------------
@@ -2005,10 +2079,10 @@ begin
             -----------------------------------------------------------------------
             pi_mode_end <= regs_rbit(PI_MODE_END_POS  );
             pi_stat_end <= regs_rbit(PI_STAT_END_POS  );
-            process (ACLOCK, RST) begin
+            process (C_CLK, RST) begin
                 if (RST = '1') then
                         i_interrupt <= '0';
-                elsif (ACLOCK'event and ACLOCK = '1') then
+                elsif (C_CLK'event and C_CLK = '1') then
                     if (regs_rbit(CI_MODE_DONE_POS ) = '1' and regs_rbit(CI_STAT_DONE_POS ) = '1') or
                        (regs_rbit(PI_MODE_END_POS  ) = '1' and regs_rbit(PI_STAT_END_POS  ) = '1') or
                        (regs_rbit(PI_MODE_FETCH_POS) = '1' and regs_rbit(PI_STAT_FETCH_POS) = '1') then
@@ -2027,10 +2101,10 @@ begin
         regs_rbit(PO_REGS_HI downto PO_REGS_LO) <= (others => '0');
         pump_load(CO_REGS_HI downto CO_REGS_LO) <= regs_load(CO_REGS_HI downto CO_REGS_LO);
         pump_wbit(CO_REGS_HI downto CO_REGS_LO) <= regs_wbit(CO_REGS_HI downto CO_REGS_LO);
-        process (ACLOCK, RST) begin
+        process (C_CLK, RST) begin
             if (RST = '1') then
                     o_interrupt <= '0';
-            elsif (ACLOCK'event and ACLOCK = '1') then
+            elsif (C_CLK'event and C_CLK = '1') then
                 if (regs_rbit(CO_MODE_DONE_POS ) = '1' and regs_rbit(CO_STAT_DONE_POS ) = '1') or
                    (regs_rbit(CO_MODE_ERROR_POS) = '1' and regs_rbit(CO_STAT_ERROR_POS) = '1') then
                     o_interrupt <= '1';
@@ -2047,10 +2121,10 @@ begin
         regs_rbit(PI_REGS_HI downto PI_REGS_LO) <= (others => '0');
         pump_load(CI_REGS_HI downto CI_REGS_LO) <= regs_load(CI_REGS_HI downto CI_REGS_LO);
         pump_wbit(CI_REGS_HI downto CI_REGS_LO) <= regs_wbit(CI_REGS_HI downto CI_REGS_LO);
-        process (ACLOCK, RST) begin
+        process (C_CLK, RST) begin
             if (RST = '1') then
                     i_interrupt <= '0';
-            elsif (ACLOCK'event and ACLOCK = '1') then
+            elsif (C_CLK'event and C_CLK = '1') then
                 if (regs_rbit(CI_MODE_DONE_POS ) = '1' and regs_rbit(CI_STAT_DONE_POS ) = '1') or
                    (regs_rbit(CI_MODE_ERROR_POS) = '1' and regs_rbit(CI_STAT_ERROR_POS) = '1') then
                     i_interrupt <= '1';
@@ -2070,28 +2144,33 @@ begin
             I_DATA_WIDTH    => I_DATA_WIDTH      ,
             I_ID_WIDTH      => I_ID_WIDTH        ,
             I_AUSER_WIDTH   => I_AUSER_WIDTH     ,
-            I_RUSER_WIDTH   => I_RUSER_WIDTH     ,
+            I_RUSER_WIDTH   => 1                 ,
             I_AXI_ID        => I_AXI_ID          ,
             I_REG_ADDR_BITS => CI_ADDR_REGS_BITS ,
             I_REG_SIZE_BITS => CI_SIZE_REGS_BITS ,
             I_REG_MODE_BITS => CI_MODE_REGS_BITS ,
             I_REG_STAT_BITS => CI_STAT_RESV_BITS ,
             I_MAX_XFER_SIZE => I_MAX_XFER_SIZE   ,
-            I_REQ_QUEUE     => 2                 ,
+            I_ACK_REGS      => I_ACK_REGS        ,
+            I_REQ_QUEUE     => I_REQ_QUEUE       ,
+            I_RDATA_REGS    => I_RDATA_REGS      ,
             O_CLK_RATE      => 1                 ,
             O_ADDR_WIDTH    => O_ADDR_WIDTH      ,
             O_DATA_WIDTH    => O_DATA_WIDTH      ,
             O_ID_WIDTH      => O_ID_WIDTH        ,
             O_AUSER_WIDTH   => O_AUSER_WIDTH     ,
-            O_WUSER_WIDTH   => O_WUSER_WIDTH     ,
-            O_BUSER_WIDTH   => O_BUSER_WIDTH     ,
+            O_WUSER_WIDTH   => 1                 ,
+            O_BUSER_WIDTH   => 1                 ,
             O_AXI_ID        => O_AXI_ID          ,
             O_REG_ADDR_BITS => CO_ADDR_REGS_BITS ,
             O_REG_SIZE_BITS => CO_SIZE_REGS_BITS ,
             O_REG_MODE_BITS => CO_MODE_REGS_BITS ,
             O_REG_STAT_BITS => CO_STAT_RESV_BITS ,
             O_MAX_XFER_SIZE => O_MAX_XFER_SIZE   ,
-            O_RES_QUEUE     => 2                 ,
+            O_REQ_REGS      => O_REQ_REGS        ,
+            O_ACK_REGS      => O_ACK_REGS        ,
+            O_RES_QUEUE     => O_RES_QUEUE       ,
+            O_RES_REGS      => O_RES_REGS        ,
             BUF_DEPTH       => BUF_DEPTH       
         )
         port map (
@@ -2102,13 +2181,13 @@ begin
         ---------------------------------------------------------------------------
         -- Pump Intake Clock and Clock Enable.
         ---------------------------------------------------------------------------
-            I_CLK           => ACLOCK            , -- In  :
+            I_CLK           => I_CLK             , -- In  :
             I_CLR           => CLR               , -- In  :
             I_CKE           => I_CKE             , -- In  :
         ---------------------------------------------------------------------------
         -- Pump Outlet Clock and Clock Enable.
         ---------------------------------------------------------------------------
-            O_CLK           => ACLOCK            , -- In  :
+            O_CLK           => O_CLK             , -- In  :
             O_CLR           => CLR               , -- In  :
             O_CKE           => O_CKE             , -- In  :
         ---------------------------------------------------------------------------
@@ -2162,6 +2241,7 @@ begin
             I_PROT          => I_PROT            ,
             I_QOS           => I_QOS             ,
             I_REGION        => I_REGION          ,
+            I_AUSER         => core_i_auser      ,
         ---------------------------------------------------------------------------
         -- Pump Outlet Control Register I/F Signals.
         ---------------------------------------------------------------------------
@@ -2213,6 +2293,7 @@ begin
             O_PROT          => O_PROT            ,
             O_QOS           => O_QOS             ,
             O_REGION        => O_REGION          ,
+            O_AUSER         => core_o_auser      ,
         --------------------------------------------------------------------------
         -- Pump Intake AXI4 Read Address Channel Signals.
         --------------------------------------------------------------------------
@@ -2236,7 +2317,7 @@ begin
             I_RDATA         => I_RDATA           , -- In  :
             I_RRESP         => I_RRESP           , -- In  :
             I_RLAST         => I_RLAST           , -- In  :
-            I_RUSER         => I_RUSER           , -- In  :
+            I_RUSER         => i_ruser           , -- In  :
             I_RVALID        => I_RVALID          , -- In  :
             I_RREADY        => I_RREADY          , -- Out :
         --------------------------------------------------------------------------
@@ -2258,10 +2339,10 @@ begin
         --------------------------------------------------------------------------
         -- Pump Outlet AXI4 Write Data Channel Signals.
         --------------------------------------------------------------------------
-            O_WID           => O_WID             , -- Out :
+            O_WID           => open              , -- Out :
             O_WDATA         => O_WDATA           , -- Out :
             O_WSTRB         => O_WSTRB           , -- Out :
-            O_WUSER         => O_WUSER           , -- Out :
+            O_WUSER         => open              , -- Out :
             O_WLAST         => O_WLAST           , -- Out :
             O_WVALID        => O_WVALID          , -- Out :
             O_WREADY        => O_WREADY          , -- In  :
@@ -2270,7 +2351,7 @@ begin
         --------------------------------------------------------------------------
             O_BID           => O_BID             , -- In  :
             O_BRESP         => O_BRESP           , -- In  :
-            O_BUSER         => O_BUSER           , -- In  :
+            O_BUSER         => o_buser           , -- In  :
             O_BVALID        => O_BVALID          , -- In  :
             O_BREADY        => O_BREADY          , -- Out :
         ---------------------------------------------------------------------------
@@ -2293,45 +2374,49 @@ begin
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    core_i_stat <= (others => '0');
-    core_o_stat <= (others => '0');
+    core_i_auser <= RESIZE(regs_rbit(CI_MODE_AUSER_HI downto CI_MODE_AUSER_LO), I_AUSER_WIDTH);
+    core_o_auser <= RESIZE(regs_rbit(CO_MODE_AUSER_HI downto CO_MODE_AUSER_LO), O_AUSER_WIDTH);
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    I_AWID          <= (others => '0');
-    I_AWADDR        <= (others => '0');
-    I_AWLEN         <= (others => '0');
-    I_AWSIZE        <= (others => '0');
-    I_AWBURST       <= (others => '0');
-    I_AWLOCK        <= (others => '0');
-    I_AWCACHE       <= (others => '0');
-    I_AWPROT        <= (others => '0');
-    I_AWQOS         <= (others => '0');
-    I_AWREGION      <= (others => '0');
-    I_AWUSER        <= (others => '0');
-    I_AWVALID       <= '0';
-    I_WID           <= (others => '0');
-    I_WDATA         <= (others => '0');
-    I_WSTRB         <= (others => '0');
-    I_WUSER         <= (others => '0');
-    I_WLAST         <= '0';
-    I_WVALID        <= '0';
+    core_i_stat  <= (others => '0');
+    core_o_stat  <= (others => '0');
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    O_ARID          <= (others => '0');
-    O_ARADDR        <= (others => '0');
-    O_ARLEN         <= (others => '0');
-    O_ARSIZE        <= (others => '0');
-    O_ARBURST       <= (others => '0');
-    O_ARLOCK        <= (others => '0');
-    O_ARCACHE       <= (others => '0');
-    O_ARPROT        <= (others => '0');
-    O_ARQOS         <= (others => '0');
-    O_ARREGION      <= (others => '0');
-    O_ARUSER        <= (others => '0');
-    O_ARVALID       <= '0';
-    O_RREADY        <= '0';
+    I_AWID       <= (others => '0');
+    I_AWADDR     <= (others => '0');
+    I_AWLEN      <= (others => '0');
+    I_AWSIZE     <= (others => '0');
+    I_AWBURST    <= (others => '0');
+    I_AWLOCK     <= (others => '0');
+    I_AWCACHE    <= (others => '0');
+    I_AWPROT     <= (others => '0');
+    I_AWQOS      <= (others => '0');
+    I_AWREGION   <= (others => '0');
+    I_AWUSER     <= (others => '0');
+    I_AWVALID    <= '0';
+    I_WDATA      <= (others => '0');
+    I_WSTRB      <= (others => '0');
+    I_WLAST      <= '0';
+    I_WVALID     <= '0';
+    I_BREADY     <= '0';
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    O_ARID       <= (others => '0');
+    O_ARADDR     <= (others => '0');
+    O_ARLEN      <= (others => '0');
+    O_ARSIZE     <= (others => '0');
+    O_ARBURST    <= (others => '0');
+    O_ARLOCK     <= (others => '0');
+    O_ARCACHE    <= (others => '0');
+    O_ARPROT     <= (others => '0');
+    O_ARQOS      <= (others => '0');
+    O_ARREGION   <= (others => '0');
+    O_ARUSER     <= (others => '0');
+    O_ARVALID    <= '0';
+    O_RREADY     <= '0';
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------

@@ -3,11 +3,11 @@
 --!     @brief   DELAY REGISTER/ADJUSTER TEST BENCH :
 --!              DELAY REGISTER/ADJUSTERを検証するためのテストベンチ.
 --!     @version 1.0.0
---!     @date    2012/8/11
+--!     @date    2015/1/17
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012 Ichiro Kawazome
+--      Copyright (C) 2012-2015 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -104,6 +104,9 @@ architecture MODEL of DELAY_REGISTER_TEST_BENCH is
                "):";
     end function;
 begin
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     REG: DELAY_REGISTER
         generic map (
             DATA_BITS => DATA_BITS,
@@ -121,6 +124,9 @@ begin
             O_DATA    => reg_o_data,
             O_VAL     => reg_o_valid
         );
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     ADJ: DELAY_ADJUSTER
         generic map (
             DATA_BITS => DATA_BITS,
@@ -138,11 +144,16 @@ begin
             O_DATA    => adj_o_data,
             O_VAL     => adj_o_valid
         );
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     process begin
         CLK <= '1'; wait for PERIOD/2;
         CLK <= '0'; wait for PERIOD/2;
     end process;
-
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
     process
         procedure WAIT_CLK(CNT:integer) is
         begin
@@ -156,6 +167,7 @@ begin
             reg_i_data  <= std_logic_vector(to_unsigned(DATA,DATA_BITS));
             reg_i_valid <= '1';
             WAIT_CLK(1);
+            reg_i_data  <= (others => '0');
             reg_i_valid <= '0';
         end procedure;
         procedure SET_ADJ(DATA: integer) is
@@ -163,6 +175,7 @@ begin
             adj_i_data  <= std_logic_vector(to_unsigned(DATA,DATA_BITS));
             adj_i_valid <= '1';
             WAIT_CLK(1);
+            adj_i_data  <= (others => '0');
             adj_i_valid <= '0';
         end procedure;
         procedure SET_REG_ADJ(REG_DATA,ADJ_DATA: integer) is
@@ -172,6 +185,8 @@ begin
             reg_i_valid <= '1';
             adj_i_valid <= '1';
             WAIT_CLK(1);
+            reg_i_data  <= (others => '0');
+            adj_i_data  <= (others => '0');
             reg_i_valid <= '0';
             adj_i_valid <= '0';
         end procedure;
@@ -251,6 +266,62 @@ begin
         end if;
         wait;
     end process;
+    -------------------------------------------------------------------------------
+    --
+    -------------------------------------------------------------------------------
+    CHECK: block
+        type    DATA_VECTOR   is array(integer range <>) of std_logic_vector(DATA_BITS-1 downto 0);
+        signal  reg_queue_valid   :  std_logic_vector(0 to DELAY_MAX);
+        signal  reg_queue_data    :  DATA_VECTOR     (0 to DELAY_MAX);
+        signal  reg_exp_valid     :  std_logic;
+        signal  reg_exp_data      :  std_logic_vector(DATA_BITS-1 downto 0);
+    begin
+        reg_queue_valid(0) <= reg_i_valid;
+        reg_queue_data (0) <= reg_i_data;
+        DELAY_MAX_GE_1: if (DELAY_MAX >= 1) generate
+            signal reg_queue_q_valid : std_logic_vector(1 to DELAY_MAX);
+            signal reg_queue_q_data  : DATA_VECTOR     (1 to DELAY_MAX);
+        begin 
+            process (CLK) begin
+                if (CLK'event and CLK = '1') then
+                    for i in 1 to DELAY_MAX loop
+                        reg_queue_q_valid(i) <= reg_queue_valid(i-1);
+                        reg_queue_q_data (i) <= reg_queue_data (i-1);
+                    end loop;
+                end if;
+            end process;
+            OUTLET: for i in 1 to DELAY_MAX generate
+                reg_queue_valid(i) <= reg_queue_q_valid(i);
+                reg_queue_data (i) <= reg_queue_q_data (i);
+            end generate;
+        end generate;
+        process (reg_queue_valid, reg_queue_data, SEL) 
+            variable valid : std_logic;
+            variable data  : std_logic_vector(DATA_BITS-1 downto 0);
+        begin
+            valid := '0';
+            data  := (others => '0');
+            for i in SEL'range loop
+                if (SEL(i) = '1') then
+                    valid := reg_queue_valid(i);
+                    data  := reg_queue_data (i);
+                end if;
+            end loop;
+            reg_exp_valid <= valid;
+            reg_exp_data  <= data;
+        end process;
+        process (CLK) begin
+            if (CLK'event and CLK = '1') then
+                if (reg_o_valid /= reg_exp_valid) then
+                    assert(false) report MESSAGE_TAG & "Mismatch reg_o_valid" severity ERROR;
+                end if;
+                if (reg_o_valid = '1') and
+                   (reg_o_data  /= reg_exp_data) then
+                    assert(false) report MESSAGE_TAG & "Mismatch reg_o_data"  severity ERROR;
+                end if;
+            end if;
+        end process;
+    end block;
 end MODEL;
 -----------------------------------------------------------------------------------
 -- DELAY_REGISTER_TEST_BENCH_ALL

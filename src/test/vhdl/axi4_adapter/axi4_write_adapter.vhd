@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_write_adapter.vhd
 --!     @brief   AXI4_WRITE_ADPATER
---!     @version 1.5.5
---!     @date    2014/3/26
+--!     @version 1.5.6
+--!     @date    2014/9/27
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -73,10 +73,15 @@ entity  AXI4_WRITE_ADAPTER is
         M_DATA_WIDTH        : --! @brief REQUESTER AXI4 WRITE DATA CHANNEL DATA WIDTH :
                               --! AXI4 ライトデータチャネルのWDATA信号のビット幅.
                               integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        M_MAX_XFER_SIZE     : integer := 12;
+        M_MAX_XFER_SIZE     : --! @brief TRANSFER MAXIMUM SIZE :
+                              --! 一回の転送サイズの最大バイト数を２のべき乗で指定する.
+                              integer := 12;
         BUF_DEPTH           : --! @brief Buffer Depth :
                               --! バッファの容量(バイト数)を２のべき乗値で指定する.
-                              integer := 12
+                              integer := 12;
+        RESP_REGS           : --! @brief RESPONSE REGISTER USE :
+                              --! レスポンスの入力側にレジスタを挿入する.
+                              integer := 0
     );
     port(
     ------------------------------------------------------------------------------
@@ -876,7 +881,8 @@ begin
             XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => M_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => M_MAX_XFER_SIZE     , -- 
-            QUEUE_SIZE          => 1                     -- 
+            QUEUE_SIZE          => 1                   , --
+            RESP_REGS           => RESP_REGS             --
         )                                                -- 
         port map(                                        -- 
         ---------------------------------------------------------------------------
