@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_write_adapter_test_bench.vhd
 --!     @brief   TEST BENCH for AXI4_ADPATER
---!     @version 1.5.4
---!     @date    2014/2/20
+--!     @version 1.5.9
+--!     @date    2016/1/8
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

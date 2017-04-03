@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_read_adapter.vhd
 --!     @brief   AXI4_READ_ADPATER
---!     @version 1.5.5
---!     @date    2014/3/26
+--!     @version 1.5.9
+--!     @date    2016/1/8
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2014 Ichiro Kawazome
+--      Copyright (C) 2012-2016 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -296,7 +296,7 @@ architecture RTL of AXI4_READ_ADAPTER is
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
-    constant  t_xfer_select     : std_logic_vector(0 downto 0) := "1";
+    constant  t_xfer_select     : std_logic_vector(0 downto 0) := std_logic_vector'("1");
     signal    t_xfer_busy       : std_logic;
     signal    t_xfer_done       : std_logic;
     signal    t_xfer_error      : std_logic;

@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    reducer_test_model.vhd
 --!     @brief   TEST MODEL for REDUCER :
---!     @version 1.5.8
---!     @date    2015/9/20
+--!     @version 1.5.9
+--!     @date    2016/1/8
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012,2013 Ichiro Kawazome
+--      Copyright (C) 2012-2016 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ package RANDOM_DATA_TABLE is
             STRB    : out std_logic_vector;
             DONE    : out std_logic);
     constant  TABLE_SIZE : integer := 4096;
-    constant  ERROR_CODE : std_logic_vector(7 downto 0) := "11001100";
+    constant  ERROR_CODE : std_logic_vector(7 downto 0) := std_logic_vector'("11001100");
 end     RANDOM_DATA_TABLE;
 -----------------------------------------------------------------------------------
 -- 
