@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4_test_bench.vhd
 --!     @brief   Test Bench for Pump Sample Module (AXI4 to AXI4)
---!     @version 0.7.0
---!     @date    2014/3/29
+--!     @version 1.1.0
+--!     @date    2017/11/5
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2014 Ichiro Kawazome
+--      Copyright (C) 2012-2017 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,8 @@ entity  PUMP_AXI4_TO_AXI4_TEST_BENCH is
         SCENARIO_FILE   : STRING;
         I_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
         O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
-        MAX_XFER_SIZE   : integer                                :=  6
+        MAX_XFER_SIZE   : integer                                :=  6;
+        BUF_DEPTH       : integer                                := 12
     );
 end     PUMP_AXI4_TO_AXI4_TEST_BENCH;
 -----------------------------------------------------------------------------------
@@ -128,10 +129,11 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH is
                                  BUSER       => 1);
     constant I_PROC_VALID    : integer :=  1;
     constant O_PROC_VALID    : integer :=  1;
+    constant I_QUEUE_SIZE    : integer :=  4;
+    constant O_QUEUE_SIZE    : integer :=  4;
     constant I_AXI_ID        : integer :=  1;
     constant O_AXI_ID        : integer :=  2;
     constant M_AXI_ID        : integer :=  3;
-    constant BUF_DEPTH       : integer := 12;
     constant SYNC_WIDTH      : integer :=  2;
     constant GPO_WIDTH       : integer :=  8;
     constant GPI_WIDTH       : integer :=  GPO_WIDTH;
@@ -390,6 +392,7 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH is
             I_ID_WIDTH      : integer                                := AXI4_ID_MAX_WIDTH;
             I_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
             I_MAX_XFER_SIZE : integer                                :=  8;
+            I_QUEUE_SIZE    : integer                                :=  1;
             I_PROC_VALID    : integer                                :=  1;
             O_AXI_ID        : integer                                :=  2;
             O_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
@@ -397,6 +400,7 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH is
             O_ID_WIDTH      : integer                                := AXI4_ID_MAX_WIDTH;
             O_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
             O_MAX_XFER_SIZE : integer                                :=  8;
+            O_QUEUE_SIZE    : integer                                :=  1;
             O_PROC_VALID    : integer                                :=  1;
             BUF_DEPTH       : integer                                := 12
         );
@@ -667,6 +671,7 @@ begin
             I_ID_WIDTH      => I_WIDTH.ID         ,
             I_AUSER_WIDTH   => I_WIDTH.ARUSER     ,
             I_MAX_XFER_SIZE => MAX_XFER_SIZE      ,
+            I_QUEUE_SIZE    => I_QUEUE_SIZE       ,
             I_PROC_VALID    => I_PROC_VALID       ,
             O_AXI_ID        => O_AXI_ID           ,
             O_ADDR_WIDTH    => O_WIDTH.AWADDR     ,
@@ -674,6 +679,7 @@ begin
             O_ID_WIDTH      => O_WIDTH.ID         ,
             O_AUSER_WIDTH   => O_WIDTH.AWUSER     ,
             O_MAX_XFER_SIZE => MAX_XFER_SIZE      ,
+            O_QUEUE_SIZE    => O_QUEUE_SIZE       ,
             O_PROC_VALID    => O_PROC_VALID       ,
             BUF_DEPTH       => BUF_DEPTH          
         )
