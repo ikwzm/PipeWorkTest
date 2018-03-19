@@ -777,9 +777,9 @@ begin
             procedure p(M:in string) is
             begin
                 if    (TAG_WIDTH > 0) then
-                    WRITE(text_line, NAME, RIGHT,  TAG_WIDTH);
+                    WRITE(text_line, NAME, RIGHT, abs(TAG_WIDTH));
                 elsif (TAG_WIDTH < 0) then
-                    WRITE(text_line, NAME, LEFT , -TAG_WIDTH);
+                    WRITE(text_line, NAME, LEFT , abs(TAG_WIDTH));
                 end if;
                 WRITE(text_line, M);
                 WRITELINE(OUTPUT, text_line);
@@ -787,14 +787,14 @@ begin
             procedure p(T:in time;M:in string) is
             begin
                 if    (TAG_WIDTH > 0) then
-                    WRITE(text_line, NAME, RIGHT,  TAG_WIDTH);
+                    WRITE(text_line, NAME, RIGHT, abs(TAG_WIDTH));
                 elsif (TAG_WIDTH < 0) then
-                    WRITE(text_line, NAME, LEFT , -TAG_WIDTH);
+                    WRITE(text_line, NAME, LEFT , abs(TAG_WIDTH));
                 end if;
                 if    (TIME_WIDTH > 0) then
-                    WRITE(text_line, T, RIGHT,  TIME_WIDTH);
+                    WRITE(text_line, T, RIGHT, abs(TIME_WIDTH));
                 elsif (TIME_WIDTH < 0) then
-                    WRITE(text_line, T, LEFT , -TIME_WIDTH);
+                    WRITE(text_line, T, LEFT , abs(TIME_WIDTH));
                 end if;
                 WRITE(text_line, M);
                 WRITELINE(OUTPUT, text_line);
