@@ -1,9 +1,9 @@
 
 DUMMY_PLUG_PATH      = ../../../Dummy_Plug
 DUMMY_PLUG_SRC_PATH  = $(DUMMY_PLUG_PATH)/src/main/vhdl
-DUMMY_PLUG_WORK_PATH = $(DUMMY_PLUG_PATH)/sim/ghdl/dummy_plug
+DUMMY_PLUG_WORK_PATH = $(DUMMY_PLUG_PATH)/sim/ghdl-0.29/dummy_plug
 DUMMY_PLUG_TOOL_PATH = $(DUMMY_PLUG_PATH)/tools
-PIPEWORK_WORK_PATH   = ../../../PipeWork/sim/ghdl
+PIPEWORK_WORK_PATH   = ../../../PipeWork/sim/ghdl-0.29
 
 SRC_TEST_PATH        = ../../../src/test/vhdl/axi4_register_interface
 SCENARIO_PATH        = ../../../src/test/scenarios/axi4_register_interface

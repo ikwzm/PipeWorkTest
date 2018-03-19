@@ -1,5 +1,5 @@
 GHDL=ghdl
-GHDLFLAGS=--mb-comments -P../../../PipeWork/sim/ghdl -P../../../Dummy_Plug/sim/ghdl/dummy_plug
+GHDLFLAGS=--mb-comments -P../../../PipeWork/sim/ghdl-0.29 -P../../../Dummy_Plug/sim/ghdl-0.29/dummy_plug
 
 SRC_MAIN_PATH = ../../../PipeWork/src/components
 SRC_TEST_PATH = ../../../src/test/vhdl/reducer
@@ -107,6 +107,9 @@ reducer_test_bench_dwc_w08_i4_o3_q0_j0_v0.vhd : $(SRC_TEST_PATH)/reducer_test_be
 
 reducer_test_bench_dwc_w08_i4_o4_q0_j0_v0.vhd : $(SRC_TEST_PATH)/reducer_test_bench_template.vhd
 	sed -e "s/%W/08/g" -e "s/%I/4/g" -e "s/%O/4/g" -e "s/%Q/0/g" -e "s/%J/0/g" -e "s/%V/0/g" < $< > $@
+
+reducer_test_bench_dwc_w08_i4_o4_q0_j0_v4.vhd : $(SRC_TEST_PATH)/reducer_test_bench_template.vhd
+	sed -e "s/%W/08/g" -e "s/%I/4/g" -e "s/%O/4/g" -e "s/%Q/0/g" -e "s/%J/0/g" -e "s/%V/4/g" < $< > $@
 
 reducer_test_bench_dwc_w08_i4_o4_q0_j4_v0.vhd : $(SRC_TEST_PATH)/reducer_test_bench_template.vhd
 	sed -e "s/%W/08/g" -e "s/%I/4/g" -e "s/%O/4/g" -e "s/%Q/0/g" -e "s/%J/0/g" -e "s/%V/4/g" < $< > $@
