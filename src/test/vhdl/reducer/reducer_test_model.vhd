@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    reducer_test_model.vhd
 --!     @brief   TEST MODEL for REDUCER :
---!     @version 1.5.9
---!     @date    2016/1/8
+--!     @version 1.7.0
+--!     @date    2018/3/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2016 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -149,6 +149,7 @@ entity  REDUCER_TEST_MODEL is
         O_SHIFT_MAX   : integer :=  4;
         I_JUSTIFIED   : integer :=  0;
         FLUSH_ENABLE  : integer :=  0;
+        DEBUG_PRINT   : boolean :=  FALSE;
         AUTO_FINISH   : integer :=  1
     );
     port(
@@ -752,16 +753,65 @@ begin
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    process (SCENARIO) begin
-        case SCENARIO is
-            when "NONE." | "START" =>
-                null;
-            when "DONE." =>
-                assert FALSE report NAME & " Scenario All Done..." severity NOTE;
-            when others  =>
-                assert FALSE report NAME & ":" & SCENARIO & " Start..." severity NOTE;
-        end case;
-    end process;
+    DEBUG_PRINT_BLOCK: if (DEBUG_PRINT = TRUE) generate
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        process (SCENARIO) begin
+            case SCENARIO is
+                when "NONE." | "START" =>
+                    null;
+                when "DONE." =>
+                    assert FALSE report NAME & " Scenario All Done..." severity NOTE;
+                when others  =>
+                    assert FALSE report NAME & ":" & SCENARIO & " Start..." severity NOTE;
+            end case;
+        end process;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        process
+            variable  text_line      : LINE;
+            constant  TIME_WIDTH     : integer := 13;
+            constant  TAG_WIDTH      : integer := 32;
+            procedure p(M:in string) is
+            begin
+                if    (TAG_WIDTH > 0) then
+                    WRITE(text_line, NAME, RIGHT,  TAG_WIDTH);
+                elsif (TAG_WIDTH < 0) then
+                    WRITE(text_line, NAME, LEFT , -TAG_WIDTH);
+                end if;
+                WRITE(text_line, M);
+                WRITELINE(OUTPUT, text_line);
+            end procedure;
+            procedure p(T:in time;M:in string) is
+            begin
+                if    (TAG_WIDTH > 0) then
+                    WRITE(text_line, NAME, RIGHT,  TAG_WIDTH);
+                elsif (TAG_WIDTH < 0) then
+                    WRITE(text_line, NAME, LEFT , -TAG_WIDTH);
+                end if;
+                if    (TIME_WIDTH > 0) then
+                    WRITE(text_line, T, RIGHT,  TIME_WIDTH);
+                elsif (TIME_WIDTH < 0) then
+                    WRITE(text_line, T, LEFT , -TIME_WIDTH);
+                end if;
+                WRITE(text_line, M);
+                WRITELINE(OUTPUT, text_line);
+            end procedure;
+        begin
+            MAIN_LOOP:loop
+                wait until (CLK'event and CLK = '1');
+                p(Now, string'("|") & HEX_TO_STRING(O_DATA ) &
+                       string'("|") & BIN_TO_STRING(O_STRB ) &
+                       string'("|") & BIN_TO_STRING(O_DONE ) &
+                       string'(" ") & BIN_TO_STRING(O_FLUSH) &
+                       string'(" ") & BIN_TO_STRING(O_VAL  ) &
+                       string'(" ") & BIN_TO_STRING(o_ready) &
+                       string'("|"));
+            end loop;
+        end process;
+    end generate;
 end MODEL;
 -----------------------------------------------------------------------------------
 -- 
