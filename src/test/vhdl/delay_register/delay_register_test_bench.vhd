@@ -2,12 +2,12 @@
 --!     @file    delay_register_test_bench.vhd
 --!     @brief   DELAY REGISTER/ADJUSTER TEST BENCH :
 --!              DELAY REGISTER/ADJUSTERを検証するためのテストベンチ.
---!     @version 1.0.0
---!     @date    2015/1/17
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2015 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -83,6 +83,7 @@ use     PIPEWORK.COMPONENTS.DELAY_ADJUSTER;
 architecture MODEL of DELAY_REGISTER_TEST_BENCH is
     constant    PERIOD          : time    := 10 ns;
     constant    DELAY           : time    :=  1 ns;
+    signal      clk_ena         : boolean;
     signal      CLK             : std_logic;
     signal      RST             : std_logic;
     signal      CLR             : std_logic;
@@ -148,8 +149,13 @@ begin
     --
     -------------------------------------------------------------------------------
     process begin
-        CLK <= '1'; wait for PERIOD/2;
-        CLK <= '0'; wait for PERIOD/2;
+        while (TRUE) loop
+            CLK <= '1'; wait for PERIOD/2;
+            CLK <= '0'; wait for PERIOD/2;
+            exit when (clk_ena = FALSE);
+        end loop;
+        CLK <= '0';
+        wait;
     end process;
     -------------------------------------------------------------------------------
     --
@@ -195,6 +201,7 @@ begin
         -- シミュレーションの開始、まずはリセットから。
         ---------------------------------------------------------------------------
         assert(false) report MESSAGE_TAG & "Starting Run..." severity NOTE;
+                              clk_ena <= TRUE;
                               CLR  <= '1';
                               RST  <= '1';
                               SEL  <= (others => '0');
@@ -259,10 +266,12 @@ begin
         WAIT_CLK(10); 
         if (AUTO_FINISH = 0) then
             assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
-            FINISH <= 'Z';
+            FINISH  <= 'Z';
+            clk_ena <= FALSE;
         else
-            FINISH <= 'Z';
-            assert(false) report MESSAGE_TAG & "Run complete..." severity FAILURE;
+            FINISH  <= 'Z';
+            clk_ena <= FALSE;
+            assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
         end if;
         wait;
     end process;
@@ -353,7 +362,7 @@ begin
     FINISH <= 'H' after 1 ns;
     process (FINISH) begin
         if (FINISH'event and FINISH = 'H') then
-            assert(false) report "Run complete all." severity FAILURE;
+            assert(false) report "Run complete all." severity NOTE;
         end if;
     end process;
 end MODEL;
