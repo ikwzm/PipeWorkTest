@@ -31,8 +31,8 @@ clean:
 
 
 $(TEST_BENCH) : $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .snr,$(TEST_BENCH))
-	 $(GHDL) -e $(GHDLFLAGS) --work=WORK $@
-	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
 DUT : $(addsuffix .o,$(PIPEWORK_COMPONENTS))
 
@@ -45,29 +45,29 @@ pipework:
             $(PIPEWORK_SRC_PATH)
 
 axi4_adapter_test_bench_4096_32_32.o : $(SRC_TEST_PATH)/axi4_adapter_test_bench_4096_32_32.vhd axi4_adapter_test_bench.o
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_adapter_test_bench_4096_32_64.o : $(SRC_TEST_PATH)/axi4_adapter_test_bench_4096_32_64.vhd axi4_adapter_test_bench.o
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_adapter_test_bench_4096_64_32.o : $(SRC_TEST_PATH)/axi4_adapter_test_bench_4096_64_32.vhd axi4_adapter_test_bench.o
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_adapter_test_bench.o            : $(SRC_TEST_PATH)/axi4_adapter_test_bench.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_write_adapter.o                 : $(SRC_TEST_PATH)/axi4_write_adapter.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_read_adapter.o                  : $(SRC_TEST_PATH)/axi4_read_adapter.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_adapter.o                       : $(SRC_TEST_PATH)/axi4_adapter.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 
 axi4_adapter_test_bench_4096_32_32.snr : $(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb
-	 $(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb \
+	$(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb \
              --name       AXI4_ADAPTER_TEST_4096_32_32 \
              --t_width    32 \
              --m_width    32 \
@@ -75,7 +75,7 @@ axi4_adapter_test_bench_4096_32_32.snr : $(SRC_PATH)/test/scenarios/axi4_adapter
              --output     axi4_adapter_test_bench_4096_32_32.snr
 
 axi4_adapter_test_bench_4096_32_64.snr : $(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb
-	 $(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb \
+	$(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb \
              --name       AXI4_ADAPTER_TEST_4096_32_64 \
              --t_width    32 \
              --m_width    64 \
@@ -83,7 +83,7 @@ axi4_adapter_test_bench_4096_32_64.snr : $(SRC_PATH)/test/scenarios/axi4_adapter
              --output     axi4_adapter_test_bench_4096_32_64.snr
 
 axi4_adapter_test_bench_4096_64_32.snr : $(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb
-	 $(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb \
+	$(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb \
              --name       AXI4_ADAPTER_TEST_4096_64_32 \
              --t_width    64 \
              --m_width    32 \

@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
---!     @file    aix4_write_adapter_test_bench.vhd
---!     @brief   TEST BENCH for AXI4_ADPATER
---!     @version 1.5.9
---!     @date    2016/1/8
+--!     @file    aix4_adapter_test_bench.vhd
+--!     @brief   AXI4_ADPATER TEST BENCH
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2016 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -732,12 +732,22 @@ begin
     -------------------------------------------------------------------------------
     ASYNC: if (M_CLK_RATE = 0 and T_CLK_RATE = 0) generate
         process begin
-            M_CLK <= '1'; wait for M_CLK_PERIOD/2;
-            M_CLK <= '0'; wait for M_CLK_PERIOD/2;
+            loop
+                M_CLK <= '1'; wait for M_CLK_PERIOD/2;
+                M_CLK <= '0'; wait for M_CLK_PERIOD/2;
+                exit when (M_FINISH = '1');
+            end loop;
+            M_CLK <= '0';
+            wait;
         end process;
         process begin
-            T_CLK <= '1'; wait for T_CLK_PERIOD/2;
-            T_CLK <= '0'; wait for T_CLK_PERIOD/2;
+            loop
+                T_CLK <= '1'; wait for T_CLK_PERIOD/2;
+                T_CLK <= '0'; wait for T_CLK_PERIOD/2;
+                exit when (T_FINISH = '1');
+            end loop;
+            T_CLK <= '0';
+            wait;
         end process;
         M_CKE <= '1';
         T_CKE <= '1';
@@ -769,7 +779,13 @@ begin
                         T_CKE <= '0';
                     end if;
                 end loop;
+                exit when (T_FINISH = '1');
             end loop;
+            T_CLK <= '0';
+            T_CKE <= '1';
+            M_CLK <= '0';
+            M_CKE <= '1';
+            wait;
         end process;
     end generate;
     RSYNC: if (T_CLK_RATE = 1 and M_CLK_RATE >= 2) generate
@@ -799,7 +815,13 @@ begin
                         M_CKE <= '0';
                     end if;
                 end loop;
+                exit when (T_FINISH = '1');
             end loop;
+            T_CLK <= '0';
+            T_CKE <= '1';
+            M_CLK <= '0';
+            M_CKE <= '1';
+            wait;
         end process;
     end generate;
     -------------------------------------------------------------------------------
@@ -829,7 +851,13 @@ begin
         WRITE(L,T & "  Mismatch : ");WRITE(L,M_REPORT.mismatch_count);WRITELINE(OUTPUT,L);
         WRITE(L,T & "  Warning  : ");WRITE(L,M_REPORT.warning_count );WRITELINE(OUTPUT,L);
         WRITE(L,T);                                                   WRITELINE(OUTPUT,L);
-        assert FALSE report "Simulation complete." severity FAILURE;
+        assert (T_REPORT.error_count    = 0 and
+                M_REPORT.error_count    = 0)
+            report "Simulation complete(error)." severity FAILURE;
+        assert (T_REPORT.mismatch_count = 0 and
+                M_REPORT.mismatch_count = 0)
+            report "Simulation complete(mismatch)." severity FAILURE;
+        assert FALSE report "Simulation complete(success)." severity NOTE;
         wait;
     end process;
     
