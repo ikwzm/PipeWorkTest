@@ -2,12 +2,12 @@
 --!     @file    test_bench.vhd
 --!     @brief   TEST BENCH for Priority Encoder Procedures :
 --!              Priority Encoder Procedurs Packageを検証するためのテストベンチ.
---!     @version 1.5.1
---!     @date    2013/8/9
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2013 Ichiro Kawazome
+--      Copyright (C) 2013-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -227,13 +227,13 @@ begin
             CHECK(i_data);
         end loop;
         if (AUTO_FINISH = FALSE) then
-            assert(mismatch=0) report MESSAGE_TAG & "Run error!!!!!!" severity NOTE;
+            assert(mismatch=0) report MESSAGE_TAG & "Run error!!!!!!" severity FAILURE;
             assert(mismatch>0) report MESSAGE_TAG & "Run complete..." severity NOTE;
             FINISH <= 'Z';
         else
             FINISH <= 'Z';
             assert(mismatch=0) report MESSAGE_TAG & "Run error!!!!!!" severity FAILURE;
-            assert(mismatch>0) report MESSAGE_TAG & "Run complete..." severity FAILURE;
+            assert(mismatch>0) report MESSAGE_TAG & "Run complete..." severity NOTE;
         end if;
         wait;
     end process;
@@ -280,7 +280,7 @@ begin
     FINISH <= 'H' after 1 ns;
     process (FINISH) begin
         if (FINISH'event and FINISH = 'H') then
-            assert(false) report "Run complete all." severity FAILURE;
+            assert(false) report "Run complete all." severity NOTE;
         end if;
     end process;
 end MODEL;
