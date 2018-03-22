@@ -15,16 +15,16 @@ clean:
 	rm -f *.o *.cf tmp.vhd $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
 
 util.o              : $(DUMMY_PLUG_SRC_PATH)/core/util.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=DUMMY_PLUG $<
+	$(GHDL) -a $(GHDLFLAGS) --work=DUMMY_PLUG $<
 
 tinymt32.o          : $(DUMMY_PLUG_SRC_PATH)/core/tinymt32.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=DUMMY_PLUG $<
+	$(GHDL) -a $(GHDLFLAGS) --work=DUMMY_PLUG $<
 
 components.o        : $(PIPEWORK_SRC_MAIN_PATH)/components/components.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
 queue_receiver.o    : $(PIPEWORK_SRC_MAIN_PATH)/components/queue_receiver.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=PIPEWORK $<
 
 queue_receiver_test_bench.o: components.o queue_receiver.o util.o tinymt32.o
 queue_receiver_test_bench.o: $(PIPEWORK_SRC_TEST_PATH)/queue_receiver/queue_receiver_test_bench.vhd 
@@ -32,6 +32,6 @@ queue_receiver_test_bench.o: $(PIPEWORK_SRC_TEST_PATH)/queue_receiver/queue_rece
 
 
 queue_receiver_test_bench_all   : queue_receiver_test_bench.o
-	 $(GHDL) -e $(GHDLFLAGS) --work=work $@
-	-$(GHDL) -r $(GHDLFLAGS) --work=work $@
+	$(GHDL) -e $(GHDLFLAGS) --work=work $@
+	$(GHDL) -r $(GHDLFLAGS) --work=work $@
 

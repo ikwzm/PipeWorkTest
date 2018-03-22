@@ -2,12 +2,12 @@
 --!     @file    queue_receiver_test_bench.vhd
 --!     @brief   QUEUE RECEIVER/ADJUSTER TEST BENCH :
 --!              QUEUE RECEIVER/ADJUSTERを検証するためのテストベンチ.
---!     @version 1.5.3
---!     @date    2014/1/25
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2014 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -93,6 +93,7 @@ architecture MODEL of QUEUE_RECEIVER_TEST_BENCH is
     signal   O_VAL       : std_logic;
     signal   EXP_DATA    : std_logic_vector(DATA_BITS-1 downto 0);
     signal   MISMATCH    : boolean;
+    signal   CLK_ENA     : boolean;
     function MESSAGE_TAG return STRING is
     begin
         return "(DATA_BITS="  & INTEGER_TO_STRING(DATA_BITS ) &
@@ -120,8 +121,13 @@ begin
         );
 
     process begin
-        CLK <= '1'; wait for PERIOD/2;
-        CLK <= '0'; wait for PERIOD/2;
+        loop
+            CLK <= '1'; wait for PERIOD/2;
+            CLK <= '0'; wait for PERIOD/2;
+            exit when(CLK_ENA = FALSE);
+        end loop;
+        CLK <= '0';
+        wait;
     end process;
 
     process (CLK, RST) begin
@@ -177,6 +183,7 @@ begin
         ---------------------------------------------------------------------------
         assert(false) report MESSAGE_TAG & "Starting Run..." severity NOTE;
                              SCENARIO <= "START";
+                             CLK_ENA  <= TRUE;
                              RST      <= '1';
                              CLR      <= '1';
                              I_VAL    <= '0';
@@ -344,10 +351,12 @@ begin
         WAIT_CLK(10); 
         if (AUTO_FINISH = 0) then
             assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
-            FINISH <= 'Z';
+            CLK_ENA <= FALSE;
+            FINISH  <= 'Z';
         else
-            FINISH <= 'Z';
-            assert(false) report MESSAGE_TAG & " Run complete..." severity FAILURE;
+            CLK_ENA <= FALSE;
+            FINISH  <= 'Z';
+            assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
         end if;
         wait;
     end process;
@@ -405,7 +414,7 @@ begin
     FINISH <= 'H' after 1 ns;
     process (FINISH) begin
         if (FINISH'event and FINISH = 'H') then
-            assert(false) report "Run complete all." severity FAILURE;
+            assert(false) report "Run complete all." severity NOTE;
         end if;
     end process;
 end MODEL;
