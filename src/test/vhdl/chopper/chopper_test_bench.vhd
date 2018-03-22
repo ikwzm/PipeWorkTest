@@ -2,12 +2,12 @@
 --!     @file    chopper_test_bench.vhd
 --!     @brief   CHOPPER TEST BENCH :
 --!              CHOPPER MODULEを検証するためのテストベンチ.
---!     @version 1.0.0
---!     @date    2012/8/11
+--!     @version 1.7.0
+--!     @date    2018/3/21
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -254,7 +254,7 @@ begin
     FINISH <= 'H' after 1 ns;
     process (FINISH) begin
         if (FINISH'event and FINISH = 'H') then
-            assert(false) report "Run complete all." severity FAILURE;
+            assert(false) report "Run complete all." severity NOTE;
         end if;
     end process;
 end MODEL;
