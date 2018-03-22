@@ -16,12 +16,12 @@ clean:
 	rm -f *.o *.cf $(TEST_BENCH)
 
 test_bench_one_hot_arch: test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 test_bench_integer_arch: test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 test_bench.o: components.o queue_arbiter.o queue_arbiter_one_hot_arch.o queue_arbiter_integer_arch.o 
 test_bench.o: $(SRC_TEST_PATH)/test_bench.vhd 
