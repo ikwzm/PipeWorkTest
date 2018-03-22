@@ -176,6 +176,7 @@ entity  REDUCER_TEST_MODEL is
         O_RDY         : out std_logic;
         O_SHIFT       : out std_logic_vector(O_SHIFT_MAX downto O_SHIFT_MIN);
         BUSY          : in  std_logic;
+        CLK_ENA       : out std_logic;
         FINISH        : out std_logic
     );
 end     REDUCER_TEST_MODEL;
@@ -409,6 +410,7 @@ begin
         ---------------------------------------------------------------------------
         assert(false) report "Starting Run..." severity NOTE;
                        SCENARIO <= "START";
+                       CLK_ENA  <= '1';
                        RST      <= '1';
                        CLR      <= '1';
                        START    <= '0';
@@ -585,10 +587,12 @@ begin
         WAIT_CLK(10); 
         if (AUTO_FINISH = 0) then
             assert(false) report NAME & " Run complete..." severity NOTE;
-            FINISH <= 'Z';
+            FINISH  <= 'Z';
+            CLK_ENA <= '0';
         else
-            FINISH <= 'Z';
-            assert(false) report NAME & " Run complete..." severity FAILURE;
+            FINISH  <= 'Z';
+            CLK_ENA <= '0';
+            assert(false) report NAME & " Run complete..." severity NOTE;
         end if;
         wait;
     end process;
@@ -857,6 +861,7 @@ package COMPONENTS is
             O_RDY       : out std_logic;
             O_SHIFT     : out std_logic_vector(O_SHIFT_MAX downto O_SHIFT_MIN);
             BUSY        : in  std_logic;
+            CLK_ENA     : out std_logic;
             FINISH      : out std_logic
         );
     end component;

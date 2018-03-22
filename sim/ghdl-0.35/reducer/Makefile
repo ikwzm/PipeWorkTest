@@ -46,15 +46,15 @@ clean:
 	rm -f *.o *.cf tmp.vhd $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
 
 reducer_test_model.o : $(SRC_TEST_PATH)/reducer_test_model.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=work $<
+	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
 $(addsuffix .o,$(TEST_BENCH)) : reducer_test_model.o
 %.o : %.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=work $<
+	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
 $(TEST_BENCH) : $(addsuffix .o,$(TEST_BENCH))
-	 $(GHDL) -e $(GHDLFLAGS) --work=work $@
-	-$(GHDL) -r $(GHDLFLAGS) --work=work $@
+	$(GHDL) -e $(GHDLFLAGS) --work=work $@
+	$(GHDL) -r $(GHDLFLAGS) --work=work $@
 
 
 reducer_test_bench_dwc_w08_i1_o1_q0_j0_v0.vhd : $(SRC_TEST_PATH)/reducer_test_bench_template.vhd
