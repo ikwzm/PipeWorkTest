@@ -23,44 +23,44 @@ clean:
 	rm -f *.o *.cf $(TEST_BENCH)
 
 sdpram_test_bench_all: sdpram_test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sdpram_test_bench_depth08_rd3_wd3_we0 : sdpram_test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sdpram_test_bench_depth08_rd4_wd4_we0 : sdpram_test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sdpram_test_bench_depth08_rd5_wd5_we0 : sdpram_test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sdpram_test_bench_depth08_rd6_wd6_we3 : sdpram_test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sdpram_test_bench_depth08_rd3_wd4_we0 : sdpram_test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sdpram_test_bench_depth08_rd3_wd5_we0 : sdpram_test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sdpram_test_bench_depth08_rd4_wd3_we0 : sdpram_test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sdpram_test_bench_depth08_rd5_wd3_we0 : sdpram_test_bench.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sdpram_test_bench: sdpram_test_bench.o sdpram_model.o 
-	 $(GHDL) -e $(GHDLFLAGS) $@
-	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sdpram_test_bench.o: mt19937ar.o components.o sdpram.o sdpram_model.o 
 sdpram_test_bench.o: $(PIPEWORK_SRC_TEST_PATH)/sdpram/test_bench.vhd 
