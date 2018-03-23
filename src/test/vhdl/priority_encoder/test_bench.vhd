@@ -46,8 +46,7 @@ package COMPONENTS is
             MSB         : boolean := FALSE;
             L           : integer := 0;
             H           : integer := 31;
-            VERBOSE     : boolean := FALSE;
-            AUTO_FINISH : boolean := FALSE
+            VERBOSE     : boolean := FALSE
         );
         port (
             FINISH      : out std_logic
@@ -64,8 +63,7 @@ entity  TEST_BENCH is
         MSB         : boolean := FALSE;
         L           : integer := 0;
         H           : integer := 31;
-        VERBOSE     : boolean := FALSE;
-        AUTO_FINISH : boolean := FALSE
+        VERBOSE     : boolean := FALSE
     );
     port (
         FINISH      : out std_logic
@@ -226,15 +224,9 @@ begin
             i_data := rnd_data;
             CHECK(i_data);
         end loop;
-        if (AUTO_FINISH = FALSE) then
-            assert(mismatch=0) report MESSAGE_TAG & "Run error!!!!!!" severity FAILURE;
-            assert(mismatch>0) report MESSAGE_TAG & "Run complete..." severity NOTE;
-            FINISH <= 'Z';
-        else
-            FINISH <= 'Z';
-            assert(mismatch=0) report MESSAGE_TAG & "Run error!!!!!!" severity FAILURE;
-            assert(mismatch>0) report MESSAGE_TAG & "Run complete..." severity NOTE;
-        end if;
+        assert(mismatch=0) report MESSAGE_TAG & "Run error!!!!!!" severity FAILURE;
+        assert(mismatch>0) report MESSAGE_TAG & "Run complete..." severity NOTE;
+        FINISH <= 'Z';
         wait;
     end process;
 end stimulus;
@@ -258,8 +250,7 @@ begin
                 MSB         => TRUE ,
                 L           => L,
                 H           => L+W-1,
-                VERBOSE     => FALSE,
-                AUTO_FINISH => FALSE
+                VERBOSE     => FALSE
             )
             port map (
                 FINISH      => FINISH
@@ -269,8 +260,7 @@ begin
                 MSB         => FALSE,
                 L           => L,
                 H           => L+W-1,
-                VERBOSE     => FALSE,
-                AUTO_FINISH => FALSE
+                VERBOSE     => FALSE
             )
             port map (
                 FINISH      => FINISH
