@@ -45,8 +45,7 @@ component DELAY_REGISTER_TEST_BENCH
     generic (
         DATA_BITS   : integer := 8;
         DELAY_MIN   : integer := 0;
-        DELAY_MAX   : integer := 1;
-        AUTO_FINISH : integer := 1
+        DELAY_MAX   : integer := 1
     );
     port (
         FINISH      : out std_logic
@@ -62,8 +61,7 @@ entity  DELAY_REGISTER_TEST_BENCH is
     generic (
         DATA_BITS   : integer := 8;
         DELAY_MIN   : integer := 0;
-        DELAY_MAX   : integer := 1;
-        AUTO_FINISH : integer := 1
+        DELAY_MAX   : integer := 1
     );
     port (
         FINISH      : out std_logic
@@ -264,15 +262,9 @@ begin
         -- シミュレーション終了
         ---------------------------------------------------------------------------
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
-            FINISH  <= 'Z';
-            clk_ena <= FALSE;
-        else
-            FINISH  <= 'Z';
-            clk_ena <= FALSE;
-            assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
-        end if;
+        assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
+        FINISH  <= 'Z';
+        clk_ena <= FALSE;
         wait;
     end process;
     -------------------------------------------------------------------------------
@@ -351,8 +343,7 @@ begin
             generic map (
                 DATA_BITS   => 8,
                 DELAY_MIN   => DELAY_MIN,
-                DELAY_MAX   => DELAY_MAX,
-                AUTO_FINISH => 0
+                DELAY_MAX   => DELAY_MAX
             )
             port map (
                 FINISH      => FINISH
@@ -382,8 +373,7 @@ begin
         generic map (
             DATA_BITS   => 8,
             DELAY_MIN   => 3,
-            DELAY_MAX   => 3,
-            AUTO_FINISH => 1
+            DELAY_MAX   => 3
         )
         port map (
             FINISH      => open
