@@ -44,8 +44,7 @@ package COMPONENTS is
     component QUEUE_RECEIVER_TEST_BENCH
         generic (
             QUEUE_SIZE       : integer := 4;
-            DATA_BITS        : integer := 8;
-            AUTO_FINISH      : integer := 0
+            DATA_BITS        : integer := 8
         );
         port (
             FINISH           : out std_logic
@@ -67,8 +66,7 @@ use     DUMMY_PLUG.TINYMT32.all;
 entity  QUEUE_RECEIVER_TEST_BENCH is
     generic (
         QUEUE_SIZE       : integer := 4;
-        DATA_BITS        : integer := 8;
-        AUTO_FINISH      : integer := 0
+        DATA_BITS        : integer := 8
     );
     port (
         FINISH           : out std_logic
@@ -349,15 +347,9 @@ begin
         -- シミュレーション終了
         ---------------------------------------------------------------------------
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
-            CLK_ENA <= FALSE;
-            FINISH  <= 'Z';
-        else
-            CLK_ENA <= FALSE;
-            FINISH  <= 'Z';
-            assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
-        end if;
+        assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
+        CLK_ENA <= FALSE;
+        FINISH  <= 'Z';
         wait;
     end process;
 
@@ -367,28 +359,28 @@ entity QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08 is
 end    QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08;
 architecture MODEL of QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08 is
 begin
-    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_RECEIVER_TEST_BENCH;
 entity QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08 is
 end    QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08;
 architecture MODEL of QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08 is
 begin
-    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_RECEIVER_TEST_BENCH;
 entity QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08 is
 end    QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08;
 architecture MODEL of QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08 is
 begin
-    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_RECEIVER_TEST_BENCH;
 entity QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08 is
 end    QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08;
 architecture MODEL of QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08 is
 begin
-    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8) port map(FINISH=>open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -404,8 +396,7 @@ begin
     QUEUE_SIZE_GEN: for QUEUE_SIZE in 2 to 4 generate
         TB:QUEUE_RECEIVER_TEST_BENCH generic map (
             QUEUE_SIZE  => QUEUE_SIZE,
-            DATA_BITS   => 8,
-            AUTO_FINISH => 0
+            DATA_BITS   => 8
         )
         port map (
            FINISH       => FINISH
