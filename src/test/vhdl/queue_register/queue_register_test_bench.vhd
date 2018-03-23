@@ -45,8 +45,7 @@ package COMPONENTS is
         generic (
             QUEUE_SIZE       : integer := 4;
             DATA_BITS        : integer := 8;
-            LOWPOWER         : integer := 1;
-            AUTO_FINISH      : integer := 0
+            LOWPOWER         : integer := 1
         );
         port (
             FINISH           : out std_logic
@@ -69,8 +68,7 @@ entity  QUEUE_REGISTER_TEST_BENCH is
     generic (
         QUEUE_SIZE       : integer := 4;
         DATA_BITS        : integer := 8;
-        LOWPOWER         : integer := 1;
-        AUTO_FINISH      : integer := 0
+        LOWPOWER         : integer := 1
     );
     port (
         FINISH           : out std_logic
@@ -354,15 +352,9 @@ begin
         -- シミュレーション終了
         ---------------------------------------------------------------------------
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
-            FINISH  <= 'Z';
-            CLK_ENA <= FALSE;
-        else
-            FINISH  <= 'Z';
-            CLK_ENA <= FALSE;
-            assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
-        end if;
+        assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
+        FINISH  <= 'Z';
+        CLK_ENA <= FALSE;
         wait;
     end process;
 
@@ -372,56 +364,56 @@ entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER1 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER1;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER1 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8,LOWPOWER=>1,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8,LOWPOWER=>1) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER1 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER1;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER1 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8,LOWPOWER=>1,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8,LOWPOWER=>1) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER1 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER1;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER1 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8,LOWPOWER=>1,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8,LOWPOWER=>1) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER1 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER1;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER1 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8,LOWPOWER=>1,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8,LOWPOWER=>1) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER0 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER0;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER0 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8,LOWPOWER=>0,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8,LOWPOWER=>0) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER0 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER0;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER0 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8,LOWPOWER=>0,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8,LOWPOWER=>0) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER0 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER0;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER0 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8,LOWPOWER=>0,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8,LOWPOWER=>0) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER0 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER0;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER0 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8,LOWPOWER=>0,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8,LOWPOWER=>0) port map(FINISH=>open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -439,8 +431,7 @@ begin
         TB:QUEUE_REGISTER_TEST_BENCH generic map (
             QUEUE_SIZE  => QUEUE_SIZE,
             DATA_BITS   => 8,
-            LOWPOWER    => LOWPOWER,
-            AUTO_FINISH => 0
+            LOWPOWER    => LOWPOWER
         )
         port map (
            FINISH       => FINISH
