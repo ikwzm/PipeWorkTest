@@ -51,8 +51,7 @@ entity  CHOPPER_FUNCTION_MODEL is
         COUNT_BITS  : integer := 9;
         PSIZE_BITS  : integer := 9;
         GEN_VALID   : integer := 1;
-        VERBOSE     : integer := 0;
-        AUTO_FINISH : integer := 1
+        VERBOSE     : integer := 0
     );
     port (
         CLK         : out std_logic;  
@@ -347,15 +346,9 @@ begin
         ---------------------------------------------------------------------------
         SCENARIO <= "DONE.";
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
-            FINISH  <= 'Z';
-            clk_ena <= '0';
-        else
-            FINISH  <= 'Z';
-            clk_ena <= '0';
-            assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
-        end if;
+        assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
+        FINISH  <= 'Z';
+        clk_ena <= '0';
         wait;
     end process;
 
