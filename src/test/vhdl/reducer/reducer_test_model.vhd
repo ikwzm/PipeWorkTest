@@ -149,8 +149,7 @@ entity  REDUCER_TEST_MODEL is
         O_SHIFT_MAX   : integer :=  4;
         I_JUSTIFIED   : integer :=  0;
         FLUSH_ENABLE  : integer :=  0;
-        DEBUG_PRINT   : boolean :=  FALSE;
-        AUTO_FINISH   : integer :=  1
+        DEBUG_PRINT   : boolean :=  FALSE
     );
     port(
         CLK           : in  std_logic;
@@ -585,15 +584,9 @@ begin
         WAIT_CLK(10); 
         SCENARIO <= "DONE.";
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report NAME & " Run complete..." severity NOTE;
-            FINISH  <= 'Z';
-            CLK_ENA <= '0';
-        else
-            FINISH  <= 'Z';
-            CLK_ENA <= '0';
-            assert(false) report NAME & " Run complete..." severity NOTE;
-        end if;
+        assert(false) report NAME & " Run complete..." severity NOTE;
+        FINISH  <= 'Z';
+        CLK_ENA <= '0';
         wait;
     end process;
     -------------------------------------------------------------------------------
@@ -834,8 +827,7 @@ package COMPONENTS is
             O_SHIFT_MIN : integer;
             O_SHIFT_MAX : integer;
             I_JUSTIFIED : integer;
-            FLUSH_ENABLE: integer;
-            AUTO_FINISH : integer
+            FLUSH_ENABLE: integer
         );
         port(
             CLK         : in  std_logic;

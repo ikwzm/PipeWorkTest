@@ -40,7 +40,7 @@ library PIPEWORK;
 use     PIPEWORK.COMPONENTS.REDUCER;
 use     WORK.COMPONENTS.REDUCER_TEST_MODEL;
 entity  REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V is
-    generic(AUTO_FINISH:integer:=1);port(FINISH:out std_logic);
+    port(FINISH:out std_logic);
 end     REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V;
 architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V is
     constant   WORD_BITS      : integer := %W;
@@ -124,7 +124,6 @@ begin
         );
     O:REDUCER_TEST_MODEL
         generic map (
-            AUTO_FINISH   => AUTO_FINISH,
             NAME          => NAME,
             DELAY         => DELAY,
             WORD_BITS     => WORD_BITS,
