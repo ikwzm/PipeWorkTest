@@ -51,8 +51,7 @@ entity  SDPRAM_TEST_BENCH is
         DEPTH       : integer := 9;
         RWIDTH      : integer := 5;
         WWIDTH      : integer := 6;
-        WEBIT       : integer := 0;
-        AUTO_FINISH : integer := 1
+        WEBIT       : integer := 0
     );
     port (
         FINISH      : out std_logic
@@ -377,15 +376,9 @@ begin
         -- シミュレーション終了
         ---------------------------------------------------------------------------
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report INSTANCE_NAME & " Run complete..." severity NOTE;
-            CLK_ENA <= FALSE;
-            FINISH  <= 'Z';
-        else
-            CLK_ENA <= FALSE;
-            FINISH  <= 'Z';
-            assert(false) report INSTANCE_NAME & " Run complete..." severity NOTE;
-        end if;
+        assert(false) report INSTANCE_NAME & " Run complete..." severity NOTE;
+        CLK_ENA <= FALSE;
+        FINISH  <= 'Z';
         wait;
     end process;
 end MODEL;
@@ -400,8 +393,7 @@ component SDPRAM_TEST_BENCH is
         DEPTH       : integer := 9;
         RWIDTH      : integer := 5;
         WWIDTH      : integer := 6;
-        WEBIT       : integer := 0;
-        AUTO_FINISH : integer := 0
+        WEBIT       : integer := 0
     );
     port (
         FINISH      : out std_logic
@@ -419,7 +411,7 @@ end     SDPRAM_TEST_BENCH_DEPTH08_RD3_WD3_WE0;
 architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH08_RD3_WD3_WE0 is
     signal FINISH : std_logic;
 begin
-    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>3,WWIDTH=>3,WEBIT=>0,AUTO_FINISH => 1)port map (open);
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>3,WWIDTH=>3,WEBIT=>0)port map (open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -432,7 +424,7 @@ end     SDPRAM_TEST_BENCH_DEPTH08_RD4_WD4_WE0;
 architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH08_RD4_WD4_WE0 is
     signal FINISH : std_logic;
 begin
-    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>4,WWIDTH=>4,WEBIT=>0,AUTO_FINISH => 1)port map (open);
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>4,WWIDTH=>4,WEBIT=>0)port map (open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -445,7 +437,7 @@ end     SDPRAM_TEST_BENCH_DEPTH08_RD5_WD5_WE0;
 architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH08_RD5_WD5_WE0 is
     signal FINISH : std_logic;
 begin
-    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>5,WWIDTH=>5,WEBIT=>0,AUTO_FINISH => 1)port map (open);
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>5,WWIDTH=>5,WEBIT=>0)port map (open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -458,7 +450,7 @@ end     SDPRAM_TEST_BENCH_DEPTH08_RD6_WD6_WE3;
 architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH08_RD6_WD6_WE3 is
     signal FINISH : std_logic;
 begin
-    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>6,WWIDTH=>6,WEBIT=>3,AUTO_FINISH => 1)port map (open);
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>6,WWIDTH=>6,WEBIT=>3)port map (open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -471,7 +463,7 @@ end     SDPRAM_TEST_BENCH_DEPTH08_RD3_WD4_WE0;
 architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH08_RD3_WD4_WE0 is
     signal FINISH : std_logic;
 begin
-    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>3,WWIDTH=>4,WEBIT=>0,AUTO_FINISH => 1)port map (open);
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>3,WWIDTH=>4,WEBIT=>0)port map (open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -484,7 +476,7 @@ end     SDPRAM_TEST_BENCH_DEPTH08_RD3_WD5_WE0;
 architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH08_RD3_WD5_WE0 is
     signal FINISH : std_logic;
 begin
-    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>3,WWIDTH=>5,WEBIT=>0,AUTO_FINISH => 1)port map (open);
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>3,WWIDTH=>5,WEBIT=>0)port map (open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -497,7 +489,7 @@ end     SDPRAM_TEST_BENCH_DEPTH08_RD4_WD3_WE0;
 architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH08_RD4_WD3_WE0 is
     signal FINISH : std_logic;
 begin
-    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>4,WWIDTH=>3,WEBIT=>0,AUTO_FINISH => 1)port map (open);
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>4,WWIDTH=>3,WEBIT=>0)port map (open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -510,7 +502,7 @@ end     SDPRAM_TEST_BENCH_DEPTH08_RD5_WD3_WE0;
 architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH08_RD5_WD3_WE0 is
     signal FINISH : std_logic;
 begin
-    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>5,WWIDTH=>3,WEBIT=>0,AUTO_FINISH => 1)port map (open);
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>5,WWIDTH=>3,WEBIT=>0)port map (open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -531,8 +523,7 @@ begin
             DEPTH       => DEPTH,
             RWIDTH      => RWIDTH,
             WWIDTH      => WWIDTH,
-            WEBIT       => WEBIT,
-            AUTO_FINISH => 0
+            WEBIT       => WEBIT
         )
         port map (
            FINISH       => FINISH
