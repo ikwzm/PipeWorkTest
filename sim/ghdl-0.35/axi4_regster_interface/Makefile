@@ -24,28 +24,28 @@ clean:
 
 
 axi4_register_interface_test_bench_32_32    : axi4_register_interface_test_bench_32_32.o axi4_register_interface_test_bench_32_32.snr
-	 $(GHDL) -e $(GHDLFLAGS) --work=WORK $@
-	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
 axi4_register_interface_test_bench_32_64    : axi4_register_interface_test_bench_32_64.o axi4_register_interface_test_bench_32_64.snr
-	 $(GHDL) -e $(GHDLFLAGS) --work=WORK $@
-	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
 axi4_register_interface_test_bench_64_32    : axi4_register_interface_test_bench_64_32.o axi4_register_interface_test_bench_64_32.snr
-	 $(GHDL) -e $(GHDLFLAGS) --work=WORK $@
-	-$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
 axi4_register_interface_test_bench_32_32.o  : $(SRC_TEST_PATH)/axi4_register_interface_test_bench_32_32.vhd axi4_register_interface_test_bench.o
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_register_interface_test_bench_32_64.o  : $(SRC_TEST_PATH)/axi4_register_interface_test_bench_32_64.vhd axi4_register_interface_test_bench.o
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_register_interface_test_bench_64_32.o  : $(SRC_TEST_PATH)/axi4_register_interface_test_bench_64_32.vhd axi4_register_interface_test_bench.o
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_register_interface_test_bench.o        : $(SRC_TEST_PATH)/axi4_register_interface_test_bench.vhd
-	 $(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_register_interface_test_bench_32_32.snr: $(SCENARIO_PATH)/axi4_register_interface_test_bench_32_32.snr
 	$(COPY) $< .

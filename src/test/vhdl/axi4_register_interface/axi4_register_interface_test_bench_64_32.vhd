@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
---!     @file    aix4_register_interface_test_bench.vhd
---!     @brief   TEST BENCH for AXI4_REGISTER_INTERFACE
---!     @version 0.0.1
---!     @date    2013/1/2
+--!     @file    aix4_register_interface_test_bench_64_32.vhd
+--!     @brief   AXI4_REGISTER_INTERFACE TEST BENCH(AXI4_DATA_WIDTH=64,REGS_DATA_WIDTH=32)
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
