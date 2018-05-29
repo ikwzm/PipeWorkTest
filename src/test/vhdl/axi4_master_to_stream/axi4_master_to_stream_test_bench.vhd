@@ -126,7 +126,6 @@ architecture MODEL of AXI4_MASTER_TO_STREAM_TEST_BENCH is
     -- CSR I/F 
     ------------------------------------------------------------------------------
     signal    C_ARADDR          :  std_logic_vector(C_WIDTH.ARADDR -1 downto 0);
-    signal    C_ARWRITE         :  std_logic;
     signal    C_ARLEN           :  std_logic_vector(C_WIDTH.ALEN   -1 downto 0);
     signal    C_ARSIZE          :  AXI4_ASIZE_TYPE;
     signal    C_ARBURST         :  AXI4_ABURST_TYPE;
@@ -690,7 +689,7 @@ begin
             SCENARIO_FILE   => SCENARIO_FILE   ,
             NAME            => "I"             ,
             READ_ENABLE     => TRUE            ,
-            WRITE_ENABLE    => FALSE           ,
+            WRITE_ENABLE    => TRUE            ,
             OUTPUT_DELAY    => DELAY           ,
             WIDTH           => I_WIDTH         ,
             SYNC_PLUG_NUM   => 3               ,
@@ -820,9 +819,9 @@ begin
     CLK_SYNC: if (I_CLK_RATE = 1 and O_CLK_RATE = 1) generate
         process begin
             loop
-                I_CLK <= '0'; wait for I_PERIOD / 2;
+                I_CLK <= '0'; 
                 O_CLK <= '0'; wait for I_PERIOD / 2;
-                I_CLK <= '1'; wait for I_PERIOD / 2;
+                I_CLK <= '1'; 
                 O_CLK <= '1'; wait for I_PERIOD / 2;
                 exit when(C_FINISH = '1');
             end loop;

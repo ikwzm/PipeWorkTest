@@ -2,7 +2,7 @@
 --!     @file    axi4_master_to_stream.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4-Stream)
 --!     @version 1.7.0
---!     @date    2018/5/23
+--!     @date    2018/5/29
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -284,13 +284,14 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     signal    i_o_open_valid    :  std_logic;
     signal    i_o_close_info    :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
     signal    i_o_close_valid   :  std_logic;
-    signal    i_o_open          :  std_logic;
     signal    o_open            :  std_logic;
     signal    o_running         :  std_logic;
     signal    o_done            :  std_logic;
     signal    o_error           :  std_logic;
     signal    o_i_open_info     :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
+    signal    o_i_open_valid    :  std_logic;
     signal    o_i_close_info    :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
+    signal    o_i_close_valid   :  std_logic;
     signal    o_o_open_info     :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
     signal    o_o_open_valid    :  std_logic;
     signal    o_o_close_info    :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
@@ -403,6 +404,7 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     constant  I_MODE_AUSER_LO   :  integer := 8*I_MODE_REGS_ADDR +  8;
     constant  I_MODE_CACHE_HI   :  integer := 8*I_MODE_REGS_ADDR +  7;
     constant  I_MODE_CACHE_LO   :  integer := 8*I_MODE_REGS_ADDR +  4;
+    constant  I_MODE_CLOSE_POS  :  integer := 8*I_MODE_REGS_ADDR +  2;
     constant  I_MODE_ERROR_POS  :  integer := 8*I_MODE_REGS_ADDR +  1;
     constant  I_MODE_DONE_POS   :  integer := 8*I_MODE_REGS_ADDR +  0;
     -------------------------------------------------------------------------------
@@ -415,7 +417,8 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     constant  I_STAT_REGS_ADDR  :  integer := I_REGS_BASE_ADDR + 16#0E#;
     constant  I_STAT_REGS_BITS  :  integer := 8;
     constant  I_STAT_RESV_HI    :  integer := 8*I_STAT_REGS_ADDR +  7;
-    constant  I_STAT_RESV_LO    :  integer := 8*I_STAT_REGS_ADDR +  2;
+    constant  I_STAT_RESV_LO    :  integer := 8*I_STAT_REGS_ADDR +  3;
+    constant  I_STAT_CLOSE_POS  :  integer := 8*I_STAT_REGS_ADDR +  2;
     constant  I_STAT_ERROR_POS  :  integer := 8*I_STAT_REGS_ADDR +  1;
     constant  I_STAT_DONE_POS   :  integer := 8*I_STAT_REGS_ADDR +  0;
     constant  I_STAT_RESV_BITS  :  integer := I_STAT_RESV_HI - I_STAT_RESV_LO + 1;
@@ -719,9 +722,6 @@ begin
             BUF_DATA            => buf_wdata         , -- Out :
             BUF_PTR             => buf_wptr            -- Out :
         );
-    i_req_cache       <= regs_rbit(I_MODE_CACHE_HI downto I_MODE_CACHE_LO);
-    i_req_speculative <= regs_rbit(I_MODE_SPECUL_POS);
-    i_req_safety      <= regs_rbit(I_MODE_SAFETY_POS);
     I_AWID            <= (others => '0');
     I_AWADDR          <= (others => '0');
     I_AWLEN           <= (others => '0');
@@ -785,6 +785,8 @@ begin
         regs_rbit(I_OPEN_REGS_HI  downto I_OPEN_REGS_LO ) <= i_q_open_info;
         regs_rbit(I_CLOSE_REGS_HI downto I_CLOSE_REGS_LO) <= i_q_close_info;
         regs_rbit(I_RESV_REGS_HI  downto I_RESV_REGS_LO ) <= (I_RESV_REGS_HI downto I_RESV_REGS_LO => '0');
+        o_i_open_valid  <= o_o_open_valid;
+        o_i_close_valid <= o_o_close_valid;
     end block;
     -------------------------------------------------------------------------------
     --
@@ -867,6 +869,9 @@ begin
             I_ERR_ST_L          => regs_load(I_STAT_ERROR_POS)                    , --  In  :
             I_ERR_ST_D          => regs_wbit(I_STAT_ERROR_POS)                    , --  In  :
             I_ERR_ST_Q          => regs_rbit(I_STAT_ERROR_POS)                    , --  Out :
+            I_CLOSE_ST_L        => regs_load(I_STAT_CLOSE_POS)                    , --  In  :
+            I_CLOSE_ST_D        => regs_wbit(I_STAT_CLOSE_POS)                    , --  In  :
+            I_CLOSE_ST_Q        => regs_rbit(I_STAT_CLOSE_POS)                    , --  Out :
         ---------------------------------------------------------------------------
         -- Intake Configuration Signals.
         ---------------------------------------------------------------------------
@@ -931,13 +936,12 @@ begin
         ---------------------------------------------------------------------------
         -- Intake Open/Close Infomation Interface
         ---------------------------------------------------------------------------
-            I_I_OPEN_INFO       => i_i_open_info       , --  In  :
-            I_I_CLOSE_INFO      => i_i_close_info      , --  In  :
-            I_O_OPEN_INFO       => i_o_open_info       , --  Out :
-            I_O_OPEN_VALID      => i_o_open_valid      , --  Out :
-            I_O_CLOSE_INFO      => i_o_close_info      , --  Out :
-            I_O_CLOSE_VALID     => i_o_close_valid     , --  Out :
-            I_O_OPEN            => i_o_open            , --  Out :
+            I_I2O_OPEN_INFO     => i_i_open_info       , --  In  :
+            I_I2O_CLOSE_INFO    => i_i_close_info      , --  In  :
+            I_O2I_OPEN_INFO     => i_o_open_info       , --  Out :
+            I_O2I_OPEN_VALID    => i_o_open_valid      , --  Out :
+            I_O2I_CLOSE_INFO    => i_o_close_info      , --  Out :
+            I_O2I_CLOSE_VALID   => i_o_close_valid     , --  Out :
         ---------------------------------------------------------------------------
         -- Outlet Clock and Clock Enable.
         ---------------------------------------------------------------------------
@@ -962,20 +966,44 @@ begin
         ---------------------------------------------------------------------------
         -- Outlet Open/Close Infomation Interface
         ---------------------------------------------------------------------------
-            O_I_OPEN_INFO       => o_i_open_info       , --  In  :
-            O_I_CLOSE_INFO      => o_i_close_info      , --  In  :
-            O_O_OPEN_INFO       => o_o_open_info       , --  Out :
-            O_O_OPEN_VALID      => o_o_open_valid      , --  Out :
-            O_O_CLOSE_INFO      => o_o_close_info      , --  Out :
-            O_O_CLOSE_VALID     => o_o_close_valid     , --  Out :
-            O_O_OPEN            => o_o_open            , --  Out :
+            O_O2I_OPEN_INFO     => o_i_open_info       , --  In  :
+            O_O2I_OPEN_VALID    => o_i_open_valid      , --  In  :
+            O_O2I_CLOSE_INFO    => o_i_close_info      , --  In  :
+            O_O2I_CLOSE_VALID   => o_i_close_valid     , --  In  :
+            O_I2O_OPEN_INFO     => o_o_open_info       , --  Out :
+            O_I2O_OPEN_VALID    => o_o_open_valid      , --  Out :
+            O_I2O_CLOSE_INFO    => o_o_close_info      , --  Out :
+            O_I2O_CLOSE_VALID   => o_o_close_valid     , --  Out :
         ---------------------------------------------------------------------------
         -- Outlet Buffer Read Interface.
         ---------------------------------------------------------------------------
             BUF_REN             => buf_ren             , --  Out :
             BUF_PTR             => buf_rptr            , --  Out :
             BUF_DATA            => buf_rdata             --  In  :
-        );                                               -- 
+        );                                               --
+    regs_rbit(I_CTRL_RESV_POS) <= '0';
+    i_req_cache       <= regs_rbit(I_MODE_CACHE_HI downto I_MODE_CACHE_LO);
+    i_req_speculative <= regs_rbit(I_MODE_SPECUL_POS);
+    i_req_safety      <= regs_rbit(I_MODE_SAFETY_POS);
+    I_ARUSER          <= std_logic_vector(resize(unsigned(regs_rbit(I_MODE_AUSER_HI downto I_MODE_AUSER_LO)), I_AUSER_WIDTH));
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    process (I_CLK, RST) begin
+        if (RST = '1') then
+                IRQ <= '0';
+        elsif (I_CLK'event and I_CLK = '1') then
+            if (CLR = '1') then
+                IRQ <= '0';
+            elsif (regs_rbit(I_STAT_CLOSE_POS) = '1' and regs_rbit(I_MODE_CLOSE_POS) = '1') or
+                  (regs_rbit(I_STAT_DONE_POS ) = '1' and regs_rbit(I_MODE_DONE_POS ) = '1') or
+                  (regs_rbit(I_STAT_ERROR_POS) = '1' and regs_rbit(I_MODE_ERROR_POS) = '1') then
+                IRQ <= '1';
+            else
+                IRQ <= '0';
+            end if;
+        end if;
+    end process;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
