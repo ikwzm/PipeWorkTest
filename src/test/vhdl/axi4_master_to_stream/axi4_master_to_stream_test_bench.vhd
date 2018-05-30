@@ -50,7 +50,8 @@ entity  AXI4_MASTER_TO_STREAM_TEST_BENCH is
         O_PERIOD        : time                                   := 10 ns;
         MAX_XFER_SIZE   : integer                                :=  6;
         BUF_WIDTH       : integer                                := 32;
-        BUF_DEPTH       : integer                                := 12
+        BUF_DEPTH       : integer                                := 12;
+        FINISH_ABORT    : boolean                                := FALSE
     );
 end     AXI4_MASTER_TO_STREAM_TEST_BENCH;
 -----------------------------------------------------------------------------------
@@ -888,8 +889,11 @@ begin
                 I_REPORT.mismatch_count = 0 and
                 O_REPORT.mismatch_count = 0)
             report "Simulation complete(mismatch)." severity FAILURE;
-        assert FALSE
-            report "Simulation complete(success)."  severity NOTE;
+        if (FINISH_ABORT) then
+            assert FALSE report "Simulation complete(success)."  severity FAILURE;
+        else
+            assert FALSE report "Simulation complete(success)."  severity NOTE;
+        end if;
         wait;
     end process;
 end MODEL;
