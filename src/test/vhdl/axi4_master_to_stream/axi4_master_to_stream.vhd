@@ -226,8 +226,8 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     constant  I_REQ_QUEUE       :  integer := I_QUEUE_SIZE;
     constant  I_RDATA_REGS      :  integer := 3;
     constant  I_REQ_SIZE_BITS   :  integer := 32;
-    constant  I_XFER_MIN_SIZE   :  integer := 12;
-    constant  I_XFER_MAX_SIZE   :  integer := 12;
+    constant  I_XFER_MIN_SIZE   :  integer := I_MAX_XFER_SIZE;
+    constant  I_XFER_MAX_SIZE   :  integer := I_MAX_XFER_SIZE;
     constant  OPEN_INFO_BITS    :  integer := 32;
     constant  CLOSE_INFO_BITS   :  integer := 32;
     -------------------------------------------------------------------------------
