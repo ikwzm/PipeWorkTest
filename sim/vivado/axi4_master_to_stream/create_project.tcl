@@ -3,7 +3,7 @@
 #
 
 set project_directory       [file dirname [info script]]
-set project_name            "axi4_master_to_stream"
+set project_name            "axi4_m2s"
 set device_parts            "xc7z010clg400-1"
 #
 # Create project
@@ -84,8 +84,8 @@ set_property "top" "AXI4_MASTER_TO_STREAM" $obj
 # Set 'sim_1' fileset properties
 #
 set obj [get_filesets sim_1]
-set_property "top" "AXI4_MASTER_TO_STREAM_TEST_BENCH"  $obj
-set_property "generic" "NAME=AXI4_MASTER_TO_STREAM_TEST_BENCH_32_32_64 SCENARIO_FILE=../../../../../../src/test/scenarios/axi4_master_to_stream/test_32_32_64.snr I_DATA_WIDTH=32 O_DATA_WIDTH=32 BUF_WIDTH=32 MAX_XFER_SIZE=6 BUF_DEPTH=12 FINISH_ABORT=true" $obj
+set_property "top" "AXI4_M2S_TB_32_32_256_SYNC"  $obj
+set_property "generic" "NAME=AXI4_MASTER_TO_STREAM_TEST_BENCH_32_32_64 SCENARIO_FILE=../../../../../../src/test/scenarios/axi4_master_to_stream/axi4_master_to_stream_test_bench_32_32_256.snr FINISH_ABORT=true" $obj
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1

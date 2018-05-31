@@ -111,7 +111,7 @@ architecture MODEL of AXI4_MASTER_TO_STREAM_TEST_BENCH is
                                       DATA       => O_DATA_WIDTH
                                    );
     constant   I_AXI_ID         :  integer :=  1;
-    constant   I_QUEUE_SIZE     :  integer :=  0;
+    constant   I_QUEUE_SIZE     :  integer :=  4;
     constant   SYNC_WIDTH       :  integer :=  2;
     constant   GPO_WIDTH        :  integer :=  8;
     constant   GPI_WIDTH        :  integer :=  GPO_WIDTH;
@@ -896,4 +896,184 @@ begin
         end if;
         wait;
     end process;
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_32_32_256_SYNC is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_32_32_256_SYNC";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_32_32_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_32_32_256_SYNC;
+architecture MODEL of AXI4_M2S_TB_32_32_256_SYNC is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 32              , --   
+            O_DATA_WIDTH    => 32              , --   
+            I_CLK_RATE      => 1               , --   
+            O_CLK_RATE      => 1               , --   
+            I_PERIOD        => 10 ns           , --   
+            O_PERIOD        => 10 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 32              , --   
+            BUF_DEPTH       => 16              , --   
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_32_64_256_SYNC is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_32_64_256_SYNC";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_32_64_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_32_64_256_SYNC;
+architecture MODEL of AXI4_M2S_TB_32_64_256_SYNC is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 32              , --   
+            O_DATA_WIDTH    => 64              , --   
+            I_CLK_RATE      => 1               , --   
+            O_CLK_RATE      => 1               , --   
+            I_PERIOD        => 10 ns           , --   
+            O_PERIOD        => 10 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 64              , --   
+            BUF_DEPTH       => 16              , --   
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_64_32_256_SYNC is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_64_32_256_SYNC";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_64_32_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_64_32_256_SYNC;
+architecture MODEL of AXI4_M2S_TB_64_32_256_SYNC is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 64              , --   
+            O_DATA_WIDTH    => 32              , --   
+            I_CLK_RATE      => 1               , --   
+            O_CLK_RATE      => 1               , --   
+            I_PERIOD        => 10 ns           , --   
+            O_PERIOD        => 10 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 64              , --   
+            BUF_DEPTH       => 16              , --   
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_64_64_256_SYNC is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_64_64_256_SYNC";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_64_64_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_64_64_256_SYNC;
+architecture MODEL of AXI4_M2S_TB_64_64_256_SYNC is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 64              , --   
+            O_DATA_WIDTH    => 64              , --   
+            I_CLK_RATE      => 1               , --   
+            O_CLK_RATE      => 1               , --   
+            I_PERIOD        => 10 ns           , --   
+            O_PERIOD        => 10 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 64              , --   
+            BUF_DEPTH       => 16              , --   
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_32_32_256_100MHz_250MHz is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_32_32_256_100MHz_250MHz";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_32_32_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_32_32_256_100MHz_250MHz;
+architecture MODEL of AXI4_M2S_TB_32_32_256_100MHz_250MHz is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 32              , --   
+            O_DATA_WIDTH    => 32              , --   
+            I_CLK_RATE      => 0               , --   
+            O_CLK_RATE      => 0               , --   
+            I_PERIOD        => 10 ns           , --   
+            O_PERIOD        =>  4 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 32              , --   
+            BUF_DEPTH       => 16              , --   
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_32_32_256_250MHz_100MHz is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_32_32_256_250MHz_100MHz";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_32_32_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_32_32_256_250MHz_100MHz;
+architecture MODEL of AXI4_M2S_TB_32_32_256_250MHz_100MHz is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 32              , --   
+            O_DATA_WIDTH    => 32              , --   
+            I_CLK_RATE      => 0               , --   
+            O_CLK_RATE      => 0               , --   
+            I_PERIOD        =>  4 ns           , --   
+            O_PERIOD        => 10 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 32              , --   
+            BUF_DEPTH       => 16              , --   
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
 end MODEL;

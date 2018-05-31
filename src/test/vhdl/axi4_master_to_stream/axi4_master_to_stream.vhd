@@ -54,7 +54,7 @@ entity  AXI4_MASTER_TO_STREAM is
         I_ID_WIDTH      : integer                 :=  8;
         I_AUSER_WIDTH   : integer                 :=  4;
         I_MAX_XFER_SIZE : integer                 :=  8;
-        I_QUEUE_SIZE    : integer                 :=  1;
+        I_QUEUE_SIZE    : integer                 :=  2;
         O_CLK_RATE      : integer                 :=  1;
         O_DATA_WIDTH    : integer                 := 32;
         BUF_WIDTH       : integer                 := 32;
@@ -296,7 +296,6 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     signal    o_o_open_valid    :  std_logic;
     signal    o_o_close_info    :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
     signal    o_o_close_valid   :  std_logic;
-    signal    o_o_open          :  std_logic;
     -------------------------------------------------------------------------------
     -- データバスのビット数の２のべき乗値を計算する.
     -------------------------------------------------------------------------------
@@ -769,24 +768,13 @@ begin
                 end if;
             end if;
         end process;
-        process(O_CLK, RST) begin
-            if (RST = '1') then
-                    o_i_open_info  <= (others => '0');
-                    o_i_close_info <= (others => '0');
-            elsif (O_CLK'event and O_CLK = '1') then
-                if (o_o_open_valid = '1') then
-                    o_i_open_info  <= o_o_open_info;
-                end if;
-                if (o_o_close_valid = '1') then
-                    o_i_close_info <= o_o_close_info;
-                end if;
-            end if;
-        end process;
         regs_rbit(I_OPEN_REGS_HI  downto I_OPEN_REGS_LO ) <= i_q_open_info;
         regs_rbit(I_CLOSE_REGS_HI downto I_CLOSE_REGS_LO) <= i_q_close_info;
         regs_rbit(I_RESV_REGS_HI  downto I_RESV_REGS_LO ) <= (I_RESV_REGS_HI downto I_RESV_REGS_LO => '0');
         o_i_open_valid  <= o_o_open_valid;
+        o_i_open_info   <= o_o_open_info;
         o_i_close_valid <= o_o_close_valid;
+        o_i_close_info  <= o_o_close_info;
     end block;
     -------------------------------------------------------------------------------
     --
