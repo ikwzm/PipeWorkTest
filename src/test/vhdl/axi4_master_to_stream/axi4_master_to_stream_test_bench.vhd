@@ -233,6 +233,9 @@ architecture MODEL of AXI4_MASTER_TO_STREAM_TEST_BENCH is
     signal    O_TLAST           :  std_logic;
     signal    O_TVALID          :  std_logic;
     signal    O_TREADY          :  std_logic;
+    signal    O_I2O_STOP        :  std_logic;
+    signal    O_I2O_RESET       :  std_logic;
+    signal    O_O2I_STOP        :  std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -403,11 +406,17 @@ architecture MODEL of AXI4_MASTER_TO_STREAM_TEST_BENCH is
         ---------------------------------------------------------------------------
         -- Pump Outlet Stream Interface.
         ---------------------------------------------------------------------------
-            O_DATA              : out std_logic_vector(O_DATA_WIDTH   -1 downto 0);
-            O_STRB              : out std_logic_vector(O_DATA_WIDTH/8 -1 downto 0);
-            O_LAST              : out std_logic;
-            O_VALID             : out std_logic;
-            O_READY             : in  std_logic;
+            O_DATA          : out std_logic_vector(O_DATA_WIDTH   -1 downto 0);
+            O_STRB          : out std_logic_vector(O_DATA_WIDTH/8 -1 downto 0);
+            O_LAST          : out std_logic;
+            O_VALID         : out std_logic;
+            O_READY         : in  std_logic;
+        ---------------------------------------------------------------------------
+        -- Pump Outlet Stop Interface.
+        ---------------------------------------------------------------------------
+            O_O2I_STOP      : in  std_logic;
+            O_I2O_STOP      : out std_logic;
+            O_I2O_RESET     : out std_logic;
         ---------------------------------------------------------------------------
         -- Interrupt Request Signals.
         ---------------------------------------------------------------------------
@@ -559,6 +568,12 @@ begin
             O_LAST          => O_TLAST             , -- Out :
             O_VALID         => O_TVALID            , -- Out :
             O_READY         => O_TREADY            , -- In  :
+        ---------------------------------------------------------------------------
+        -- Pump Outlet Stop Interface.
+        ---------------------------------------------------------------------------
+            O_O2I_STOP      => O_O2I_STOP          , -- In  :
+            O_I2O_STOP      => O_I2O_STOP          , -- Out :
+            O_I2O_RESET     => O_I2O_RESET         , -- Out :
         ---------------------------------------------------------------------------
         -- Interrupt Request Signals.
         ---------------------------------------------------------------------------
@@ -808,7 +823,8 @@ begin
             TLAST           => O_TLAST         , -- In  :
             TVALID          => O_TVALID        , -- In  :
             TREADY          => O_TREADY        , -- Out :
-            SYNC            => SYNC            , -- I/O :
+            SYNC(0)         => SYNC(0)         , -- I/O :
+            SYNC(1)         => SYNC(1)         , -- I/O :
             GPI             => O_GPI           , -- In  :
             GPO             => O_GPO           , -- Out :
             REPORT_STATUS   => O_REPORT        , -- Out :
@@ -856,7 +872,10 @@ begin
     C_GPI(0) <= IRQ;
     C_GPI(C_GPI'high downto 1) <= (C_GPI'high downto 1 => '0');
     I_GPI    <= (others => '0');
-    O_GPI    <= (others => '0');
+    O_GPI(0) <= O_I2O_STOP;
+    O_GPI(1) <= O_I2O_RESET;
+    O_GPI(O_GPI'high downto 2) <= (O_GPI'high downto 2 => '0');
+    O_O2I_STOP <= O_GPO(0);
         
     process
         variable L   : LINE;

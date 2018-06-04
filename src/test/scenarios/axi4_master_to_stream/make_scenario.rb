@@ -124,6 +124,7 @@ class ScenarioGenerater
     pos  = 0
     last = 0
     io.print "- O: \n"
+    io.print "  - OUT   : {GPO(0) : 0}\n"
     while (pos < data.length)
       len = @o_axi4_data_width/8
       if (pos + len >= data.length)
@@ -198,6 +199,8 @@ class ScenarioGenerater
     io.print "---\n"
     io.print "- MARCHAL : \n"
     io.print "  - SAY : ", title, "\n"
+    io.print "- #{@c_model.name} : \n"
+    io.print "  - WAIT : 2\n"
     io.print @c_model.write({
                :Address => 0x00000010, 
                :Data    => [sprintf("0x%08X", open_info     ),
@@ -248,6 +251,8 @@ class ScenarioGenerater
     io.print "---\n"
     io.print "- MARCHAL : \n"
     io.print "  - SAY : ", title, "\n"
+    io.print "- #{@c_model.name} : \n"
+    io.print "  - WAIT : 2\n"
     io.print @c_model.write({
                :Address => 0x00000000, 
                :Data    => [sprintf("0x%08X", i_address)     ,
@@ -310,12 +315,111 @@ class ScenarioGenerater
   #-------------------------------------------------------------------------------
   # 
   #-------------------------------------------------------------------------------
+  def test_3_1(io)
+    title  = @name.to_s + ".3.1"
+    reset  = gen_ctrl_regs([:Reset])
+    io.print "---\n"
+    io.print "- MARCHAL : \n"
+    io.print "  - SAY : ", title, "\n"
+    io.print "- #{@c_model.name} : \n"
+    io.print "  - WAIT : 2\n"
+    io.print @c_model.write({
+               :Address => 0x0000000C, 
+               :Data    => [sprintf("0x%08X", reset)]
+             })
+    io.print @c_model.write({
+               :Address => 0x0000000C, 
+               :Data    => [sprintf("0x%08X", 0    )]
+             })
+    io.print "- O: \n"
+    io.print "  - OUT   : {GPO(0) : 0}\n"
+    io.print "  - WAIT  : {GPI(1) : 1, TIMEOUT: #{@timeout.to_s} }\n"
+    io.print "  - WAIT  : {GPI(1) : 0, TIMEOUT: 1}\n"
+  end
+  #-------------------------------------------------------------------------------
+  # 
+  #-------------------------------------------------------------------------------
+  def test_3_2(io)
+    title  = @name.to_s + ".3.2"
+    addr   = 0x10000000
+    size   = @max_xfer_size*4
+    i_size = 0
+    data   = (1..size).collect{rand(256)}
+    i_cache= 3
+    i_auser= 1
+    i_mode = gen_ctrl_regs([:Last,:First,:Done_Enable,:Close_Irq_Enable,:Error_Irq_Enable,:Safety], i_cache, i_auser)
+    close  = gen_ctrl_regs([:Close])
+    done   = gen_ctrl_regs([:Done ])
+    start  = gen_ctrl_regs([:Start])
+    stop   = gen_ctrl_regs([:Stop ])
+    io.print "---\n"
+    io.print "- MARCHAL : \n"
+    io.print "  - SAY : ", title, "\n"
+    io.print "- #{@c_model.name} : \n"
+    io.print "  - WAIT : 2\n"
+    io.print @c_model.write({
+               :Address => 0x00000000, 
+               :Data    => [sprintf("0x%08X", addr          ),
+                            "0x00000000"                     , 
+                            sprintf("0x%08X", size          ),
+                            sprintf("0x%08X", i_mode | start)
+                           ]
+             })
+    io.print "  - WAIT  : 10\n"
+    # io.print "  - WAIT : #{(i_size/(@i_axi4_data_width/8))+10}\n"
+    gen_simple_read( io, @i_model, addr+i_size, data.slice(i_size, @max_xfer_size*2), "OKAY", i_cache, i_auser)
+    i_size += @max_xfer_size*2
+    io.print "- O : \n"
+    io.print "  - OUT   : {GPO(0) : 0}\n"
+    io.print "  - WAIT  : 10\n"
+    io.print "---\n"
+    gen_simple_read( io, @i_model, addr+i_size, data.slice(i_size, @max_xfer_size  ), "OKAY", i_cache, i_auser)
+    i_size += @max_xfer_size
+    io.print "- #{@c_model.name} : \n"
+    io.print "  - WAIT : 2\n"
+    io.print @c_model.write({
+               :Address => 0x0000000C, 
+               :Data    => [sprintf("0x%08X", i_mode | stop )
+                           ]
+             })
+    io.print "  - WAIT  : {GPI(0) : 1, TIMEOUT: ", @timeout.to_s, "}\n"
+    io.print @c_model.read({
+               :Address => 0x00000000, 
+               :Data    => [sprintf("0x%08X", addr + i_size ),
+                            "0x00000000"                     , 
+                            sprintf("0x%08X", size - i_size ),
+                            sprintf("0x%08X", i_mode | done | close),
+                           ]
+             })
+    io.print @c_model.write({
+               :Address => 0x00000000, 
+               :Data    => ["0x00000000"                     ,
+                            "0x00000000"                     , 
+                            "0x00000000"                     , 
+                            "0x00000000"                     ,
+                           ]
+             })
+    io.print "  - WAIT  : {GPI(0) : 0, TIMEOUT: #{@timeout.to_s} }\n"
+    io.print "- O: \n"
+    io.print "  - WAIT  : {GPI(0) : 1, TIMEOUT: #{@timeout.to_s} }\n"
+    io.print "  - WAIT  : {GPI(0) : 0, TIMEOUT: 1}\n"
+  end
+  #-------------------------------------------------------------------------------
+  # 
+  #-------------------------------------------------------------------------------
+  def test_3(io)
+    test_3_1(io)
+    test_3_2(io)
+  end
+  #-------------------------------------------------------------------------------
+  # 
+  #-------------------------------------------------------------------------------
   def generate
     if @file_name == nil then
         @file_name = sprintf("axi4_master_to_stream_test_bench_%d_%d_%d.snr", @i_axi4_data_width, @o_axi4_data_width, @max_xfer_size)
     end
     if @test_items == []
-      @test_items = [1,2]
+      @test_items = [1,2,3]
     end
     puts "Scenario File: #{@file_name}"         if @verbose
     puts "I Data Width : #{@i_axi4_data_width}" if @verbose
@@ -359,6 +463,7 @@ class ScenarioGenerater
     @test_items.each {|item|
         test_1(io) if (item == 1)
         test_2(io) if (item == 2)
+        test_3(io) if (item == 3)
     }
   end
 end
