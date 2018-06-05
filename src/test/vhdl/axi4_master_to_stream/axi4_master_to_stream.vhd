@@ -2,7 +2,7 @@
 --!     @file    axi4_master_to_stream.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4-Stream)
 --!     @version 1.7.0
---!     @date    2018/6/3
+--!     @date    2018/6/4
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -212,97 +212,106 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     -------------------------------------------------------------------------------
     -- リセット信号.
     -------------------------------------------------------------------------------
-    signal    RST               :  std_logic;
-    constant  CLR               :  std_logic := '0';
+    signal    RST                   :  std_logic;
+    constant  CLR                   :  std_logic := '0';
+    ------------------------------------------------------------------------------
+    -- 入力側のフロー制御用定数.
+    ------------------------------------------------------------------------------
+    constant  I_FLOW_VALID          :  integer := 1;
+    constant  I_USE_PUSH_BUF_SIZE   :  integer := 0;
+    constant  I_FIXED_FLOW_OPEN     :  integer := 0;
+    constant  I_FIXED_POOL_OPEN     :  integer := 1;
+    constant  I_REQ_ADDR_VALID      :  integer := 1;
+    constant  I_REQ_SIZE_VALID      :  integer := 1;
+    constant  I_FLOW_READY_LEVEL    :  std_logic_vector(BUF_DEPTH downto 0)
+                                    := std_logic_vector(to_unsigned(2**BUF_DEPTH-2**I_MAX_XFER_SIZE, BUF_DEPTH+1));
+    constant  I_BUF_READY_LEVEL     :  std_logic_vector(BUF_DEPTH downto 0)
+                                    := std_logic_vector(to_unsigned(2**BUF_DEPTH-2*I_DATA_WIDTH    , BUF_DEPTH+1));
     -------------------------------------------------------------------------------
     -- 定数
     -------------------------------------------------------------------------------
-    constant  I_REQ_LOCK        :  AXI4_ALOCK_TYPE  := (others => '0');
-    constant  I_REQ_PROT        :  AXI4_APROT_TYPE  := (others => '0');
-    constant  I_REQ_QOS         :  AXI4_AQOS_TYPE   := (others => '0');
-    constant  I_REQ_REGION      :  AXI4_AREGION_TYPE:= (others => '0');
-    constant  I_REQ_ID          :  std_logic_vector(I_ID_WIDTH -1 downto 0)
-                                := std_logic_vector(to_unsigned(I_AXI_ID, I_ID_WIDTH));
-    constant  I_ADDR_FIX        :  std_logic := '0';
-    constant  I_BUF_READY_LEVEL :  std_logic_vector(BUF_DEPTH downto 0)
-                                := std_logic_vector(to_unsigned(2**BUF_DEPTH-2*I_DATA_WIDTH    , BUF_DEPTH+1));
-    constant  I_FLOW_READY_LEVEL:  std_logic_vector(BUF_DEPTH downto 0)
-                                := std_logic_vector(to_unsigned(2**BUF_DEPTH-2**I_MAX_XFER_SIZE, BUF_DEPTH+1));
-    constant  I_ACK_REGS        :  integer := 1;
-    constant  I_REQ_QUEUE       :  integer := I_QUEUE_SIZE;
-    constant  I_RDATA_REGS      :  integer := 3;
-    constant  I_REQ_SIZE_BITS   :  integer := 32;
-    constant  I_XFER_MIN_SIZE   :  integer := I_MAX_XFER_SIZE;
-    constant  I_XFER_MAX_SIZE   :  integer := I_MAX_XFER_SIZE;
-    constant  OPEN_INFO_BITS    :  integer := 32;
-    constant  CLOSE_INFO_BITS   :  integer := 32;
+    constant  I_REQ_LOCK            :  AXI4_ALOCK_TYPE  := (others => '0');
+    constant  I_REQ_PROT            :  AXI4_APROT_TYPE  := (others => '0');
+    constant  I_REQ_QOS             :  AXI4_AQOS_TYPE   := (others => '0');
+    constant  I_REQ_REGION          :  AXI4_AREGION_TYPE:= (others => '0');
+    constant  I_REQ_ID              :  std_logic_vector(I_ID_WIDTH -1 downto 0)
+                                    := std_logic_vector(to_unsigned(I_AXI_ID, I_ID_WIDTH));
+    constant  I_ADDR_FIX            :  std_logic := '0';
+    constant  I_ACK_REGS            :  integer := 1;
+    constant  I_REQ_QUEUE           :  integer := I_QUEUE_SIZE;
+    constant  I_RDATA_REGS          :  integer := 3;
+    constant  I_REQ_SIZE_BITS       :  integer := 32;
+    constant  I_XFER_MIN_SIZE       :  integer := I_MAX_XFER_SIZE;
+    constant  I_XFER_MAX_SIZE       :  integer := I_MAX_XFER_SIZE;
+    constant  OPEN_INFO_BITS        :  integer := 32;
+    constant  CLOSE_INFO_BITS       :  integer := 32;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal    i_req_valid       :  std_logic;
-    signal    i_req_addr        :  std_logic_vector(I_ADDR_WIDTH   -1 downto 0);
-    signal    i_req_size        :  std_logic_vector(I_REQ_SIZE_BITS-1 downto 0);
-    signal    i_req_buf_ptr     :  std_logic_vector(BUF_DEPTH      -1 downto 0);
-    signal    i_req_cache       :  AXI4_ACACHE_TYPE;
-    signal    i_req_speculative :  std_logic;
-    signal    i_req_safety      :  std_logic;
-    signal    i_req_first       :  std_logic;
-    signal    i_req_last        :  std_logic;
-    signal    i_req_ready       :  std_logic;
-    signal    i_ack_valid       :  std_logic;
-    signal    i_ack_size        :  std_logic_vector(BUF_DEPTH         downto 0);
-    signal    i_ack_error       :  std_logic;
-    signal    i_ack_next        :  std_logic;
-    signal    i_ack_last        :  std_logic;
-    signal    i_ack_stop        :  std_logic;
-    signal    i_ack_none        :  std_logic;
-    signal    i_xfer_busy       :  std_logic;
-    signal    i_xfer_done       :  std_logic;
-    signal    i_xfer_error      :  std_logic;
-    signal    i_flow_ready      :  std_logic;
-    signal    i_flow_pause      :  std_logic;
-    signal    i_flow_stop       :  std_logic;
-    signal    i_flow_last       :  std_logic;
-    signal    i_flow_size       :  std_logic_vector(BUF_DEPTH         downto 0);
-    signal    i_push_fin_valid  :  std_logic;
-    signal    i_push_fin_last   :  std_logic;
-    signal    i_push_fin_error  :  std_logic;
-    signal    i_push_fin_size   :  std_logic_vector(BUF_DEPTH         downto 0);
-    signal    i_push_rsv_valid  :  std_logic;
-    signal    i_push_rsv_last   :  std_logic;
-    signal    i_push_rsv_error  :  std_logic;
-    signal    i_push_rsv_size   :  std_logic_vector(BUF_DEPTH         downto 0);
-    signal    i_push_buf_reset  :  std_logic;
-    signal    i_push_buf_valid  :  std_logic;
-    signal    i_push_buf_last   :  std_logic;
-    signal    i_push_buf_error  :  std_logic;
-    signal    i_push_buf_size   :  std_logic_vector(BUF_DEPTH         downto 0);
-    signal    i_push_buf_ready  :  std_logic;
-    signal    i_open            :  std_logic;
-    signal    i_running         :  std_logic;
-    signal    i_done            :  std_logic;
-    signal    i_error           :  std_logic;
-    signal    i_i_open_info     :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
-    signal    i_q_open_info     :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
-    signal    i_i_close_info    :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
-    signal    i_q_close_info    :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
-    signal    i_o_open_info     :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
-    signal    i_o_open_valid    :  std_logic;
-    signal    i_o_close_info    :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
-    signal    i_o_close_valid   :  std_logic;
-    signal    i_o_stop_valid    :  std_logic;
-    signal    o_open            :  std_logic;
-    signal    o_running         :  std_logic;
-    signal    o_done            :  std_logic;
-    signal    o_error           :  std_logic;
-    signal    o_i_open_info     :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
-    signal    o_i_open_valid    :  std_logic;
-    signal    o_i_close_info    :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
-    signal    o_i_close_valid   :  std_logic;
-    signal    o_o_open_info     :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
-    signal    o_o_open_valid    :  std_logic;
-    signal    o_o_close_info    :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
-    signal    o_o_close_valid   :  std_logic;
+    signal    i_req_valid           :  std_logic;
+    signal    i_req_addr            :  std_logic_vector(I_ADDR_WIDTH   -1 downto 0);
+    signal    i_req_size            :  std_logic_vector(I_REQ_SIZE_BITS-1 downto 0);
+    signal    i_req_buf_ptr         :  std_logic_vector(BUF_DEPTH      -1 downto 0);
+    signal    i_req_cache           :  AXI4_ACACHE_TYPE;
+    signal    i_req_speculative     :  std_logic;
+    signal    i_req_safety          :  std_logic;
+    signal    i_req_first           :  std_logic;
+    signal    i_req_last            :  std_logic;
+    signal    i_req_ready           :  std_logic;
+    signal    i_ack_valid           :  std_logic;
+    signal    i_ack_size            :  std_logic_vector(BUF_DEPTH         downto 0);
+    signal    i_ack_error           :  std_logic;
+    signal    i_ack_next            :  std_logic;
+    signal    i_ack_last            :  std_logic;
+    signal    i_ack_stop            :  std_logic;
+    signal    i_ack_none            :  std_logic;
+    signal    i_xfer_busy           :  std_logic;
+    signal    i_xfer_done           :  std_logic;
+    signal    i_xfer_error          :  std_logic;
+    signal    i_flow_ready          :  std_logic;
+    signal    i_flow_pause          :  std_logic;
+    signal    i_flow_stop           :  std_logic;
+    signal    i_flow_last           :  std_logic;
+    signal    i_flow_size           :  std_logic_vector(BUF_DEPTH         downto 0);
+    signal    i_push_fin_valid      :  std_logic;
+    signal    i_push_fin_last       :  std_logic;
+    signal    i_push_fin_error      :  std_logic;
+    signal    i_push_fin_size       :  std_logic_vector(BUF_DEPTH         downto 0);
+    signal    i_push_rsv_valid      :  std_logic;
+    signal    i_push_rsv_last       :  std_logic;
+    signal    i_push_rsv_error      :  std_logic;
+    signal    i_push_rsv_size       :  std_logic_vector(BUF_DEPTH         downto 0);
+    signal    i_push_buf_reset      :  std_logic;
+    signal    i_push_buf_valid      :  std_logic;
+    signal    i_push_buf_last       :  std_logic;
+    signal    i_push_buf_error      :  std_logic;
+    signal    i_push_buf_size       :  std_logic_vector(BUF_DEPTH         downto 0);
+    signal    i_push_buf_ready      :  std_logic;
+    signal    i_open                :  std_logic;
+    signal    i_running             :  std_logic;
+    signal    i_done                :  std_logic;
+    signal    i_error               :  std_logic;
+    signal    i_i_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
+    signal    i_q_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
+    signal    i_i_close_info        :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
+    signal    i_q_close_info        :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
+    signal    i_o_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
+    signal    i_o_open_valid        :  std_logic;
+    signal    i_o_close_info        :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
+    signal    i_o_close_valid       :  std_logic;
+    signal    i_o_stop_valid        :  std_logic;
+    signal    o_open                :  std_logic;
+    signal    o_running             :  std_logic;
+    signal    o_done                :  std_logic;
+    signal    o_error               :  std_logic;
+    signal    o_i_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
+    signal    o_i_open_valid        :  std_logic;
+    signal    o_i_close_info        :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
+    signal    o_i_close_valid       :  std_logic;
+    signal    o_o_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
+    signal    o_o_open_valid        :  std_logic;
+    signal    o_o_close_info        :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
+    signal    o_o_close_valid       :  std_logic;
     -------------------------------------------------------------------------------
     -- データバスのビット数の２のべき乗値を計算する.
     -------------------------------------------------------------------------------
@@ -318,36 +327,36 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     ------------------------------------------------------------------------------
     -- バッファのデータ幅のビット数を２のべき乗値で示す.
     ------------------------------------------------------------------------------
-    constant  BUF_DATA_BIT_SIZE :  integer := CALC_DATA_SIZE(BUF_WIDTH);
+    constant  BUF_DATA_BIT_SIZE     :  integer := CALC_DATA_SIZE(BUF_WIDTH);
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
-    signal    buf_ren           :  std_logic;
-    signal    buf_rptr          :  std_logic_vector(BUF_DEPTH      -1 downto 0);
-    signal    buf_rdata         :  std_logic_vector(BUF_WIDTH      -1 downto 0);
-    signal    buf_wen           :  std_logic;
-    signal    buf_we            :  std_logic_vector(BUF_WIDTH/8    -1 downto 0);
-    signal    buf_ben           :  std_logic_vector(BUF_WIDTH/8    -1 downto 0);
-    signal    buf_wdata         :  std_logic_vector(BUF_WIDTH      -1 downto 0);
-    signal    buf_wptr          :  std_logic_vector(BUF_DEPTH      -1 downto 0);
+    signal    buf_ren               :  std_logic;
+    signal    buf_rptr              :  std_logic_vector(BUF_DEPTH      -1 downto 0);
+    signal    buf_rdata             :  std_logic_vector(BUF_WIDTH      -1 downto 0);
+    signal    buf_wen               :  std_logic;
+    signal    buf_we                :  std_logic_vector(BUF_WIDTH/8    -1 downto 0);
+    signal    buf_ben               :  std_logic_vector(BUF_WIDTH/8    -1 downto 0);
+    signal    buf_wdata             :  std_logic_vector(BUF_WIDTH      -1 downto 0);
+    signal    buf_wptr              :  std_logic_vector(BUF_DEPTH      -1 downto 0);
     -------------------------------------------------------------------------------
     -- レジスタアクセスインターフェースのアドレスのビット数.
     -------------------------------------------------------------------------------
-    constant  REGS_ADDR_WIDTH   :  integer := 5;
+    constant  REGS_ADDR_WIDTH       :  integer := 5;
     -------------------------------------------------------------------------------
     -- 全レジスタのビット数.
     -------------------------------------------------------------------------------
-    constant  REGS_DATA_BITS    :  integer := (2**REGS_ADDR_WIDTH)*8;
+    constant  REGS_DATA_BITS        :  integer := (2**REGS_ADDR_WIDTH)*8;
     -------------------------------------------------------------------------------
     -- レジスタアクセスインターフェースのデータのビット数.
     -------------------------------------------------------------------------------
-    constant  REGS_DATA_WIDTH   :  integer := 32;
+    constant  REGS_DATA_WIDTH       :  integer := 32;
     -------------------------------------------------------------------------------
     -- レジスタアクセス用の信号群.
     -------------------------------------------------------------------------------
-    signal    regs_load         :  std_logic_vector(REGS_DATA_BITS   -1 downto 0);
-    signal    regs_wbit         :  std_logic_vector(REGS_DATA_BITS   -1 downto 0);
-    signal    regs_rbit         :  std_logic_vector(REGS_DATA_BITS   -1 downto 0);
+    signal    regs_load             :  std_logic_vector(REGS_DATA_BITS   -1 downto 0);
+    signal    regs_wbit             :  std_logic_vector(REGS_DATA_BITS   -1 downto 0);
+    signal    regs_rbit             :  std_logic_vector(REGS_DATA_BITS   -1 downto 0);
     -------------------------------------------------------------------------------
     -- Pump Intake Registers
     -------------------------------------------------------------------------------
@@ -366,28 +375,28 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     -- Addr=0x14 |                    CLOSE_INFO[31:00]                          |
     --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     -------------------------------------------------------------------------------
-    constant  I_REGS_BASE_ADDR  :  integer := 16#00#;
-    constant  I_REGS_BITS       :  integer := 128;
-    constant  I_REGS_LO         :  integer := 8*I_REGS_BASE_ADDR;
-    constant  I_REGS_HI         :  integer := I_REGS_LO + I_REGS_BITS - 1;
+    constant  I_REGS_BASE_ADDR      :  integer := 16#00#;
+    constant  I_REGS_BITS           :  integer := 128;
+    constant  I_REGS_LO             :  integer := 8*I_REGS_BASE_ADDR;
+    constant  I_REGS_HI             :  integer := I_REGS_LO + I_REGS_BITS - 1;
     -------------------------------------------------------------------------------
     -- Pump Intake Address Register
     -------------------------------------------------------------------------------
     -- Address     = 転送開始アドレス.
     -------------------------------------------------------------------------------
-    constant  I_ADDR_REGS_ADDR  :  integer := I_REGS_BASE_ADDR + 16#00#;
-    constant  I_ADDR_REGS_BITS  :  integer := 64;
-    constant  I_ADDR_REGS_LO    :  integer := 8*I_ADDR_REGS_ADDR;
-    constant  I_ADDR_REGS_HI    :  integer := 8*I_ADDR_REGS_ADDR + I_ADDR_REGS_BITS-1;
+    constant  I_ADDR_REGS_ADDR      :  integer := I_REGS_BASE_ADDR + 16#00#;
+    constant  I_ADDR_REGS_BITS      :  integer := 64;
+    constant  I_ADDR_REGS_LO        :  integer := 8*I_ADDR_REGS_ADDR;
+    constant  I_ADDR_REGS_HI        :  integer := 8*I_ADDR_REGS_ADDR + I_ADDR_REGS_BITS-1;
     -------------------------------------------------------------------------------
     -- Pump Intake Size Register
     -------------------------------------------------------------------------------
     -- Size[31:00] = 転送サイズ.
     -------------------------------------------------------------------------------
-    constant  I_SIZE_REGS_ADDR  :  integer := I_REGS_BASE_ADDR + 16#08#;
-    constant  I_SIZE_REGS_BITS  :  integer := 32;
-    constant  I_SIZE_REGS_LO    :  integer := 8*I_SIZE_REGS_ADDR;
-    constant  I_SIZE_REGS_HI    :  integer := 8*I_SIZE_REGS_ADDR + I_SIZE_REGS_BITS-1;
+    constant  I_SIZE_REGS_ADDR      :  integer := I_REGS_BASE_ADDR + 16#08#;
+    constant  I_SIZE_REGS_BITS      :  integer := 32;
+    constant  I_SIZE_REGS_LO        :  integer := 8*I_SIZE_REGS_ADDR;
+    constant  I_SIZE_REGS_HI        :  integer := 8*I_SIZE_REGS_ADDR + I_SIZE_REGS_BITS-1;
     -------------------------------------------------------------------------------
     -- Pump Intake Mode Register
     -------------------------------------------------------------------------------
@@ -399,20 +408,20 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     -- Mode[01]    = 1:エラー発生時(Status[1]='1')に割り込みを発生する.
     -- Mode[00]    = 1:転送終了時(Status[0]='1')に割り込みを発生する.
     -------------------------------------------------------------------------------
-    constant  I_MODE_REGS_ADDR  :  integer := I_REGS_BASE_ADDR + 16#0C#;
-    constant  I_MODE_REGS_BITS  :  integer := 16;
-    constant  I_MODE_REGS_HI    :  integer := 8*I_MODE_REGS_ADDR + 15;
-    constant  I_MODE_REGS_LO    :  integer := 8*I_MODE_REGS_ADDR +  0;
-    constant  I_MODE_SAFETY_POS :  integer := 8*I_MODE_REGS_ADDR + 15;
-    constant  I_MODE_SPECUL_POS :  integer := 8*I_MODE_REGS_ADDR + 14;
-    constant  I_MODE_AFIX_POS   :  integer := 8*I_MODE_REGS_ADDR + 13;
-    constant  I_MODE_AUSER_HI   :  integer := 8*I_MODE_REGS_ADDR + 12;
-    constant  I_MODE_AUSER_LO   :  integer := 8*I_MODE_REGS_ADDR +  8;
-    constant  I_MODE_CACHE_HI   :  integer := 8*I_MODE_REGS_ADDR +  7;
-    constant  I_MODE_CACHE_LO   :  integer := 8*I_MODE_REGS_ADDR +  4;
-    constant  I_MODE_CLOSE_POS  :  integer := 8*I_MODE_REGS_ADDR +  2;
-    constant  I_MODE_ERROR_POS  :  integer := 8*I_MODE_REGS_ADDR +  1;
-    constant  I_MODE_DONE_POS   :  integer := 8*I_MODE_REGS_ADDR +  0;
+    constant  I_MODE_REGS_ADDR      :  integer := I_REGS_BASE_ADDR + 16#0C#;
+    constant  I_MODE_REGS_BITS      :  integer := 16;
+    constant  I_MODE_REGS_HI        :  integer := 8*I_MODE_REGS_ADDR + 15;
+    constant  I_MODE_REGS_LO        :  integer := 8*I_MODE_REGS_ADDR +  0;
+    constant  I_MODE_SAFETY_POS     :  integer := 8*I_MODE_REGS_ADDR + 15;
+    constant  I_MODE_SPECUL_POS     :  integer := 8*I_MODE_REGS_ADDR + 14;
+    constant  I_MODE_AFIX_POS       :  integer := 8*I_MODE_REGS_ADDR + 13;
+    constant  I_MODE_AUSER_HI       :  integer := 8*I_MODE_REGS_ADDR + 12;
+    constant  I_MODE_AUSER_LO       :  integer := 8*I_MODE_REGS_ADDR +  8;
+    constant  I_MODE_CACHE_HI       :  integer := 8*I_MODE_REGS_ADDR +  7;
+    constant  I_MODE_CACHE_LO       :  integer := 8*I_MODE_REGS_ADDR +  4;
+    constant  I_MODE_CLOSE_POS      :  integer := 8*I_MODE_REGS_ADDR +  2;
+    constant  I_MODE_ERROR_POS      :  integer := 8*I_MODE_REGS_ADDR +  1;
+    constant  I_MODE_DONE_POS       :  integer := 8*I_MODE_REGS_ADDR +  0;
     -------------------------------------------------------------------------------
     -- Pump Intake Status Register
     -------------------------------------------------------------------------------
@@ -420,15 +429,15 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     -- Status[1]   = エラー発生時にセットされる.
     -- Status[0]   = 転送終了時かつ Control[2]='1' にセットされる.
     -------------------------------------------------------------------------------
-    constant  I_STAT_REGS_ADDR  :  integer := I_REGS_BASE_ADDR + 16#0E#;
-    constant  I_STAT_REGS_BITS  :  integer := 8;
-    constant  I_STAT_RESV_HI    :  integer := 8*I_STAT_REGS_ADDR +  7;
-    constant  I_STAT_RESV_LO    :  integer := 8*I_STAT_REGS_ADDR +  3;
-    constant  I_STAT_CLOSE_POS  :  integer := 8*I_STAT_REGS_ADDR +  2;
-    constant  I_STAT_ERROR_POS  :  integer := 8*I_STAT_REGS_ADDR +  1;
-    constant  I_STAT_DONE_POS   :  integer := 8*I_STAT_REGS_ADDR +  0;
-    constant  I_STAT_RESV_BITS  :  integer := I_STAT_RESV_HI - I_STAT_RESV_LO + 1;
-    constant  I_STAT_RESV_NULL  :  std_logic_vector(I_STAT_RESV_BITS-1 downto 0) := (others => '0');
+    constant  I_STAT_REGS_ADDR      :  integer := I_REGS_BASE_ADDR + 16#0E#;
+    constant  I_STAT_REGS_BITS      :  integer := 8;
+    constant  I_STAT_RESV_HI        :  integer := 8*I_STAT_REGS_ADDR +  7;
+    constant  I_STAT_RESV_LO        :  integer := 8*I_STAT_REGS_ADDR +  3;
+    constant  I_STAT_CLOSE_POS      :  integer := 8*I_STAT_REGS_ADDR +  2;
+    constant  I_STAT_ERROR_POS      :  integer := 8*I_STAT_REGS_ADDR +  1;
+    constant  I_STAT_DONE_POS       :  integer := 8*I_STAT_REGS_ADDR +  0;
+    constant  I_STAT_RESV_BITS      :  integer := I_STAT_RESV_HI - I_STAT_RESV_LO + 1;
+    constant  I_STAT_RESV_NULL      :  std_logic_vector(I_STAT_RESV_BITS-1 downto 0) := (others => '0');
     -------------------------------------------------------------------------------
     -- Pump Intake Control Register
     -------------------------------------------------------------------------------
@@ -441,36 +450,36 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     -- Control[1]  = 1:連続したトランザクションの開始を指定する.
     -- Control[0]  = 1:連続したトランザクションの終了を指定する.
     -------------------------------------------------------------------------------
-    constant  I_CTRL_REGS_ADDR  :  integer := I_REGS_BASE_ADDR + 16#0F#;
-    constant  I_CTRL_RESET_POS  :  integer := 8*I_CTRL_REGS_ADDR +  7;
-    constant  I_CTRL_PAUSE_POS  :  integer := 8*I_CTRL_REGS_ADDR +  6;
-    constant  I_CTRL_STOP_POS   :  integer := 8*I_CTRL_REGS_ADDR +  5;
-    constant  I_CTRL_START_POS  :  integer := 8*I_CTRL_REGS_ADDR +  4;
-    constant  I_CTRL_RESV_POS   :  integer := 8*I_CTRL_REGS_ADDR +  3;
-    constant  I_CTRL_DONE_POS   :  integer := 8*I_CTRL_REGS_ADDR +  2;
-    constant  I_CTRL_FIRST_POS  :  integer := 8*I_CTRL_REGS_ADDR +  1;
-    constant  I_CTRL_LAST_POS   :  integer := 8*I_CTRL_REGS_ADDR +  0;
+    constant  I_CTRL_REGS_ADDR      :  integer := I_REGS_BASE_ADDR + 16#0F#;
+    constant  I_CTRL_RESET_POS      :  integer := 8*I_CTRL_REGS_ADDR +  7;
+    constant  I_CTRL_PAUSE_POS      :  integer := 8*I_CTRL_REGS_ADDR +  6;
+    constant  I_CTRL_STOP_POS       :  integer := 8*I_CTRL_REGS_ADDR +  5;
+    constant  I_CTRL_START_POS      :  integer := 8*I_CTRL_REGS_ADDR +  4;
+    constant  I_CTRL_RESV_POS       :  integer := 8*I_CTRL_REGS_ADDR +  3;
+    constant  I_CTRL_DONE_POS       :  integer := 8*I_CTRL_REGS_ADDR +  2;
+    constant  I_CTRL_FIRST_POS      :  integer := 8*I_CTRL_REGS_ADDR +  1;
+    constant  I_CTRL_LAST_POS       :  integer := 8*I_CTRL_REGS_ADDR +  0;
     -------------------------------------------------------------------------------
     -- Pump Intake Open Infomation Register
     -------------------------------------------------------------------------------
-    constant  I_OPEN_REGS_ADDR  :  integer := I_REGS_BASE_ADDR + 16#10#;
-    constant  I_OPEN_REGS_BITS  :  integer := OPEN_INFO_BITS;
-    constant  I_OPEN_REGS_LO    :  integer := 8*I_OPEN_REGS_ADDR;
-    constant  I_OPEN_REGS_HI    :  integer := 8*I_OPEN_REGS_ADDR + I_OPEN_REGS_BITS-1;
+    constant  I_OPEN_REGS_ADDR      :  integer := I_REGS_BASE_ADDR + 16#10#;
+    constant  I_OPEN_REGS_BITS      :  integer := OPEN_INFO_BITS;
+    constant  I_OPEN_REGS_LO        :  integer := 8*I_OPEN_REGS_ADDR;
+    constant  I_OPEN_REGS_HI        :  integer := 8*I_OPEN_REGS_ADDR + I_OPEN_REGS_BITS-1;
     -------------------------------------------------------------------------------
     -- Pump Intake Close Infomation Register
     -------------------------------------------------------------------------------
-    constant  I_CLOSE_REGS_ADDR :  integer := I_REGS_BASE_ADDR + 16#14#;
-    constant  I_CLOSE_REGS_BITS :  integer := CLOSE_INFO_BITS;
-    constant  I_CLOSE_REGS_LO   :  integer := 8*I_CLOSE_REGS_ADDR;
-    constant  I_CLOSE_REGS_HI   :  integer := 8*I_CLOSE_REGS_ADDR + I_CLOSE_REGS_BITS-1;
+    constant  I_CLOSE_REGS_ADDR     :  integer := I_REGS_BASE_ADDR + 16#14#;
+    constant  I_CLOSE_REGS_BITS     :  integer := CLOSE_INFO_BITS;
+    constant  I_CLOSE_REGS_LO       :  integer := 8*I_CLOSE_REGS_ADDR;
+    constant  I_CLOSE_REGS_HI       :  integer := 8*I_CLOSE_REGS_ADDR + I_CLOSE_REGS_BITS-1;
     -------------------------------------------------------------------------------
     -- Pump Reserve Register
     -------------------------------------------------------------------------------
-    constant  I_RESV_REGS_ADDR  :  integer := I_REGS_BASE_ADDR + 16#18#;
-    constant  I_RESV_REGS_BITS  :  integer := 64;
-    constant  I_RESV_REGS_LO    :  integer := 8*I_RESV_REGS_ADDR;
-    constant  I_RESV_REGS_HI    :  integer := 8*I_RESV_REGS_ADDR + I_RESV_REGS_BITS-1;
+    constant  I_RESV_REGS_ADDR      :  integer := I_REGS_BASE_ADDR + 16#18#;
+    constant  I_RESV_REGS_BITS      :  integer := 64;
+    constant  I_RESV_REGS_LO        :  integer := 8*I_RESV_REGS_ADDR;
+    constant  I_RESV_REGS_HI        :  integer := 8*I_RESV_REGS_ADDR + I_RESV_REGS_BITS-1;
 begin
     -------------------------------------------------------------------------------
     -- 
@@ -611,8 +620,8 @@ begin
             AXI4_ID_WIDTH       => I_ID_WIDTH        , --   
             VAL_BITS            => 1                 , --   
             REQ_SIZE_BITS       => I_REQ_SIZE_BITS   , --   
-            REQ_SIZE_VALID      => 1                 , --   
-            FLOW_VALID          => 1                 , --   
+            REQ_SIZE_VALID      => I_REQ_SIZE_VALID  , --   
+            FLOW_VALID          => I_FLOW_VALID      , --   
             BUF_DATA_WIDTH      => BUF_WIDTH         , --   
             BUF_PTR_BITS        => BUF_DEPTH         , --   
             ALIGNMENT_BITS      => 8                 , --   
@@ -789,17 +798,17 @@ begin
     CTRL: PUMP_STREAM_INTAKE_CONTROLLER
         generic map (
             I_CLK_RATE          => I_CLK_RATE          , --
-            I_REQ_ADDR_VALID    => 1                   , --
+            I_REQ_ADDR_VALID    => I_REQ_ADDR_VALID    , --
             I_REQ_ADDR_BITS     => I_ADDR_WIDTH        , --
             I_REG_ADDR_BITS     => I_ADDR_REGS_BITS    , --
-            I_REQ_SIZE_VALID    => 1                   , --
+            I_REQ_SIZE_VALID    => I_REQ_SIZE_VALID    , --
             I_REQ_SIZE_BITS     => I_REQ_SIZE_BITS     , --
             I_REG_SIZE_BITS     => I_SIZE_REGS_BITS    , --
             I_REG_MODE_BITS     => I_MODE_REGS_BITS    , --
             I_REG_STAT_BITS     => I_STAT_RESV_BITS    , --
-            I_USE_PUSH_BUF_SIZE => 1                   , --
-            I_FIXED_FLOW_OPEN   => 0                   , --
-            I_FIXED_POOL_OPEN   => 0                   , --
+            I_USE_PUSH_BUF_SIZE => I_USE_PUSH_BUF_SIZE , --
+            I_FIXED_FLOW_OPEN   => I_FIXED_FLOW_OPEN   , --
+            I_FIXED_POOL_OPEN   => I_FIXED_POOL_OPEN   , --
             O_CLK_RATE          => O_CLK_RATE          , --
             O_DATA_BITS         => O_DATA_WIDTH        , --
             BUF_DEPTH           => BUF_DEPTH           , --
