@@ -185,6 +185,12 @@ entity  AXI4_STREAM_TO_MASTER is
         I_VALID         : in  std_logic;
         I_READY         : out std_logic;
     -------------------------------------------------------------------------------
+    -- Pump Outlet Stop Interface.
+    -------------------------------------------------------------------------------
+        I_I2O_STOP      : in  std_logic;
+        I_O2I_STOP      : out std_logic;
+        I_O2I_RESET     : out std_logic;
+    -------------------------------------------------------------------------------
     -- Interrupt Request Signals.
     -------------------------------------------------------------------------------
         IRQ             : out   std_logic
@@ -287,6 +293,7 @@ architecture RTL of AXI4_STREAM_TO_MASTER is
     signal    o_o_open_valid    :  std_logic;
     signal    o_o_close_info    :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
     signal    o_o_close_valid   :  std_logic;
+    signal    o_o_stop_valid    :  std_logic;
     signal    i_open            :  std_logic;
     signal    i_running         :  std_logic;
     signal    i_done            :  std_logic;
@@ -796,9 +803,9 @@ begin
             O_REG_SIZE_BITS     => O_SIZE_REGS_BITS    , --
             O_REG_MODE_BITS     => O_MODE_REGS_BITS    , --
             O_REG_STAT_BITS     => O_STAT_RESV_BITS    , --
-            O_USE_PULL_BUF_SIZE => 1                   , --
+            O_USE_PULL_BUF_SIZE => 0                   , --
             O_FIXED_FLOW_OPEN   => 0                   , --
-            O_FIXED_POOL_OPEN   => 0                   , --
+            O_FIXED_POOL_OPEN   => 1                   , --
             I_CLK_RATE          => I_CLK_RATE          , --
             I_DATA_BITS         => I_DATA_WIDTH        , --
             BUF_DEPTH           => BUF_DEPTH           , --
@@ -936,6 +943,7 @@ begin
             O_I2O_OPEN_VALID    => o_o_open_valid      , --  Out :
             O_I2O_CLOSE_INFO    => o_o_close_info      , --  Out :
             O_I2O_CLOSE_VALID   => o_o_close_valid     , --  Out :
+            O_I2O_STOP_VALID    => o_o_stop_valid      , --  Out :
         ---------------------------------------------------------------------------
         -- Intake Clock and Clock Enable.
         ---------------------------------------------------------------------------
@@ -960,14 +968,17 @@ begin
         ---------------------------------------------------------------------------
         -- Intake Open/Close Infomation Interface
         ---------------------------------------------------------------------------
-            I_O2I_OPEN_INFO     => i_o_open_info       , --  Out :
-            I_O2I_OPEN_VALID    => i_o_open_valid      , --  Out :
-            I_O2I_CLOSE_INFO    => i_o_close_info      , --  Out :
-            I_O2I_CLOSE_VALID   => i_o_close_valid     , --  Out :
+            I_I2O_STOP_VALID    => I_I2O_STOP          , --  In  :
             I_I2O_OPEN_INFO     => i_i_open_info       , --  In  :
             I_I2O_OPEN_VALID    => i_i_open_valid      , --  In  :
             I_I2O_CLOSE_INFO    => i_i_close_info      , --  In  :
             I_I2O_CLOSE_VALID   => i_i_close_valid     , --  In  :
+            I_O2I_RESET         => I_O2I_RESET         , --  Out :
+            I_O2I_STOP_VALID    => I_O2I_STOP          , --  Out :
+            I_O2I_OPEN_INFO     => i_o_open_info       , --  Out :
+            I_O2I_OPEN_VALID    => i_o_open_valid      , --  Out :
+            I_O2I_CLOSE_INFO    => i_o_close_info      , --  Out :
+            I_O2I_CLOSE_VALID   => i_o_close_valid     , --  Out :
         ---------------------------------------------------------------------------
         -- Intake Buffer Read Interface.
         ---------------------------------------------------------------------------

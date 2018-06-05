@@ -2,7 +2,7 @@
 --!     @file    axi4_stream_to_master_test_bench.vhd
 --!     @brief   Pump Core Module (AXI4-Stream to AXI4) Test Bench
 --!     @version 1.7.0
---!     @date    2018/6/2
+--!     @date    2018/6/4
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -233,6 +233,9 @@ architecture MODEL of AXI4_STREAM_TO_MASTER_TEST_BENCH is
     signal    I_TLAST           :  std_logic;
     signal    I_TVALID          :  std_logic;
     signal    I_TREADY          :  std_logic;
+    signal    I_I2O_STOP        :  std_logic;
+    signal    I_O2I_STOP        :  std_logic;
+    signal    I_O2I_RESET       :  std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -358,6 +361,7 @@ architecture MODEL of AXI4_STREAM_TO_MASTER_TEST_BENCH is
         ---------------------------------------------------------------------------
         -- Pump Outlet I/F AXI4 Write Data Channel Signals.
         ---------------------------------------------------------------------------
+            O_WID           : out   std_logic_vector(O_ID_WIDTH    -1 downto 0);
             O_WDATA         : out   std_logic_vector(O_DATA_WIDTH  -1 downto 0);
             O_WSTRB         : out   std_logic_vector(O_DATA_WIDTH/8-1 downto 0);
             O_WLAST         : out   std_logic;
@@ -408,6 +412,12 @@ architecture MODEL of AXI4_STREAM_TO_MASTER_TEST_BENCH is
             I_LAST          : in    std_logic;
             I_VALID         : in    std_logic;
             I_READY         : out   std_logic;
+        ---------------------------------------------------------------------------
+        -- Pump Outlet Stop Interface.
+        ---------------------------------------------------------------------------
+            I_I2O_STOP      : in  std_logic;
+            I_O2I_STOP      : out std_logic;
+            I_O2I_RESET     : out std_logic;
         ---------------------------------------------------------------------------
         -- Interrupt Request Signals.
         ---------------------------------------------------------------------------
@@ -509,6 +519,7 @@ begin
         ---------------------------------------------------------------------------
         -- Pump Outlet I/F AXI4 Write Data Channel Signals.
         ---------------------------------------------------------------------------
+            O_WID           => O_WID               , -- Out :
             O_WDATA         => O_WDATA             , -- Out :
             O_WSTRB         => O_WSTRB             , -- Out :
             O_WLAST         => O_WLAST             , -- Out :
@@ -559,6 +570,12 @@ begin
             I_LAST          => I_TLAST             , -- In  :
             I_VALID         => I_TVALID            , -- In  :
             I_READY         => I_TREADY            , -- Out :
+        ---------------------------------------------------------------------------
+        -- Pump Outlet Stop Interface.
+        ---------------------------------------------------------------------------
+            I_I2O_STOP      => I_I2O_STOP          , -- In  :
+            I_O2I_STOP      => I_O2I_STOP          , -- Out :
+            I_O2I_RESET     => I_O2I_RESET         , -- Out :
         ---------------------------------------------------------------------------
         -- Interrupt Request Signals.
         ---------------------------------------------------------------------------
@@ -856,7 +873,10 @@ begin
     C_GPI(0) <= IRQ;
     C_GPI(C_GPI'high downto 1) <= (C_GPI'high downto 1 => '0');
     O_GPI    <= (others => '0');
-    I_GPI    <= (others => '0');
+    I_GPI(0) <= I_O2I_STOP;
+    I_GPI(1) <= I_O2I_RESET;
+    I_GPI(I_GPI'high downto 2) <= (I_GPI'high downto 2 => '0');
+    I_I2O_STOP <= I_GPO(0);
         
     process
         variable L   : LINE;
@@ -945,12 +965,12 @@ begin
         generic map (
             NAME            => NAME            , -- 
             SCENARIO_FILE   => SCENARIO_FILE   , --   
-            I_DATA_WIDTH    => 32              , --   
-            O_DATA_WIDTH    => 64              , --   
-            I_CLK_RATE      => 1               , --   
+            O_DATA_WIDTH    => 32              , --   
+            I_DATA_WIDTH    => 64              , --   
             O_CLK_RATE      => 1               , --   
-            I_PERIOD        => 10 ns           , --   
+            I_CLK_RATE      => 1               , --   
             O_PERIOD        => 10 ns           , --   
+            I_PERIOD        => 10 ns           , --   
             MAX_XFER_SIZE   => 8               , --   
             BUF_WIDTH       => 64              , --   
             BUF_DEPTH       => 16              , --   
@@ -975,12 +995,12 @@ begin
         generic map (
             NAME            => NAME            , -- 
             SCENARIO_FILE   => SCENARIO_FILE   , --   
-            I_DATA_WIDTH    => 64              , --   
-            O_DATA_WIDTH    => 32              , --   
-            I_CLK_RATE      => 1               , --   
+            O_DATA_WIDTH    => 64              , --   
+            I_DATA_WIDTH    => 32              , --   
             O_CLK_RATE      => 1               , --   
-            I_PERIOD        => 10 ns           , --   
+            I_CLK_RATE      => 1               , --   
             O_PERIOD        => 10 ns           , --   
+            I_PERIOD        => 10 ns           , --   
             MAX_XFER_SIZE   => 8               , --   
             BUF_WIDTH       => 64              , --   
             BUF_DEPTH       => 16              , --   
@@ -1005,12 +1025,12 @@ begin
         generic map (
             NAME            => NAME            , -- 
             SCENARIO_FILE   => SCENARIO_FILE   , --   
-            I_DATA_WIDTH    => 64              , --   
             O_DATA_WIDTH    => 64              , --   
-            I_CLK_RATE      => 1               , --   
+            I_DATA_WIDTH    => 64              , --   
             O_CLK_RATE      => 1               , --   
-            I_PERIOD        => 10 ns           , --   
+            I_CLK_RATE      => 1               , --   
             O_PERIOD        => 10 ns           , --   
+            I_PERIOD        => 10 ns           , --   
             MAX_XFER_SIZE   => 8               , --   
             BUF_WIDTH       => 64              , --   
             BUF_DEPTH       => 16              , --   
@@ -1035,12 +1055,12 @@ begin
         generic map (
             NAME            => NAME            , -- 
             SCENARIO_FILE   => SCENARIO_FILE   , --   
-            I_DATA_WIDTH    => 32              , --   
             O_DATA_WIDTH    => 32              , --   
-            I_CLK_RATE      => 0               , --   
+            I_DATA_WIDTH    => 32              , --   
             O_CLK_RATE      => 0               , --   
-            I_PERIOD        => 10 ns           , --   
-            O_PERIOD        =>  4 ns           , --   
+            I_CLK_RATE      => 0               , --   
+            O_PERIOD        => 10 ns           , --   
+            I_PERIOD        =>  4 ns           , --   
             MAX_XFER_SIZE   => 8               , --   
             BUF_WIDTH       => 32              , --   
             BUF_DEPTH       => 16              , --   
@@ -1065,12 +1085,12 @@ begin
         generic map (
             NAME            => NAME            , -- 
             SCENARIO_FILE   => SCENARIO_FILE   , --   
-            I_DATA_WIDTH    => 32              , --   
             O_DATA_WIDTH    => 32              , --   
-            I_CLK_RATE      => 0               , --   
+            I_DATA_WIDTH    => 32              , --   
             O_CLK_RATE      => 0               , --   
-            I_PERIOD        =>  4 ns           , --   
-            O_PERIOD        => 10 ns           , --   
+            I_CLK_RATE      => 0               , --   
+            O_PERIOD        =>  4 ns           , --   
+            I_PERIOD        => 10 ns           , --   
             MAX_XFER_SIZE   => 8               , --   
             BUF_WIDTH       => 32              , --   
             BUF_DEPTH       => 16              , --   
