@@ -508,7 +508,7 @@ begin
             -----------------------------------------------------------------------
             -- Clock and Reset Signals.
             -----------------------------------------------------------------------
-                CLK             => I_CLK             , -- In  :
+                CLK             => O_CLK             , -- In  :
                 RST             => RST               , -- In  :
                 CLR             => CLR               , -- In  :
             -----------------------------------------------------------------------
@@ -584,7 +584,7 @@ begin
             )                                          -- 
             port map (                                 -- 
                 RST             => RST               , -- In  :
-                I_CLK           => I_CLK             , -- In  :
+                I_CLK           => O_CLK             , -- In  :
                 I_CLR           => CLR               , -- In  :
                 I_CKE           => sig_1             , -- In  :
                 I_REQ           => regs_req          , -- In  :
@@ -596,7 +596,7 @@ begin
                 I_RDATA         => regs_rdata        , -- Out :
                 I_ACK           => regs_ack          , -- Out :
                 I_ERR           => regs_err          , -- Out :
-                O_CLK           => I_CLK             , -- In  :
+                O_CLK           => O_CLK             , -- In  :
                 O_CLR           => CLR               , -- In  :
                 O_CKE           => sig_1             , -- In  :
                 O_WDATA         => regs_wbit         , -- Out :
@@ -756,7 +756,7 @@ begin
     -------------------------------------------------------------------------------
     INFO: block
     begin
-        process(I_CLK, RST) begin
+        process(O_CLK, RST) begin
             if (RST = '1') then
                 o_i_open_info  <= (others => '0');
                 o_i_close_info <= (others => '0');
