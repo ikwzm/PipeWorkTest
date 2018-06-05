@@ -85,7 +85,7 @@ set_property "top" "AXI4_STREAM_TO_MASTER" $obj
 #
 set obj [get_filesets sim_1]
 set_property "top" "AXI4_S2M_TB_32_32_256_SYNC"  $obj
-set_property "generic" "NAME=AXI4_STREAM_TO_MASTER_TEST_BENCH_32_32_64 SCENARIO_FILE=../../../../../../src/test/scenarios/axi4_stream_to_master/axi4_stream_to_master_test_bench_32_32_256.snr FINISH_ABORT=true" $obj
+set_property "generic" "NAME=AXI4_STREAM_TO_MASTER_TEST_BENCH_32_32_256 SCENARIO_FILE=../../../../../../src/test/scenarios/axi4_stream_to_master/axi4_stream_to_master_test_bench_32_32_256.snr FINISH_ABORT=true" $obj
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
