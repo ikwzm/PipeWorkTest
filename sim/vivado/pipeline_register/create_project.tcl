@@ -2,7 +2,7 @@
 # create_project.tcl  Tcl script for creating project
 #
 set project_directory       [file dirname [info script]]
-set project_name            "test_bench"
+set project_name            "pipeline_register"
 set device_parts            "xc7z010clg400-1"
 #
 # Create project
@@ -44,12 +44,13 @@ set_property library Dummy_Plug [get_files $dummy_plug_src_list]
 
 set pipework_src_list [list]
 lappend pipework_src_list   {../../../PipeWork/src/components/components.vhd}
+lappend pipework_src_list   {../../../PipeWork/src/components/pipeline_register.vhd}
 lappend pipework_src_list   {../../../PipeWork/src/components/pipeline_register_controller.vhd}
 add_files -fileset sim_1 -norecurse $pipework_src_list
 set_property library PipeWork [get_files $pipework_src_list]
 
 set work_src_list [list]
-lappend work_src_list       {../../../src/test/vhdl/pipeline_register_controller/pipeline_register_controller_test_bench.vhd}
+lappend work_src_list       {../../../src/test/vhdl/pipeline_register/pipeline_register_test_bench.vhd}
 add_files -fileset sim_1 -norecurse $work_src_list
 
 update_compile_order -fileset sim_1
