@@ -2,7 +2,7 @@
 --!     @file    axi4_master_to_stream.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4-Stream)
 --!     @version 1.7.0
---!     @date    2018/6/4
+--!     @date    2018/7/18
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -288,9 +288,9 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     signal    i_push_buf_size       :  std_logic_vector(BUF_DEPTH         downto 0);
     signal    i_push_buf_ready      :  std_logic;
     signal    i_open                :  std_logic;
-    signal    i_running             :  std_logic;
-    signal    i_done                :  std_logic;
-    signal    i_error               :  std_logic;
+    signal    i_tran_busy           :  std_logic;
+    signal    i_tran_done           :  std_logic;
+    signal    i_tran_error          :  std_logic;
     signal    i_i_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
     signal    i_q_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
     signal    i_i_close_info        :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
@@ -301,7 +301,6 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     signal    i_o_close_valid       :  std_logic;
     signal    i_o_stop_valid        :  std_logic;
     signal    o_open                :  std_logic;
-    signal    o_running             :  std_logic;
     signal    o_done                :  std_logic;
     signal    o_error               :  std_logic;
     signal    o_i_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
@@ -934,9 +933,9 @@ begin
         -- Intake Status.
         ---------------------------------------------------------------------------
             I_OPEN              => i_open              , --  Out :
-            I_RUNNING           => i_running           , --  Out :
-            I_DONE              => i_done              , --  Out :
-            I_ERROR             => i_error             , --  Out :
+            I_TRAN_BUSY         => i_tran_busy         , --  Out :
+            I_TRAN_DONE         => i_tran_done         , --  Out :
+            I_TRAN_ERROR        => i_tran_error        , --  Out :
         ---------------------------------------------------------------------------
         -- Intake Open/Close Infomation Interface
         ---------------------------------------------------------------------------
@@ -965,7 +964,6 @@ begin
         -- Outlet Status.
         ---------------------------------------------------------------------------
             O_OPEN              => o_open              , --  Out :
-            O_RUNNING           => o_running           , --  Out :
             O_DONE              => o_done              , --  Out :
             O_ERROR             => o_error             , --  Out :
         ---------------------------------------------------------------------------
