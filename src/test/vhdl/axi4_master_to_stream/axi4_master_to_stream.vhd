@@ -189,6 +189,7 @@ entity  AXI4_MASTER_TO_STREAM is
         O_O2I_STOP      : in  std_logic;
         O_I2O_STOP      : out std_logic;
         O_I2O_RESET     : out std_logic;
+        O_I2O_ERROR     : out std_logic;
     -------------------------------------------------------------------------------
     -- Interrupt Request Signals.
     -------------------------------------------------------------------------------
@@ -299,10 +300,9 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     signal    i_o_open_valid        :  std_logic;
     signal    i_o_close_info        :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
     signal    i_o_close_valid       :  std_logic;
-    signal    i_o_stop_valid        :  std_logic;
+    signal    i_o_stop              :  std_logic;
     signal    o_open                :  std_logic;
     signal    o_done                :  std_logic;
-    signal    o_error               :  std_logic;
     signal    o_i_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
     signal    o_i_open_valid        :  std_logic;
     signal    o_i_close_info        :  std_logic_vector(CLOSE_INFO_BITS-1 downto 0);
@@ -945,7 +945,7 @@ begin
             I_O2I_OPEN_VALID    => i_o_open_valid      , --  Out :
             I_O2I_CLOSE_INFO    => i_o_close_info      , --  Out :
             I_O2I_CLOSE_VALID   => i_o_close_valid     , --  Out :
-            I_O2I_STOP_VALID    => i_o_stop_valid      , --  Out :
+            I_O2I_STOP          => i_o_stop            , --  Out :
         ---------------------------------------------------------------------------
         -- Outlet Clock and Clock Enable.
         ---------------------------------------------------------------------------
@@ -965,17 +965,17 @@ begin
         ---------------------------------------------------------------------------
             O_OPEN              => o_open              , --  Out :
             O_DONE              => o_done              , --  Out :
-            O_ERROR             => o_error             , --  Out :
         ---------------------------------------------------------------------------
         -- Outlet Open/Close Infomation Interface
         ---------------------------------------------------------------------------
-            O_O2I_STOP_VALID    => O_O2I_STOP          , --  In  :
+            O_O2I_STOP          => O_O2I_STOP          , --  In  :
             O_O2I_OPEN_INFO     => o_i_open_info       , --  In  :
             O_O2I_OPEN_VALID    => o_i_open_valid      , --  In  :
             O_O2I_CLOSE_INFO    => o_i_close_info      , --  In  :
             O_O2I_CLOSE_VALID   => o_i_close_valid     , --  In  :
             O_I2O_RESET         => O_I2O_RESET         , --  Out :
-            O_I2O_STOP_VALID    => O_I2O_STOP          , --  Out :
+            O_I2O_ERROR         => O_I2O_ERROR         , --  Out :
+            O_I2O_STOP          => O_I2O_STOP          , --  Out :
             O_I2O_OPEN_INFO     => o_o_open_info       , --  Out :
             O_I2O_OPEN_VALID    => o_o_open_valid      , --  Out :
             O_I2O_CLOSE_INFO    => o_o_close_info      , --  Out :

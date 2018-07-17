@@ -2,7 +2,7 @@
 --!     @file    axi4_stream_to_master_test_bench.vhd
 --!     @brief   Pump Core Module (AXI4-Stream to AXI4) Test Bench
 --!     @version 1.7.0
---!     @date    2018/6/4
+--!     @date    2018/7/18
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -236,6 +236,7 @@ architecture MODEL of AXI4_STREAM_TO_MASTER_TEST_BENCH is
     signal    I_I2O_STOP        :  std_logic;
     signal    I_O2I_STOP        :  std_logic;
     signal    I_O2I_RESET       :  std_logic;
+    signal    I_O2I_ERROR       :  std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -418,6 +419,7 @@ architecture MODEL of AXI4_STREAM_TO_MASTER_TEST_BENCH is
             I_I2O_STOP      : in  std_logic;
             I_O2I_STOP      : out std_logic;
             I_O2I_RESET     : out std_logic;
+            I_O2I_ERROR     : out std_logic;
         ---------------------------------------------------------------------------
         -- Interrupt Request Signals.
         ---------------------------------------------------------------------------
@@ -576,6 +578,7 @@ begin
             I_I2O_STOP      => I_I2O_STOP          , -- In  :
             I_O2I_STOP      => I_O2I_STOP          , -- Out :
             I_O2I_RESET     => I_O2I_RESET         , -- Out :
+            I_O2I_ERROR     => I_O2I_ERROR         , -- Out :
         ---------------------------------------------------------------------------
         -- Interrupt Request Signals.
         ---------------------------------------------------------------------------
@@ -875,7 +878,8 @@ begin
     O_GPI    <= (others => '0');
     I_GPI(0) <= I_O2I_STOP;
     I_GPI(1) <= I_O2I_RESET;
-    I_GPI(I_GPI'high downto 2) <= (I_GPI'high downto 2 => '0');
+    I_GPI(2) <= I_O2I_ERROR;
+    I_GPI(I_GPI'high downto 3) <= (I_GPI'high downto 3 => '0');
     I_I2O_STOP <= I_GPO(0);
         
     process
