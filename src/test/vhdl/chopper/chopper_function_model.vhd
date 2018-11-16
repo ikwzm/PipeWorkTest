@@ -2,12 +2,12 @@
 --!     @file    chopper_function_model.vhd
 --!     @brief   CHOPPER FUNCTION MODEL :
 --!              CHOPPER MODULEを検証するための機能モデル.
---!     @version 1.0.0
---!     @date    2012/8/11
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -51,8 +51,7 @@ entity  CHOPPER_FUNCTION_MODEL is
         COUNT_BITS  : integer := 9;
         PSIZE_BITS  : integer := 9;
         GEN_VALID   : integer := 1;
-        VERBOSE     : integer := 0;
-        AUTO_FINISH : integer := 1
+        VERBOSE     : integer := 0
     );
     port (
         CLK         : out std_logic;  
@@ -93,6 +92,7 @@ architecture MODEL of CHOPPER_FUNCTION_MODEL is
     constant    TIMEOUT_CYCLE   : integer := 1000000;
     signal      SCENARIO        : STRING(1 to 5);
     signal      clock           : std_logic;
+    signal      clk_ena         : std_logic;
     function    MESSAGE_TAG return STRING is
     begin
         return "(BURST="      & INTEGER_TO_STRING(BURST     ) &
@@ -108,11 +108,19 @@ architecture MODEL of CHOPPER_FUNCTION_MODEL is
     end function;
 begin
     process begin
-        CLK <= '1'; clock <= '1'; wait for PERIOD/2;
-        CLK <= '0'; clock <= '0'; wait for PERIOD/2;
+        while (TRUE) loop
+            CLK <= '1'; clock <= '1'; wait for PERIOD/2;
+            CLK <= '0'; clock <= '0'; wait for PERIOD/2;
+            exit when (clk_ena = '0');
+        end loop;
+        CLK <= '0'; clock <= '0';
+        wait;
     end process;
 
     process
+        variable test_count    : integer;
+        variable test_total    : integer;
+        variable test_interim  : integer;
         variable block_size    : integer;
         variable remain_size   : integer;
         variable none_piece    : boolean;
@@ -294,6 +302,7 @@ begin
         -- シミュレーションの開始、まずはリセットから。
         ---------------------------------------------------------------------------
         assert(false) report  MESSAGE_TAG & "Starting Run..." severity NOTE;
+                              clk_ena  <= '1';
                               SCENARIO <= "START";
                               CLR  <= '1';
                               RST  <= '1';
@@ -306,15 +315,28 @@ begin
                               CLR  <= '0';
         WAIT_CLK( 4);
         ---------------------------------------------------------------------------
-        -- シミュレーション終了
+        -- シミュレーション開始
         ---------------------------------------------------------------------------
         SCENARIO <= "1.1.1";
+        test_count := 0;
+        test_total := 0;
+        for W in MIN_PIECE to MAX_PIECE loop
+            for A in 0 to 2**W-1 loop
+                test_total := test_total + (2**MAX_SIZE)-A;
+            end loop;
+        end loop;
+        test_interim := 5000;
         for W in MIN_PIECE to MAX_PIECE loop
             for A in 0 to 2**W-1 loop
                 for S in 0 to (2**MAX_SIZE)-A-1 loop
                     assert(VERBOSE=0) report "W=" & INTEGER_TO_STRING(W) &
                                             ",A=" & INTEGER_TO_STRING(A) &
                                             ",S=" & INTEGER_TO_STRING(S) severity NOTE;
+                    test_count := test_count+1;
+                    assert ((test_count mod test_interim) /= 0)
+                        report MESSAGE_TAG &
+                               "(" & INTEGER_TO_STRING(test_count) & 
+                               "/" & INTEGER_TO_STRING(test_total) & ")" severity NOTE;
                     TEST(A,S,W);
                 end loop;
             end loop;
@@ -324,13 +346,9 @@ begin
         ---------------------------------------------------------------------------
         SCENARIO <= "DONE.";
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
-            FINISH <= 'Z';
-        else
-            FINISH <= 'Z';
-            assert(false) report MESSAGE_TAG & "Run complete..." severity FAILURE;
-        end if;
+        assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
+        FINISH  <= 'Z';
+        clk_ena <= '0';
         wait;
     end process;
 

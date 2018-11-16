@@ -2,12 +2,12 @@
 --!     @file    least_recently_used_selector_test_bench.vhd
 --!     @brief   Least-Recently-Used-Selector Test Bench :
 --!              Least_Recently_Used_Selectorを検証するためのテストベンチ.
---!     @version 1.5.7
---!     @date    2015/2/7
+--!     @version 1.7.0
+--!     @date    2017/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2015 Ichiro Kawazome
+--      Copyright (C) 2015-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -55,6 +55,7 @@ architecture MODEL of Least_Recently_Used_Selector_Test_Bench is
     constant   PERIOD     :  time    := 10 ns;
     constant   DELAY      :  time    :=  1 ns;
     signal     SCENARIO   :  STRING(1 to 5);
+    signal     clk_ena    :  boolean;
     signal     CLK        :  std_logic;
     signal     CLR        :  std_logic;
     signal     RST        :  std_logic;
@@ -81,8 +82,13 @@ begin
     --
     -------------------------------------------------------------------------------
     process begin
-        CLK <= '1'; wait for PERIOD/2;
-        CLK <= '0'; wait for PERIOD/2;
+        loop
+            CLK <= '1'; wait for PERIOD/2;
+            CLK <= '0'; wait for PERIOD/2;
+            exit when (clk_ena = FALSE);
+        end loop;
+        CLK <= '0';
+        wait;
     end process;
     -------------------------------------------------------------------------------
     --
@@ -125,6 +131,7 @@ begin
         ---------------------------------------------------------------------------
         assert(false) report MESSAGE_TAG & " Starting Run..." severity NOTE;
                              SCENARIO <= "START";
+                             clk_ena  <= TRUE;
                              RST      <= '1';
                              CLR      <= '1';
                              I_SEL    <= (others => '0');
@@ -160,7 +167,8 @@ begin
         -- シミュレーション終了
         ---------------------------------------------------------------------------
         WAIT_CLK(10); 
-        assert(false) report MESSAGE_TAG & " Run complete..." severity FAILURE;
+        assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
+        clk_ena <= FALSE;
         wait;
     end process;
 

@@ -2,12 +2,12 @@
 --!     @file    delay_register_test_bench.vhd
 --!     @brief   DELAY REGISTER/ADJUSTER TEST BENCH :
 --!              DELAY REGISTER/ADJUSTERを検証するためのテストベンチ.
---!     @version 1.0.0
---!     @date    2015/1/17
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2015 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -45,8 +45,7 @@ component DELAY_REGISTER_TEST_BENCH
     generic (
         DATA_BITS   : integer := 8;
         DELAY_MIN   : integer := 0;
-        DELAY_MAX   : integer := 1;
-        AUTO_FINISH : integer := 1
+        DELAY_MAX   : integer := 1
     );
     port (
         FINISH      : out std_logic
@@ -62,8 +61,7 @@ entity  DELAY_REGISTER_TEST_BENCH is
     generic (
         DATA_BITS   : integer := 8;
         DELAY_MIN   : integer := 0;
-        DELAY_MAX   : integer := 1;
-        AUTO_FINISH : integer := 1
+        DELAY_MAX   : integer := 1
     );
     port (
         FINISH      : out std_logic
@@ -83,6 +81,7 @@ use     PIPEWORK.COMPONENTS.DELAY_ADJUSTER;
 architecture MODEL of DELAY_REGISTER_TEST_BENCH is
     constant    PERIOD          : time    := 10 ns;
     constant    DELAY           : time    :=  1 ns;
+    signal      clk_ena         : boolean;
     signal      CLK             : std_logic;
     signal      RST             : std_logic;
     signal      CLR             : std_logic;
@@ -148,8 +147,13 @@ begin
     --
     -------------------------------------------------------------------------------
     process begin
-        CLK <= '1'; wait for PERIOD/2;
-        CLK <= '0'; wait for PERIOD/2;
+        while (TRUE) loop
+            CLK <= '1'; wait for PERIOD/2;
+            CLK <= '0'; wait for PERIOD/2;
+            exit when (clk_ena = FALSE);
+        end loop;
+        CLK <= '0';
+        wait;
     end process;
     -------------------------------------------------------------------------------
     --
@@ -195,6 +199,7 @@ begin
         -- シミュレーションの開始、まずはリセットから。
         ---------------------------------------------------------------------------
         assert(false) report MESSAGE_TAG & "Starting Run..." severity NOTE;
+                              clk_ena <= TRUE;
                               CLR  <= '1';
                               RST  <= '1';
                               SEL  <= (others => '0');
@@ -257,13 +262,9 @@ begin
         -- シミュレーション終了
         ---------------------------------------------------------------------------
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
-            FINISH <= 'Z';
-        else
-            FINISH <= 'Z';
-            assert(false) report MESSAGE_TAG & "Run complete..." severity FAILURE;
-        end if;
+        assert(false) report MESSAGE_TAG & "Run complete..." severity NOTE;
+        FINISH  <= 'Z';
+        clk_ena <= FALSE;
         wait;
     end process;
     -------------------------------------------------------------------------------
@@ -342,8 +343,7 @@ begin
             generic map (
                 DATA_BITS   => 8,
                 DELAY_MIN   => DELAY_MIN,
-                DELAY_MAX   => DELAY_MAX,
-                AUTO_FINISH => 0
+                DELAY_MAX   => DELAY_MAX
             )
             port map (
                 FINISH      => FINISH
@@ -353,7 +353,7 @@ begin
     FINISH <= 'H' after 1 ns;
     process (FINISH) begin
         if (FINISH'event and FINISH = 'H') then
-            assert(false) report "Run complete all." severity FAILURE;
+            assert(false) report "Run complete all." severity NOTE;
         end if;
     end process;
 end MODEL;
@@ -373,8 +373,7 @@ begin
         generic map (
             DATA_BITS   => 8,
             DELAY_MIN   => 3,
-            DELAY_MAX   => 3,
-            AUTO_FINISH => 1
+            DELAY_MAX   => 3
         )
         port map (
             FINISH      => open

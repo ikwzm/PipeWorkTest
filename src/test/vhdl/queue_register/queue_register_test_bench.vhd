@@ -2,12 +2,12 @@
 --!     @file    queue_register_test_bench.vhd
 --!     @brief   QUEUE REGISTER/ADJUSTER TEST BENCH :
 --!              QUEUE REGISTER/ADJUSTERを検証するためのテストベンチ.
---!     @version 0.2.0
---!     @date    2012/8/28
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -45,8 +45,7 @@ package COMPONENTS is
         generic (
             QUEUE_SIZE       : integer := 4;
             DATA_BITS        : integer := 8;
-            LOWPOWER         : integer := 1;
-            AUTO_FINISH      : integer := 0
+            LOWPOWER         : integer := 1
         );
         port (
             FINISH           : out std_logic
@@ -69,8 +68,7 @@ entity  QUEUE_REGISTER_TEST_BENCH is
     generic (
         QUEUE_SIZE       : integer := 4;
         DATA_BITS        : integer := 8;
-        LOWPOWER         : integer := 1;
-        AUTO_FINISH      : integer := 0
+        LOWPOWER         : integer := 1
     );
     port (
         FINISH           : out std_logic
@@ -96,6 +94,7 @@ architecture MODEL of QUEUE_REGISTER_TEST_BENCH is
     signal   O_VAL       : std_logic_vector(QUEUE_SIZE  downto 0);
     signal   EXP_DATA    : std_logic_vector(DATA_BITS-1 downto 0);
     signal   MISMATCH    : boolean;
+    signal   CLK_ENA     : boolean;
     function MESSAGE_TAG return STRING is
     begin
         return "(DATA_BITS="  & INTEGER_TO_STRING(DATA_BITS ) &
@@ -126,8 +125,13 @@ begin
         );
 
     process begin
-        CLK <= '1'; wait for PERIOD/2;
-        CLK <= '0'; wait for PERIOD/2;
+        loop
+            CLK <= '1'; wait for PERIOD/2;
+            CLK <= '0'; wait for PERIOD/2;
+            exit when(CLK_ENA = FALSE);
+        end loop;
+        CLK <= '0';
+        wait;
     end process;
 
     process (CLK, RST) begin
@@ -183,6 +187,7 @@ begin
         ---------------------------------------------------------------------------
         assert(false) report MESSAGE_TAG & "Starting Run..." severity NOTE;
                              SCENARIO <= "START";
+                             CLK_ENA  <= TRUE;
                              RST      <= '1';
                              CLR      <= '1';
                              I_VAL    <= '0';
@@ -347,13 +352,9 @@ begin
         -- シミュレーション終了
         ---------------------------------------------------------------------------
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
-            FINISH <= 'Z';
-        else
-            FINISH <= 'Z';
-            assert(false) report MESSAGE_TAG & " Run complete..." severity FAILURE;
-        end if;
+        assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
+        FINISH  <= 'Z';
+        CLK_ENA <= FALSE;
         wait;
     end process;
 
@@ -363,56 +364,56 @@ entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER1 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER1;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER1 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8,LOWPOWER=>1,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8,LOWPOWER=>1) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER1 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER1;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER1 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8,LOWPOWER=>1,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8,LOWPOWER=>1) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER1 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER1;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER1 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8,LOWPOWER=>1,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8,LOWPOWER=>1) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER1 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER1;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER1 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8,LOWPOWER=>1,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8,LOWPOWER=>1) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER0 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER0;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08_LOWPOWER0 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8,LOWPOWER=>0,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8,LOWPOWER=>0) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER0 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER0;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08_LOWPOWER0 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8,LOWPOWER=>0,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8,LOWPOWER=>0) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER0 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER0;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08_LOWPOWER0 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8,LOWPOWER=>0,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8,LOWPOWER=>0) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_REGISTER_TEST_BENCH;
 entity QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER0 is
 end    QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER0;
 architecture MODEL of QUEUE_REGISTER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08_LOWPOWER0 is
 begin
-    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8,LOWPOWER=>0,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_REGISTER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8,LOWPOWER=>0) port map(FINISH=>open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -430,8 +431,7 @@ begin
         TB:QUEUE_REGISTER_TEST_BENCH generic map (
             QUEUE_SIZE  => QUEUE_SIZE,
             DATA_BITS   => 8,
-            LOWPOWER    => LOWPOWER,
-            AUTO_FINISH => 0
+            LOWPOWER    => LOWPOWER
         )
         port map (
            FINISH       => FINISH
@@ -441,7 +441,7 @@ begin
     FINISH <= 'H' after 1 ns;
     process (FINISH) begin
         if (FINISH'event and FINISH = 'H') then
-            assert(false) report "Run complete all." severity FAILURE;
+            assert(false) report "Run complete all." severity NOTE;
         end if;
     end process;
 end MODEL;

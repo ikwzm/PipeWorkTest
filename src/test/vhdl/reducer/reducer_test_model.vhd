@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    reducer_test_model.vhd
 --!     @brief   TEST MODEL for REDUCER :
---!     @version 1.5.9
---!     @date    2016/1/8
+--!     @version 1.7.0
+--!     @date    2018/3/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2016 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -149,7 +149,7 @@ entity  REDUCER_TEST_MODEL is
         O_SHIFT_MAX   : integer :=  4;
         I_JUSTIFIED   : integer :=  0;
         FLUSH_ENABLE  : integer :=  0;
-        AUTO_FINISH   : integer :=  1
+        DEBUG_PRINT   : boolean :=  FALSE
     );
     port(
         CLK           : in  std_logic;
@@ -175,6 +175,7 @@ entity  REDUCER_TEST_MODEL is
         O_RDY         : out std_logic;
         O_SHIFT       : out std_logic_vector(O_SHIFT_MAX downto O_SHIFT_MIN);
         BUSY          : in  std_logic;
+        CLK_ENA       : out std_logic;
         FINISH        : out std_logic
     );
 end     REDUCER_TEST_MODEL;
@@ -408,6 +409,7 @@ begin
         ---------------------------------------------------------------------------
         assert(false) report "Starting Run..." severity NOTE;
                        SCENARIO <= "START";
+                       CLK_ENA  <= '1';
                        RST      <= '1';
                        CLR      <= '1';
                        START    <= '0';
@@ -582,13 +584,9 @@ begin
         WAIT_CLK(10); 
         SCENARIO <= "DONE.";
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report NAME & " Run complete..." severity NOTE;
-            FINISH <= 'Z';
-        else
-            FINISH <= 'Z';
-            assert(false) report NAME & " Run complete..." severity FAILURE;
-        end if;
+        assert(false) report NAME & " Run complete..." severity NOTE;
+        FINISH  <= 'Z';
+        CLK_ENA <= '0';
         wait;
     end process;
     -------------------------------------------------------------------------------
@@ -752,16 +750,65 @@ begin
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    process (SCENARIO) begin
-        case SCENARIO is
-            when "NONE." | "START" =>
-                null;
-            when "DONE." =>
-                assert FALSE report NAME & " Scenario All Done..." severity NOTE;
-            when others  =>
-                assert FALSE report NAME & ":" & SCENARIO & " Start..." severity NOTE;
-        end case;
-    end process;
+    DEBUG_PRINT_BLOCK: if (DEBUG_PRINT = TRUE) generate
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        process (SCENARIO) begin
+            case SCENARIO is
+                when "NONE." | "START" =>
+                    null;
+                when "DONE." =>
+                    assert FALSE report NAME & " Scenario All Done..." severity NOTE;
+                when others  =>
+                    assert FALSE report NAME & ":" & SCENARIO & " Start..." severity NOTE;
+            end case;
+        end process;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        process
+            variable  text_line      : LINE;
+            constant  TIME_WIDTH     : integer := 13;
+            constant  TAG_WIDTH      : integer := 32;
+            procedure p(M:in string) is
+            begin
+                if    (TAG_WIDTH > 0) then
+                    WRITE(text_line, NAME, RIGHT, abs(TAG_WIDTH));
+                elsif (TAG_WIDTH < 0) then
+                    WRITE(text_line, NAME, LEFT , abs(TAG_WIDTH));
+                end if;
+                WRITE(text_line, M);
+                WRITELINE(OUTPUT, text_line);
+            end procedure;
+            procedure p(T:in time;M:in string) is
+            begin
+                if    (TAG_WIDTH > 0) then
+                    WRITE(text_line, NAME, RIGHT, abs(TAG_WIDTH));
+                elsif (TAG_WIDTH < 0) then
+                    WRITE(text_line, NAME, LEFT , abs(TAG_WIDTH));
+                end if;
+                if    (TIME_WIDTH > 0) then
+                    WRITE(text_line, T, RIGHT, abs(TIME_WIDTH));
+                elsif (TIME_WIDTH < 0) then
+                    WRITE(text_line, T, LEFT , abs(TIME_WIDTH));
+                end if;
+                WRITE(text_line, M);
+                WRITELINE(OUTPUT, text_line);
+            end procedure;
+        begin
+            MAIN_LOOP:loop
+                wait until (CLK'event and CLK = '1');
+                p(Now, string'("|") & HEX_TO_STRING(O_DATA ) &
+                       string'("|") & BIN_TO_STRING(O_STRB ) &
+                       string'("|") & BIN_TO_STRING(O_DONE ) &
+                       string'(" ") & BIN_TO_STRING(O_FLUSH) &
+                       string'(" ") & BIN_TO_STRING(O_VAL  ) &
+                       string'(" ") & BIN_TO_STRING(o_ready) &
+                       string'("|"));
+            end loop;
+        end process;
+    end generate;
 end MODEL;
 -----------------------------------------------------------------------------------
 -- 
@@ -780,8 +827,7 @@ package COMPONENTS is
             O_SHIFT_MIN : integer;
             O_SHIFT_MAX : integer;
             I_JUSTIFIED : integer;
-            FLUSH_ENABLE: integer;
-            AUTO_FINISH : integer
+            FLUSH_ENABLE: integer
         );
         port(
             CLK         : in  std_logic;
@@ -807,6 +853,7 @@ package COMPONENTS is
             O_RDY       : out std_logic;
             O_SHIFT     : out std_logic_vector(O_SHIFT_MAX downto O_SHIFT_MIN);
             BUSY        : in  std_logic;
+            CLK_ENA     : out std_logic;
             FINISH      : out std_logic
         );
     end component;

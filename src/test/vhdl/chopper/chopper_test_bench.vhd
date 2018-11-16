@@ -2,12 +2,12 @@
 --!     @file    chopper_test_bench.vhd
 --!     @brief   CHOPPER TEST BENCH :
 --!              CHOPPER MODULEを検証するためのテストベンチ.
---!     @version 1.0.0
---!     @date    2012/8/11
+--!     @version 1.7.0
+--!     @date    2018/3/21
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -52,8 +52,7 @@ component  CHOPPER_TEST_BENCH
         COUNT_BITS  : integer := 9;
         PSIZE_BITS  : integer := 9;
         GEN_VALID   : integer := 1;
-        VERBOSE     : integer := 0;
-        AUTO_FINISH : integer := 1
+        VERBOSE     : integer := 0
     );
     port (
         FINISH      : out std_logic
@@ -70,8 +69,7 @@ component  CHOPPER_FUNCTION_MODEL
         COUNT_BITS  : integer := 9;
         PSIZE_BITS  : integer := 9;
         GEN_VALID   : integer := 1;
-        VERBOSE     : integer := 0;
-        AUTO_FINISH : integer := 1
+        VERBOSE     : integer := 0
     );
     port (
         CLK         : out std_logic;  
@@ -111,8 +109,7 @@ entity  CHOPPER_TEST_BENCH is
         COUNT_BITS  : integer := 9;
         PSIZE_BITS  : integer := 9;
         GEN_VALID   : integer := 1;
-        VERBOSE     : integer := 0;
-        AUTO_FINISH : integer := 1
+        VERBOSE     : integer := 0
     );
     port (
         FINISH      : out std_logic
@@ -189,8 +186,7 @@ begin
             COUNT_BITS    => COUNT_BITS,
             PSIZE_BITS    => PSIZE_BITS,
             GEN_VALID     => GEN_VALID,
-            VERBOSE       => VERBOSE,
-            AUTO_FINISH   => AUTO_FINISH
+            VERBOSE       => VERBOSE
         )
         port map (
             CLK           => CLK,
@@ -241,8 +237,7 @@ begin
                 COUNT_BITS    => MAX_SIZE,
                 PSIZE_BITS    => MAX_SIZE,
                 GEN_VALID     => 1,
-                VERBOSE       => 0,
-                AUTO_FINISH   => 0
+                VERBOSE       => 0
             )
             port map (
                 FINISH        => FINISH
@@ -254,7 +249,7 @@ begin
     FINISH <= 'H' after 1 ns;
     process (FINISH) begin
         if (FINISH'event and FINISH = 'H') then
-            assert(false) report "Run complete all." severity FAILURE;
+            assert(false) report "Run complete all." severity NOTE;
         end if;
     end process;
 end MODEL;
@@ -264,7 +259,6 @@ end MODEL;
 library ieee;
 use     ieee.std_logic_1164.all;
 entity  CHOPPER_TEST_BENCH_3_6_6 is
-    generic (AUTO_FINISH :     integer:= 1);
     port    (FINISH      : out std_logic  );
 end     CHOPPER_TEST_BENCH_3_6_6;
 library ieee;
@@ -343,8 +337,7 @@ begin
             COUNT_BITS    => COUNT_BITS,
             PSIZE_BITS    => PSIZE_BITS,
             GEN_VALID     => 1,
-            VERBOSE       => 0,
-            AUTO_FINISH   => AUTO_FINISH
+            VERBOSE       => 0
         )
         port map (
             CLK           => CLK,
@@ -373,7 +366,6 @@ end MODEL;
 library ieee;
 use     ieee.std_logic_1164.all;
 entity  CHOPPER_TEST_BENCH_7_12_24 is
-    generic (AUTO_FINISH :     integer:= 1);
     port    (FINISH      : out std_logic  );
 end     CHOPPER_TEST_BENCH_7_12_24;
 library ieee;
@@ -452,8 +444,7 @@ begin
             COUNT_BITS    => COUNT_BITS,
             PSIZE_BITS    => PSIZE_BITS,
             GEN_VALID     => 1,
-            VERBOSE       => 1,
-            AUTO_FINISH   => AUTO_FINISH
+            VERBOSE       => 1
         )
         port map (
             CLK           => CLK,
@@ -482,7 +473,6 @@ end MODEL;
 library ieee;
 use     ieee.std_logic_1164.all;
 entity  CHOPPER_TEST_BENCH_5_5_5 is
-    generic (AUTO_FINISH :     integer:= 1);
     port    (FINISH      : out std_logic  );
 end     CHOPPER_TEST_BENCH_5_5_5;
 library ieee;
@@ -561,8 +551,7 @@ begin
             COUNT_BITS    => COUNT_BITS,
             PSIZE_BITS    => PSIZE_BITS,
             GEN_VALID     => 1,
-            VERBOSE       => 0,
-            AUTO_FINISH   => AUTO_FINISH
+            VERBOSE       => 0
         )
         port map (
             CLK           => CLK,
@@ -591,7 +580,6 @@ end MODEL;
 library ieee;
 use     ieee.std_logic_1164.all;
 entity  CHOPPER_TEST_BENCH_6_9_9 is
-    generic (AUTO_FINISH :     integer:= 1);
     port    (FINISH      : out std_logic  );
 end     CHOPPER_TEST_BENCH_6_9_9;
 library ieee;
@@ -670,8 +658,7 @@ begin
             COUNT_BITS    => COUNT_BITS,
             PSIZE_BITS    => PSIZE_BITS,
             GEN_VALID     => 1,
-            VERBOSE       => 0,
-            AUTO_FINISH   => AUTO_FINISH
+            VERBOSE       => 0
         )
         port map (
             CLK           => CLK,
@@ -700,7 +687,6 @@ end MODEL;
 library ieee;
 use     ieee.std_logic_1164.all;
 entity  CHOPPER_TEST_BENCH_5_5_5_NO_BURST is
-    generic (AUTO_FINISH :     integer:= 1);
     port    (FINISH      : out std_logic  );
 end     CHOPPER_TEST_BENCH_5_5_5_NO_BURST;
 library ieee;
@@ -779,8 +765,7 @@ begin
             COUNT_BITS    => COUNT_BITS,
             PSIZE_BITS    => PSIZE_BITS,
             GEN_VALID     => 1,
-            VERBOSE       => 0,
-            AUTO_FINISH   => AUTO_FINISH
+            VERBOSE       => 0
         )
         port map (
             CLK           => CLK,

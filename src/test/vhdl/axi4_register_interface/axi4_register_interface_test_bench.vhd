@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_register_interface_test_bench.vhd
---!     @brief   TEST BENCH for AXI4_REGISTER_INTERFACE
---!     @version 1.5.5
---!     @date    2014/3/20
+--!     @brief   AXI4_REGISTER_INTERFACE TEST BENCH
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2014 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -604,12 +604,18 @@ begin
     -- 
     -------------------------------------------------------------------------------
     process begin
+        loop
+            ACLK     <= '0';
+            REGS_CLK <= '0';
+            wait for PERIOD / 2;
+            ACLK     <= '1';
+            REGS_CLK <= '1';
+            wait for PERIOD / 2;
+            exit when(M_FINISH = '1');
+        end loop;
         ACLK     <= '0';
         REGS_CLK <= '0';
-        wait for PERIOD / 2;
-        ACLK     <= '1';
-        REGS_CLK <= '1';
-        wait for PERIOD / 2;
+        wait;
     end process;
 
     ARESETn <= '1' when (RESET = '0') else '0';
@@ -627,7 +633,9 @@ begin
         WRITE(L,T & "  Mismatch : ");WRITE(L,M_REPORT.mismatch_count);WRITELINE(OUTPUT,L);
         WRITE(L,T & "  Warning  : ");WRITE(L,M_REPORT.warning_count );WRITELINE(OUTPUT,L);
         WRITE(L,T);                                                   WRITELINE(OUTPUT,L);
-        assert FALSE report "Simulation complete." severity FAILURE;
+        assert(M_REPORT.error_count    = 0) report "Simulation complete(error)."    severity FAILURE;
+        assert(M_REPORT.mismatch_count = 0) report "Simulation complete(mismatch)." severity FAILURE;
+        assert(FALSE                      ) report "Simulation complete(success)."  severity NOTE;
         wait;
     end process;
     

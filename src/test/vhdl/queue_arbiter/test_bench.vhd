@@ -1,3 +1,40 @@
+-----------------------------------------------------------------------------------
+--!     @file    test_bench.vhd
+--!     @brief   QUEUE_ARBITER TEST BENCH :
+--!              QUEUE_ARBITER を検証するためのテストベンチ.
+--!     @version 1.7.0
+--!     @date    2018/3/22
+--!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
+-----------------------------------------------------------------------------------
+--
+--      Copyright (C) 2013-2018 Ichiro Kawazome
+--      All rights reserved.
+--
+--      Redistribution and use in source and binary forms, with or without
+--      modification, are permitted provided that the following conditions
+--      are met:
+--
+--        1. Redistributions of source code must retain the above copyright
+--           notice, this list of conditions and the following disclaimer.
+--
+--        2. Redistributions in binary form must reproduce the above copyright
+--           notice, this list of conditions and the following disclaimer in
+--           the documentation and/or other materials provided with the
+--           distribution.
+--
+--      THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+--      "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+--      LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+--      A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT
+--      OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+--      SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+--      LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+--      DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+--      THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+--      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+--      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+--
+-----------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- 
 --------------------------------------------------------------------------------
@@ -28,6 +65,7 @@ architecture stimulus of TEST_BENCH is
     ----------------------------------------------------------------------------
     -- 各種信号の定義
     ----------------------------------------------------------------------------
+    signal    clk_ena        : boolean;
     signal    CLK            : std_logic;
     signal    RST            : std_logic;
     signal    CLR            : std_logic;
@@ -145,10 +183,13 @@ begin
     -- クロックの生成
     ----------------------------------------------------------------------------
     process begin
-       CLK <= '1';
-       wait for PERIOD / 2;
-       CLK <= '0';
-       wait for PERIOD / 2;
+        loop
+            CLK <= '1'; wait for PERIOD / 2;
+            CLK <= '0'; wait for PERIOD / 2;
+            exit when (clk_ena = FALSE);
+        end loop;
+        CLK <= '0';
+        wait;
     end process;
     CLR <= '0';
     ----------------------------------------------------------------------------
@@ -227,6 +268,7 @@ begin
             end loop;
         end WAIT_CLK;
     begin
+        clk_ena <= TRUE;
         wait for DELAY;REQUEST<="0000";SHIFT<='0';RST<='1';WAIT_CLK(1,'0','0',GRANT_NULL,1);
         wait for DELAY;REQUEST<="0000";SHIFT<='0';RST<='1';WAIT_CLK(1,'0','0',GRANT_NULL,1);
         wait for DELAY;REQUEST<="0000";SHIFT<='0';RST<='1';WAIT_CLK(1,'0','0',GRANT_NULL,1);
@@ -482,7 +524,9 @@ begin
         wait for DELAY;REQUEST<="0010";SHIFT<='1';RST<='0';WAIT_CLK(1,'1','1',GRANT_REQ3,3);
         wait for DELAY;REQUEST<="0000";SHIFT<='0';RST<='0';WAIT_CLK(1,'0','0',GRANT_NULL,1);
         REPORT_ERROR;
-        assert(false) report "Run complete..." severity FAILURE;
+        assert(MISMATCH =0) report "Run mismatch..." severity FAILURE;
+        assert(MISMATCH/=0) report "Run complete..." severity NOTE;
+        clk_ena <= FALSE;
         wait;
     end process;
 end stimulus;

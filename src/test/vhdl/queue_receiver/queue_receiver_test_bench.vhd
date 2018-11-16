@@ -2,12 +2,12 @@
 --!     @file    queue_receiver_test_bench.vhd
 --!     @brief   QUEUE RECEIVER/ADJUSTER TEST BENCH :
 --!              QUEUE RECEIVER/ADJUSTERを検証するためのテストベンチ.
---!     @version 1.5.3
---!     @date    2014/1/25
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2014 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -44,8 +44,7 @@ package COMPONENTS is
     component QUEUE_RECEIVER_TEST_BENCH
         generic (
             QUEUE_SIZE       : integer := 4;
-            DATA_BITS        : integer := 8;
-            AUTO_FINISH      : integer := 0
+            DATA_BITS        : integer := 8
         );
         port (
             FINISH           : out std_logic
@@ -67,8 +66,7 @@ use     DUMMY_PLUG.TINYMT32.all;
 entity  QUEUE_RECEIVER_TEST_BENCH is
     generic (
         QUEUE_SIZE       : integer := 4;
-        DATA_BITS        : integer := 8;
-        AUTO_FINISH      : integer := 0
+        DATA_BITS        : integer := 8
     );
     port (
         FINISH           : out std_logic
@@ -93,6 +91,7 @@ architecture MODEL of QUEUE_RECEIVER_TEST_BENCH is
     signal   O_VAL       : std_logic;
     signal   EXP_DATA    : std_logic_vector(DATA_BITS-1 downto 0);
     signal   MISMATCH    : boolean;
+    signal   CLK_ENA     : boolean;
     function MESSAGE_TAG return STRING is
     begin
         return "(DATA_BITS="  & INTEGER_TO_STRING(DATA_BITS ) &
@@ -120,8 +119,13 @@ begin
         );
 
     process begin
-        CLK <= '1'; wait for PERIOD/2;
-        CLK <= '0'; wait for PERIOD/2;
+        loop
+            CLK <= '1'; wait for PERIOD/2;
+            CLK <= '0'; wait for PERIOD/2;
+            exit when(CLK_ENA = FALSE);
+        end loop;
+        CLK <= '0';
+        wait;
     end process;
 
     process (CLK, RST) begin
@@ -177,6 +181,7 @@ begin
         ---------------------------------------------------------------------------
         assert(false) report MESSAGE_TAG & "Starting Run..." severity NOTE;
                              SCENARIO <= "START";
+                             CLK_ENA  <= TRUE;
                              RST      <= '1';
                              CLR      <= '1';
                              I_VAL    <= '0';
@@ -342,13 +347,9 @@ begin
         -- シミュレーション終了
         ---------------------------------------------------------------------------
         WAIT_CLK(10); 
-        if (AUTO_FINISH = 0) then
-            assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
-            FINISH <= 'Z';
-        else
-            FINISH <= 'Z';
-            assert(false) report MESSAGE_TAG & " Run complete..." severity FAILURE;
-        end if;
+        assert(false) report MESSAGE_TAG & " Run complete..." severity NOTE;
+        CLK_ENA <= FALSE;
+        FINISH  <= 'Z';
         wait;
     end process;
 
@@ -358,28 +359,28 @@ entity QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08 is
 end    QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08;
 architecture MODEL of QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE02_DATA_BITS08 is
 begin
-    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>2,DATA_BITS=>8) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_RECEIVER_TEST_BENCH;
 entity QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08 is
 end    QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08;
 architecture MODEL of QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE03_DATA_BITS08 is
 begin
-    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>3,DATA_BITS=>8) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_RECEIVER_TEST_BENCH;
 entity QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08 is
 end    QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08;
 architecture MODEL of QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE04_DATA_BITS08 is
 begin
-    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>4,DATA_BITS=>8) port map(FINISH=>open);
 end MODEL;
 use    WORK.COMPONENTS.QUEUE_RECEIVER_TEST_BENCH;
 entity QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08 is
 end    QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08;
 architecture MODEL of QUEUE_RECEIVER_TEST_BENCH_QUEUE_SIZE01_DATA_BITS08 is
 begin
-    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8,AUTO_FINISH=>1) port map(FINISH=>open);
+    TB:QUEUE_RECEIVER_TEST_BENCH generic map(QUEUE_SIZE=>1,DATA_BITS=>8) port map(FINISH=>open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ
@@ -395,8 +396,7 @@ begin
     QUEUE_SIZE_GEN: for QUEUE_SIZE in 2 to 4 generate
         TB:QUEUE_RECEIVER_TEST_BENCH generic map (
             QUEUE_SIZE  => QUEUE_SIZE,
-            DATA_BITS   => 8,
-            AUTO_FINISH => 0
+            DATA_BITS   => 8
         )
         port map (
            FINISH       => FINISH
@@ -405,7 +405,7 @@ begin
     FINISH <= 'H' after 1 ns;
     process (FINISH) begin
         if (FINISH'event and FINISH = 'H') then
-            assert(false) report "Run complete all." severity FAILURE;
+            assert(false) report "Run complete all." severity NOTE;
         end if;
     end process;
 end MODEL;
