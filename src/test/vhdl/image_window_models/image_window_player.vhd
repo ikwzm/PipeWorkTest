@@ -2,7 +2,11 @@
 --!     @file    image_window_player.vhd
 --!     @brief   Image Window Dummy Plug Player.
 --!     @version 1.8.0
+<<<<<<< HEAD
 --!     @date    2018/11/30
+=======
+--!     @date    2018/11/27
+>>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -134,10 +138,13 @@ use     DUMMY_PLUG.READER.all;
 -----------------------------------------------------------------------------------
 architecture MODEL of IMAGE_WINDOW_PLAYER is
     -------------------------------------------------------------------------------
+<<<<<<< HEAD
     --! @brief WAITオペレーション実行時のデフォルトのタイムアウトクロック数
     -------------------------------------------------------------------------------
     constant  DEFAULT_WAIT_TIMEOUT : integer := 10000;
     -------------------------------------------------------------------------------
+=======
+>>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
     --! @brief Image Window の ELEMENT 信号の定義
     -------------------------------------------------------------------------------
     subtype   IMAGE_ELEM_SIGNAL_TYPE    is std_logic_vector(PARAM.ELEM_BITS-1 downto 0);
@@ -224,8 +231,11 @@ architecture MODEL of IMAGE_WINDOW_PLAYER is
                 DATA    => W.DATA
             );
         end loop;
+<<<<<<< HEAD
         W.VALID := D;
         W.READY := D;
+=======
+>>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
     end procedure;
     -------------------------------------------------------------------------------
     --! @brief Image Window 信号を値で埋める関数
@@ -400,6 +410,7 @@ begin
         variable  gpo_signals   : std_logic_vector(GPO'range);
         variable  gpi_signals   : std_logic_vector(GPI'range);
         ---------------------------------------------------------------------------
+<<<<<<< HEAD
         --! @brief std_logic_vectorの値を読むサブプログラム.
         --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
@@ -952,6 +963,8 @@ begin
             REPORT_DEBUG(core, proc_name, "END");
         end procedure;
         ---------------------------------------------------------------------------
+=======
+>>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
         --! @brief  SYNCオペレーション. 
         --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         --! @param    OPERATION   オペレーション.
@@ -972,6 +985,7 @@ begin
             end if;
             REPORT_DEBUG  (core, proc_name, "END");
         end procedure;
+<<<<<<< HEAD
         ---------------------------------------------------------------------------
         --! @brief シナリオからDATAの値を読んで出力するサブプログラム.
         ---------------------------------------------------------------------------
@@ -1037,6 +1051,8 @@ begin
                 skip_value(proc_name);
             end if;
         end procedure;
+=======
+>>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
     begin 
         ---------------------------------------------------------------------------
         -- ダミープラグコアの初期化.
@@ -1082,6 +1098,7 @@ begin
             READ_OPERATION(core, stream, operation, keyword);
             case operation is
                 when OP_DOC_BEGIN => execute_sync(operation);
+<<<<<<< HEAD
                 when OP_MAP       =>
                     case keyword is
                         when KEY_DATA   => execute_data;
@@ -1098,6 +1115,8 @@ begin
                         when KEY_CHECK  => execute_check;
                         when others     => EXECUTE_UNDEFINED_MAP_KEY(core, stream, keyword);
                     end case;
+=======
+>>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
                 when OP_FINISH    => exit;
                 when others       => null;
             end case;

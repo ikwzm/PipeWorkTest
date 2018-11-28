@@ -75,7 +75,11 @@ source "add_sim.tcl"
 #
 set obj [get_filesets sim_1]
 set_property "top" "IMAGE_WINDOW_PLAYER_TEST_8x1_1x1"  $obj
+<<<<<<< HEAD
 set_property "generic" "NAME=AXI4_MASTER_TO_STREAM_TEST_BENCH_32_32_64 SCENARIO_FILE=../../../../../../src/test/scenarios/image_window_models/test_8x1_1x1.snr FINISH_ABORT=true" $obj
+=======
+set_property "generic" "NAME=AXI4_MASTER_TO_STREAM_TEST_BENCH_32_32_64 SCENARIO_FILE=../../../../../../src/test/scenarios/image_window_models/test_8x1_1x1.snr" $obj
+>>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
