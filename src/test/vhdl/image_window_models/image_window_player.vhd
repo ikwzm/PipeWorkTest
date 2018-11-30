@@ -2,7 +2,7 @@
 --!     @file    image_window_player.vhd
 --!     @brief   Image Window Dummy Plug Player.
 --!     @version 1.8.0
---!     @date    2018/11/27
+--!     @date    2018/11/30
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -134,6 +134,10 @@ use     DUMMY_PLUG.READER.all;
 -----------------------------------------------------------------------------------
 architecture MODEL of IMAGE_WINDOW_PLAYER is
     -------------------------------------------------------------------------------
+    --! @brief WAITオペレーション実行時のデフォルトのタイムアウトクロック数
+    -------------------------------------------------------------------------------
+    constant  DEFAULT_WAIT_TIMEOUT : integer := 10000;
+    -------------------------------------------------------------------------------
     --! @brief Image Window の ELEMENT 信号の定義
     -------------------------------------------------------------------------------
     subtype   IMAGE_ELEM_SIGNAL_TYPE    is std_logic_vector(PARAM.ELEM_BITS-1 downto 0);
@@ -220,6 +224,8 @@ architecture MODEL of IMAGE_WINDOW_PLAYER is
                 DATA    => W.DATA
             );
         end loop;
+        W.VALID := D;
+        W.READY := D;
     end procedure;
     -------------------------------------------------------------------------------
     --! @brief Image Window 信号を値で埋める関数
@@ -394,6 +400,550 @@ begin
         variable  gpo_signals   : std_logic_vector(GPO'range);
         variable  gpi_signals   : std_logic_vector(GPI'range);
         ---------------------------------------------------------------------------
+        --! @brief std_logic_vectorの値を読むサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    value       読み取ったstd_logic_vectorの値.
+        ---------------------------------------------------------------------------
+        procedure read_value(
+                      proc_name     : in    string;
+                      value         : out   std_logic_vector
+        ) is
+            variable  next_event    :       EVENT_TYPE;
+            variable  read_len      :       integer;
+            variable  value_size    :       integer;
+        begin
+            SEEK_EVENT(core, stream, next_event);
+            if (next_event /= EVENT_SCALAR) then
+                READ_ERROR(core, proc_name, "READ_VALUE NG");
+            end if;
+            READ_EVENT(core, stream, EVENT_SCALAR);
+            STRING_TO_STD_LOGIC_VECTOR(
+                STR     => core.str_buf(1 to core.str_len),
+                VAL     => value,
+                STR_LEN => read_len,
+                VAL_LEN => value_size
+            );
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief std_logicの値を読むサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    value       読み取ったstd_logicの値.
+        ---------------------------------------------------------------------------
+        procedure read_value(
+                      proc_name     : in    string;
+                      value         : out   std_logic
+        ) is
+            variable  next_event    :       EVENT_TYPE;
+            variable  read_len      :       integer;
+            variable  value_size    :       integer;
+            variable  vec           :       std_logic_vector(0 downto 0);
+        begin
+            SEEK_EVENT(core, stream, next_event);
+            if (next_event /= EVENT_SCALAR) then
+                READ_ERROR(core, proc_name, "READ_VALUE NG");
+            end if;
+            READ_EVENT(core, stream, EVENT_SCALAR);
+            STRING_TO_STD_LOGIC_VECTOR(
+                STR     => core.str_buf(1 to core.str_len),
+                VAL     => vec,
+                STR_LEN => read_len,
+                VAL_LEN => value_size
+            );
+            value := vec(0);
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief 値を読み飛ばすサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        ---------------------------------------------------------------------------
+        procedure skip_value(
+                      proc_name     : in    string
+        ) is
+            variable  next_event    :       EVENT_TYPE;
+            variable  read_len      :       integer;
+            variable  val_size      :       integer;
+        begin
+            SEEK_EVENT(core, stream, next_event);
+            if (next_event /= EVENT_SCALAR) then
+                READ_ERROR(core, proc_name, "SKIP_VALUE NG");
+            end if;
+            READ_EVENT(core, stream, EVENT_SCALAR);
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief IMAGE_WINDOW_SIGNAL 構造体の ELEM の値を読み取るサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    signals     読み取った値が入るレコード変数. inoutであることに注意.
+        ---------------------------------------------------------------------------
+        procedure read_image_window_elem(
+                      proc_name     : in    string;
+                      signals       : inout IMAGE_WINDOW_SIGNAL_TYPE
+        ) is
+            variable  next_event    :       EVENT_TYPE;
+            type      SEQ_POS_VECTOR is array(integer range <>) of integer;
+            variable  seq_pos_lo    :       SEQ_POS_VECTOR(0 to 2);
+            variable  seq_pos       :       SEQ_POS_VECTOR(0 to 2);
+            variable  seq_level     :       integer;
+        begin
+            seq_pos_lo(0) := PARAM.SHAPE.Y.LO;
+            seq_pos_lo(1) := PARAM.SHAPE.X.LO;
+            seq_pos_lo(2) := PARAM.SHAPE.C.LO;
+            seq_level := 0;
+            seq_pos   := seq_pos_lo;
+            SEQ_LOOP: loop
+                SEEK_EVENT(core, stream, next_event);
+                case next_event is
+                    when EVENT_SEQ_BEGIN => 
+                        READ_EVENT(core, stream, EVENT_SEQ_BEGIN);
+                        if (seq_level > seq_pos'high) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of Level(" & INTEGER_TO_STRING(seq_level) & ")");
+                        else
+                            seq_pos(seq_level) := seq_pos_lo(seq_level);
+                            seq_level := seq_level + 1;
+                        end if;
+                    when EVENT_SEQ_END   =>
+                        READ_EVENT(core, stream, EVENT_SEQ_END  );
+                        seq_level := seq_level - 1;
+                        seq_pos(seq_level) := seq_pos(seq_level) + 1;
+                    when EVENT_SCALAR    =>
+                        if    (seq_level /= 3) then
+                            READ_ERROR(core, proc_name, "READ_ELEM less level(" & INTEGER_TO_STRING(seq_level) & ")");
+                        elsif (seq_pos(0) < PARAM.SHAPE.Y.LO or seq_pos(0) > PARAM.SHAPE.Y.HI) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of Y Range(" & INTEGER_TO_STRING(seq_pos(0)) & ")");
+                        elsif (seq_pos(1) < PARAM.SHAPE.X.LO or seq_pos(1) > PARAM.SHAPE.X.HI) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of X Range(" & INTEGER_TO_STRING(seq_pos(1)) & ")");
+                        elsif (seq_pos(2) < PARAM.SHAPE.C.LO or seq_pos(2) > PARAM.SHAPE.C.HI) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of C Range(" & INTEGER_TO_STRING(seq_pos(2)) & ")");
+                        else
+                            read_value(proc_name, signals.ELEM(seq_pos(0),seq_pos(1),seq_pos(2)));
+                            SET_ELEMENT_TO_IMAGE_WINDOW_DATA(
+                                PARAM   => PARAM,
+                                C       => seq_pos(2),
+                                X       => seq_pos(1),
+                                Y       => seq_pos(0),
+                                ELEMENT => signals.ELEM(seq_pos(0), seq_pos(1), seq_pos(2)),
+                                DATA    => signals.DATA
+                            );
+                        end if;
+                        seq_pos(2) := seq_pos(2) + 1;
+                    when EVENT_ERROR     =>
+                        READ_ERROR(core, proc_name, "SEEK_EVENT NG");
+                    when others          =>
+                        SKIP_EVENT(core, stream, next_event);
+                        -- ERROR
+                end case;
+                exit when (seq_level <= 0);
+            end loop;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief IMAGE_WINDOW_SIGNAL 構造体の ATRB.C の値を読み取るサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    pos         ATRB.C のインデックス
+        --! @param    signals     読み取った値が入るレコード変数. inoutであることに注意.
+        ---------------------------------------------------------------------------
+        procedure read_image_window_atrb_c_value(
+                      proc_name     : in    string;
+                      pos           : in    integer;
+                      signals       : inout IMAGE_WINDOW_SIGNAL_TYPE
+        ) is
+        begin 
+            if (pos < PARAM.SHAPE.C.LO or pos > PARAM.SHAPE.C.HI) then
+                READ_ERROR(core, proc_name, "READ_ATRB.C Out of Range(" & INTEGER_TO_STRING(pos) & ")");
+            else
+                read_value(proc_name, signals.ATRB.C(pos));
+                SET_ATRB_C_TO_IMAGE_WINDOW_DATA(PARAM, pos, signals.ATRB.C(pos), signals.DATA);
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief IMAGE_WINDOW_SIGNAL 構造体の ATRB.X の値を読み取るサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    pos         ATRB.X のインデックス
+        --! @param    signals     読み取った値が入るレコード変数. inoutであることに注意.
+        ---------------------------------------------------------------------------
+        procedure read_image_window_atrb_x_value(
+                      proc_name     : in    string;
+                      pos           : in    integer;
+                      signals       : inout IMAGE_WINDOW_SIGNAL_TYPE
+        ) is
+        begin 
+            if (pos < PARAM.SHAPE.X.LO or pos > PARAM.SHAPE.X.HI) then
+                READ_ERROR(core, proc_name, "READ_ATRB.X Out of Range(" & INTEGER_TO_STRING(pos) & ")");
+            else
+                read_value(proc_name, signals.ATRB.X(pos));
+                SET_ATRB_X_TO_IMAGE_WINDOW_DATA(PARAM, pos, signals.ATRB.X(pos), signals.DATA);
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief IMAGE_WINDOW_SIGNAL 構造体の ATRB.Y の値を読み取るサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    pos         ATRB.Y のインデックス
+        --! @param    signals     読み取った値が入るレコード変数. inoutであることに注意.
+        ---------------------------------------------------------------------------
+        procedure read_image_window_atrb_y_value(
+                      proc_name     : in    string;
+                      pos           : in    integer;
+                      signals       : inout IMAGE_WINDOW_SIGNAL_TYPE
+        ) is
+        begin 
+            if (pos < PARAM.SHAPE.Y.LO or pos > PARAM.SHAPE.Y.HI) then
+                READ_ERROR(core, proc_name, "READ_ATRB.Y Out of Range(" & INTEGER_TO_STRING(pos) & ")");
+            else
+                read_value(proc_name, signals.ATRB.Y(pos));
+                SET_ATRB_Y_TO_IMAGE_WINDOW_DATA(PARAM, pos, signals.ATRB.Y(pos), signals.DATA);
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief IMAGE_WINDOW_SIGNAL 構造体の ATRB.[CXY] 配列を読み取るサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    signals     読み取った値が入るレコード変数. inoutであることに注意.
+        ---------------------------------------------------------------------------
+        procedure read_image_window_atrb_vector(
+                      proc_name     : in    string;
+                      key_word      : in    KEYWORD_TYPE;
+                      signals       : inout IMAGE_WINDOW_SIGNAL_TYPE
+        ) is
+            variable  next_event    :       EVENT_TYPE;
+            variable  seq_pos       :       integer;
+            variable  seq_level     :       integer;
+        begin
+            case key_word is
+                when KEY_C  => seq_pos := PARAM.SHAPE.C.LO;
+                when KEY_X  => seq_pos := PARAM.SHAPE.X.LO;
+                when KEY_Y  => seq_pos := PARAM.SHAPE.Y.LO;
+                when others => seq_pos := 0;
+            end case;
+            seq_level := 0;
+            SEQ_LOOP: loop
+                SEEK_EVENT(core, stream, next_event);
+                case next_event is
+                    when EVENT_SEQ_BEGIN => 
+                        READ_EVENT(core, stream, EVENT_SEQ_BEGIN);
+                        seq_level := seq_level + 1;
+                    when EVENT_SEQ_END   =>
+                        READ_EVENT(core, stream, EVENT_SEQ_END  );
+                        seq_level := seq_level - 1;
+                    when EVENT_SCALAR    =>
+                        case key_word is
+                            when KEY_C  => read_image_window_atrb_c_value(proc_name, seq_pos, signals);
+                            when KEY_X  => read_image_window_atrb_x_value(proc_name, seq_pos, signals);
+                            when KEY_Y  => read_image_window_atrb_y_value(proc_name, seq_pos, signals);
+                            when others => null;
+                        end case;
+                        seq_pos := seq_pos + 1;
+                    when EVENT_ERROR     =>
+                        READ_ERROR(core, proc_name, "SEEK_EVENT NG");
+                    when others          =>
+                        SKIP_EVENT(core, stream, next_event);
+                        -- ERROR
+                end case;
+                exit when (seq_level <= 0);
+            end loop;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief IMAGE_WINDOW_SIGNAL 構造体の ATRB の値を読み取るサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    signals     読み取った値が入るレコード変数. inoutであることに注意.
+        ---------------------------------------------------------------------------
+        procedure read_image_window_atrb(
+                      proc_name     : in    string;
+                      signals       : inout IMAGE_WINDOW_SIGNAL_TYPE
+        ) is
+            variable  next_event    :       EVENT_TYPE;
+            variable  key_word      :       KEYWORD_TYPE;
+        begin
+            SEEK_EVENT(core, stream, next_event);
+            if (next_event /= EVENT_MAP_BEGIN) then
+                READ_ERROR(core, proc_name, "READ_ATRB Not Sequece");
+            end if;
+            READ_EVENT(core, stream, EVENT_MAP_BEGIN);
+            MAP_LOOP: loop
+                SEEK_EVENT(core, stream, next_event);
+                case next_event is
+                    when EVENT_SCALAR  =>
+                        READ_EVENT(core, stream, EVENT_SCALAR);
+                        COPY_KEY_WORD(core, key_word);
+                        case key_word is
+                            when KEY_C  => read_image_window_atrb_vector(proc_name, KEY_C, signals);
+                            when KEY_X  => read_image_window_atrb_vector(proc_name, KEY_X, signals);
+                            when KEY_Y  => read_image_window_atrb_vector(proc_name, KEY_Y, signals);
+                            when others => READ_ERROR(core, proc_name, "READ_ATRB Undefined Map Operation " & key_word);
+                                           exit MAP_LOOP;
+                        end case;
+                    when EVENT_MAP_END  => READ_EVENT(core, stream, EVENT_MAP_END);
+                                           exit MAP_LOOP;
+                    when others         => READ_ERROR(core, proc_name, "READ_ATRB Illega Map Item");
+                                           exit MAP_LOOP;
+                end case;
+            end loop;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief IMAGE_WINDOW_SIGNAL 構造体の DATA の値を読み取るサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    signals     読み取った値が入るレコード変数. inoutであることに注意.
+        ---------------------------------------------------------------------------
+        procedure read_image_window_data(
+                      proc_name     : in    string;
+                      signals       : inout IMAGE_WINDOW_SIGNAL_TYPE
+        ) is
+        begin
+            read_value(proc_name, signals.DATA);
+            for y_pos in PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI loop
+            for x_pos in PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI loop
+            for c_pos in PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI loop
+                signals.ELEM(y_pos, x_pos, c_pos) := GET_ELEMENT_FROM_IMAGE_WINDOW_DATA(
+                                                         PARAM  => PARAM,
+                                                         C      => c_pos,
+                                                         X      => x_pos,
+                                                         Y      => y_pos,
+                                                         DATA   => signals.DATA
+                                                     );
+            end loop;
+            end loop;
+            end loop;
+            for y_pos in PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI loop
+                signals.ATRB.Y(y_pos) := GET_ATRB_Y_FROM_IMAGE_WINDOW_DATA(
+                                             PARAM  => PARAM,
+                                             Y      => y_pos,
+                                             DATA   => signals.DATA
+                                         );
+            end loop;
+            for x_pos in PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI loop
+                signals.ATRB.X(x_pos) := GET_ATRB_X_FROM_IMAGE_WINDOW_DATA(
+                                             PARAM  => PARAM,
+                                             X      => x_pos,
+                                             DATA   => signals.DATA
+                                         );
+            end loop;
+            for c_pos in PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI loop
+                signals.ATRB.C(c_pos) := GET_ATRB_C_FROM_IMAGE_WINDOW_DATA(
+                                             PARAM  => PARAM,
+                                             C      => c_pos,
+                                             DATA   => signals.DATA
+                                         );
+            end loop;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief シナリオのマップからIMAGE_WINDOW_SIGNAL 構造体の値を読み取るサブプログラム.
+        --!      * このサブプログラムを呼ぶときは、すでにMAP_READ_BEGINを実行済みに
+        --!        しておかなければならない。
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    signals     読み取った値が入るレコード変数. inoutであることに注意.
+        --! @param    event       次のイベント. inoutであることに注意.
+        ---------------------------------------------------------------------------
+        procedure map_read_image_window_signals(
+                      signals       : inout IMAGE_WINDOW_SIGNAL_TYPE;
+                      event         : inout EVENT_TYPE
+        ) is
+            constant  proc_name     :       string := "MAP_READ_IMAGE_WINDOW_SIGNALS";
+            variable  next_event    :       EVENT_TYPE;
+            variable  key_word      :       KEYWORD_TYPE;
+        begin
+            REPORT_DEBUG(core, proc_name, "BEGIN");
+            next_event := event;
+            MAP_LOOP: loop
+                case next_event is
+                    when EVENT_SCALAR  =>
+                        COPY_KEY_WORD(core, key_word);
+                        case key_word is
+                            when KEY_ELEM  =>
+                                read_image_window_elem(proc_name, signals);
+                            when KEY_ATRB =>
+                                read_image_window_atrb(proc_name, signals);
+                            when KEY_DATA  =>
+                                read_image_window_data(proc_name, signals);
+                            when KEY_VALID =>
+                                read_value(proc_name, signals.VALID);
+                            when KEY_READY =>
+                                read_value(proc_name, signals.READY);
+                            when others => exit MAP_LOOP;
+                        end case;
+                    when EVENT_MAP_END  => exit MAP_LOOP;
+                    when others         => exit MAP_LOOP;
+                end case;
+                SEEK_EVENT(core, stream, next_event);
+                if (next_event = EVENT_SCALAR) then
+                    READ_EVENT(core, stream, EVENT_SCALAR);
+                end if;
+            end loop;
+            event := next_event;
+            REPORT_DEBUG(core, proc_name, "END");
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief CHECKオペレーション.信号が指定された値になっているかチェック.
+        ---------------------------------------------------------------------------
+        procedure execute_check is
+            constant  proc_name      : string := "EXECUTE_CHECK";
+            variable  next_event     : EVENT_TYPE;
+            variable  keyword        : KEYWORD_TYPE;
+            variable  match          : boolean;
+        begin
+            REPORT_DEBUG(core, proc_name, "BEGIN");
+            SEEK_EVENT(core, stream, next_event);
+            case next_event is
+                when EVENT_MAP_BEGIN =>
+                    READ_EVENT(core, stream, EVENT_MAP_BEGIN);
+                    chk_signals := IMAGE_WINDOW_SIGNAL_DONTCARE;
+                    gpi_signals := (others => '-');
+                    MAP_READ_LOOP: loop
+                        MAP_READ_PREPARE_FOR_NEXT(
+                            SELF       => core            ,  -- I/O:
+                            STREAM     => stream          ,  -- I/O:
+                            EVENT      => next_event         -- I/O:
+                        );
+                        map_read_image_window_signals(
+                            signals    => chk_signals     ,  -- I/O:
+                            event      => next_event         -- I/O:
+                        );
+                        MAP_READ_STD_LOGIC_VECTOR(
+                            SELF       => core            ,  -- I/O:
+                            STREAM     => stream          ,  -- I/O:
+                            KEY        => "GPI"           ,  -- In :
+                            VAL        => gpi_signals     ,  -- I/O:
+                            EVENT      => next_event         -- I/O:
+                        );
+                        case next_event is
+                            when EVENT_SCALAR  =>
+                                COPY_KEY_WORD(core, keyword);
+                                EXECUTE_UNDEFINED_MAP_KEY(core, stream, keyword);
+                            when EVENT_MAP_END =>
+                                exit MAP_READ_LOOP;
+                            when others        =>
+                                READ_ERROR(core, proc_name, "need EVENT_MAP_END but " &
+                                           EVENT_TO_STRING(next_event));
+                        end case;
+                    end loop;
+                    match_image_window_signals(core, chk_signals, match);
+                    MATCH_GPI(core, gpi_signals, GPI, match);
+                when others =>
+                    READ_ERROR(core, proc_name, "SEEK_EVENT NG");
+            end case;
+            REPORT_DEBUG(core, proc_name, "END");
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief  WAITオペレーション. 指定された条件まで待機.
+        ---------------------------------------------------------------------------
+        procedure execute_wait is
+            constant  proc_name      : string := "EXECUTE_WAIT";
+            variable  next_event     : EVENT_TYPE;
+            variable  keyword        : KEYWORD_TYPE;
+            variable  wait_count     : integer;
+            variable  scan_len       : integer;
+            variable  timeout        : integer;
+            variable  wait_on        : boolean;
+            variable  img_match      : boolean;
+            variable  gpi_match      : boolean;
+        begin
+            REPORT_DEBUG(core, proc_name, "BEGIN");
+            timeout   := DEFAULT_WAIT_TIMEOUT;
+            wait_on   := FALSE;
+            SEEK_EVENT(core, stream, next_event);
+            case next_event is
+                when EVENT_SCALAR =>
+                    READ_EVENT(core, stream, EVENT_SCALAR);
+                    STRING_TO_INTEGER(
+                        STR     => core.str_buf(1 to core.str_len),
+                        VAL     => wait_count,
+                        STR_LEN => scan_len
+                    );
+                    if (scan_len = 0) then
+                        wait_count := 1;
+                    end if;
+                    if (wait_count > 0) then
+                        for i in 1 to wait_count loop
+                            wait until (CLK'event and CLK = '1');
+                        end loop;
+                    end if;
+                    wait_count := 0;
+                when EVENT_MAP_BEGIN =>
+                    READ_EVENT(core, stream, EVENT_MAP_BEGIN);
+                    chk_signals := IMAGE_WINDOW_SIGNAL_DONTCARE;
+                    gpi_signals := (others => '-');
+                    MAP_READ_LOOP: loop
+                        REPORT_DEBUG(core, proc_name, "MAP_READ_LOOP");
+                        MAP_READ_PREPARE_FOR_NEXT(
+                            SELF       => core            ,  -- I/O:
+                            STREAM     => stream          ,  -- I/O:
+                            EVENT      => next_event         -- I/O:
+                        );
+                        map_read_image_window_signals(
+                            signals    => chk_signals     ,  -- I/O:
+                            event      => next_event         -- I/O:
+                        );
+                        MAP_READ_STD_LOGIC_VECTOR(
+                            SELF       => core            ,  -- I/O:
+                            STREAM     => stream          ,  -- I/O:
+                            KEY        => "GPI"           ,  -- In :
+                            VAL        => gpi_signals     ,  -- I/O:
+                            EVENT      => next_event         -- I/O:
+                        );
+                        MAP_READ_INTEGER(
+                            SELF       => core            ,  -- I/O:
+                            STREAM     => stream          ,  -- I/O:
+                            KEY        => "TIMEOUT"       ,  -- In :
+                            VAL        => timeout         ,  -- I/O:
+                            EVENT      => next_event         -- I/O:
+                        );
+                        MAP_READ_BOOLEAN(
+                            SELF       => core            ,  -- I/O:
+                            STREAM     => stream          ,  -- I/O:
+                            KEY        => "ON"            ,  -- In :
+                            VAL        => wait_on         ,  -- I/O:
+                            EVENT      => next_event         -- I/O:
+                        );
+                        case next_event is
+                            when EVENT_SCALAR  =>
+                                COPY_KEY_WORD(core, keyword);
+                                EXECUTE_UNDEFINED_MAP_KEY(core, stream, keyword);
+                            when EVENT_MAP_END =>
+                                exit MAP_READ_LOOP;
+                            when others        =>
+                                READ_ERROR(core, proc_name, "need EVENT_MAP_END but " &
+                                           EVENT_TO_STRING(next_event));
+                        end case;
+                    end loop;
+                    if (wait_on) then
+                        SIG_LOOP:loop
+                            REPORT_DEBUG(core, proc_name, "SIG_LOOP");
+                            wait_on_signals;
+                            match_image_window_signals(chk_signals, img_match);
+                            gpi_match := MATCH_STD_LOGIC(gpi_signals, GPI);
+                            exit when(img_match and gpi_match);
+                            if (CLK'event and CLK = '1') then
+                                if (timeout > 0) then
+                                    timeout := timeout - 1;
+                                else
+                                    EXECUTE_ABORT(core, proc_name, "Time Out!");
+                                end if;
+                            end if;
+                        end loop;
+                    else
+                        CLK_LOOP:loop
+                            REPORT_DEBUG(core, proc_name, "CLK_LOOP");
+                            wait until (CLK'event and CLK = '1');
+                            match_image_window_signals(chk_signals, img_match);
+                            gpi_match := MATCH_STD_LOGIC(gpi_signals, GPI);
+                            exit when(img_match and gpi_match);
+                            if (timeout > 0) then
+                                timeout := timeout - 1;
+                            else
+                                EXECUTE_ABORT(core, proc_name, "Time Out!");
+                            end if;
+                        end loop;
+                    end if;
+                when others =>
+                    READ_ERROR(core, proc_name, "SEEK_EVENT NG");
+            end case;
+            REPORT_DEBUG(core, proc_name, "END");
+        end procedure;
+        ---------------------------------------------------------------------------
         --! @brief  SYNCオペレーション. 
         --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         --! @param    OPERATION   オペレーション.
@@ -413,6 +963,71 @@ begin
                 CORE_SYNC(core, port_num, wait_num, SYNC_REQ, SYNC_ACK);
             end if;
             REPORT_DEBUG  (core, proc_name, "END");
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief シナリオからDATAの値を読んで出力するサブプログラム.
+        ---------------------------------------------------------------------------
+        procedure execute_data is
+            constant proc_name : string := "EXECUTE_DATA";
+        begin
+            if (MASTER) then
+                read_image_window_data(proc_name, out_signals);
+                DATA_O <= out_signals.DATA after OUTPUT_DELAY;
+            else
+                skip_value(proc_name);
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief シナリオからELEMの値を読んで出力するサブプログラム.
+        ---------------------------------------------------------------------------
+        procedure execute_elem is
+            constant proc_name : string := "EXECUTE_ELEM";
+        begin
+            if (MASTER) then
+                read_image_window_elem(proc_name, out_signals);
+                DATA_O <= out_signals.DATA after OUTPUT_DELAY;
+            else
+                skip_value(proc_name);
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief シナリオからATRBの値を読んで出力するサブプログラム.
+        ---------------------------------------------------------------------------
+        procedure execute_atrb is
+            constant proc_name : string := "EXECUTE_ATRB";
+        begin
+            if (MASTER) then
+                read_image_window_atrb(proc_name, out_signals);
+                DATA_O <= out_signals.DATA after OUTPUT_DELAY;
+            else
+                skip_value(proc_name);
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief シナリオからVALIDの値を読んで出力するサブプログラム.
+        ---------------------------------------------------------------------------
+        procedure execute_valid is
+            constant proc_name : string := "EXECUTE_VALID";
+        begin
+            if (MASTER) then
+                read_value(proc_name, out_signals.VALID);
+                VALID_O <= out_signals.VALID after OUTPUT_DELAY;
+            else
+                skip_value(proc_name);
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief シナリオからREADYの値を読んで出力するサブプログラム.
+        ---------------------------------------------------------------------------
+        procedure execute_ready is
+            constant proc_name : string := "EXECUTE_READY";
+        begin
+            if (SLAVE) then
+                read_value(proc_name, out_signals.READY);
+                READY_O <= out_signals.READY after OUTPUT_DELAY;
+            else
+                skip_value(proc_name);
+            end if;
         end procedure;
     begin 
         ---------------------------------------------------------------------------
@@ -459,6 +1074,22 @@ begin
             READ_OPERATION(core, stream, operation, keyword);
             case operation is
                 when OP_DOC_BEGIN => execute_sync(operation);
+                when OP_MAP       =>
+                    case keyword is
+                        when KEY_DATA   => execute_data;
+                        when KEY_ELEM   => execute_elem;
+                        when KEY_ATRB   => execute_atrb;
+                        when KEY_VALID  => execute_valid;
+                        when KEY_READY  => execute_ready;
+                        when KEY_REPORT => EXECUTE_REPORT(core, stream);
+                        when KEY_DEBUG  => EXECUTE_DEBUG (core, stream);
+                        when KEY_SAY    => EXECUTE_SAY   (core, stream);
+                        when KEY_OUT    => EXECUTE_OUT   (core, stream, gpo_signals, GPO);
+                        when KEY_SYNC   => execute_sync  (operation);
+                        when KEY_WAIT   => execute_wait;
+                        when KEY_CHECK  => execute_check;
+                        when others     => EXECUTE_UNDEFINED_MAP_KEY(core, stream, keyword);
+                    end case;
                 when OP_FINISH    => exit;
                 when others       => null;
             end case;
