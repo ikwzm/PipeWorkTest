@@ -483,25 +483,26 @@ begin
         ) is
             variable  next_event    :       EVENT_TYPE;
             type      SEQ_POS_VECTOR is array(integer range <>) of integer;
-            variable  seq_pos_lo    :       SEQ_POS_VECTOR(0 to 2);
-            variable  seq_pos       :       SEQ_POS_VECTOR(0 to 2);
+            variable  seq_pos_lo    :       SEQ_POS_VECTOR(0 to 3);
+            variable  seq_pos       :       SEQ_POS_VECTOR(0 to 3);
             variable  seq_level     :       integer;
         begin
-            seq_pos_lo(0) := PARAM.SHAPE.Y.LO;
-            seq_pos_lo(1) := PARAM.SHAPE.X.LO;
-            seq_pos_lo(2) := PARAM.SHAPE.C.LO;
-            seq_level := 0;
-            seq_pos   := seq_pos_lo;
+            seq_pos_lo(0) := 0;
+            seq_pos_lo(1) := PARAM.SHAPE.Y.LO;
+            seq_pos_lo(2) := PARAM.SHAPE.X.LO;
+            seq_pos_lo(3) := PARAM.SHAPE.C.LO;
+            seq_level     := 0;
+            seq_pos       := seq_pos_lo;
             SEQ_LOOP: loop
                 SEEK_EVENT(core, stream, next_event);
                 case next_event is
                     when EVENT_SEQ_BEGIN => 
                         READ_EVENT(core, stream, EVENT_SEQ_BEGIN);
-                        if (seq_level > seq_pos'high) then
+                        if (seq_level >= seq_pos'high) then
                             READ_ERROR(core, proc_name, "READ_ELEM Out of Level(" & INTEGER_TO_STRING(seq_level) & ")");
                         else
-                            seq_pos(seq_level) := seq_pos_lo(seq_level);
                             seq_level := seq_level + 1;
+                            seq_pos(seq_level) := seq_pos_lo(seq_level);
                         end if;
                     when EVENT_SEQ_END   =>
                         READ_EVENT(core, stream, EVENT_SEQ_END  );
@@ -510,24 +511,29 @@ begin
                     when EVENT_SCALAR    =>
                         if    (seq_level /= 3) then
                             READ_ERROR(core, proc_name, "READ_ELEM less level(" & INTEGER_TO_STRING(seq_level) & ")");
-                        elsif (seq_pos(0) < PARAM.SHAPE.Y.LO or seq_pos(0) > PARAM.SHAPE.Y.HI) then
-                            READ_ERROR(core, proc_name, "READ_ELEM Out of Y Range(" & INTEGER_TO_STRING(seq_pos(0)) & ")");
-                        elsif (seq_pos(1) < PARAM.SHAPE.X.LO or seq_pos(1) > PARAM.SHAPE.X.HI) then
-                            READ_ERROR(core, proc_name, "READ_ELEM Out of X Range(" & INTEGER_TO_STRING(seq_pos(1)) & ")");
-                        elsif (seq_pos(2) < PARAM.SHAPE.C.LO or seq_pos(2) > PARAM.SHAPE.C.HI) then
-                            READ_ERROR(core, proc_name, "READ_ELEM Out of C Range(" & INTEGER_TO_STRING(seq_pos(2)) & ")");
+                        elsif (seq_pos(1) < PARAM.SHAPE.Y.LO or seq_pos(1) > PARAM.SHAPE.Y.HI) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of Y Range(" & INTEGER_TO_STRING(seq_pos(1)) & ")");
+                        elsif (seq_pos(2) < PARAM.SHAPE.X.LO or seq_pos(2) > PARAM.SHAPE.X.HI) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of X Range(" & INTEGER_TO_STRING(seq_pos(2)) & ")");
+                        elsif (seq_pos(3) < PARAM.SHAPE.C.LO or seq_pos(3) > PARAM.SHAPE.C.HI) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of C Range(" & INTEGER_TO_STRING(seq_pos(3)) & ")");
                         else
-                            read_value(proc_name, signals.ELEM(seq_pos(0),seq_pos(1),seq_pos(2)));
+                            read_value(proc_name, signals.ELEM(seq_pos(1),seq_pos(2),seq_pos(3)));
                             SET_ELEMENT_TO_IMAGE_WINDOW_DATA(
                                 PARAM   => PARAM,
-                                C       => seq_pos(2),
-                                X       => seq_pos(1),
-                                Y       => seq_pos(0),
-                                ELEMENT => signals.ELEM(seq_pos(0), seq_pos(1), seq_pos(2)),
+                                C       => seq_pos(3),
+                                X       => seq_pos(2),
+                                Y       => seq_pos(1),
+                                ELEMENT => signals.ELEM(seq_pos(1), seq_pos(2), seq_pos(3)),
                                 DATA    => signals.DATA
                             );
+                            -- REPORT_NOTE(core, string'("seq_pos(1)=") & INTEGER_TO_STRING(seq_pos(1)) &
+                            --                            ",seq_pos(2)="  & INTEGER_TO_STRING(seq_pos(2)) &
+                            --                            ",seq_pos(3)="  & INTEGER_TO_STRING(seq_pos(3)) &
+                            --                            ",elem="        & HEX_TO_STRING(signals.ELEM(seq_pos(1),seq_pos(2),seq_pos(3))) &
+                            --                            ",data="        & HEX_TO_STRING(signals.DATA));
                         end if;
-                        seq_pos(2) := seq_pos(2) + 1;
+                        seq_pos(3) := seq_pos(3) + 1;
                     when EVENT_ERROR     =>
                         READ_ERROR(core, proc_name, "SEEK_EVENT NG");
                     when others          =>
