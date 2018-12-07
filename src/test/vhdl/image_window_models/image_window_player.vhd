@@ -506,8 +506,10 @@ begin
                         end if;
                     when EVENT_SEQ_END   =>
                         READ_EVENT(core, stream, EVENT_SEQ_END  );
-                        seq_level := seq_level - 1;
-                        seq_pos(seq_level) := seq_pos(seq_level) + 1;
+                        if (seq_level > 0) then
+                            seq_level := seq_level - 1;
+                            seq_pos(seq_level) := seq_pos(seq_level) + 1;
+                        end if;
                     when EVENT_SCALAR    =>
                         if    (seq_level /= 3) then
                             READ_ERROR(core, proc_name, "READ_ELEM less level(" & INTEGER_TO_STRING(seq_level) & ")");
