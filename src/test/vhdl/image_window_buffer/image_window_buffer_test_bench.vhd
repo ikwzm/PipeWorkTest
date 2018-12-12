@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
---!     @file    image_window_fast_scan_buffer_test_bench.vhd
---!     @brief   Image Window Fast Scan Buffer Test Bench.
+--!     @file    image_window_buffer_test_bench.vhd
+--!     @brief   Image Window Buffer Test Bench.
 --!     @version 1.8.0
---!     @date    2018/12/5
+--!     @date    2018/12/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -38,7 +38,7 @@ library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH is
+entity  IMAGE_WINDOW_BUFFER_TEST_BENCH is
     generic (
         NAME            : STRING                  := "test";
         SCENARIO_FILE   : STRING                  := "test.snr";
@@ -47,7 +47,7 @@ entity  IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH is
         CHANNEL_SIZE    : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH;
+end     IMAGE_WINDOW_BUFFER_TEST_BENCH;
 -----------------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ use     ieee.numeric_std.all;
 use     std.textio.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-use     PIPEWORK.IMAGE_COMPONENTS.IMAGE_WINDOW_FAST_SCAN_BUFFER;
+use     PIPEWORK.IMAGE_COMPONENTS.IMAGE_WINDOW_BUFFER;
 library DUMMY_PLUG;
 use     DUMMY_PLUG.SYNC.all;
 use     DUMMY_PLUG.UTIL.all;
@@ -68,7 +68,7 @@ use     DUMMY_PLUG.CORE.MARGE_REPORT_STATUS;
 library WORK;
 use     WORK.IMAGE_WINDOW_MODELS.IMAGE_WINDOW_MASTER_PLAYER;
 use     WORK.IMAGE_WINDOW_MODELS.IMAGE_WINDOW_SLAVE_PLAYER;
-architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH is
+architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_BENCH is
     -------------------------------------------------------------------------------
     -- 各種定数
     -------------------------------------------------------------------------------
@@ -78,6 +78,7 @@ architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH is
     constant  GPO_WIDTH         :  integer :=  8;
     constant  GPI_WIDTH         :  integer :=  GPO_WIDTH;
     constant  ELEMENT_SIZE      :  integer := 8*1024;
+    constant  LINE_SIZE         :  integer := 1;
     constant  BANK_SIZE         :  integer := 4;
     -------------------------------------------------------------------------------
     -- グローバルシグナル.
@@ -85,12 +86,10 @@ architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH is
     signal    CLK               :  std_logic;
     signal    RESET             :  std_logic;
     constant  CLEAR             :  std_logic := '0';
-    signal    START             :  std_logic;
-    signal    DONE              :  std_logic;
-    signal    BUSY              :  std_logic;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
+    signal    I_START           :  std_logic;
     signal    I_ENABLE          :  std_logic;
     signal    I_DATA            :  std_logic_vector(I_PARAM.DATA.SIZE-1 downto 0);
     signal    I_VALID           :  std_logic;
@@ -98,7 +97,8 @@ architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal    O_ENABLE          :  std_logic;
+    signal    O_FEED            :  std_logic;
+    signal    O_RETURN          :  std_logic;
     signal    O_DATA            :  std_logic_vector(O_PARAM.DATA.SIZE-1 downto 0);
     signal    O_VALID           :  std_logic;
     signal    O_READY           :  std_logic;
@@ -126,12 +126,13 @@ begin
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    DUT: IMAGE_WINDOW_FAST_SCAN_BUFFER
+    DUT: IMAGE_WINDOW_BUFFER                         -- 
         generic map(                                 -- 
             I_PARAM             => I_PARAM         , --
             O_PARAM             => O_PARAM         , --
             ELEMENT_SIZE        => ELEMENT_SIZE    , --
             CHANNEL_SIZE        => CHANNEL_SIZE    , --
+            MEM_LINE_SIZE       => LINE_SIZE       , --
             MEM_BANK_SIZE       => BANK_SIZE       , --
             ID                  => 0                 -- 
         )                                            -- 
@@ -139,14 +140,11 @@ begin
             CLK                 => CLK             , -- In  :
             RST                 => RESET           , -- In  :
             CLR                 => CLEAR           , -- In  :
-            START               => START           , -- In  :
-            DONE                => DONE            , -- In  :
-            BUSY                => BUSY            , -- Out :
-            I_ENABLE            => I_ENABLE        , -- In  :
             I_DATA              => I_DATA          , -- In  :
             I_VALID             => I_VALID         , -- In  :
             I_READY             => I_READY         , -- Out :
-            O_ENABLE            => O_ENABLE        , -- In  :
+            O_FEED              => O_FEED          , -- In  :
+            O_RETURN            => O_RETURN        , -- In  :
             O_DATA              => O_DATA          , -- Out :
             O_VALID             => O_VALID         , -- Out :
             O_READY             => O_READY           -- In  :
@@ -241,12 +239,10 @@ begin
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    I_ENABLE <= I_GPO(0);
-    DONE     <= I_GPO(1);
-    START    <= I_GPO(2);
-    O_ENABLE <= O_GPO(0);
-    I_GPI <= O_GPO;
-    O_GPI <= I_GPO;
+    I_GPI    <= (others => '0');
+    O_FEED   <= O_GPO(0);
+    O_RETURN <= O_GPO(1);
+    O_GPI    <= (others => '0');
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -290,7 +286,7 @@ library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_4_1_1_1 is
+entity  IMAGE_WINDOW_BUFFER_TEST_4_1_1_1 is
     generic (
         NAME            : STRING                  := "test_4_1_1_1";
         SCENARIO_FILE   : STRING                  := "test_4_1_1_1.snr";
@@ -299,9 +295,9 @@ entity  IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_4_1_1_1 is
         CHANNEL_SIZE    : integer                 := 4;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_4_1_1_1;
-architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_4_1_1_1 is
-    component IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH is
+end     IMAGE_WINDOW_BUFFER_TEST_4_1_1_1;
+architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_4_1_1_1 is
+    component IMAGE_WINDOW_BUFFER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
             SCENARIO_FILE   : STRING                  := "test.snr";
@@ -312,7 +308,7 @@ architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_4_1_1_1 is
         );
     end component;
 begin
-    TB: IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH generic map (
+    TB: IMAGE_WINDOW_BUFFER_TEST_BENCH generic map (
         NAME            => NAME         ,
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
@@ -328,7 +324,7 @@ library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_4_4_1_1 is
+entity  IMAGE_WINDOW_BUFFER_TEST_4_4_1_1 is
     generic (
         NAME            : STRING                  := "test_4_4_1_1";
         SCENARIO_FILE   : STRING                  := "test_4_4_1_1.snr";
@@ -337,9 +333,9 @@ entity  IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_4_4_1_1 is
         CHANNEL_SIZE    : integer                 := 4;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_4_4_1_1;
-architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_4_4_1_1 is
-    component IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH is
+end     IMAGE_WINDOW_BUFFER_TEST_4_4_1_1;
+architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_4_4_1_1 is
+    component IMAGE_WINDOW_BUFFER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
             SCENARIO_FILE   : STRING                  := "test.snr";
@@ -350,7 +346,7 @@ architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_4_4_1_1 is
         );
     end component;
 begin
-    TB: IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH generic map (
+    TB: IMAGE_WINDOW_BUFFER_TEST_BENCH generic map (
         NAME            => NAME         ,
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
@@ -366,7 +362,7 @@ library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_0_4_1_1 is
+entity  IMAGE_WINDOW_BUFFER_TEST_0_4_1_1 is
     generic (
         NAME            : STRING                  := "test_0_4_1_1";
         SCENARIO_FILE   : STRING                  := "test_0_4_1_1.snr";
@@ -375,9 +371,9 @@ entity  IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_0_4_1_1 is
         CHANNEL_SIZE    : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_0_4_1_1;
-architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_0_4_1_1 is
-    component IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH is
+end     IMAGE_WINDOW_BUFFER_TEST_0_4_1_1;
+architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_0_4_1_1 is
+    component IMAGE_WINDOW_BUFFER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
             SCENARIO_FILE   : STRING                  := "test.snr";
@@ -388,7 +384,7 @@ architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_0_4_1_1 is
         );
     end component;
 begin
-    TB: IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH generic map (
+    TB: IMAGE_WINDOW_BUFFER_TEST_BENCH generic map (
         NAME            => NAME         ,
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
@@ -404,7 +400,7 @@ library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_0_4_3_1 is
+entity  IMAGE_WINDOW_BUFFER_TEST_0_4_3_1 is
     generic (
         NAME            : STRING                  := "test_0_4_3_1";
         SCENARIO_FILE   : STRING                  := "test_0_4_3_1.snr";
@@ -417,9 +413,9 @@ entity  IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_0_4_3_1 is
         CHANNEL_SIZE    : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_0_4_3_1;
-architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_0_4_3_1 is
-    component IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH is
+end     IMAGE_WINDOW_BUFFER_TEST_0_4_3_1;
+architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_0_4_3_1 is
+    component IMAGE_WINDOW_BUFFER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
             SCENARIO_FILE   : STRING                  := "test.snr";
@@ -430,7 +426,7 @@ architecture MODEL of IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_0_4_3_1 is
         );
     end component;
 begin
-    TB: IMAGE_WINDOW_FAST_SCAN_BUFFER_TEST_BENCH generic map (
+    TB: IMAGE_WINDOW_BUFFER_TEST_BENCH generic map (
         NAME            => NAME         ,
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,

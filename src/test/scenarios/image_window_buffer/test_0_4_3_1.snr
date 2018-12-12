@@ -3,7 +3,17 @@
   - SAY : IMAGE_WINDOW_FAST_SCAN_BUFER_TEST ELEM_BITS=8bit, CHANNEL_SIZE=0, C=4, I.X=3, O.X=1, Y=1
 ---
 - I :
+  - OUT  : {GPO(0): 0}
+  - WAIT : 4
+- O :
+  - OUT  : {GPO(0): 0}
+  - OUT  : {GPO(1): 0}
+  - WAIT : 4
+---
+- I :
   - OUT  : {GPO(0): 1}
+  - WAIT : 1
+  - OUT  : {GPO(0): 0}
   - ELEM : [[[0x00,0x01,0x02,0x03],[0x10,0x11,0x12,0x13],[0x20,0x21,0x22,0x23]]]
   - ATRB : {C: [3,1,1,1], X: [3,1,1], Y: [3]}
   - VALID: 1
@@ -64,32 +74,33 @@
   - VALID: 1
   - WAIT : {READY: 1}
   - ELEM : [[[0x90,0x91,0x92,0x93],[0xA0,0xA1,0xA2,0xA3],[0xB0,0xB1,0xB2,0xB3]]]
-  - ATRB : {C: [3,1,1,1], X: [1,1,5], Y: [3]}
+  - ATRB : {C: [3,1,1,1], X: [1,5,4], Y: [3]}
   - VALID: 1
   - WAIT : {READY: 1}
   - VALID: 0
   - ELEM : [[[0x94,0x95,0x96,0x97],[0xA4,0xA5,0xA6,0xA7],[0xB4,0xB5,0xB6,0xB7]]]
-  - ATRB : {C: [1,1,1,1], X: [1,1,5], Y: [3]}
+  - ATRB : {C: [1,1,1,1], X: [1,5,4], Y: [3]}
   - VALID: 1
   - WAIT : {READY: 1}
   - VALID: 0
   - ELEM : [[[0x98,0x99,0x9A,0x9B],[0xA8,0xA9,0xAA,0xAB],[0xB8,0xB9,0xBA,0xBB]]]
-  - ATRB : {C: [1,1,1,1], X: [1,1,5], Y: [3]}
+  - ATRB : {C: [1,1,1,1], X: [1,5,4], Y: [3]}
   - VALID: 1
   - WAIT : {READY: 1}
   - VALID: 0
   - ELEM : [[[0x9C,0x9D,0x9E,0x9F],[0xAC,0xAD,0xAE,0xAF],[0xBC,0xBD,0xBE,0xBF]]]
-  - ATRB : {C: [1,1,1,5], X: [1,1,5], Y: [3]}
+  - ATRB : {C: [1,1,1,5], X: [1,5,4], Y: [3]}
   - VALID: 1
   - WAIT : {READY: 1}
   - VALID: 0
   - OUT  : {GPO(0): 0}
 - O :
-  - OUT  : {GPO(0): 1}
   - WAIT : {VALID: 1}
   - WAIT : 5
   - READY: 1
   - WAIT : 1
   - READY: 0
+  - OUT  : {GPO(0): 1}
+  - WAIT : 1
   - OUT  : {GPO(0): 0}
 ---
