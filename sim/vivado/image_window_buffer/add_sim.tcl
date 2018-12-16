@@ -2,6 +2,7 @@ add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_types.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/components.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/sdpram.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_components.vhd
+add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_window_buffer_intake.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_window_buffer_writer.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/sdpram_altera_auto_select.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/sdpram_model.vhd
