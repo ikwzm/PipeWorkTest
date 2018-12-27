@@ -2,7 +2,6 @@
 - MARCHAL : 
   - SAY : IMAGE_WINDOW_TEST ELEM_BITS=8 CHANNEL=1 X=1 Y=1
 ---
-<<<<<<< HEAD
 - M :
   - ELEM : [[[1]]]
   - ATRB : {C: [1], X: [3], Y: [3]}
@@ -29,5 +28,3 @@
   - WAIT : 1
   - READY: 0
 ---
-=======
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS

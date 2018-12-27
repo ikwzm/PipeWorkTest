@@ -2,11 +2,7 @@
 --!     @file    image_window_player_test_bench.vhd
 --!     @brief   Image Window Dummy Plug Player Test Bench.
 --!     @version 1.8.0
-<<<<<<< HEAD
 --!     @date    2018/11/30
-=======
---!     @date    2018/11/28
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -158,11 +154,7 @@ begin
             NAME                => "MARCHAL"       , --
             SYNC_PLUG_NUM       => 1               , --
             SYNC_WIDTH          => SYNC_WIDTH      , -- 
-<<<<<<< HEAD
             FINISH_ABORT        => FALSE             -- 
-=======
-            FINISH_ABORT        => FINISH_ABORT      -- 
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
         )                                            -- 
         port map(                                    -- 
             CLK                 => CLK             , -- In  :
@@ -185,11 +177,7 @@ begin
             SYNC_WIDTH          => SYNC_WIDTH      , --   
             GPI_WIDTH           => GPI_WIDTH       , --   
             GPO_WIDTH           => GPO_WIDTH       , --   
-<<<<<<< HEAD
             FINISH_ABORT        => FALSE             --   
-=======
-            FINISH_ABORT        => FINISH_ABORT      --   
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
         )                                            -- 
         port map (                                   -- 
             CLK                 => CLK             , -- In  :
@@ -217,11 +205,7 @@ begin
             SYNC_WIDTH          => SYNC_WIDTH      , --   
             GPI_WIDTH           => GPI_WIDTH       , --   
             GPO_WIDTH           => GPO_WIDTH       , --   
-<<<<<<< HEAD
             FINISH_ABORT        => FALSE             --   
-=======
-            FINISH_ABORT        => FINISH_ABORT      --   
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
         )                                            -- 
         port map (                                   -- 
             CLK                 => CLK             , -- In  :
@@ -301,12 +285,8 @@ entity  IMAGE_WINDOW_PLAYER_TEST_8x1_1x1 is
     generic (
         NAME            : STRING                  := "test_8x1_1x1";
         SCENARIO_FILE   : STRING                  := "test_8x1_1x1.snr";
-<<<<<<< HEAD
         PARAM           : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1,1);
         FINISH_ABORT    : boolean := FALSE
-=======
-        PARAM           : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1,1)
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
     );
 end     IMAGE_WINDOW_PLAYER_TEST_8x1_1x1;
 architecture MODEL of IMAGE_WINDOW_PLAYER_TEST_8x1_1x1 is
@@ -323,11 +303,7 @@ begin
         NAME            => NAME         ,
         SCENARIO_FILE   => SCENARIO_FILE,
         PARAM           => PARAM        ,
-<<<<<<< HEAD
         FINISH_ABORT    => FINISH_ABORT
-=======
-        FINISH_ABORT    => FALSE
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
     );
 end MODEL;
 -----------------------------------------------------------------------------------
@@ -346,12 +322,8 @@ entity  IMAGE_WINDOW_PLAYER_TEST_8x1_3x3 is
                                                          C         => NEW_IMAGE_VECTOR_RANGE(1),
                                                          X         => NEW_IMAGE_VECTOR_RANGE(-1,1),
                                                          Y         => NEW_IMAGE_VECTOR_RANGE(-1,1)
-<<<<<<< HEAD
                                                      );
         FINISH_ABORT    : boolean := FALSE
-=======
-                                                     )
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
     );
 end     IMAGE_WINDOW_PLAYER_TEST_8x1_3x3;
 architecture MODEL of IMAGE_WINDOW_PLAYER_TEST_8x1_3x3 is
@@ -368,11 +340,7 @@ begin
         NAME            => NAME         ,
         SCENARIO_FILE   => SCENARIO_FILE,
         PARAM           => PARAM        ,
-<<<<<<< HEAD
         FINISH_ABORT    => FINISH_ABORT
-=======
-        FINISH_ABORT    => FALSE
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
     );
 end MODEL;
 -----------------------------------------------------------------------------------
@@ -391,12 +359,8 @@ entity  IMAGE_WINDOW_PLAYER_TEST_8x3_4x1 is
                                                          C         => NEW_IMAGE_VECTOR_RANGE(3),
                                                          X         => NEW_IMAGE_VECTOR_RANGE(4),
                                                          Y         => NEW_IMAGE_VECTOR_RANGE(1)
-<<<<<<< HEAD
                                                          );
         FINISH_ABORT    : boolean := FALSE
-=======
-                                                     )
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
     );
 end     IMAGE_WINDOW_PLAYER_TEST_8x3_4x1;
 architecture MODEL of IMAGE_WINDOW_PLAYER_TEST_8x3_4x1 is
@@ -413,10 +377,6 @@ begin
         NAME            => NAME         ,
         SCENARIO_FILE   => SCENARIO_FILE,
         PARAM           => PARAM        ,
-<<<<<<< HEAD
         FINISH_ABORT    => FINISH_ABORT
-=======
-        FINISH_ABORT    => FALSE
->>>>>>> a5286c6... [add] IMAGE_WINDOW_MODELS
     );
 end MODEL;
