@@ -2,7 +2,7 @@
 --!     @file    image_window_channel_reducer_test_bench.vhd
 --!     @brief   Image Window Channel Reducer Test Bench.
 --!     @version 1.8.0
---!     @date    2018/11/30
+--!     @date    2018/12/27
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -441,8 +441,20 @@ entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_8_8 is
     generic (
         NAME            : STRING                  := "test_0_8_8";
         SCENARIO_FILE   : STRING                  := "test_0_8_8.snr";
-        I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,8,3,3);
-        O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,8,3,3);
+        I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(
+                                                         ELEM_BITS => 8,
+                                                         INFO_BITS => 4,
+                                                         C         => NEW_IMAGE_VECTOR_RANGE(8),
+                                                         X         => NEW_IMAGE_VECTOR_RANGE(3),
+                                                         Y         => NEW_IMAGE_VECTOR_RANGE(3)
+                                                     );
+        O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(
+                                                         ELEM_BITS => 8,
+                                                         INFO_BITS => 4,
+                                                         C         => NEW_IMAGE_VECTOR_RANGE(8),
+                                                         X         => NEW_IMAGE_VECTOR_RANGE(3),
+                                                         Y         => NEW_IMAGE_VECTOR_RANGE(3)
+                                                     );
         CHANNEL_SIZE    : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
     );

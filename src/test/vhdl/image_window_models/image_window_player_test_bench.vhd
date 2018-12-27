@@ -356,6 +356,7 @@ entity  IMAGE_WINDOW_PLAYER_TEST_8x3_4x1 is
         SCENARIO_FILE   : STRING                  := "test_8x3_4x1.snr";
         PARAM           : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(
                                                          ELEM_BITS => 8,
+                                                         INFO_BITS => 4,
                                                          C         => NEW_IMAGE_VECTOR_RANGE(3),
                                                          X         => NEW_IMAGE_VECTOR_RANGE(4),
                                                          Y         => NEW_IMAGE_VECTOR_RANGE(1)

@@ -2,7 +2,7 @@
 --!     @file    image_window_player.vhd
 --!     @brief   Image Window Dummy Plug Player.
 --!     @version 1.8.0
---!     @date    2018/11/30
+--!     @date    2018/12/27
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -134,6 +134,15 @@ use     DUMMY_PLUG.READER.all;
 -----------------------------------------------------------------------------------
 architecture MODEL of IMAGE_WINDOW_PLAYER is
     -------------------------------------------------------------------------------
+    --! @brief MAX : 二つの引数を比較して大きい方を選択する関数
+    -------------------------------------------------------------------------------
+    function  MAX(A,B:integer) return integer is
+    begin
+        if (A > B) then return A;
+        else            return B;
+        end if;
+    end function;
+    -------------------------------------------------------------------------------
     --! @brief WAITオペレーション実行時のデフォルトのタイムアウトクロック数
     -------------------------------------------------------------------------------
     constant  DEFAULT_WAIT_TIMEOUT : integer := 10000;
@@ -162,6 +171,7 @@ architecture MODEL of IMAGE_WINDOW_PLAYER is
                                                         PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI,
                                                         PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI);
                   ATRB      :  IMAGE_ATRB_SIGNAL_WINDOW;
+                  INFO      :  std_logic_vector(MAX(1, PARAM.INFO_BITS)-1 downto 0);
                   DATA      :  std_logic_vector(PARAM.DATA.SIZE-1 downto 0);
                   VALID     :  std_logic;
                   READY     :  std_logic;
@@ -224,6 +234,14 @@ architecture MODEL of IMAGE_WINDOW_PLAYER is
                 DATA    => W.DATA
             );
         end loop;
+        for i in W.INFO'range loop
+            W.INFO(i) := D;
+        end loop;
+        if (PARAM.INFO_BITS > 0) then
+            for i in PARAM.DATA.INFO_FIELD.LO to PARAM.DATA.INFO_FIELD.HI loop
+                W.DATA(i) := D;
+            end loop;
+        end if;
         W.VALID := D;
         W.READY := D;
     end procedure;
@@ -315,8 +333,8 @@ architecture MODEL of IMAGE_WINDOW_PLAYER is
                 REPORT_MISMATCH(core, "ELEM[" &
                                 INTEGER_TO_STRING(y_pos) & "][" &
                                 INTEGER_TO_STRING(x_pos) & "][ " & 
-                                INTEGER_TO_STRING(c_pos) & "] " & 
-                                HEX_TO_STRING(elem_i)    & " /= " &
+                                INTEGER_TO_STRING(c_pos) & "] 0x" & 
+                                HEX_TO_STRING(elem_i)    & " /= 0x" &
                                 HEX_TO_STRING(signals.ELEM(y_pos, x_pos, c_pos)));
             end if;
         end loop;
@@ -330,8 +348,8 @@ architecture MODEL of IMAGE_WINDOW_PLAYER is
                           );
             if (MATCH_STD_LOGIC(signals.ATRB.Y(y_pos), atrb_i) = FALSE) then
                 REPORT_MISMATCH(core, "ATRB.Y[" &
-                                INTEGER_TO_STRING(y_pos) & "] " &
-                                HEX_TO_STRING(atrb_i)    & " /= " &
+                                INTEGER_TO_STRING(y_pos) & "] 0x" &
+                                HEX_TO_STRING(atrb_i)    & " /= 0x" &
                                 HEX_TO_STRING(signals.ATRB.Y(y_pos)));
             end if;
         end loop;
@@ -343,8 +361,8 @@ architecture MODEL of IMAGE_WINDOW_PLAYER is
                           );
             if (MATCH_STD_LOGIC(signals.ATRB.X(x_pos), atrb_i) = FALSE) then
                 REPORT_MISMATCH(core, "ATRB.X[" &
-                                INTEGER_TO_STRING(x_pos) & "] " &
-                                HEX_TO_STRING(atrb_i)    & " /= " &
+                                INTEGER_TO_STRING(x_pos) & "] 0x" &
+                                HEX_TO_STRING(atrb_i)    & " /= 0x" &
                                 HEX_TO_STRING(signals.ATRB.X(x_pos)));
             end if;
         end loop;
@@ -356,11 +374,18 @@ architecture MODEL of IMAGE_WINDOW_PLAYER is
                           );
             if (MATCH_STD_LOGIC(signals.ATRB.C(c_pos) , atrb_i) = FALSE) then
                 REPORT_MISMATCH(core, "ATRB.C[" &
-                                INTEGER_TO_STRING(c_pos) & "] " &
-                                HEX_TO_STRING(atrb_i)    & " /= " &
+                                INTEGER_TO_STRING(c_pos) & "] 0x" &
+                                HEX_TO_STRING(atrb_i)    & " /= 0x" &
                                 HEX_TO_STRING(signals.ATRB.C(c_pos)));
             end if;
         end loop;
+        if PARAM.INFO_BITS > 0 then
+            if (MATCH_STD_LOGIC(signals.INFO, DATA_I(PARAM.DATA.INFO_FIELD.HI downto PARAM.DATA.INFO_FIELD.LO)) = FALSE) then
+                REPORT_MISMATCH(core, "INFO 0x" &
+                                HEX_TO_STRING(DATA_I(PARAM.DATA.INFO_FIELD.HI downto PARAM.DATA.INFO_FIELD.LO)) & " /= 0x" &
+                                HEX_TO_STRING(signals.INFO));
+            end if;
+        end if;
     end procedure;
     -------------------------------------------------------------------------------
     -- キーワードの定義.
@@ -381,6 +406,7 @@ architecture MODEL of IMAGE_WINDOW_PLAYER is
     constant  KEY_C         : KEYWORD_TYPE := "C     ";
     constant  KEY_X         : KEYWORD_TYPE := "X     ";
     constant  KEY_Y         : KEYWORD_TYPE := "Y     ";
+    constant  KEY_INFO      : KEYWORD_TYPE := "INFO  ";
     constant  KEY_VALID     : KEYWORD_TYPE := "VALID ";
     constant  KEY_READY     : KEYWORD_TYPE := "READY ";
 begin 
@@ -737,6 +763,25 @@ begin
                                              DATA   => signals.DATA
                                          );
             end loop;
+            if (PARAM.INFO_BITS > 0) then
+                signals.INFO := signals.DATA(PARAM.DATA.INFO_FIELD.HI downto PARAM.DATA.INFO_FIELD.LO);
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --! @brief IMAGE_WINDOW_SIGNAL 構造体の INFO の値を読み取るサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    signals     読み取った値が入るレコード変数. inoutであることに注意.
+        ---------------------------------------------------------------------------
+        procedure read_image_window_info(
+                      proc_name     : in    string;
+                      signals       : inout IMAGE_WINDOW_SIGNAL_TYPE
+        ) is
+        begin
+            if (PARAM.INFO_BITS > 0) then
+                read_value(proc_name, signals.INFO);
+                signals.DATA(PARAM.DATA.INFO_FIELD.HI downto PARAM.DATA.INFO_FIELD.LO) := signals.INFO;
+            end if;
         end procedure;
         ---------------------------------------------------------------------------
         --! @brief シナリオのマップからIMAGE_WINDOW_SIGNAL 構造体の値を読み取るサブプログラム.
@@ -765,6 +810,8 @@ begin
                                 read_image_window_elem(proc_name, signals);
                             when KEY_ATRB =>
                                 read_image_window_atrb(proc_name, signals);
+                            when KEY_INFO =>
+                                read_image_window_info(proc_name, signals);
                             when KEY_DATA  =>
                                 read_image_window_data(proc_name, signals);
                             when KEY_VALID =>
@@ -1012,6 +1059,19 @@ begin
             end if;
         end procedure;
         ---------------------------------------------------------------------------
+        --! @brief シナリオからINFOの値を読んで出力するサブプログラム.
+        ---------------------------------------------------------------------------
+        procedure execute_info is
+            constant proc_name : string := "EXECUTE_INFO";
+        begin
+            if (MASTER) then
+                read_image_window_info(proc_name, out_signals);
+                DATA_O <= out_signals.DATA after OUTPUT_DELAY;
+            else
+                skip_value(proc_name);
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
         --! @brief シナリオからVALIDの値を読んで出力するサブプログラム.
         ---------------------------------------------------------------------------
         procedure execute_valid is
@@ -1087,6 +1147,7 @@ begin
                         when KEY_DATA   => execute_data;
                         when KEY_ELEM   => execute_elem;
                         when KEY_ATRB   => execute_atrb;
+                        when KEY_INFO   => execute_info;
                         when KEY_VALID  => execute_valid;
                         when KEY_READY  => execute_ready;
                         when KEY_REPORT => EXECUTE_REPORT(core, stream);
