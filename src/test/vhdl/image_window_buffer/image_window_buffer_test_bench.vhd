@@ -45,6 +45,7 @@ entity  IMAGE_WINDOW_BUFFER_TEST_BENCH is
         I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
         O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
         CHANNEL_SIZE    : integer                 := 0;
+        D_SIZE          : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
 end     IMAGE_WINDOW_BUFFER_TEST_BENCH;
@@ -80,6 +81,7 @@ architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_BENCH is
     constant  ELEMENT_SIZE      :  integer := 8*1024;
     constant  LINE_SIZE         :  integer := 1;
     constant  BANK_SIZE         :  integer := 4;
+    constant  D_UNROLL          :  integer := 1;
     -------------------------------------------------------------------------------
     -- グローバルシグナル.
     -------------------------------------------------------------------------------
@@ -102,6 +104,7 @@ architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_BENCH is
     signal    O_DATA            :  std_logic_vector(O_PARAM.DATA.SIZE-1 downto 0);
     signal    O_VALID           :  std_logic;
     signal    O_READY           :  std_logic;
+    signal    O_D_ATRB          :  IMAGE_ATRB_VECTOR(0 to D_UNROLL-1);
     -------------------------------------------------------------------------------
     -- シンクロ用信号
     -------------------------------------------------------------------------------
@@ -132,20 +135,25 @@ begin
             O_PARAM             => O_PARAM         , --
             ELEMENT_SIZE        => ELEMENT_SIZE    , --
             CHANNEL_SIZE        => CHANNEL_SIZE    , --
-            MEM_LINE_SIZE       => LINE_SIZE       , --
+            MAX_D_SIZE          => D_SIZE          , --
+            D_STRIDE            => 1               , --
+            D_UNROLL            => 1               , --
             MEM_BANK_SIZE       => BANK_SIZE       , --
+            MEM_LINE_SIZE       => LINE_SIZE       , --
             ID                  => 0                 -- 
         )                                            -- 
         port map (                                   -- 
             CLK                 => CLK             , -- In  :
             RST                 => RESET           , -- In  :
             CLR                 => CLEAR           , -- In  :
+            D_SIZE              => D_SIZE          , -- In  :
             I_DATA              => I_DATA          , -- In  :
             I_VALID             => I_VALID         , -- In  :
             I_READY             => I_READY         , -- Out :
             O_FEED              => O_FEED          , -- In  :
             O_RETURN            => O_RETURN        , -- In  :
             O_DATA              => O_DATA          , -- Out :
+            O_D_ATRB            => O_D_ATRB        , -- Out :
             O_VALID             => O_VALID         , -- Out :
             O_READY             => O_READY           -- In  :
     );
