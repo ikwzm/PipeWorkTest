@@ -14,11 +14,11 @@ IMAGE_MODELS   = image_window_player.o        \
                  image_window_slave_player.o  \
                  $(END_LIST)
 
-TEST_BENCH     = image_window_channel_reducer_test_4_1_2 \
-                 image_window_channel_reducer_test_4_2_1 \
-                 image_window_channel_reducer_test_8_4_8 \
-                 image_window_channel_reducer_test_8_8_4 \
-                 image_window_channel_reducer_test_0_8_8 \
+TEST_BENCH     = image_window_channel_reducer_test_0_0_1_2 \
+                 image_window_channel_reducer_test_0_0_2_1 \
+                 image_window_channel_reducer_test_0_0_4_8 \
+                 image_window_channel_reducer_test_0_0_8_4 \
+                 image_window_channel_reducer_test_1_1_8_8 \
                  $(END_LIST)
 
 all: $(TEST_BENCH)
@@ -28,23 +28,23 @@ IMAGE_WINDOW_MODELS : image_window_models.o image_window_player.o image_window_m
 clean:
 	rm -f *.o *.cf $(TEST_BENCH)
 
-image_window_channel_reducer_test_4_1_2 : image_window_channel_reducer_test_bench.o test_4_1_2.snr
+image_window_channel_reducer_test_0_0_1_2 : image_window_channel_reducer_test_bench.o test_0_0_1_2.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
-image_window_channel_reducer_test_4_2_1 : image_window_channel_reducer_test_bench.o test_4_2_1.snr
+image_window_channel_reducer_test_0_0_2_1 : image_window_channel_reducer_test_bench.o test_0_0_2_1.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
-image_window_channel_reducer_test_8_4_8 : image_window_channel_reducer_test_bench.o test_8_4_8.snr
+image_window_channel_reducer_test_0_0_4_8 : image_window_channel_reducer_test_bench.o test_0_0_4_8.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
-image_window_channel_reducer_test_8_8_4 : image_window_channel_reducer_test_bench.o test_8_8_4.snr
+image_window_channel_reducer_test_0_0_8_4 : image_window_channel_reducer_test_bench.o test_0_0_8_4.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
-image_window_channel_reducer_test_0_8_8 : image_window_channel_reducer_test_bench.o test_0_8_8.snr
+image_window_channel_reducer_test_1_1_8_8 : image_window_channel_reducer_test_bench.o test_1_1_8_8.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
@@ -63,18 +63,18 @@ image_window_models.o                          : $(VHDL_SRC_PATH)/image_window_m
 image_window_channel_reducer_test_bench.o      : $(VHDL_SRC_PATH)/image_window_channel_reducer/image_window_channel_reducer_test_bench.vhd IMAGE_WINDOW_MODELS 
 	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
-test_4_1_2.snr : $(SCENARIO_PATH)/test_4_1_2.snr
+test_0_0_1_2.snr : $(SCENARIO_PATH)/test_0_0_1_2.snr
 	cp $< $@
 
-test_4_2_1.snr : $(SCENARIO_PATH)/test_4_2_1.snr
+test_0_0_2_1.snr : $(SCENARIO_PATH)/test_0_0_2_1.snr
 	cp $< $@
 
-test_8_4_8.snr : $(SCENARIO_PATH)/test_8_4_8.snr
+test_0_0_4_8.snr : $(SCENARIO_PATH)/test_0_0_4_8.snr
 	cp $< $@
 
-test_8_8_4.snr : $(SCENARIO_PATH)/test_8_8_4.snr
+test_0_0_8_4.snr : $(SCENARIO_PATH)/test_0_0_8_4.snr
 	cp $< $@
 
-test_0_8_8.snr : $(SCENARIO_PATH)/test_0_8_8.snr
+test_1_1_8_8.snr : $(SCENARIO_PATH)/test_1_1_8_8.snr
 	cp $< $@
 

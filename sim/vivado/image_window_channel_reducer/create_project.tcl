@@ -74,8 +74,8 @@ source "add_sim.tcl"
 # Set 'sim_1' fileset properties
 #
 set obj [get_filesets sim_1]
-set_property "top" "IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_8_8"  $obj
-set_property "generic" "SCENARIO_FILE=../../../../../../src/test/scenarios/image_window_channel_reducer/test_0_8_8.snr FINISH_ABORT=true" $obj
+set_property "top" "IMAGE_WINDOW_CHANNEL_REDUCER_TEST_1_1_8_8"  $obj
+set_property "generic" "SCENARIO_FILE=../../../../../../src/test/scenarios/image_window_channel_reducer/test_1_1_8_8.snr FINISH_ABORT=true" $obj
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1

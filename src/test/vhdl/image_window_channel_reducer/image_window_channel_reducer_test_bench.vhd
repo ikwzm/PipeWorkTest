@@ -44,7 +44,8 @@ entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_BENCH is
         SCENARIO_FILE   : STRING                  := "test.snr";
         I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
         O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-        CHANNEL_SIZE    : integer                 := 0;
+        C_SIZE          : integer                 := 0;
+        C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
     );
 end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_BENCH;
@@ -91,6 +92,7 @@ architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_BENCH is
     -------------------------------------------------------------------------------
     signal    I_ENABLE          :  std_logic;
     signal    I_DATA            :  std_logic_vector(I_PARAM.DATA.SIZE-1 downto 0);
+    signal    I_DONE            :  std_logic;
     signal    I_VALID           :  std_logic;
     signal    I_READY           :  std_logic;
     -------------------------------------------------------------------------------
@@ -98,6 +100,7 @@ architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_BENCH is
     -------------------------------------------------------------------------------
     signal    O_ENABLE          :  std_logic;
     signal    O_DATA            :  std_logic_vector(O_PARAM.DATA.SIZE-1 downto 0);
+    signal    O_DONE            :  std_logic;
     signal    O_VALID           :  std_logic;
     signal    O_READY           :  std_logic;
     -------------------------------------------------------------------------------
@@ -128,7 +131,8 @@ begin
         generic map(                                 -- 
             I_PARAM             => I_PARAM         , --
             O_PARAM             => O_PARAM         , --
-            CHANNEL_SIZE        => CHANNEL_SIZE      -- 
+            C_SIZE              => C_SIZE          , -- 
+            C_DONE              => C_DONE            -- 
         )                                            -- 
         port map (                                   -- 
             CLK                 => CLK             , -- In  :
@@ -139,10 +143,12 @@ begin
             BUSY                => BUSY            , -- Out :
             I_ENABLE            => I_ENABLE        , -- In  :
             I_DATA              => I_DATA          , -- In  :
+            I_DONE              => I_DONE          , -- In  :
             I_VALID             => I_VALID         , -- In  :
             I_READY             => I_READY         , -- Out :
             O_ENABLE            => O_ENABLE        , -- In  :
             O_DATA              => O_DATA          , -- Out :
+            O_DONE              => O_DONE          , -- Out :
             O_VALID             => O_VALID         , -- Out :
             O_READY             => O_READY           -- In  :
     );
@@ -237,11 +243,14 @@ begin
     -- 
     -------------------------------------------------------------------------------
     I_ENABLE <= I_GPO(0);
-    DONE     <= I_GPO(1);
-    START    <= I_GPO(2);
+    I_DONE   <= I_GPO(1);
+    DONE     <= I_GPO(2);
+    START    <= I_GPO(3);
+    I_GPI    <= (others => '0');
     O_ENABLE <= O_GPO(0);
-    I_GPI <= O_GPO;
-    O_GPI <= I_GPO;
+    O_GPI(0) <= '0';
+    O_GPI(1) <= O_DONE;
+    O_GPI(O_GPI'high downto 2) <= (O_GPI'high downto 2 => '0');
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -279,30 +288,32 @@ begin
     end process;
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, X=3, Y=3, CHANNEL_SIZE=4, I.C=1, O.C=2
+-- ELEM_BITS=8bit, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=1, O.C=2
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_4_1_2 is
+entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_1_2 is
     generic (
-        NAME            : STRING                  := "test_4_1_2";
-        SCENARIO_FILE   : STRING                  := "test_4_1_2.snr";
+        NAME            : STRING                  := "test_0_0_1_2";
+        SCENARIO_FILE   : STRING                  := "test_0_0_1_2.snr";
         I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,3,3);
         O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,2,3,3);
-        CHANNEL_SIZE    : integer                 := 4;
+        C_SIZE          : integer                 := 0;
+        C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_4_1_2;
-architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_4_1_2 is
+end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_1_2;
+architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_1_2 is
     component IMAGE_WINDOW_CHANNEL_REDUCER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
             SCENARIO_FILE   : STRING                  := "test.snr";
             I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
             O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 8;
+            C_SIZE          : integer                 := 0;
+            C_DONE          : integer                 := 0;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -312,35 +323,38 @@ begin
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
         O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        C_SIZE          => C_SIZE       ,
+        C_DONE          => C_DONE       ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, X=3, Y=3, CHANNEL_SIZE=4, I.C=2, O.C=1
+-- ELEM_BITS=8bit, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=2, O.C=1
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_4_2_1 is
+entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_2_1 is
     generic (
-        NAME            : STRING                  := "test_4_2_1";
-        SCENARIO_FILE   : STRING                  := "test_4_2_1.snr";
+        NAME            : STRING                  := "test_0_0_2_1";
+        SCENARIO_FILE   : STRING                  := "test_0_0_2_1.snr";
         I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,2,3,3);
         O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,3,3);
-        CHANNEL_SIZE    : integer                 := 4;
+        C_SIZE          : integer                 := 0;
+        C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_4_2_1;
-architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_4_2_1 is
+end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_2_1;
+architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_2_1 is
     component IMAGE_WINDOW_CHANNEL_REDUCER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
             SCENARIO_FILE   : STRING                  := "test.snr";
             I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
             O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 8;
+            C_SIZE          : integer                 := 0;
+            C_DONE          : integer                 := 0;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -350,35 +364,38 @@ begin
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
         O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        C_SIZE          => C_SIZE       ,
+        C_DONE          => C_DONE       ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, X=3, Y=3, CHANNEL_SIZE=8, I.C=4, O.C=8
+-- ELEM_BITS=8bit, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=4, O.C=8
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_8_4_8 is
+entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_4_8 is
     generic (
-        NAME            : STRING                  := "test_8_4_8";
-        SCENARIO_FILE   : STRING                  := "test_8_4_8.snr";
+        NAME            : STRING                  := "test_0_0_4_8";
+        SCENARIO_FILE   : STRING                  := "test_0_0_4_8.snr";
         I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,4,3,3);
         O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,8,3,3);
-        CHANNEL_SIZE    : integer                 := 8;
+        C_SIZE          : integer                 := 0;
+        C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_8_4_8;
-architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_8_4_8 is
+end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_4_8;
+architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_4_8 is
     component IMAGE_WINDOW_CHANNEL_REDUCER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
             SCENARIO_FILE   : STRING                  := "test.snr";
             I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
             O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 8;
+            C_SIZE          : integer                 := 0;
+            C_DONE          : integer                 := 0;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -388,35 +405,38 @@ begin
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
         O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        C_SIZE          => C_SIZE       ,
+        C_DONE          => C_DONE       ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, X=3, Y=3, CHANNEL_SIZE=8, I.C=8, O.C=4
+-- ELEM_BITS=8bit, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=8, O.C=4
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_8_8_4 is
+entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_8_4 is
     generic (
-        NAME            : STRING                  := "test_8_8_4";
-        SCENARIO_FILE   : STRING                  := "test_8_8_4.snr";
+        NAME            : STRING                  := "test_0_0_8_4";
+        SCENARIO_FILE   : STRING                  := "test_0_0_8_4.snr";
         I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,8,3,3);
         O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,4,3,3);
-        CHANNEL_SIZE    : integer                 := 8;
+        C_SIZE          : integer                 := 0;
+        C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_8_8_4;
-architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_8_8_4 is
+end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_8_4;
+architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_0_8_4 is
     component IMAGE_WINDOW_CHANNEL_REDUCER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
             SCENARIO_FILE   : STRING                  := "test.snr";
             I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
             O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 8;
+            C_SIZE          : integer                 := 0;
+            C_DONE          : integer                 := 0;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -426,21 +446,22 @@ begin
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
         O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        C_SIZE          => C_SIZE       ,
+        C_DONE          => C_DONE       ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, X=3, Y=3, CHANNEL_SIZE=0, I.C=8, O.C=8
+-- ELEM_BITS=8bit, X=3, Y=3, C_SIZE=1, C_DONE=1, I.C=8, O.C=8
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_8_8 is
+entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_1_1_8_8 is
     generic (
-        NAME            : STRING                  := "test_0_8_8";
-        SCENARIO_FILE   : STRING                  := "test_0_8_8.snr";
+        NAME            : STRING                  := "test_1_1_8_8";
+        SCENARIO_FILE   : STRING                  := "test_1_1_8_8.snr";
         I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(
                                                          ELEM_BITS => 8,
                                                          INFO_BITS => 4,
@@ -455,18 +476,20 @@ entity  IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_8_8 is
                                                          X         => NEW_IMAGE_VECTOR_RANGE(3),
                                                          Y         => NEW_IMAGE_VECTOR_RANGE(3)
                                                      );
-        CHANNEL_SIZE    : integer                 := 0;
+        C_SIZE          : integer                 := 1;
+        C_DONE          : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_8_8;
-architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_0_8_8 is
+end     IMAGE_WINDOW_CHANNEL_REDUCER_TEST_1_1_8_8;
+architecture MODEL of IMAGE_WINDOW_CHANNEL_REDUCER_TEST_1_1_8_8 is
     component IMAGE_WINDOW_CHANNEL_REDUCER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
             SCENARIO_FILE   : STRING                  := "test.snr";
             I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
             O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 8;
+            C_SIZE          : integer                 := 8;
+            C_DONE          : integer                 := 8;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -476,7 +499,8 @@ begin
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
         O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        C_SIZE          => C_SIZE       ,
+        C_DONE          => C_DONE       ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;

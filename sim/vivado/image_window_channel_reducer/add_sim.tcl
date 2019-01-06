@@ -1,5 +1,3 @@
-add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/components.vhd
-add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/reducer.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_types.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_components.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_window_channel_reducer.vhd

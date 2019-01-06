@@ -2,13 +2,13 @@ add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/components.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/pipeline_register_controller.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_types.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/pipeline_register.vhd
-add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/queue_register.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/unrolled_loop_counter.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_atrb_generator.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_components.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_window_buffer_intake_bank_writer.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_window_buffer_intake_line_selector.vhd
-add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_window_buffer_reader.vhd
+add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_window_buffer_outlet_bank_reader.vhd
+add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_window_buffer_outlet_line_selector.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/sdpram.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_window_buffer_intake.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_window_buffer_outlet.vhd
