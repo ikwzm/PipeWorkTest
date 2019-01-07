@@ -2,11 +2,11 @@
 --!     @file    image_window_buffer_test_bench.vhd
 --!     @brief   Image Window Buffer Test Bench.
 --!     @version 1.8.0
---!     @date    2018/12/12
+--!     @date    2019/1/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2018 Ichiro Kawazome
+--      Copyright (C) 2018-2019 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -44,8 +44,12 @@ entity  IMAGE_WINDOW_BUFFER_TEST_BENCH is
         SCENARIO_FILE   : STRING                  := "test.snr";
         I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
         O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
+        ELEMENT_SIZE    : integer                 := 8*1024;
         CHANNEL_SIZE    : integer                 := 0;
+        LINE_SIZE       : integer                 := 0;
+        BANK_SIZE       : integer                 := 0;
         D_SIZE          : integer                 := 1;
+        D_UNROLL        : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
 end     IMAGE_WINDOW_BUFFER_TEST_BENCH;
@@ -78,10 +82,6 @@ architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_BENCH is
     constant  SYNC_WIDTH        :  integer :=  2;
     constant  GPO_WIDTH         :  integer :=  8;
     constant  GPI_WIDTH         :  integer :=  GPO_WIDTH;
-    constant  ELEMENT_SIZE      :  integer := 8*1024;
-    constant  LINE_SIZE         :  integer := 1;
-    constant  BANK_SIZE         :  integer := 4;
-    constant  D_UNROLL          :  integer := 1;
     -------------------------------------------------------------------------------
     -- グローバルシグナル.
     -------------------------------------------------------------------------------
@@ -138,8 +138,8 @@ begin
             MAX_D_SIZE          => D_SIZE          , --
             D_STRIDE            => 1               , --
             D_UNROLL            => 1               , --
-            MEM_BANK_SIZE       => BANK_SIZE       , --
-            MEM_LINE_SIZE       => LINE_SIZE       , --
+            BANK_SIZE           => BANK_SIZE       , --
+            LINE_SIZE           => LINE_SIZE       , --
             ID                  => 0                 -- 
         )                                            -- 
         port map (                                   -- 
@@ -419,6 +419,8 @@ entity  IMAGE_WINDOW_BUFFER_TEST_0_4_3_1 is
                                                      );
         O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,4,1,1);
         CHANNEL_SIZE    : integer                 := 0;
+        BANK_SIZE       : integer                 := 0;
+        LINE_SIZE       : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
     );
 end     IMAGE_WINDOW_BUFFER_TEST_0_4_3_1;
@@ -430,6 +432,8 @@ architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_0_4_3_1 is
             I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
             O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
             CHANNEL_SIZE    : integer                 := 8;
+            BANK_SIZE       : integer                 := 0;
+            LINE_SIZE       : integer                 := 0;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -440,6 +444,8 @@ begin
         I_PARAM         => I_PARAM      ,
         O_PARAM         => O_PARAM      ,
         CHANNEL_SIZE    => CHANNEL_SIZE ,
+        BANK_SIZE       => BANK_SIZE    ,
+        LINE_SIZE       => LINE_SIZE    ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
