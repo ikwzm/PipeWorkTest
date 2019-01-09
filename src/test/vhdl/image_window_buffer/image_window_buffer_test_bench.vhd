@@ -137,7 +137,7 @@ begin
             CHANNEL_SIZE        => CHANNEL_SIZE    , --
             MAX_D_SIZE          => D_SIZE          , --
             D_STRIDE            => 1               , --
-            D_UNROLL            => 1               , --
+            D_UNROLL            => D_UNROLL        , --
             BANK_SIZE           => BANK_SIZE       , --
             LINE_SIZE           => LINE_SIZE       , --
             ID                  => 0                 -- 
@@ -288,143 +288,27 @@ begin
     end process;
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, CHANNEL_SIZE=4, C=1, I.X=1, O.Y=1, Y=1
+-- ELEM_BIT8=8bit, CHANNEL_SIZE=4, I.C=1, I.X=1, I.Y=1, O.C=1, O.X=1, O.Y=1
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_BUFFER_TEST_4_1_1_1 is
+entity  IMAGE_WINDOW_BUFFER_TEST_4_8_1x1x1_1x1x1_1_1 is
     generic (
-        NAME            : STRING                  := "test_4_1_1_1";
-        SCENARIO_FILE   : STRING                  := "test_4_1_1_1.snr";
+        NAME            : STRING                  := "test_4_8_1x1x1_1x1x1_1_1";
+        SCENARIO_FILE   : STRING                  := "test_4_8_1x1x1_1x1x1_1_1.snr";
         I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1,1);
         O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1,1);
         CHANNEL_SIZE    : integer                 := 4;
-        FINISH_ABORT    : boolean                 := FALSE
-    );
-end     IMAGE_WINDOW_BUFFER_TEST_4_1_1_1;
-architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_4_1_1_1 is
-    component IMAGE_WINDOW_BUFFER_TEST_BENCH is
-        generic (
-            NAME            : STRING                  := "test";
-            SCENARIO_FILE   : STRING                  := "test.snr";
-            I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 8;
-            FINISH_ABORT    : boolean                 := FALSE
-        );
-    end component;
-begin
-    TB: IMAGE_WINDOW_BUFFER_TEST_BENCH generic map (
-        NAME            => NAME         ,
-        SCENARIO_FILE   => SCENARIO_FILE,
-        I_PARAM         => I_PARAM      ,
-        O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
-        FINISH_ABORT    => FINISH_ABORT
-    );
-end MODEL;
------------------------------------------------------------------------------------
--- ELEM_BITS=8bit, CHANNEL_SIZE=4, C=4, I.X=1, O.X=1, Y=1
------------------------------------------------------------------------------------
-library ieee;
-use     ieee.std_logic_1164.all;
-library PIPEWORK;
-use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_BUFFER_TEST_4_4_1_1 is
-    generic (
-        NAME            : STRING                  := "test_4_4_1_1";
-        SCENARIO_FILE   : STRING                  := "test_4_4_1_1.snr";
-        I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,4,1,1);
-        O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,4,1,1);
-        CHANNEL_SIZE    : integer                 := 4;
-        FINISH_ABORT    : boolean                 := FALSE
-    );
-end     IMAGE_WINDOW_BUFFER_TEST_4_4_1_1;
-architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_4_4_1_1 is
-    component IMAGE_WINDOW_BUFFER_TEST_BENCH is
-        generic (
-            NAME            : STRING                  := "test";
-            SCENARIO_FILE   : STRING                  := "test.snr";
-            I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 8;
-            FINISH_ABORT    : boolean                 := FALSE
-        );
-    end component;
-begin
-    TB: IMAGE_WINDOW_BUFFER_TEST_BENCH generic map (
-        NAME            => NAME         ,
-        SCENARIO_FILE   => SCENARIO_FILE,
-        I_PARAM         => I_PARAM      ,
-        O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
-        FINISH_ABORT    => FINISH_ABORT
-    );
-end MODEL;
------------------------------------------------------------------------------------
--- ELEM_BITS=8bit, CHANNEL_SIZE=0, C=4, I.X=1, O.X=1, Y=1
------------------------------------------------------------------------------------
-library ieee;
-use     ieee.std_logic_1164.all;
-library PIPEWORK;
-use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_BUFFER_TEST_0_4_1_1 is
-    generic (
-        NAME            : STRING                  := "test_0_4_1_1";
-        SCENARIO_FILE   : STRING                  := "test_0_4_1_1.snr";
-        I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,4,1,1);
-        O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,4,1,1);
-        CHANNEL_SIZE    : integer                 := 0;
-        FINISH_ABORT    : boolean                 := FALSE
-    );
-end     IMAGE_WINDOW_BUFFER_TEST_0_4_1_1;
-architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_0_4_1_1 is
-    component IMAGE_WINDOW_BUFFER_TEST_BENCH is
-        generic (
-            NAME            : STRING                  := "test";
-            SCENARIO_FILE   : STRING                  := "test.snr";
-            I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 8;
-            FINISH_ABORT    : boolean                 := FALSE
-        );
-    end component;
-begin
-    TB: IMAGE_WINDOW_BUFFER_TEST_BENCH generic map (
-        NAME            => NAME         ,
-        SCENARIO_FILE   => SCENARIO_FILE,
-        I_PARAM         => I_PARAM      ,
-        O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
-        FINISH_ABORT    => FINISH_ABORT
-    );
-end MODEL;
------------------------------------------------------------------------------------
--- ELEM_BITS=8bit, CHANNEL_SIZE=0, C=4, I.X=3, O.X=1, Y=1
------------------------------------------------------------------------------------
-library ieee;
-use     ieee.std_logic_1164.all;
-library PIPEWORK;
-use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_WINDOW_BUFFER_TEST_0_4_3_1 is
-    generic (
-        NAME            : STRING                  := "test_0_4_3_1";
-        SCENARIO_FILE   : STRING                  := "test_0_4_3_1.snr";
-        I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(
-                                                         ELEM_BITS => 8,
-                                                         SHAPE     => NEW_IMAGE_WINDOW_SHAPE_PARAM(4,3,1),
-                                                         STRIDE    => NEW_IMAGE_WINDOW_STRIDE_PARAM(3,1)
-                                                     );
-        O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,4,1,1);
-        CHANNEL_SIZE    : integer                 := 0;
         BANK_SIZE       : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
+        D_SIZE          : integer                 := 1;
+        D_UNROLL        : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_WINDOW_BUFFER_TEST_0_4_3_1;
-architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_0_4_3_1 is
+end     IMAGE_WINDOW_BUFFER_TEST_4_8_1x1x1_1x1x1_1_1;
+architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_4_8_1x1x1_1x1x1_1_1 is
     component IMAGE_WINDOW_BUFFER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
@@ -434,6 +318,8 @@ architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_0_4_3_1 is
             CHANNEL_SIZE    : integer                 := 8;
             BANK_SIZE       : integer                 := 0;
             LINE_SIZE       : integer                 := 0;
+            D_SIZE          : integer                 := 1;
+            D_UNROLL        : integer                 := 1;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -446,6 +332,174 @@ begin
         CHANNEL_SIZE    => CHANNEL_SIZE ,
         BANK_SIZE       => BANK_SIZE    ,
         LINE_SIZE       => LINE_SIZE    ,
+        D_SIZE          => D_SIZE       ,
+        D_UNROLL        => D_UNROLL     ,
+        FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- ELEM_BIT8=8bit, CHANNEL_SIZE=4, I.C=4, I.X=1, I.Y=1, O.C=4, O.X=1, O.Y=1
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+library PIPEWORK;
+use     PIPEWORK.IMAGE_TYPES.all;
+entity  IMAGE_WINDOW_BUFFER_TEST_4_8_4x1x1_4x1x1_1_1 is
+    generic (
+        NAME            : STRING                  := "test_4_8_4x1x1_4x1x1_1_1";
+        SCENARIO_FILE   : STRING                  := "test_4_8_4x1x1_4x1x1_1_1.snr";
+        I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,4,1,1);
+        O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,4,1,1);
+        CHANNEL_SIZE    : integer                 := 0;
+        BANK_SIZE       : integer                 := 0;
+        LINE_SIZE       : integer                 := 0;
+        D_SIZE          : integer                 := 1;
+        D_UNROLL        : integer                 := 1;
+        FINISH_ABORT    : boolean                 := FALSE
+    );
+end     IMAGE_WINDOW_BUFFER_TEST_4_8_4x1x1_4x1x1_1_1;
+architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_4_8_4x1x1_4x1x1_1_1 is
+    component IMAGE_WINDOW_BUFFER_TEST_BENCH is
+        generic (
+            NAME            : STRING                  := "test";
+            SCENARIO_FILE   : STRING                  := "test.snr";
+            I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
+            O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
+            CHANNEL_SIZE    : integer                 := 4;
+            BANK_SIZE       : integer                 := 0;
+            LINE_SIZE       : integer                 := 0;
+            D_SIZE          : integer                 := 1;
+            D_UNROLL        : integer                 := 1;
+            FINISH_ABORT    : boolean                 := FALSE
+        );
+    end component;
+begin
+    TB: IMAGE_WINDOW_BUFFER_TEST_BENCH generic map (
+        NAME            => NAME         ,
+        SCENARIO_FILE   => SCENARIO_FILE,
+        I_PARAM         => I_PARAM      ,
+        O_PARAM         => O_PARAM      ,
+        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        BANK_SIZE       => BANK_SIZE    ,
+        LINE_SIZE       => LINE_SIZE    ,
+        D_SIZE          => D_SIZE       ,
+        D_UNROLL        => D_UNROLL     ,
+        FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- ELEM_BIT8=8bit, CHANNEL_SIZE=1, I.C=1, I.X=4, I.Y=1, O.C=1, O.X=5, O.Y=5
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+library PIPEWORK;
+use     PIPEWORK.IMAGE_TYPES.all;
+entity  IMAGE_WINDOW_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1 is
+    generic (
+        NAME            : STRING                  := "test_1_8_1x4x1_1x5x5_1_1";
+        SCENARIO_FILE   : STRING                  := "test_1_8_1x4x1_1x5x5_1_1.snr";
+        I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,4,1);
+        O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,5,5);
+        CHANNEL_SIZE    : integer                 := 1;
+        BANK_SIZE       : integer                 := 0;
+        LINE_SIZE       : integer                 := 0;
+        D_SIZE          : integer                 := 1;
+        D_UNROLL        : integer                 := 1;
+        FINISH_ABORT    : boolean                 := FALSE
+    );
+end     IMAGE_WINDOW_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1;
+architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1 is
+    component IMAGE_WINDOW_BUFFER_TEST_BENCH is
+        generic (
+            NAME            : STRING                  := "test";
+            SCENARIO_FILE   : STRING                  := "test.snr";
+            I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
+            O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
+            CHANNEL_SIZE    : integer                 := 4;
+            BANK_SIZE       : integer                 := 0;
+            LINE_SIZE       : integer                 := 0;
+            D_SIZE          : integer                 := 1;
+            D_UNROLL        : integer                 := 1;
+            FINISH_ABORT    : boolean                 := FALSE
+        );
+    end component;
+begin
+    TB: IMAGE_WINDOW_BUFFER_TEST_BENCH generic map (
+        NAME            => NAME         ,
+        SCENARIO_FILE   => SCENARIO_FILE,
+        I_PARAM         => I_PARAM      ,
+        O_PARAM         => O_PARAM      ,
+        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        BANK_SIZE       => BANK_SIZE    ,
+        LINE_SIZE       => LINE_SIZE    ,
+        D_SIZE          => D_SIZE       ,
+        D_UNROLL        => D_UNROLL     ,
+        FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- ELEM_BITS=2bit, CHANNEL_SIZE=0, I.C=32, I.X=1, I.Y=1, O.C=32, O.X=3, O.Y=3 D_SIZE=8
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+library PIPEWORK;
+use     PIPEWORK.IMAGE_TYPES.all;
+entity  IMAGE_WINDOW_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4 is
+    generic (
+        NAME            : STRING                  := "test_0_2_32x1x1_32x3x3_8_4";
+        SCENARIO_FILE   : STRING                  := "test_0_2_32x1x1_32x3x3_8_4.snr";
+        I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(
+                                                         ELEM_BITS => 2,
+                                                         SHAPE     => NEW_IMAGE_WINDOW_SHAPE_PARAM(
+                                                                        C => NEW_IMAGE_VECTOR_RANGE(32),
+                                                                        X => NEW_IMAGE_VECTOR_RANGE(1),
+                                                                        Y => NEW_IMAGE_VECTOR_RANGE(1)
+                                                                      ),
+                                                         STRIDE    => NEW_IMAGE_WINDOW_STRIDE_PARAM(1,1)
+                                                     );
+        O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(
+                                                         ELEM_BITS => 2,
+                                                         SHAPE     => NEW_IMAGE_WINDOW_SHAPE_PARAM(
+                                                                        C => NEW_IMAGE_VECTOR_RANGE(32),
+                                                                        X => NEW_IMAGE_VECTOR_RANGE(-1,1),
+                                                                        Y => NEW_IMAGE_VECTOR_RANGE(-1,1)
+                                                                      ),
+                                                         STRIDE    => NEW_IMAGE_WINDOW_STRIDE_PARAM(1,1)
+                                                     );
+        CHANNEL_SIZE    : integer                 := 0;
+        BANK_SIZE       : integer                 := 0;
+        LINE_SIZE       : integer                 := 0;
+        D_SIZE          : integer                 := 8;
+        D_UNROLL        : integer                 := 4;
+        FINISH_ABORT    : boolean                 := FALSE
+    );
+end     IMAGE_WINDOW_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4;
+architecture MODEL of IMAGE_WINDOW_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4 is
+    component IMAGE_WINDOW_BUFFER_TEST_BENCH is
+        generic (
+            NAME            : STRING                  := "test";
+            SCENARIO_FILE   : STRING                  := "test.snr";
+            I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
+            O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,1);
+            CHANNEL_SIZE    : integer                 := 8;
+            BANK_SIZE       : integer                 := 0;
+            LINE_SIZE       : integer                 := 0;
+            D_SIZE          : integer                 := 1;
+            D_UNROLL        : integer                 := 1;
+            FINISH_ABORT    : boolean                 := FALSE
+        );
+    end component;
+begin
+    TB: IMAGE_WINDOW_BUFFER_TEST_BENCH generic map (
+        NAME            => NAME         ,
+        SCENARIO_FILE   => SCENARIO_FILE,
+        I_PARAM         => I_PARAM      ,
+        O_PARAM         => O_PARAM      ,
+        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        BANK_SIZE       => BANK_SIZE    ,
+        LINE_SIZE       => LINE_SIZE    ,
+        D_SIZE          => D_SIZE       ,
+        D_UNROLL        => D_UNROLL     ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
