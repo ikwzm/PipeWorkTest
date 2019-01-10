@@ -398,8 +398,24 @@ entity  IMAGE_WINDOW_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1 is
     generic (
         NAME            : STRING                  := "test_1_8_1x4x1_1x5x5_1_1";
         SCENARIO_FILE   : STRING                  := "test_1_8_1x4x1_1x5x5_1_1.snr";
-        I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,4,1);
-        O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(8,1,5,5);
+        I_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(
+                                                         ELEM_BITS => 8,
+                                                         SHAPE     => NEW_IMAGE_WINDOW_SHAPE_PARAM(
+                                                                        C => NEW_IMAGE_VECTOR_RANGE(1),
+                                                                        X => NEW_IMAGE_VECTOR_RANGE(4),
+                                                                        Y => NEW_IMAGE_VECTOR_RANGE(1)
+                                                                      ),
+                                                         STRIDE    => NEW_IMAGE_WINDOW_STRIDE_PARAM(4,1)
+                                                     );
+        O_PARAM         : IMAGE_WINDOW_PARAM_TYPE := NEW_IMAGE_WINDOW_PARAM(
+                                                         ELEM_BITS => 8,
+                                                         SHAPE     => NEW_IMAGE_WINDOW_SHAPE_PARAM(
+                                                                        C => NEW_IMAGE_VECTOR_RANGE(1),
+                                                                        X => NEW_IMAGE_VECTOR_RANGE(5),
+                                                                        Y => NEW_IMAGE_VECTOR_RANGE(5)
+                                                                      ),
+                                                         STRIDE    => NEW_IMAGE_WINDOW_STRIDE_PARAM(1,1)
+                                                     );
         CHANNEL_SIZE    : integer                 := 1;
         BANK_SIZE       : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
