@@ -48,5 +48,23 @@ class ScenarioGenerater
     @o_model.check_data(@io, "  ", data, @o_d_size, @o_d_unroll)
     @io.print "---\n"
   end
+
+  def test_2(c_size, x_size, y_size)
+    data = Array.new(y_size){Array.new(x_size){Array.new(c_size){rand(2**@elem_bits)}}}
+    @io.print "- MARCHAL : \n"
+    @io.print "  - SAY : ", @name.to_s, ".2 C.SIZE=#{c_size} X.SIZE=#{x_size} Y.SIZE=#{y_size} \n"
+    @io.print "---\n"
+    @io.print @i_model.output_name("- ")
+    @io.print "  - OUT  : {GPO(0): 1}\n"
+    @io.print "  - WAIT : 1\n"
+    @io.print "  - OUT  : {GPO(0): 0}\n"
+    @i_model.output_data(@io, "  ", data)
+    @io.print "  - OUT  : {GPO(0): 0}\n"
+    @io.print @o_model.output_name("- ")
+    @io.print "  - OUT  : {GPO(0): 1}\n"
+    @io.print "  - WAIT : {VALID: 1}\n"
+    @o_model.check_data(@io, "  ", data, @o_d_size, @o_d_unroll){rand(5)}
+    @io.print "---\n"
+  end
 end
 

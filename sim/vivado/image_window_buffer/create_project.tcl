@@ -74,10 +74,10 @@ source "add_sim.tcl"
 # Set 'sim_1' fileset properties
 #
 set obj [get_filesets sim_1]
-# set_property "top" "IMAGE_WINDOW_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4"  $obj
-# set_property "generic" "SCENARIO_FILE=../../../../../../src/test/scenarios/image_window_buffer/test_0_2_32x1x1_32x3x3_8_4.snr FINISH_ABORT=true" $obj
-set_property "top" "IMAGE_WINDOW_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1"  $obj
-set_property "generic" "SCENARIO_FILE=../../../../../../src/test/scenarios/image_window_buffer/test_1_8_1x4x1_1x5x5_1_1.snr FINISH_ABORT=true" $obj
+set_property "top" "IMAGE_WINDOW_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4"  $obj
+set_property "generic" "SCENARIO_FILE=../../../../../../src/test/scenarios/image_window_buffer/test_0_2_32x1x1_32x3x3_8_4.snr FINISH_ABORT=true" $obj
+## set_property "top" "IMAGE_WINDOW_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1"  $obj
+## set_property "generic" "SCENARIO_FILE=../../../../../../src/test/scenarios/image_window_buffer/test_1_8_1x4x1_1x5x5_1_1.snr FINISH_ABORT=true" $obj
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
