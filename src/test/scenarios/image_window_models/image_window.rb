@@ -183,10 +183,14 @@ module Dummy_Plug
           y_size     = data.size
           x_size     = data[0].size
           c_size     = data[0][0].size
+          y_last_pos = y_size-(@shape.y.size-@stride.y+1)
+          y_last_pos = 0 if (y_last_pos < 0)
+          x_last_pos = x_size-(@shape.x.size-@stride.x+1)
+          x_last_pos = 0 if (x_last_pos < 0)
           y_pos = 0
-          while y_pos <= y_size-@shape.y.size do
+          while y_pos <= y_last_pos do
             x_pos = 0
-            while x_pos <= x_size-@shape.y.size do
+            while x_pos <= x_last_pos do
               d_pos = 0
               while d_pos < d_size do
                 c_pos  = 0
@@ -213,13 +217,13 @@ module Dummy_Plug
                     elem.push(elem_x)
                   end
                   for c in 0 ...@shape.c.size do
-                    atrb_c.push(Atrb.new(TRUE, (c_pos + c == 0), (c_pos + c >= c_size-1)).to_int)
+                    atrb_c.push(Atrb.new((c_pos + c >= 0 and c_pos + c <= c_size-1), (c_pos + c == 0), (c_pos + c >= c_size-1)).to_int)
                   end
                   for x in 0 ...@shape.x.size do
-                    atrb_x.push(Atrb.new(TRUE, (x_pos + x == 0), (x_pos + x >= x_size-1)).to_int)
+                    atrb_x.push(Atrb.new((x_pos + x >= 0 and x_pos + x <= x_size-1), (x_pos + x == 0), (x_pos + x >= x_size-1)).to_int)
                   end
                   for y in 0 ...@shape.y.size do
-                    atrb_y.push(Atrb.new(TRUE, (y_pos + y == 0), (y_pos + y >= y_size-1)).to_int)
+                    atrb_y.push(Atrb.new((y_pos + y >= 0 and y_pos + y <= y_size-1), (y_pos + y == 0), (y_pos + y >= y_size-1)).to_int)
                   end
                   data_array.push({:ELEM => elem, :ATRB => {:C => atrb_c, :X => atrb_x, :Y => atrb_y}}) 
                   c_pos += @shape.c.size
@@ -238,7 +242,30 @@ module Dummy_Plug
         end
 
         def output_elem(indent, elem)
-          str = indent + "ELEM : #{elem}\n"
+          if (@elem_bits % 4 == 0) then
+            string_size     = @elem_bits/4
+            dontcare_string = '"' + "#{@elem_bits}'x" + ("-" * string_size) + '"'
+            element_format  = "0x%0#{string_size}X"
+          else
+            dontcare_string = '"' + "#{@elem_bits}'b" + ("-" * @elem_bits ) + '"'
+            element_format  = "%d"
+          end
+          str = indent + "ELEM : "
+                         "       [" "[["
+                         "        "
+                         "       ]"
+          str += "[" + elem.each.map{|elem_line|
+                   "[" + elem_line.each.map{|elem_chan|
+                     "[" + elem_chan.map{ |element|
+                       if element == '-' then
+                         dontcare_string
+                       else
+                         sprintf(element_format, element)
+                       end
+                     }.join(", ") + "]"
+                   }.join(",") + "]"
+                 }.join(", \n"+indent+"        ") + "]\n"
+          return str
         end
 
         def output_atrb(indent, atrb)
