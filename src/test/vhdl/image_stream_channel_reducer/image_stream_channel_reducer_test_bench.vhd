@@ -465,16 +465,16 @@ entity  IMAGE_STREAM_CHANNEL_REDUCER_TEST_1_1_8_8 is
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 8,
                                                          INFO_BITS => 4,
-                                                         C         => NEW_IMAGE_VECTOR_RANGE(8),
-                                                         X         => NEW_IMAGE_VECTOR_RANGE(3),
-                                                         Y         => NEW_IMAGE_VECTOR_RANGE(3)
+                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(8),
+                                                         X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3),
+                                                         Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3)
                                                      );
         O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 8,
                                                          INFO_BITS => 4,
-                                                         C         => NEW_IMAGE_VECTOR_RANGE(8),
-                                                         X         => NEW_IMAGE_VECTOR_RANGE(3),
-                                                         Y         => NEW_IMAGE_VECTOR_RANGE(3)
+                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(8),
+                                                         X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3),
+                                                         Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3)
                                                      );
         C_SIZE          : integer                 := 1;
         C_DONE          : integer                 := 1;

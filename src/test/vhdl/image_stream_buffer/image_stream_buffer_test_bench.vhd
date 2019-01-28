@@ -400,19 +400,21 @@ entity  IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1 is
         SCENARIO_FILE   : STRING                  := "test_1_8_1x4x1_1x5x5_1_1.snr";
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 8,
-                                                         SHAPE     => NEW_IMAGE_STREAM_SHAPE_PARAM(
-                                                                        C => NEW_IMAGE_VECTOR_RANGE(1),
-                                                                        X => NEW_IMAGE_VECTOR_RANGE(4),
-                                                                        Y => NEW_IMAGE_VECTOR_RANGE(1)
+                                                         SHAPE     => NEW_IMAGE_SHAPE(
+                                                                        ELEM_BITS => 8,
+                                                                        C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
+                                                                        X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(4),
+                                                                        Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1)
                                                                       ),
                                                          STRIDE    => NEW_IMAGE_STREAM_STRIDE_PARAM(4,1)
                                                      );
         O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 8,
-                                                         SHAPE     => NEW_IMAGE_STREAM_SHAPE_PARAM(
-                                                                        C => NEW_IMAGE_VECTOR_RANGE(1),
-                                                                        X => NEW_IMAGE_VECTOR_RANGE(5),
-                                                                        Y => NEW_IMAGE_VECTOR_RANGE(5)
+                                                         SHAPE     => NEW_IMAGE_SHAPE(
+                                                                        ELEM_BITS => 8,
+                                                                        C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
+                                                                        X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(5),
+                                                                        Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(5)
                                                                       ),
                                                          STRIDE    => NEW_IMAGE_STREAM_STRIDE_PARAM(1,1)
                                                      );
@@ -466,19 +468,21 @@ entity  IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4 is
         SCENARIO_FILE   : STRING                  := "test_0_2_32x1x1_32x3x3_8_4.snr";
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 2,
-                                                         SHAPE     => NEW_IMAGE_STREAM_SHAPE_PARAM(
-                                                                        C => NEW_IMAGE_VECTOR_RANGE(32),
-                                                                        X => NEW_IMAGE_VECTOR_RANGE(1),
-                                                                        Y => NEW_IMAGE_VECTOR_RANGE(1)
+                                                         SHAPE     => NEW_IMAGE_SHAPE(
+                                                                        ELEM_BITS => 2,
+                                                                        C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(32),
+                                                                        X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
+                                                                        Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1)
                                                                       ),
                                                          STRIDE    => NEW_IMAGE_STREAM_STRIDE_PARAM(1,1)
                                                      );
         O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 2,
-                                                         SHAPE     => NEW_IMAGE_STREAM_SHAPE_PARAM(
-                                                                        C => NEW_IMAGE_VECTOR_RANGE(32),
-                                                                        X => NEW_IMAGE_VECTOR_RANGE(-1,1),
-                                                                        Y => NEW_IMAGE_VECTOR_RANGE(-1,1)
+                                                         SHAPE     => NEW_IMAGE_SHAPE(
+                                                                        ELEM_BITS => 2,
+                                                                        C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(32),
+                                                                        X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1),
+                                                                        Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1)
                                                                       ),
                                                          STRIDE    => NEW_IMAGE_STREAM_STRIDE_PARAM(1,1)
                                                      );

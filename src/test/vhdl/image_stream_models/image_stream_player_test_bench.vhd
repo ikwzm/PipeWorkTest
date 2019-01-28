@@ -119,6 +119,9 @@ architecture MODEL of IMAGE_STREAM_PLAYER_TEST_BENCH is
         WRITE(L,T & "  SHAPE.C SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.C.SIZE) &
                                " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.C.LO)   &
                                " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.C.HI)     );WRITELINE(OUTPUT,L);
+        WRITE(L,T & "       .D SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.D.SIZE) &
+                               " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.D.LO)   &
+                               " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.D.HI)     );WRITELINE(OUTPUT,L);
         WRITE(L,T & "       .X SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.X.SIZE) &
                                " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.X.LO)   &
                                " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.X.HI)     );WRITELINE(OUTPUT,L);
@@ -319,9 +322,9 @@ entity  IMAGE_STREAM_PLAYER_TEST_8x1_3x3 is
         SCENARIO_FILE   : STRING                  := "test_8x1_3x3.snr";
         PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 8,
-                                                         C         => NEW_IMAGE_VECTOR_RANGE(1),
-                                                         X         => NEW_IMAGE_VECTOR_RANGE(-1,1),
-                                                         Y         => NEW_IMAGE_VECTOR_RANGE(-1,1)
+                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
+                                                         X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1),
+                                                         Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1)
                                                      );
         FINISH_ABORT    : boolean := FALSE
     );
@@ -357,9 +360,9 @@ entity  IMAGE_STREAM_PLAYER_TEST_8x3_4x1 is
         PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 8,
                                                          INFO_BITS => 4,
-                                                         C         => NEW_IMAGE_VECTOR_RANGE(3),
-                                                         X         => NEW_IMAGE_VECTOR_RANGE(4),
-                                                         Y         => NEW_IMAGE_VECTOR_RANGE(1)
+                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3),
+                                                         X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(4),
+                                                         Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1)
                                                          );
         FINISH_ABORT    : boolean := FALSE
     );
