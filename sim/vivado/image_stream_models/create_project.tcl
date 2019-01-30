@@ -74,8 +74,8 @@ source "add_sim.tcl"
 # Set 'sim_1' fileset properties
 #
 set obj [get_filesets sim_1]
-set_property "top" "IMAGE_STREAM_PLAYER_TEST_8x1_1x1"  $obj
-set_property "generic" "NAME=AXI4_MASTER_TO_STREAM_TEST_BENCH_32_32_64 SCENARIO_FILE=../../../../../../src/test/scenarios/image_stream_models/test_8x1_1x1.snr FINISH_ABORT=true" $obj
+set_property "top" "IMAGE_STREAM_PLAYER_TEST_8x0x0x0x0"  $obj
+set_property "generic" "NAME=IMAGE_STREAM_PLAYER_TEST_8x0x0x0x0 SCENARIO_FILE=../../../../../../src/test/scenarios/image_stream_models/test_8x0x0x0x0.snr FINISH_ABORT=true" $obj
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1

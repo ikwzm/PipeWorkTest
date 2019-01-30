@@ -116,6 +116,7 @@ architecture MODEL of IMAGE_STREAM_PLAYER_TEST_BENCH is
         WRITE(L,T & NAME);WRITELINE(OUTPUT,L);
         WRITE(L,T & "  ELEM_BITS   = " & INTEGER_TO_STRING(PARAM.ELEM_BITS));WRITELINE(OUTPUT,L);
         WRITE(L,T & "  ATRB_BITS   = " & INTEGER_TO_STRING(PARAM.ATRB_BITS));WRITELINE(OUTPUT,L);
+        WRITE(L,T & "  INFO_BITS   = " & INTEGER_TO_STRING(PARAM.INFO_BITS));WRITELINE(OUTPUT,L);
         WRITE(L,T & "  SHAPE.C SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.C.SIZE) &
                                " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.C.LO)   &
                                " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.C.HI)     );WRITELINE(OUTPUT,L);
@@ -137,15 +138,21 @@ architecture MODEL of IMAGE_STREAM_PLAYER_TEST_BENCH is
         WRITE(L,T & "     ATRB_FIELD   SIZE=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.SIZE)   &
                                        " LO=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.LO)     &
                                        " HI=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.HI)     );WRITELINE(OUTPUT,L);
-        WRITE(L,T & "     ATRB_C_FIELD SIZE=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_C_FIELD.SIZE) &
-                                       " LO=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_C_FIELD.LO)   &
-                                       " HI=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_C_FIELD.HI)   );WRITELINE(OUTPUT,L);
-        WRITE(L,T & "     ATRB_X_FIELD SIZE=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_X_FIELD.SIZE) &
-                                       " LO=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_X_FIELD.LO)   &
-                                       " HI=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_X_FIELD.HI)   );WRITELINE(OUTPUT,L);
-        WRITE(L,T & "     ATRB_Y_FIELD SIZE=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_Y_FIELD.SIZE) &
-                                       " LO=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_Y_FIELD.LO)   &
-                                       " HI=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_Y_FIELD.HI)   );WRITELINE(OUTPUT,L);
+        WRITE(L,T & "     ATRB_FIELD.C SIZE=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.C.SIZE) &
+                                       " LO=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.C.LO)   &
+                                       " HI=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.C.HI)   );WRITELINE(OUTPUT,L);
+        WRITE(L,T & "     ATRB_FIELD.D SIZE=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.D.SIZE) &
+                                       " LO=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.D.LO)   &
+                                       " HI=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.D.HI)   );WRITELINE(OUTPUT,L);
+        WRITE(L,T & "     ATRB_FIELD.X SIZE=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.X.SIZE) &
+                                       " LO=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.X.LO)   &
+                                       " HI=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.X.HI)   );WRITELINE(OUTPUT,L);
+        WRITE(L,T & "     ATRB_FIELD.Y SIZE=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.Y.SIZE) &
+                                       " LO=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.Y.LO)   &
+                                       " HI=" & INTEGER_TO_STRING(PARAM.DATA.ATRB_FIELD.Y.HI)   );WRITELINE(OUTPUT,L);
+        WRITE(L,T & "     INFO_FIELD   SIZE=" & INTEGER_TO_STRING(PARAM.DATA.INFO_FIELD.SIZE)   &
+                                       " LO=" & INTEGER_TO_STRING(PARAM.DATA.INFO_FIELD.LO)     &
+                                       " HI=" & INTEGER_TO_STRING(PARAM.DATA.INFO_FIELD.HI)     );WRITELINE(OUTPUT,L);
     end procedure;
 begin
     -------------------------------------------------------------------------------
@@ -278,21 +285,85 @@ begin
     end process;
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, C=1, X=1, Y=1
+-- ELEM_BITS=8bit, C=0, D=0, X=0, Y=0
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_STREAM_PLAYER_TEST_8x1_1x1 is
+entity  IMAGE_STREAM_PLAYER_TEST_8x0x0x0x0 is
     generic (
-        NAME            : STRING                  := "test_8x1_1x1";
-        SCENARIO_FILE   : STRING                  := "test_8x1_1x1.snr";
+        NAME            : STRING                  := "test_8x0x0x0x0";
+        SCENARIO_FILE   : STRING                  := "test_8x0x0x0x0.snr";
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,0,0,0,0));
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     IMAGE_STREAM_PLAYER_TEST_8x0x0x0x0;
+architecture MODEL of IMAGE_STREAM_PLAYER_TEST_8x0x0x0x0 is
+    component IMAGE_STREAM_PLAYER_TEST_BENCH is
+        generic (
+            NAME            : STRING                  := "test";
+            SCENARIO_FILE   : STRING                  := "test.snr";
+            PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
+            FINISH_ABORT    : boolean                 := FALSE
+        );
+    end component;
+begin
+    TB: IMAGE_STREAM_PLAYER_TEST_BENCH generic map (
+        NAME            => NAME         ,
+        SCENARIO_FILE   => SCENARIO_FILE,
+        PARAM           => PARAM        ,
+        FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- ELEM_BITS=8bit, C=1, D=0, X=0, Y=0
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+library PIPEWORK;
+use     PIPEWORK.IMAGE_TYPES.all;
+entity  IMAGE_STREAM_PLAYER_TEST_8x1x0x0x0 is
+    generic (
+        NAME            : STRING                  := "test_8x1x0x0x0";
+        SCENARIO_FILE   : STRING                  := "test_8x1x0x0x0.snr";
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,0,0);
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     IMAGE_STREAM_PLAYER_TEST_8x1x0x0x0;
+architecture MODEL of IMAGE_STREAM_PLAYER_TEST_8x1x0x0x0 is
+    component IMAGE_STREAM_PLAYER_TEST_BENCH is
+        generic (
+            NAME            : STRING                  := "test";
+            SCENARIO_FILE   : STRING                  := "test.snr";
+            PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
+            FINISH_ABORT    : boolean                 := FALSE
+        );
+    end component;
+begin
+    TB: IMAGE_STREAM_PLAYER_TEST_BENCH generic map (
+        NAME            => NAME         ,
+        SCENARIO_FILE   => SCENARIO_FILE,
+        PARAM           => PARAM        ,
+        FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- ELEM_BITS=8bit, C=1, D=0, X=1, Y=1
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+library PIPEWORK;
+use     PIPEWORK.IMAGE_TYPES.all;
+entity  IMAGE_STREAM_PLAYER_TEST_8x1x0x1x1 is
+    generic (
+        NAME            : STRING                  := "test_8x1x0x1x1";
+        SCENARIO_FILE   : STRING                  := "test_8x1x0x1x1.snr";
         PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1,1);
         FINISH_ABORT    : boolean := FALSE
     );
-end     IMAGE_STREAM_PLAYER_TEST_8x1_1x1;
-architecture MODEL of IMAGE_STREAM_PLAYER_TEST_8x1_1x1 is
+end     IMAGE_STREAM_PLAYER_TEST_8x1x0x1x1;
+architecture MODEL of IMAGE_STREAM_PLAYER_TEST_8x1x0x1x1 is
     component IMAGE_STREAM_PLAYER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
@@ -310,26 +381,21 @@ begin
     );
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, C=1, X=3, Y=3
+-- ELEM_BITS=8bit, C=3, D=0, X=4, Y=1
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_STREAM_PLAYER_TEST_8x1_3x3 is
+entity  IMAGE_STREAM_PLAYER_TEST_8x3x0x4x1 is
     generic (
-        NAME            : STRING                  := "test_8x1_3x3";
-        SCENARIO_FILE   : STRING                  := "test_8x1_3x3.snr";
-        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
-                                                         ELEM_BITS => 8,
-                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
-                                                         X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1),
-                                                         Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1)
-                                                     );
+        NAME            : STRING                  := "test_8x3x0x4x1";
+        SCENARIO_FILE   : STRING                  := "test_8x3x0x4x1.snr";
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,3,0,4,1),NEW_IMAGE_STREAM_STRIDE_PARAM(4,1));
         FINISH_ABORT    : boolean := FALSE
     );
-end     IMAGE_STREAM_PLAYER_TEST_8x1_3x3;
-architecture MODEL of IMAGE_STREAM_PLAYER_TEST_8x1_3x3 is
+end     IMAGE_STREAM_PLAYER_TEST_8x3x0x4x1;
+architecture MODEL of IMAGE_STREAM_PLAYER_TEST_8x3x0x4x1 is
     component IMAGE_STREAM_PLAYER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
@@ -347,27 +413,85 @@ begin
     );
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, C=3, X=4, Y=1
+-- ELEM_BITS=8bit, C=0, D=0, X=2, Y=2
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_STREAM_PLAYER_TEST_8x3_4x1 is
+entity  IMAGE_STREAM_PLAYER_TEST_8x0x0x2x2 is
     generic (
-        NAME            : STRING                  := "test_8x3_4x1";
-        SCENARIO_FILE   : STRING                  := "test_8x3_4x1.snr";
-        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
-                                                         ELEM_BITS => 8,
-                                                         INFO_BITS => 4,
-                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3),
-                                                         X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(4),
-                                                         Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1)
-                                                         );
+        NAME            : STRING                  := "test_8x0x0x2x2";
+        SCENARIO_FILE   : STRING                  := "test_8x0x0x2x2.snr";
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,2,2);
         FINISH_ABORT    : boolean := FALSE
     );
-end     IMAGE_STREAM_PLAYER_TEST_8x3_4x1;
-architecture MODEL of IMAGE_STREAM_PLAYER_TEST_8x3_4x1 is
+end     IMAGE_STREAM_PLAYER_TEST_8x0x0x2x2;
+architecture MODEL of IMAGE_STREAM_PLAYER_TEST_8x0x0x2x2 is
+    component IMAGE_STREAM_PLAYER_TEST_BENCH is
+        generic (
+            NAME            : STRING                  := "test";
+            SCENARIO_FILE   : STRING                  := "test.snr";
+            PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
+            FINISH_ABORT    : boolean                 := FALSE
+        );
+    end component;
+begin
+    TB: IMAGE_STREAM_PLAYER_TEST_BENCH generic map (
+        NAME            => NAME         ,
+        SCENARIO_FILE   => SCENARIO_FILE,
+        PARAM           => PARAM        ,
+        FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- ELEM_BITS=8bit, C=4, D=4, X=3, Y=3
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+library PIPEWORK;
+use     PIPEWORK.IMAGE_TYPES.all;
+entity  IMAGE_STREAM_PLAYER_TEST_8x4x4x3x3 is
+    generic (
+        NAME            : STRING                  := "test_8x4x4x3x3";
+        SCENARIO_FILE   : STRING                  := "test_8x4x4x3x3.snr";
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,4,4,3,3));
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     IMAGE_STREAM_PLAYER_TEST_8x4x4x3x3;
+architecture MODEL of IMAGE_STREAM_PLAYER_TEST_8x4x4x3x3 is
+    component IMAGE_STREAM_PLAYER_TEST_BENCH is
+        generic (
+            NAME            : STRING                  := "test";
+            SCENARIO_FILE   : STRING                  := "test.snr";
+            PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
+            FINISH_ABORT    : boolean                 := FALSE
+        );
+    end component;
+begin
+    TB: IMAGE_STREAM_PLAYER_TEST_BENCH generic map (
+        NAME            => NAME         ,
+        SCENARIO_FILE   => SCENARIO_FILE,
+        PARAM           => PARAM        ,
+        FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- ELEM_BITS=8bit, C=0, D=1, X=0, Y=0
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+library PIPEWORK;
+use     PIPEWORK.IMAGE_TYPES.all;
+entity  IMAGE_STREAM_PLAYER_TEST_8x0x1x0x0 is
+    generic (
+        NAME            : STRING                  := "test_8x0x1x0x0";
+        SCENARIO_FILE   : STRING                  := "test_8x0x1x0x0.snr";
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,0,1,0,0));
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     IMAGE_STREAM_PLAYER_TEST_8x0x1x0x0;
+architecture MODEL of IMAGE_STREAM_PLAYER_TEST_8x0x1x0x0 is
     component IMAGE_STREAM_PLAYER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";

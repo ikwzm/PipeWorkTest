@@ -2,7 +2,7 @@
 --!     @file    image_stream_master_player.vhd
 --!     @brief   Image Stream Master Dummy Plug Player.
 --!     @version 1.8.0
---!     @date    2019/1/22
+--!     @date    2019/1/29
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

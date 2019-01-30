@@ -3,7 +3,7 @@ require_relative "../image_stream_models/image_stream.rb"
 class ScenarioGenerater
 
   def initialize(elem_bits, channel_size, i_win_size, i_win_stride, o_win_size, o_win_stride, o_d_size, o_d_unroll)
-    @name           = "IMAGE_STREAM_FAST_SCAN_BUFER_TEST"
+    @name           = "IMAGE_STREAM_BUFFER_TEST"
     @elem_bits      = elem_bits
     @channel_size   = channel_size
     @i_win_size     = i_win_size

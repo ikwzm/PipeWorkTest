@@ -2,7 +2,7 @@
 --!     @file    image_stream_player.vhd
 --!     @brief   Image Stream Dummy Plug Player.
 --!     @version 1.8.0
---!     @date    2019/1/22
+--!     @date    2019/1/29
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -161,6 +161,7 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
     type      IMAGE_ATRB_SIGNAL_STREAM  is record
                   Y         :  IMAGE_ATRB_SIGNAL_VECTOR(PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI);
                   X         :  IMAGE_ATRB_SIGNAL_VECTOR(PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI);
+                  D         :  IMAGE_ATRB_SIGNAL_VECTOR(PARAM.SHAPE.D.LO to PARAM.SHAPE.D.HI);
                   C         :  IMAGE_ATRB_SIGNAL_VECTOR(PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI);
     end record;
     -------------------------------------------------------------------------------
@@ -220,6 +221,17 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
                 PARAM   => PARAM,
                 X       => x_pos,
                 ATRB    => W.ATRB.X(x_pos),
+                DATA    => W.DATA
+            );
+        end loop;
+        for d_pos in PARAM.SHAPE.D.LO to PARAM.SHAPE.D.HI loop
+            for i in IMAGE_ATRB_SIGNAL_TYPE'range loop
+                W.ATRB.D(d_pos)(i) := D;
+            end loop;
+            SET_ATRB_D_TO_IMAGE_STREAM_DATA(
+                PARAM   => PARAM,
+                D       => d_pos,
+                ATRB    => W.ATRB.D(d_pos),
                 DATA    => W.DATA
             );
         end loop;
@@ -340,46 +352,67 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
         end loop;
         end loop;
         end loop;
-        for y_pos in PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI loop
-            atrb_i := GET_ATRB_Y_FROM_IMAGE_STREAM_DATA(
-                              PARAM  => PARAM,
-                              Y      => y_pos,
-                              DATA   => DATA_I
-                          );
-            if (MATCH_STD_LOGIC(signals.ATRB.Y(y_pos), atrb_i) = FALSE) then
-                REPORT_MISMATCH(core, "ATRB.Y[" &
-                                INTEGER_TO_STRING(y_pos) & "] 0x" &
-                                HEX_TO_STRING(atrb_i)    & " /= 0x" &
-                                HEX_TO_STRING(signals.ATRB.Y(y_pos)));
-            end if;
-        end loop;
-        for x_pos in PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI loop
-            atrb_i := GET_ATRB_X_FROM_IMAGE_STREAM_DATA(
-                              PARAM  => PARAM,
-                              X      => x_pos,
-                              DATA   => DATA_I
-                          );
-            if (MATCH_STD_LOGIC(signals.ATRB.X(x_pos), atrb_i) = FALSE) then
-                REPORT_MISMATCH(core, "ATRB.X[" &
-                                INTEGER_TO_STRING(x_pos) & "] 0x" &
-                                HEX_TO_STRING(atrb_i)    & " /= 0x" &
-                                HEX_TO_STRING(signals.ATRB.X(x_pos)));
-            end if;
-        end loop;
-        for c_pos in PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI loop
-            atrb_i := GET_ATRB_C_FROM_IMAGE_STREAM_DATA(
-                              PARAM  => PARAM,
-                              C      => c_pos,
-                              DATA   => DATA_I
-                          );
-            if (MATCH_STD_LOGIC(signals.ATRB.C(c_pos) , atrb_i) = FALSE) then
-                REPORT_MISMATCH(core, "ATRB.C[" &
-                                INTEGER_TO_STRING(c_pos) & "] 0x" &
-                                HEX_TO_STRING(atrb_i)    & " /= 0x" &
-                                HEX_TO_STRING(signals.ATRB.C(c_pos)));
-            end if;
-        end loop;
-        if PARAM.INFO_BITS > 0 then
+        if (PARAM.DATA.ATRB_FIELD.Y.SIZE > 0) then
+            for y_pos in PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI loop
+                atrb_i := GET_ATRB_Y_FROM_IMAGE_STREAM_DATA(
+                                  PARAM  => PARAM,
+                                  Y      => y_pos,
+                                  DATA   => DATA_I
+                              );
+                if (MATCH_STD_LOGIC(signals.ATRB.Y(y_pos), atrb_i) = FALSE) then
+                    REPORT_MISMATCH(core, "ATRB.Y[" &
+                                    INTEGER_TO_STRING(y_pos) & "] 0x" &
+                                    HEX_TO_STRING(atrb_i)    & " /= 0x" &
+                                    HEX_TO_STRING(signals.ATRB.Y(y_pos)));
+                end if;
+            end loop;
+        end if;
+        if (PARAM.DATA.ATRB_FIELD.X.SIZE > 0) then
+            for x_pos in PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI loop
+                atrb_i := GET_ATRB_X_FROM_IMAGE_STREAM_DATA(
+                                  PARAM  => PARAM,
+                                  X      => x_pos,
+                                  DATA   => DATA_I
+                              );
+                if (MATCH_STD_LOGIC(signals.ATRB.X(x_pos), atrb_i) = FALSE) then
+                    REPORT_MISMATCH(core, "ATRB.X[" &
+                                    INTEGER_TO_STRING(x_pos) & "] 0x" &
+                                    HEX_TO_STRING(atrb_i)    & " /= 0x" &
+                                    HEX_TO_STRING(signals.ATRB.X(x_pos)));
+                end if;
+            end loop;
+        end if;
+        if (PARAM.DATA.ATRB_FIELD.D.SIZE > 0) then
+            for d_pos in PARAM.SHAPE.D.LO to PARAM.SHAPE.D.HI loop
+                atrb_i := GET_ATRB_D_FROM_IMAGE_STREAM_DATA(
+                                  PARAM  => PARAM,
+                                  D      => d_pos,
+                                  DATA   => DATA_I
+                              );
+                if (MATCH_STD_LOGIC(signals.ATRB.D(d_pos) , atrb_i) = FALSE) then
+                    REPORT_MISMATCH(core, "ATRB.D[" &
+                                    INTEGER_TO_STRING(d_pos) & "] 0x" &
+                                    HEX_TO_STRING(atrb_i)    & " /= 0x" &
+                                    HEX_TO_STRING(signals.ATRB.D(d_pos)));
+                end if;
+            end loop;
+        end if;
+        if (PARAM.DATA.ATRB_FIELD.C.SIZE > 0) then
+            for c_pos in PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI loop
+                atrb_i := GET_ATRB_C_FROM_IMAGE_STREAM_DATA(
+                                  PARAM  => PARAM,
+                                  C      => c_pos,
+                                  DATA   => DATA_I
+                              );
+                if (MATCH_STD_LOGIC(signals.ATRB.C(c_pos) , atrb_i) = FALSE) then
+                    REPORT_MISMATCH(core, "ATRB.C[" &
+                                    INTEGER_TO_STRING(c_pos) & "] 0x" &
+                                    HEX_TO_STRING(atrb_i)    & " /= 0x" &
+                                    HEX_TO_STRING(signals.ATRB.C(c_pos)));
+                end if;
+            end loop;
+        end if;
+        if (PARAM.INFO_BITS > 0) then
             if (MATCH_STD_LOGIC(signals.INFO, DATA_I(PARAM.DATA.INFO_FIELD.HI downto PARAM.DATA.INFO_FIELD.LO)) = FALSE) then
                 REPORT_MISMATCH(core, "INFO 0x" &
                                 HEX_TO_STRING(DATA_I(PARAM.DATA.INFO_FIELD.HI downto PARAM.DATA.INFO_FIELD.LO)) & " /= 0x" &
@@ -404,6 +437,7 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
     constant  KEY_ELEM      : KEYWORD_TYPE := "ELEM  ";
     constant  KEY_ATRB      : KEYWORD_TYPE := "ATRB  ";
     constant  KEY_C         : KEYWORD_TYPE := "C     ";
+    constant  KEY_D         : KEYWORD_TYPE := "D     ";
     constant  KEY_X         : KEYWORD_TYPE := "X     ";
     constant  KEY_Y         : KEYWORD_TYPE := "Y     ";
     constant  KEY_INFO      : KEYWORD_TYPE := "INFO  ";
@@ -592,6 +626,26 @@ begin
             end if;
         end procedure;
         ---------------------------------------------------------------------------
+        --! @brief IMAGE_STREAM_SIGNAL 構造体の ATRB.D の値を読み取るサブプログラム.
+        --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
+        --! @param    pos         ATRB.C のインデックス
+        --! @param    signals     読み取った値が入るレコード変数. inoutであることに注意.
+        ---------------------------------------------------------------------------
+        procedure read_image_stream_atrb_d_value(
+                      proc_name     : in    string;
+                      pos           : in    integer;
+                      signals       : inout IMAGE_STREAM_SIGNAL_TYPE
+        ) is
+        begin 
+            if (pos < PARAM.SHAPE.D.LO or pos > PARAM.SHAPE.D.HI) then
+                READ_ERROR(core, proc_name, "READ_ATRB.D Out of Range(" & INTEGER_TO_STRING(pos) & ")");
+            else
+                read_value(proc_name, signals.ATRB.D(pos));
+                SET_ATRB_D_TO_IMAGE_STREAM_DATA(PARAM, pos, signals.ATRB.D(pos), signals.DATA);
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
         --! @brief IMAGE_STREAM_SIGNAL 構造体の ATRB.X の値を読み取るサブプログラム.
         --! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         --! @param    proc_name   プロシージャ名.リードエラー発生時に出力する.
@@ -648,6 +702,7 @@ begin
         begin
             case key_word is
                 when KEY_C  => seq_pos := PARAM.SHAPE.C.LO;
+                when KEY_D  => seq_pos := PARAM.SHAPE.D.LO;
                 when KEY_X  => seq_pos := PARAM.SHAPE.X.LO;
                 when KEY_Y  => seq_pos := PARAM.SHAPE.Y.LO;
                 when others => seq_pos := 0;
@@ -665,6 +720,7 @@ begin
                     when EVENT_SCALAR    =>
                         case key_word is
                             when KEY_C  => read_image_stream_atrb_c_value(proc_name, seq_pos, signals);
+                            when KEY_D  => read_image_stream_atrb_d_value(proc_name, seq_pos, signals);
                             when KEY_X  => read_image_stream_atrb_x_value(proc_name, seq_pos, signals);
                             when KEY_Y  => read_image_stream_atrb_y_value(proc_name, seq_pos, signals);
                             when others => null;
@@ -705,6 +761,7 @@ begin
                         COPY_KEY_WORD(core, key_word);
                         case key_word is
                             when KEY_C  => read_image_stream_atrb_vector(proc_name, KEY_C, signals);
+                            when KEY_D  => read_image_stream_atrb_vector(proc_name, KEY_D, signals);
                             when KEY_X  => read_image_stream_atrb_vector(proc_name, KEY_X, signals);
                             when KEY_Y  => read_image_stream_atrb_vector(proc_name, KEY_Y, signals);
                             when others => READ_ERROR(core, proc_name, "READ_ATRB Undefined Map Operation " & key_word);

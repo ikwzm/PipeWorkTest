@@ -84,7 +84,7 @@ module Dummy_Plug
           elsif x.class == Array  then
             @lo   = x[0]
             @hi   = x[1]
-            @size = @hi - @lo + 1
+            @size = x[2]
           else
             raise ArgumentError
           end
@@ -97,39 +97,96 @@ module Dummy_Plug
         attr_reader :info_field
         attr_reader :atrb_field
         attr_reader :atrb_c_field
+        attr_reader :atrb_d_field
         attr_reader :atrb_x_field
         attr_reader :atrb_y_field
         def initialize(elem_bits, info_bits, shape)
-          def new_field(prev_field, size)
-            if prev_field.nil?
-              return Range.new(size)
-            else 
-              return Range.new([prev_field.hi+1, prev_field.hi+1+size-1])
+          def new_field(lo,size)
+            if (size > 0)
+              return Range.new([lo, lo+size-1, size])
+            else
+              return Range.new([lo, lo       , 0   ])
             end
           end
-          @elem_field   = new_field(nil          , elem_bits * shape.c.size * shape.x.size * shape.y.size)
-          @atrb_c_field = new_field(@elem_field  , ATRB_BITS * shape.c.size)
-          @atrb_x_field = new_field(@atrb_c_field, ATRB_BITS * shape.x.size)
-          @atrb_y_field = new_field(@atrb_x_field, ATRB_BITS * shape.y.size)
-          @atrb_field   = Range.new([@atrb_c_field.lo, @atrb_y_field.hi])
-          @info_field   = new_field(@atrb_field  , info_bits)
-          if (info_bits > 0)
-            @hi = @info_field.hi
-          else
-            @hi = @atrb_field.hi
+          @lo             = 0
+          next_field_lo   = @lo
+          data_field_size = 0
+          elem_field_size = elem_bits
+          
+          if shape.c.size > 0
+            elem_field_size = elem_field_size * shape.c.size
           end
-          @lo   = @elem_field.lo
-          @size = @hi - @lo + 1
+          if shape.d.size > 0
+            elem_field_size = elem_field_size * shape.d.size
+          end
+          if shape.x.size > 0
+            elem_field_size = elem_field_size * shape.x.size
+          end
+          if shape.y.size > 0
+            elem_field_size = elem_field_size * shape.y.size
+          end
+          @elem_field     = new_field(next_field_lo, elem_field_size)
+          data_field_size = data_field_size + @elem_field.size
+          next_field_lo   = @elem_field.hi + 1
+
+          atrb_field_size = 0
+          atrb_field_lo   = next_field_lo
+          if shape.c.size > 0 
+            @atrb_c_field   = new_field(next_field_lo, shape.c.size)
+            next_field_lo   = @atrb_c_field.hi + 1
+            atrb_field_size = atrb_field_size + @atrb_c_field.size
+          end
+          if shape.d.size > 0 
+            @atrb_d_field   = new_field(next_field_lo, shape.d.size)
+            next_field_lo   = @atrb_d_field.hi + 1
+            atrb_field_size = atrb_field_size + @atrb_d_field.size
+          end
+          if shape.x.size > 0 
+            @atrb_x_field   = new_field(next_field_lo, shape.x.size)
+            next_field_lo   = @atrb_x_field.hi + 1
+            atrb_field_size = atrb_field_size + @atrb_x_field.size
+          end
+          if shape.y.size > 0 
+            @atrb_y_field   = new_field(next_field_lo, shape.y.size)
+            next_field_lo   = @atrb_y_field.hi + 1
+            atrb_field_size = atrb_field_size + @atrb_y_field.size
+          end
+          if shape.c.size <= 0 
+            @atrb_c_field   = new_field(next_field_lo, shape.c.size)
+          end
+          if shape.d.size <= 0 
+            @atrb_d_field   = new_field(next_field_lo, shape.d.size)
+          end
+          if shape.x.size <= 0 
+            @atrb_x_field   = new_field(next_field_lo, shape.x.size)
+          end
+          if shape.y.size <= 0 
+            @atrb_y_field   = new_field(next_field_lo, shape.y.size)
+          end
+
+          @atrb_field     = new_field(atrb_field_lo, atrb_field_size)
+          data_field_size = data_field_size + atrb_field_size
+
+          @info_field     = new_field(next_field_lo, info_bits)
+          data_field_size = data_field_size + info_bits
+
+          @size = data_field_size
+          @hi   = @lo + data_field_size - 1
         end
       end
 
       class Shape
-        attr_reader :c, :x, :y, :size
-        def initialize(c,x,y)
+        attr_reader :c, :d, :x, :y, :size
+        def initialize(c,d,x,y)
           if c.class == Dummy_Plug::ScenarioWriter::ImageStream::Range then
             @c = c
           else
             @c = Range.new(c)
+          end
+          if d.class == Dummy_Plug::ScenarioWriter::ImageStream::Range then
+            @d = d
+          else
+            @d = Range.new(d)
           end
           if x.class == Dummy_Plug::ScenarioWriter::ImageStream::Range then
             @x = x
@@ -165,7 +222,7 @@ module Dummy_Plug
           if    shape.class == Dummy_Plug::ScenarioWriter::ImageStream::Shape then
             @shape   = shape
           elsif shape.class == Array then
-            @shape   = Shape.new(shape[0],shape[1],shape[2])
+            @shape   = Shape.new(shape[0],shape[1],shape[2],shape[3])
           else
             raise ArgumentError
           end
@@ -178,16 +235,22 @@ module Dummy_Plug
           end
           @data = Data.new(@elem_bits, @info_bits, @shape)
         end
-        def gen_data_array(data, value, d_size, d_unroll)
+        def gen_data_array(data, value, d_size)
           data_array = Array.new
           y_size     = data.size
           x_size     = data[0].size
           c_size     = data[0][0].size
-          y_last_pos = y_size-(@shape.y.size-@stride.y+1)
+          c_stride   = (@shape.c.size > 0) ? @shape.c.size : 1
+          d_stride   = (@shape.d.size > 0) ? @shape.d.size : 1
+          c_elem_size= (@shape.c.size > 0) ? @shape.c.size : 1
+          x_elem_size= (@shape.x.size > 0) ? @shape.x.size : 1
+          y_elem_size= (@shape.y.size > 0) ? @shape.y.size : 1
+          y_last_pos = y_size-(y_elem_size-@stride.y+1)
           y_last_pos = 0 if (y_last_pos < 0)
-          x_last_pos = x_size-(@shape.x.size-@stride.x+1)
+          x_last_pos = x_size-(x_elem_size-@stride.x+1)
           x_last_pos = 0 if (x_last_pos < 0)
           y_pos = 0
+          # p "c_size=#{c_size} d_size=#{d_size} x_size=#{x_size} y_size=#{y_size} d_stride=#{d_stride} x_last_pos=#{x_last_pos} y_last_pos=#{y_last_pos}"
           while y_pos <= y_last_pos do
             x_pos = 0
             while x_pos <= x_last_pos do
@@ -197,13 +260,14 @@ module Dummy_Plug
                 while c_pos < c_size do
                   elem   = Array.new
                   atrb_c = Array.new
+                  atrb_d = Array.new
                   atrb_x = Array.new
                   atrb_y = Array.new
-                  for y in 0...@shape.y.size do
+                  for y in 0...y_elem_size do
                     elem_x = Array.new
-                    for x in 0...@shape.x.size do
+                    for x in 0...x_elem_size do
                       elem_c = Array.new
-                      for c in 0 ...@shape.c.size do
+                      for c in 0 ...c_elem_size do
                         if (y_pos+y < y_size) and
                            (x_pos+x < x_size) and
                            (c_pos+c < c_size) then
@@ -219,16 +283,19 @@ module Dummy_Plug
                   for c in 0 ...@shape.c.size do
                     atrb_c.push(Atrb.new((c_pos + c >= 0 and c_pos + c <= c_size-1), (c_pos + c == 0), (c_pos + c >= c_size-1)).to_int)
                   end
+                  for d in 0 ...@shape.d.size do
+                    atrb_d.push(Atrb.new((d_pos + d >= 0 and d_pos + d <= d_size-1), (d_pos + d == 0), (d_pos + d >= d_size-1)).to_int)
+                  end
                   for x in 0 ...@shape.x.size do
                     atrb_x.push(Atrb.new((x_pos + x >= 0 and x_pos + x <= x_size-1), (x_pos + x == 0), (x_pos + x >= x_size-1)).to_int)
                   end
                   for y in 0 ...@shape.y.size do
                     atrb_y.push(Atrb.new((y_pos + y >= 0 and y_pos + y <= y_size-1), (y_pos + y == 0), (y_pos + y >= y_size-1)).to_int)
                   end
-                  data_array.push({:ELEM => elem, :ATRB => {:C => atrb_c, :X => atrb_x, :Y => atrb_y}}) 
-                  c_pos += @shape.c.size
+                  data_array.push({:ELEM => elem, :ATRB => {:C => atrb_c, :D => atrb_d, :X => atrb_x, :Y => atrb_y}}) 
+                  c_pos += c_stride
                 end
-                d_pos += d_unroll
+                d_pos += d_stride
               end
               x_pos += @stride.x
             end
@@ -250,6 +317,7 @@ module Dummy_Plug
             dontcare_string = '"' + "#{@elem_bits}'b" + ("-" * @elem_bits ) + '"'
             element_format  = "%d"
           end
+          line_indent = Array.new(indent.size, ' ').join
           str = indent + "ELEM : "
                          "       [" "[["
                          "        "
@@ -264,12 +332,29 @@ module Dummy_Plug
                        end
                      }.join(", ") + "]"
                    }.join(",") + "]"
-                 }.join(", \n"+indent+"        ") + "]\n"
+                 }.join(", \n"+line_indent+"        ") + "]\n"
           return str
         end
 
         def output_atrb(indent, atrb)
-          str = indent + "ATRB : {C: #{atrb[:C]}, X: #{atrb[:X]}, Y: #{atrb[:Y]}}\n"
+          atrb_str = Array.new
+          if atrb[:C].size > 0 then
+            atrb_str.push("C: #{atrb[:C]}")
+          end
+          if atrb[:D].size > 0 then
+            atrb_str.push("D: #{atrb[:D]}")
+          end
+          if atrb[:X].size > 0 then
+            atrb_str.push("X: #{atrb[:X]}")
+          end
+          if atrb[:Y].size > 0 then
+            atrb_str.push("Y: #{atrb[:Y]}")
+          end
+          if atrb_str.size > 0 then
+            str = indent + "ATRB : {" + atrb_str.join(", ") + "}\n"
+          else
+            str = ""
+          end
         end
 
         def output_valid(indent, value)
@@ -299,9 +384,9 @@ module Dummy_Plug
           super(name, elem_bits, info_bits, shape, stride)
         end
 
-        def output_data(io, indent, data)
+        def output_data(io, indent, data, d_size=1)
           array_indent = indent + "- "
-          gen_data_array(data, 0, 1, 1).each do |line|
+          gen_data_array(data, 0, d_size).each do |line|
             if block_given? then
               cycle = yield
               if cycle > 0 then
@@ -323,10 +408,10 @@ module Dummy_Plug
           super(name, elem_bits, info_bits, shape, stride)
         end
 
-        def check_data(io, indent, data, d_size=1, d_unroll=1)
+        def check_data(io, indent, data, d_size=1)
           array_indent = indent + "- "
           check_indent = indent + "   "
-          gen_data_array(data, '-', d_size, d_unroll).each do |line|
+          gen_data_array(data, '-', d_size).each do |line|
             if block_given? then
               cycle = yield
               if cycle > 0 then

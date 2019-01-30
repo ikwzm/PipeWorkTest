@@ -11,9 +11,12 @@ DUT_COMPONENTS = image_stream_player        \
                  image_stream_slave_player  \
                  $(END_LIST)
 
-TEST_BENCH     = image_stream_player_test_8x1_1x1 \
-                 image_stream_player_test_8x1_3x3 \
-                 image_stream_player_test_8x3_4x1 \
+TEST_BENCH     = image_stream_player_test_8x0x0x0x0 \
+                 image_stream_player_test_8x0x0x2x2 \
+                 image_stream_player_test_8x1x0x0x0 \
+                 image_stream_player_test_8x1x0x1x1 \
+                 image_stream_player_test_8x3x0x4x1 \
+                 image_stream_player_test_8x4x4x3x3 \
                  $(END_LIST)
 
 all: DUT $(TEST_BENCH)
@@ -21,15 +24,27 @@ all: DUT $(TEST_BENCH)
 clean:
 	rm -f *.o *.cf $(TEST_BENCH)
 
-image_stream_player_test_8x1_1x1    : image_stream_player_test_bench.o DUT test_8x1_1x1.snr
+image_stream_player_test_8x0x0x0x0  : image_stream_player_test_bench.o DUT test_8x0x0x0x0.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
-image_stream_player_test_8x1_3x3    : image_stream_player_test_bench.o DUT test_8x1_3x3.snr
+image_stream_player_test_8x0x0x2x2  : image_stream_player_test_bench.o DUT test_8x0x0x2x2.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
-image_stream_player_test_8x3_4x1    : image_stream_player_test_bench.o DUT test_8x3_4x1.snr
+image_stream_player_test_8x1x0x0x0  : image_stream_player_test_bench.o DUT test_8x1x0x0x0.snr
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+
+image_stream_player_test_8x1x0x1x1  : image_stream_player_test_bench.o DUT test_8x1x0x1x1.snr
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+
+image_stream_player_test_8x3x0x4x1  : image_stream_player_test_bench.o DUT test_8x3x0x4x1.snr
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+
+image_stream_player_test_8x4x4x3x3  : image_stream_player_test_bench.o DUT test_8x4x4x3x3.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
@@ -50,12 +65,21 @@ image_stream_models.o                          : $(SRC_PATH)/test/vhdl/image_str
 image_stream_player_test_bench.o               : $(SRC_PATH)/test/vhdl/image_stream_models/image_stream_player_test_bench.vhd image_stream_models.o
 	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
-test_8x1_1x1.snr : $(SRC_PATH)/test/scenarios/image_stream_models/test_8x1_1x1.snr
+test_8x0x0x0x0.snr : $(SRC_PATH)/test/scenarios/image_stream_models/test_8x0x0x0x0.snr
 	cp $< $@
 
-test_8x1_3x3.snr : $(SRC_PATH)/test/scenarios/image_stream_models/test_8x1_3x3.snr
+test_8x0x0x2x2.snr : $(SRC_PATH)/test/scenarios/image_stream_models/test_8x0x0x2x2.snr
 	cp $< $@
 
-test_8x3_4x1.snr : $(SRC_PATH)/test/scenarios/image_stream_models/test_8x3_4x1.snr
+test_8x1x0x0x0.snr : $(SRC_PATH)/test/scenarios/image_stream_models/test_8x1x0x0x0.snr
+	cp $< $@
+
+test_8x1x0x1x1.snr : $(SRC_PATH)/test/scenarios/image_stream_models/test_8x1x0x1x1.snr
+	cp $< $@
+
+test_8x3x0x4x1.snr : $(SRC_PATH)/test/scenarios/image_stream_models/test_8x3x0x4x1.snr
+	cp $< $@
+
+test_8x4x4x3x3.snr : $(SRC_PATH)/test/scenarios/image_stream_models/test_8x4x4x3x3.snr
 	cp $< $@
 
