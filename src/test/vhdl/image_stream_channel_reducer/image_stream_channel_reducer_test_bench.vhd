@@ -2,7 +2,7 @@
 --!     @file    image_stream_channel_reducer_test_bench.vhd
 --!     @brief   Image Stream Channel Reducer Test Bench.
 --!     @version 1.8.0
---!     @date    2019/1/22
+--!     @date    2019/1/30
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -243,14 +243,18 @@ begin
     -- 
     -------------------------------------------------------------------------------
     I_ENABLE <= I_GPO(0);
-    I_DONE   <= I_GPO(1);
+    I_DONE   <= '1' when (IMAGE_STREAM_DATA_IS_LAST_C(I_PARAM, I_DATA) and
+                          IMAGE_STREAM_DATA_IS_LAST_D(I_PARAM, I_DATA) and
+                          IMAGE_STREAM_DATA_IS_LAST_X(I_PARAM, I_DATA) and
+                          IMAGE_STREAM_DATA_IS_LAST_Y(I_PARAM, I_DATA)) else '0';
     DONE     <= I_GPO(2);
     START    <= I_GPO(3);
     I_GPI    <= (others => '0');
     O_ENABLE <= O_GPO(0);
     O_GPI(0) <= '0';
     O_GPI(1) <= O_DONE;
-    O_GPI(O_GPI'high downto 2) <= (O_GPI'high downto 2 => '0');
+    O_GPI(2) <= BUSY;
+    O_GPI(O_GPI'high downto 3) <= (O_GPI'high downto 3 => '0');
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -288,7 +292,7 @@ begin
     end process;
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=1, O.C=2
+-- ELEM_BITS=8bit, D=0, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=1, O.C=2
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
@@ -298,8 +302,8 @@ entity  IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_1_2 is
     generic (
         NAME            : STRING                  := "test_0_0_1_2";
         SCENARIO_FILE   : STRING                  := "test_0_0_1_2.snr";
-        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,3,3);
-        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,2,3,3);
+        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,1,0,3,3));
+        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,2,0,3,3));
         C_SIZE          : integer                 := 0;
         C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
@@ -329,7 +333,7 @@ begin
     );
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=2, O.C=1
+-- ELEM_BITS=8bit, D=0, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=2, O.C=1
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
@@ -339,8 +343,8 @@ entity  IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_2_1 is
     generic (
         NAME            : STRING                  := "test_0_0_2_1";
         SCENARIO_FILE   : STRING                  := "test_0_0_2_1.snr";
-        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,2,3,3);
-        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,3,3);
+        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,2,0,3,3));
+        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,1,0,3,3));
         C_SIZE          : integer                 := 0;
         C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
@@ -370,7 +374,7 @@ begin
     );
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=4, O.C=8
+-- ELEM_BITS=8bit, D=4, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=4, O.C=8
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
@@ -380,8 +384,8 @@ entity  IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_4_8 is
     generic (
         NAME            : STRING                  := "test_0_0_4_8";
         SCENARIO_FILE   : STRING                  := "test_0_0_4_8.snr";
-        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,4,3,3);
-        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,8,3,3);
+        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,4,4,3,3));
+        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,8,4,3,3));
         C_SIZE          : integer                 := 0;
         C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
@@ -411,7 +415,7 @@ begin
     );
 end MODEL;
 -----------------------------------------------------------------------------------
--- ELEM_BITS=8bit, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=8, O.C=4
+-- ELEM_BITS=8bit, D=4, X=3, Y=3, C_SIZE=0, C_DONE=0, I.C=8, O.C=4
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
@@ -421,8 +425,8 @@ entity  IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_8_4 is
     generic (
         NAME            : STRING                  := "test_0_0_8_4";
         SCENARIO_FILE   : STRING                  := "test_0_0_8_4.snr";
-        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,8,3,3);
-        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,4,3,3);
+        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,8,4,3,3));
+        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,4,4,3,3));
         C_SIZE          : integer                 := 0;
         C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
@@ -465,16 +469,12 @@ entity  IMAGE_STREAM_CHANNEL_REDUCER_TEST_1_1_8_8 is
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 8,
                                                          INFO_BITS => 4,
-                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(8),
-                                                         X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3),
-                                                         Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3)
+                                                         SHAPE     => NEW_IMAGE_SHAPE_CONSTANT(8, 8, 0, 3, 3)
                                                      );
         O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 8,
                                                          INFO_BITS => 4,
-                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(8),
-                                                         X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3),
-                                                         Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3)
+                                                         SHAPE     => NEW_IMAGE_SHAPE_CONSTANT(8, 8, 0, 3, 3)
                                                      );
         C_SIZE          : integer                 := 1;
         C_DONE          : integer                 := 1;

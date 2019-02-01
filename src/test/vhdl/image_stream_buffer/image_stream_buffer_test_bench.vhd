@@ -2,7 +2,7 @@
 --!     @file    image_stream_buffer_test_bench.vhd
 --!     @brief   Image Stream Buffer Test Bench.
 --!     @version 1.8.0
---!     @date    2019/1/22
+--!     @date    2019/2/1
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -49,7 +49,6 @@ entity  IMAGE_STREAM_BUFFER_TEST_BENCH is
         LINE_SIZE       : integer                 := 0;
         BANK_SIZE       : integer                 := 0;
         D_SIZE          : integer                 := 1;
-        D_UNROLL        : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
 end     IMAGE_STREAM_BUFFER_TEST_BENCH;
@@ -104,7 +103,6 @@ architecture MODEL of IMAGE_STREAM_BUFFER_TEST_BENCH is
     signal    O_DATA            :  std_logic_vector(O_PARAM.DATA.SIZE-1 downto 0);
     signal    O_VALID           :  std_logic;
     signal    O_READY           :  std_logic;
-    signal    O_D_ATRB          :  IMAGE_STREAM_ATRB_VECTOR(0 to D_UNROLL-1);
     -------------------------------------------------------------------------------
     -- シンクロ用信号
     -------------------------------------------------------------------------------
@@ -136,8 +134,6 @@ begin
             ELEMENT_SIZE        => ELEMENT_SIZE    , --
             CHANNEL_SIZE        => CHANNEL_SIZE    , --
             MAX_D_SIZE          => D_SIZE          , --
-            D_STRIDE            => 1               , --
-            D_UNROLL            => D_UNROLL        , --
             BANK_SIZE           => BANK_SIZE       , --
             LINE_SIZE           => LINE_SIZE       , --
             ID                  => 0                 -- 
@@ -153,7 +149,6 @@ begin
             O_FEED              => O_FEED          , -- In  :
             O_RETURN            => O_RETURN        , -- In  :
             O_DATA              => O_DATA          , -- Out :
-            O_D_ATRB            => O_D_ATRB        , -- Out :
             O_VALID             => O_VALID         , -- Out :
             O_READY             => O_READY           -- In  :
     );
@@ -294,21 +289,20 @@ library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1_1_1 is
+entity  IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1x1 is
     generic (
-        NAME            : STRING                  := "test_4_8_1x1x1_1x1x1_1_1";
-        SCENARIO_FILE   : STRING                  := "test_4_8_1x1x1_1x1x1_1_1.snr";
+        NAME            : STRING                  := "test_4_8_1x1x1_1x1x1x1";
+        SCENARIO_FILE   : STRING                  := "test_4_8_1x1x1_1x1x1x1.snr";
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1,1);
         O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1,1);
         CHANNEL_SIZE    : integer                 := 4;
         BANK_SIZE       : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
         D_SIZE          : integer                 := 1;
-        D_UNROLL        : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1_1_1;
-architecture MODEL of IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1_1_1 is
+end     IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1x1;
+architecture MODEL of IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1x1 is
     component IMAGE_STREAM_BUFFER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
@@ -319,7 +313,6 @@ architecture MODEL of IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1_1_1 is
             BANK_SIZE       : integer                 := 0;
             LINE_SIZE       : integer                 := 0;
             D_SIZE          : integer                 := 1;
-            D_UNROLL        : integer                 := 1;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -333,7 +326,6 @@ begin
         BANK_SIZE       => BANK_SIZE    ,
         LINE_SIZE       => LINE_SIZE    ,
         D_SIZE          => D_SIZE       ,
-        D_UNROLL        => D_UNROLL     ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
@@ -344,21 +336,20 @@ library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1_1_1 is
+entity  IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1x1 is
     generic (
-        NAME            : STRING                  := "test_4_8_4x1x1_4x1x1_1_1";
-        SCENARIO_FILE   : STRING                  := "test_4_8_4x1x1_4x1x1_1_1.snr";
+        NAME            : STRING                  := "test_4_8_4x1x1_4x1x1x1";
+        SCENARIO_FILE   : STRING                  := "test_4_8_4x1x1_4x1x1x1.snr";
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,4,1,1);
         O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,4,1,1);
         CHANNEL_SIZE    : integer                 := 0;
         BANK_SIZE       : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
         D_SIZE          : integer                 := 1;
-        D_UNROLL        : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1_1_1;
-architecture MODEL of IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1_1_1 is
+end     IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1x1;
+architecture MODEL of IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1x1 is
     component IMAGE_STREAM_BUFFER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
@@ -369,7 +360,6 @@ architecture MODEL of IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1_1_1 is
             BANK_SIZE       : integer                 := 0;
             LINE_SIZE       : integer                 := 0;
             D_SIZE          : integer                 := 1;
-            D_UNROLL        : integer                 := 1;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -383,7 +373,6 @@ begin
         BANK_SIZE       => BANK_SIZE    ,
         LINE_SIZE       => LINE_SIZE    ,
         D_SIZE          => D_SIZE       ,
-        D_UNROLL        => D_UNROLL     ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
@@ -394,10 +383,10 @@ library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1 is
+entity  IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x1x5x5 is
     generic (
-        NAME            : STRING                  := "test_1_8_1x4x1_1x5x5_1_1";
-        SCENARIO_FILE   : STRING                  := "test_1_8_1x4x1_1x5x5_1_1.snr";
+        NAME            : STRING                  := "test_1_8_1x4x1_1x1x5x5";
+        SCENARIO_FILE   : STRING                  := "test_1_8_1x4x1_1x1x5x5.snr";
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 8,
                                                          SHAPE     => NEW_IMAGE_SHAPE(
@@ -422,11 +411,10 @@ entity  IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1 is
         BANK_SIZE       : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
         D_SIZE          : integer                 := 1;
-        D_UNROLL        : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1;
-architecture MODEL of IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1 is
+end     IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x1x5x5;
+architecture MODEL of IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x1x5x5 is
     component IMAGE_STREAM_BUFFER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
@@ -437,7 +425,6 @@ architecture MODEL of IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1 is
             BANK_SIZE       : integer                 := 0;
             LINE_SIZE       : integer                 := 0;
             D_SIZE          : integer                 := 1;
-            D_UNROLL        : integer                 := 1;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -451,7 +438,6 @@ begin
         BANK_SIZE       => BANK_SIZE    ,
         LINE_SIZE       => LINE_SIZE    ,
         D_SIZE          => D_SIZE       ,
-        D_UNROLL        => D_UNROLL     ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
@@ -462,15 +448,16 @@ library ieee;
 use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-entity  IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4 is
+entity  IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3 is
     generic (
-        NAME            : STRING                  := "test_0_2_32x1x1_32x3x3_8_4";
-        SCENARIO_FILE   : STRING                  := "test_0_2_32x1x1_32x3x3_8_4.snr";
+        NAME            : STRING                  := "test_0_2_32x1x1_32x4x3x3";
+        SCENARIO_FILE   : STRING                  := "test_0_2_32x1x1_32x4x3x3.snr";
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
                                                          ELEM_BITS => 2,
                                                          SHAPE     => NEW_IMAGE_SHAPE(
                                                                         ELEM_BITS => 2,
                                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(32),
+                                                                        D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(0),
                                                                         X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
                                                                         Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1)
                                                                       ),
@@ -481,6 +468,7 @@ entity  IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4 is
                                                          SHAPE     => NEW_IMAGE_SHAPE(
                                                                         ELEM_BITS => 2,
                                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(32),
+                                                                        D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(4),
                                                                         X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1),
                                                                         Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1)
                                                                       ),
@@ -490,11 +478,10 @@ entity  IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4 is
         BANK_SIZE       : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
         D_SIZE          : integer                 := 8;
-        D_UNROLL        : integer                 := 4;
         FINISH_ABORT    : boolean                 := FALSE
     );
-end     IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4;
-architecture MODEL of IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4 is
+end     IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3;
+architecture MODEL of IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3 is
     component IMAGE_STREAM_BUFFER_TEST_BENCH is
         generic (
             NAME            : STRING                  := "test";
@@ -505,7 +492,6 @@ architecture MODEL of IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4 is
             BANK_SIZE       : integer                 := 0;
             LINE_SIZE       : integer                 := 0;
             D_SIZE          : integer                 := 1;
-            D_UNROLL        : integer                 := 1;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -519,7 +505,6 @@ begin
         BANK_SIZE       => BANK_SIZE    ,
         LINE_SIZE       => LINE_SIZE    ,
         D_SIZE          => D_SIZE       ,
-        D_UNROLL        => D_UNROLL     ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;

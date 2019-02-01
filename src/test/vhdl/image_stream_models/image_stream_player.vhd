@@ -187,6 +187,7 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
     begin
         for y_pos in PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI loop
         for x_pos in PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI loop
+        for d_pos in PARAM.SHAPE.D.LO to PARAM.SHAPE.D.HI loop
         for c_pos in PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI loop
             for i in IMAGE_ELEM_SIGNAL_TYPE'range loop
                 W.ELEM(y_pos, x_pos, c_pos)(i) := D;
@@ -194,11 +195,13 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
             SET_ELEMENT_TO_IMAGE_STREAM_DATA(
                 PARAM   => PARAM,
                 C       => c_pos,
+                D       => d_pos,
                 X       => x_pos,
                 Y       => y_pos,
                 ELEMENT => W.ELEM(y_pos, x_pos, c_pos),
                 DATA    => W.DATA
             );
+        end loop;
         end loop;
         end loop;
         end loop;
@@ -333,10 +336,12 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
         end if;
         for y_pos in PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI loop
         for x_pos in PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI loop
+        for d_pos in PARAM.SHAPE.D.LO to PARAM.SHAPE.D.LO loop -- D Channel は要素に含まれていない
         for c_pos in PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI loop
             elem_i := GET_ELEMENT_FROM_IMAGE_STREAM_DATA(
                           PARAM  => PARAM,
                           C      => c_pos,
+                          D      => d_pos,
                           X      => x_pos,
                           Y      => y_pos,
                           DATA   => DATA_I
@@ -349,6 +354,7 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
                                 HEX_TO_STRING(elem_i)    & " /= 0x" &
                                 HEX_TO_STRING(signals.ELEM(y_pos, x_pos, c_pos)));
             end if;
+        end loop;
         end loop;
         end loop;
         end loop;
@@ -584,6 +590,7 @@ begin
                             SET_ELEMENT_TO_IMAGE_STREAM_DATA(
                                 PARAM   => PARAM,
                                 C       => seq_pos(3),
+                                D       => PARAM.SHAPE.D.LO,
                                 X       => seq_pos(2),
                                 Y       => seq_pos(1),
                                 ELEMENT => signals.ELEM(seq_pos(1), seq_pos(2), seq_pos(3)),
@@ -788,14 +795,17 @@ begin
             read_value(proc_name, signals.DATA);
             for y_pos in PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI loop
             for x_pos in PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI loop
+            for d_pos in PARAM.SHAPE.D.LO to PARAM.SHAPE.D.LO loop -- D Channel は要素に含まれていない
             for c_pos in PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI loop
                 signals.ELEM(y_pos, x_pos, c_pos) := GET_ELEMENT_FROM_IMAGE_STREAM_DATA(
                                                          PARAM  => PARAM,
                                                          C      => c_pos,
+                                                         D      => d_pos,
                                                          X      => x_pos,
                                                          Y      => y_pos,
                                                          DATA   => signals.DATA
                                                      );
+            end loop;
             end loop;
             end loop;
             end loop;
