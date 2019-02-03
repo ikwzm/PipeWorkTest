@@ -2,7 +2,7 @@
 --!     @file    image_stream_buffer_test_bench.vhd
 --!     @brief   Image Stream Buffer Test Bench.
 --!     @version 1.8.0
---!     @date    2019/2/1
+--!     @date    2019/2/3
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -44,11 +44,10 @@ entity  IMAGE_STREAM_BUFFER_TEST_BENCH is
         SCENARIO_FILE   : STRING                  := "test.snr";
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
         O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
+        O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE_CONSTANT(8,1,1,1,1);
         ELEMENT_SIZE    : integer                 := 8*1024;
-        CHANNEL_SIZE    : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
         BANK_SIZE       : integer                 := 0;
-        D_SIZE          : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
 end     IMAGE_STREAM_BUFFER_TEST_BENCH;
@@ -131,9 +130,8 @@ begin
         generic map(                                 -- 
             I_PARAM             => I_PARAM         , --
             O_PARAM             => O_PARAM         , --
+            O_SHAPE             => O_SHAPE         , --
             ELEMENT_SIZE        => ELEMENT_SIZE    , --
-            CHANNEL_SIZE        => CHANNEL_SIZE    , --
-            MAX_D_SIZE          => D_SIZE          , --
             BANK_SIZE           => BANK_SIZE       , --
             LINE_SIZE           => LINE_SIZE       , --
             ID                  => 0                 -- 
@@ -142,7 +140,6 @@ begin
             CLK                 => CLK             , -- In  :
             RST                 => RESET           , -- In  :
             CLR                 => CLEAR           , -- In  :
-            D_SIZE              => D_SIZE          , -- In  :
             I_DATA              => I_DATA          , -- In  :
             I_VALID             => I_VALID         , -- In  :
             I_READY             => I_READY         , -- Out :
@@ -295,10 +292,14 @@ entity  IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1x1 is
         SCENARIO_FILE   : STRING                  := "test_4_8_1x1x1_1x1x1x1.snr";
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1,1);
         O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1,1);
-        CHANNEL_SIZE    : integer                 := 4;
+        O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE(8,
+                                                                     NEW_IMAGE_SHAPE_SIDE_CONSTANT(4),
+                                                                     NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
+                                                                     NEW_IMAGE_SHAPE_SIDE_AUTO    (1024),
+                                                                     NEW_IMAGE_SHAPE_SIDE_AUTO    (1024)
+                                                     );
         BANK_SIZE       : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
-        D_SIZE          : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
 end     IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1x1;
@@ -309,10 +310,9 @@ architecture MODEL of IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1x1 is
             SCENARIO_FILE   : STRING                  := "test.snr";
             I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
             O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 8;
+            O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE_CONSTANT(8,1,1,1,1);
             BANK_SIZE       : integer                 := 0;
             LINE_SIZE       : integer                 := 0;
-            D_SIZE          : integer                 := 1;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -322,10 +322,9 @@ begin
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
         O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        O_SHAPE         => O_SHAPE      ,
         BANK_SIZE       => BANK_SIZE    ,
         LINE_SIZE       => LINE_SIZE    ,
-        D_SIZE          => D_SIZE       ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
@@ -342,10 +341,14 @@ entity  IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1x1 is
         SCENARIO_FILE   : STRING                  := "test_4_8_4x1x1_4x1x1x1.snr";
         I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,4,1,1);
         O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,4,1,1);
-        CHANNEL_SIZE    : integer                 := 0;
+        O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE(8,
+                                                                     NEW_IMAGE_SHAPE_SIDE_CONSTANT(4),
+                                                                     NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
+                                                                     NEW_IMAGE_SHAPE_SIDE_AUTO    (1024),
+                                                                     NEW_IMAGE_SHAPE_SIDE_AUTO    (1024)
+                                                     );
         BANK_SIZE       : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
-        D_SIZE          : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
 end     IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1x1;
@@ -356,10 +359,9 @@ architecture MODEL of IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1x1 is
             SCENARIO_FILE   : STRING                  := "test.snr";
             I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
             O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 4;
+            O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE_CONSTANT(8,1,1,1,1);
             BANK_SIZE       : integer                 := 0;
             LINE_SIZE       : integer                 := 0;
-            D_SIZE          : integer                 := 1;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -369,10 +371,9 @@ begin
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
         O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        O_SHAPE         => O_SHAPE      ,
         BANK_SIZE       => BANK_SIZE    ,
         LINE_SIZE       => LINE_SIZE    ,
-        D_SIZE          => D_SIZE       ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
@@ -407,10 +408,15 @@ entity  IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x1x5x5 is
                                                                       ),
                                                          STRIDE    => NEW_IMAGE_STREAM_STRIDE_PARAM(1,1)
                                                      );
-        CHANNEL_SIZE    : integer                 := 1;
+        O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE(
+                                                         ELEM_BITS => 8,
+                                                         C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
+                                                         D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
+                                                         X         => NEW_IMAGE_SHAPE_SIDE_AUTO    (1024),
+                                                         Y         => NEW_IMAGE_SHAPE_SIDE_AUTO    (1024)
+                                                     );
         BANK_SIZE       : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
-        D_SIZE          : integer                 := 1;
         FINISH_ABORT    : boolean                 := FALSE
     );
 end     IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x1x5x5;
@@ -421,10 +427,9 @@ architecture MODEL of IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x1x5x5 is
             SCENARIO_FILE   : STRING                  := "test.snr";
             I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
             O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 4;
+            O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE_CONSTANT(8,1,1,1,1);
             BANK_SIZE       : integer                 := 0;
             LINE_SIZE       : integer                 := 0;
-            D_SIZE          : integer                 := 1;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -434,10 +439,9 @@ begin
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
         O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        O_SHAPE         => O_SHAPE      ,
         BANK_SIZE       => BANK_SIZE    ,
         LINE_SIZE       => LINE_SIZE    ,
-        D_SIZE          => D_SIZE       ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
@@ -474,10 +478,15 @@ entity  IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3 is
                                                                       ),
                                                          STRIDE    => NEW_IMAGE_STREAM_STRIDE_PARAM(1,1)
                                                      );
-        CHANNEL_SIZE    : integer                 := 0;
+        O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE(
+                                                         ELEM_BITS => 8,
+                                                         C         => NEW_IMAGE_SHAPE_SIDE_AUTO    (1024),
+                                                         D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(8),
+                                                         X         => NEW_IMAGE_SHAPE_SIDE_AUTO    (1024),
+                                                         Y         => NEW_IMAGE_SHAPE_SIDE_AUTO    (1024)
+                                                     );
         BANK_SIZE       : integer                 := 0;
         LINE_SIZE       : integer                 := 0;
-        D_SIZE          : integer                 := 8;
         FINISH_ABORT    : boolean                 := FALSE
     );
 end     IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3;
@@ -488,10 +497,9 @@ architecture MODEL of IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3 is
             SCENARIO_FILE   : STRING                  := "test.snr";
             I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
             O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
-            CHANNEL_SIZE    : integer                 := 8;
+            O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE_CONSTANT(8,1,1,1,1);
             BANK_SIZE       : integer                 := 0;
             LINE_SIZE       : integer                 := 0;
-            D_SIZE          : integer                 := 1;
             FINISH_ABORT    : boolean                 := FALSE
         );
     end component;
@@ -501,10 +509,9 @@ begin
         SCENARIO_FILE   => SCENARIO_FILE,
         I_PARAM         => I_PARAM      ,
         O_PARAM         => O_PARAM      ,
-        CHANNEL_SIZE    => CHANNEL_SIZE ,
+        O_SHAPE         => O_SHAPE      ,
         BANK_SIZE       => BANK_SIZE    ,
         LINE_SIZE       => LINE_SIZE    ,
-        D_SIZE          => D_SIZE       ,
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;

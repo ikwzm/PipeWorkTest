@@ -74,11 +74,10 @@ source "add_sim.tcl"
 # Set 'sim_1' fileset properties
 #
 set obj [get_filesets sim_1]
-## set_property "top" "IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x3x3_8_4"  $obj
-## set_property "generic" "SCENARIO_FILE=../../../../../../src/test/scenarios/image_stream_buffer/test_0_2_32x1x1_32x3x3_8_4.snr FINISH_ABORT=true" $obj
-set_property "top" "IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x5x5_1_1"  $obj
-set_property "generic" "SCENARIO_FILE=../../../../../../sim/ghdl-0.35/image_stream_buffer/test_1_8_1x4x1_1x5x5_1_1.snr FINISH_ABORT=true" $obj
-## set_property "generic" "SCENARIO_FILE=../../../../../../src/test/scenarios/image_stream_buffer/test_1_8_1x4x1_1x5x5_1_1.snr FINISH_ABORT=true" $obj
+# set_property "top" "IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3"  $obj
+# set_property "generic" "SCENARIO_FILE=../../../../../../sim/ghdl-0.35/image_stream_buffer/test_0_2_32x1x1_32x4x3x3.snr FINISH_ABORT=true" $obj
+set_property "top" "IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1x1"  $obj
+set_property "generic" "SCENARIO_FILE=../../../../../../sim/ghdl-0.35/image_stream_buffer/test_4_8_4x1x1_4x1x1x1.snr FINISH_ABORT=true" $obj
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
