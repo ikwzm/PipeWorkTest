@@ -117,18 +117,26 @@ architecture MODEL of IMAGE_STREAM_PLAYER_TEST_BENCH is
         WRITE(L,T & "  ELEM_BITS   = " & INTEGER_TO_STRING(PARAM.ELEM_BITS));WRITELINE(OUTPUT,L);
         WRITE(L,T & "  ATRB_BITS   = " & INTEGER_TO_STRING(PARAM.ATRB_BITS));WRITELINE(OUTPUT,L);
         WRITE(L,T & "  INFO_BITS   = " & INTEGER_TO_STRING(PARAM.INFO_BITS));WRITELINE(OUTPUT,L);
-        WRITE(L,T & "  SHAPE.C SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.C.SIZE) &
-                               " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.C.LO)   &
-                               " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.C.HI)     );WRITELINE(OUTPUT,L);
-        WRITE(L,T & "       .D SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.D.SIZE) &
-                               " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.D.LO)   &
-                               " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.D.HI)     );WRITELINE(OUTPUT,L);
-        WRITE(L,T & "       .X SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.X.SIZE) &
-                               " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.X.LO)   &
-                               " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.X.HI)     );WRITELINE(OUTPUT,L);
-        WRITE(L,T & "       .Y SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.Y.SIZE) &
-                               " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.Y.LO)   &
-                               " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.Y.HI)     );WRITELINE(OUTPUT,L);
+        WRITE(L,T & "  SHAPE.C SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.C.SIZE)                  &
+                               " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.C.LO)                    &
+                               " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.C.HI)                    &
+                               " DE="  & BOOLEAN_TO_STRING(PARAM.SHAPE.C.DATA_ELEM)(1 to 1)     &
+                               " DA="  & BOOLEAN_TO_STRING(PARAM.SHAPE.C.DATA_ATRB)(1 to 1)     );WRITELINE(OUTPUT,L);
+        WRITE(L,T & "       .D SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.D.SIZE)                  &
+                               " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.D.LO)                    &
+                               " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.D.HI)                    &
+                               " DE="  & BOOLEAN_TO_STRING(PARAM.SHAPE.D.DATA_ELEM)(1 to 1)     &
+                               " DA="  & BOOLEAN_TO_STRING(PARAM.SHAPE.D.DATA_ATRB)(1 to 1)     );WRITELINE(OUTPUT,L);
+        WRITE(L,T & "       .X SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.X.SIZE)                  &
+                               " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.X.LO)                    &
+                               " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.X.HI)                    &
+                               " DE="  & BOOLEAN_TO_STRING(PARAM.SHAPE.X.DATA_ELEM)(1 to 1)     &
+                               " DA="  & BOOLEAN_TO_STRING(PARAM.SHAPE.X.DATA_ATRB)(1 to 1)     );WRITELINE(OUTPUT,L);
+        WRITE(L,T & "       .Y SIZE="  & INTEGER_TO_STRING(PARAM.SHAPE.Y.SIZE)                  &
+                               " LO="  & INTEGER_TO_STRING(PARAM.SHAPE.Y.LO)                    &
+                               " HI="  & INTEGER_TO_STRING(PARAM.SHAPE.Y.HI)                    &
+                               " DE="  & BOOLEAN_TO_STRING(PARAM.SHAPE.Y.DATA_ELEM)(1 to 1)     &
+                               " DA="  & BOOLEAN_TO_STRING(PARAM.SHAPE.Y.DATA_ATRB)(1 to 1)     );WRITELINE(OUTPUT,L);
         WRITE(L,T & "  DATA            SIZE=" & INTEGER_TO_STRING(PARAM.DATA.SIZE)              &
                                        " LO=" & INTEGER_TO_STRING(PARAM.DATA.LO)                &
                                        " HI=" & INTEGER_TO_STRING(PARAM.DATA.HI)                );WRITELINE(OUTPUT,L);
@@ -295,7 +303,15 @@ entity  IMAGE_STREAM_PLAYER_TEST_8x0x0x0x0 is
     generic (
         NAME            : STRING                  := "test_8x0x0x0x0";
         SCENARIO_FILE   : STRING                  := "test_8x0x0x0x0.snr";
-        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,0,0,0,0));
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS => 8,
+                                                                            SHAPE     => NEW_IMAGE_SHAPE(
+                                                                                ELEM_BITS => 8,
+                                                                                C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , FALSE),
+                                                                                D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, FALSE, FALSE),
+                                                                                X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , FALSE),
+                                                                                Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , FALSE)
+                                                                            )
+                                                                           );
         FINISH_ABORT    : boolean := FALSE
     );
 end     IMAGE_STREAM_PLAYER_TEST_8x0x0x0x0;
@@ -327,7 +343,15 @@ entity  IMAGE_STREAM_PLAYER_TEST_8x1x0x0x0 is
     generic (
         NAME            : STRING                  := "test_8x1x0x0x0";
         SCENARIO_FILE   : STRING                  := "test_8x1x0x0x0.snr";
-        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,0,0);
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS => 8,
+                                                                            SHAPE     => NEW_IMAGE_SHAPE(
+                                                                                ELEM_BITS => 8,
+                                                                                C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , TRUE ),
+                                                                                D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, FALSE, FALSE),
+                                                                                X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , FALSE),
+                                                                                Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , FALSE)
+                                                                            )
+                                                                           );
         FINISH_ABORT    : boolean := FALSE
     );
 end     IMAGE_STREAM_PLAYER_TEST_8x1x0x0x0;
@@ -359,7 +383,15 @@ entity  IMAGE_STREAM_PLAYER_TEST_8x1x0x1x1 is
     generic (
         NAME            : STRING                  := "test_8x1x0x1x1";
         SCENARIO_FILE   : STRING                  := "test_8x1x0x1x1.snr";
-        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1,1);
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS => 8,
+                                                                            SHAPE     => NEW_IMAGE_SHAPE(
+                                                                                ELEM_BITS => 8,
+                                                                                C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , TRUE ),
+                                                                                D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, FALSE, FALSE),
+                                                                                X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , TRUE ),
+                                                                                Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , TRUE )
+                                                                            )
+                                                                           );
         FINISH_ABORT    : boolean := FALSE
     );
 end     IMAGE_STREAM_PLAYER_TEST_8x1x0x1x1;
@@ -391,7 +423,16 @@ entity  IMAGE_STREAM_PLAYER_TEST_8x3x0x4x1 is
     generic (
         NAME            : STRING                  := "test_8x3x0x4x1";
         SCENARIO_FILE   : STRING                  := "test_8x3x0x4x1.snr";
-        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,3,0,4,1),NEW_IMAGE_STREAM_STRIDE_PARAM(4,1));
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS => 8,
+                                                                            SHAPE     => NEW_IMAGE_SHAPE(
+                                                                                ELEM_BITS => 8,
+                                                                                C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3, TRUE , TRUE ),
+                                                                                D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, FALSE, FALSE),
+                                                                                X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(4, TRUE , TRUE ),
+                                                                                Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , TRUE )
+                                                                                ),
+                                                                            STRIDE    => NEW_IMAGE_STREAM_STRIDE_PARAM(4,1)
+                                                                           );
         FINISH_ABORT    : boolean := FALSE
     );
 end     IMAGE_STREAM_PLAYER_TEST_8x3x0x4x1;
@@ -423,7 +464,15 @@ entity  IMAGE_STREAM_PLAYER_TEST_8x0x0x2x2 is
     generic (
         NAME            : STRING                  := "test_8x0x0x2x2";
         SCENARIO_FILE   : STRING                  := "test_8x0x0x2x2.snr";
-        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,2,2);
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS => 8,
+                                                                            SHAPE     => NEW_IMAGE_SHAPE(
+                                                                                ELEM_BITS => 8,
+                                                                                C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , FALSE),
+                                                                                D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, FALSE, FALSE),
+                                                                                X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(2, TRUE , TRUE ),
+                                                                                Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(2, TRUE , TRUE )
+                                                                                )
+                                                                           );
         FINISH_ABORT    : boolean := FALSE
     );
 end     IMAGE_STREAM_PLAYER_TEST_8x0x0x2x2;
@@ -455,7 +504,15 @@ entity  IMAGE_STREAM_PLAYER_TEST_8x4x4x3x3 is
     generic (
         NAME            : STRING                  := "test_8x4x4x3x3";
         SCENARIO_FILE   : STRING                  := "test_8x4x4x3x3.snr";
-        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,4,4,3,3));
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS => 8,
+                                                                            SHAPE     => NEW_IMAGE_SHAPE(
+                                                                                ELEM_BITS => 8,
+                                                                                C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(4, TRUE , TRUE ),
+                                                                                D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(4, FALSE, TRUE ),
+                                                                                X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3, TRUE , TRUE ),
+                                                                                Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(3, TRUE , TRUE )
+                                                                                )
+                                                                           );
         FINISH_ABORT    : boolean := FALSE
     );
 end     IMAGE_STREAM_PLAYER_TEST_8x4x4x3x3;
@@ -487,7 +544,15 @@ entity  IMAGE_STREAM_PLAYER_TEST_8x0x1x0x0 is
     generic (
         NAME            : STRING                  := "test_8x0x1x0x0";
         SCENARIO_FILE   : STRING                  := "test_8x0x1x0x0.snr";
-        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,0,1,0,0));
+        PARAM           : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS => 8,
+                                                                            SHAPE     => NEW_IMAGE_SHAPE(
+                                                                                ELEM_BITS => 8,
+                                                                                C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , FALSE),
+                                                                                D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, FALSE, TRUE ),
+                                                                                X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , FALSE),
+                                                                                Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1, TRUE , FALSE)
+                                                                                )
+                                                                           );
         FINISH_ABORT    : boolean := FALSE
     );
 end     IMAGE_STREAM_PLAYER_TEST_8x0x1x0x0;

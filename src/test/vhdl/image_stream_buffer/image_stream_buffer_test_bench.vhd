@@ -471,10 +471,10 @@ entity  IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3 is
                                                          ELEM_BITS => 2,
                                                          SHAPE     => NEW_IMAGE_SHAPE(
                                                                         ELEM_BITS => 2,
-                                                                        C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(32),
-                                                                        D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(4),
-                                                                        X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1),
-                                                                        Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1)
+                                                                        C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(32  , TRUE , TRUE),
+                                                                        D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(4   , FALSE, TRUE),
+                                                                        X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1, TRUE , TRUE),
+                                                                        Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1, TRUE , TRUE)
                                                                       ),
                                                          STRIDE    => NEW_IMAGE_STREAM_STRIDE_PARAM(1,1)
                                                      );

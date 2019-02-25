@@ -152,6 +152,7 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
     subtype   IMAGE_ELEM_SIGNAL_TYPE    is std_logic_vector(PARAM.ELEM_BITS-1 downto 0);
     type      IMAGE_ELEM_SIGNAL_STREAM  is array (integer range <>,
                                                   integer range <>,
+                                                  integer range <>,
                                                   integer range <>) of IMAGE_ELEM_SIGNAL_TYPE;
     -------------------------------------------------------------------------------
     --! @brief Image Stream の ATTRIBUTE 信号の定義
@@ -170,6 +171,7 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
     type      IMAGE_STREAM_SIGNAL_TYPE is record
                   ELEM      :  IMAGE_ELEM_SIGNAL_STREAM(PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI,
                                                         PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI,
+                                                        PARAM.SHAPE.D.LO to PARAM.SHAPE.D.HI,
                                                         PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI);
                   ATRB      :  IMAGE_ATRB_SIGNAL_STREAM;
                   INFO      :  std_logic_vector(MAX(1, PARAM.INFO_BITS)-1 downto 0);
@@ -190,7 +192,7 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
         for d_pos in PARAM.SHAPE.D.LO to PARAM.SHAPE.D.HI loop
         for c_pos in PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI loop
             for i in IMAGE_ELEM_SIGNAL_TYPE'range loop
-                W.ELEM(y_pos, x_pos, c_pos)(i) := D;
+                W.ELEM(y_pos, x_pos, d_pos, c_pos)(i) := D;
             end loop;
             SET_ELEMENT_TO_IMAGE_STREAM_DATA(
                 PARAM   => PARAM,
@@ -198,7 +200,7 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
                 D       => d_pos,
                 X       => x_pos,
                 Y       => y_pos,
-                ELEMENT => W.ELEM(y_pos, x_pos, c_pos),
+                ELEMENT => W.ELEM(y_pos, x_pos, d_pos, c_pos),
                 DATA    => W.DATA
             );
         end loop;
@@ -336,7 +338,7 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
         end if;
         for y_pos in PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI loop
         for x_pos in PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI loop
-        for d_pos in PARAM.SHAPE.D.LO to PARAM.SHAPE.D.LO loop -- D Channel は要素に含まれていない
+        for d_pos in PARAM.SHAPE.D.LO to PARAM.SHAPE.D.HI loop -- D Channel は要素に含まれていない
         for c_pos in PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI loop
             elem_i := GET_ELEMENT_FROM_IMAGE_STREAM_DATA(
                           PARAM  => PARAM,
@@ -346,13 +348,14 @@ architecture MODEL of IMAGE_STREAM_PLAYER is
                           Y      => y_pos,
                           DATA   => DATA_I
                       );
-            if (MATCH_STD_LOGIC(signals.ELEM(y_pos, x_pos, c_pos) , elem_i) = FALSE) then
+            if (MATCH_STD_LOGIC(signals.ELEM(y_pos, x_pos, d_pos, c_pos) , elem_i) = FALSE) then
                 REPORT_MISMATCH(core, "ELEM[" &
                                 INTEGER_TO_STRING(y_pos) & "][" &
                                 INTEGER_TO_STRING(x_pos) & "][ " & 
+                                INTEGER_TO_STRING(d_pos) & "][ " & 
                                 INTEGER_TO_STRING(c_pos) & "] 0x" & 
                                 HEX_TO_STRING(elem_i)    & " /= 0x" &
-                                HEX_TO_STRING(signals.ELEM(y_pos, x_pos, c_pos)));
+                                HEX_TO_STRING(signals.ELEM(y_pos, x_pos, d_pos, c_pos)));
             end if;
         end loop;
         end loop;
@@ -455,6 +458,64 @@ begin
     -------------------------------------------------------------------------------
     process
         ---------------------------------------------------------------------------
+        --
+        ---------------------------------------------------------------------------
+        type      SEQ_POS_VECTOR is array(integer range <>) of integer;
+        type      SEQ_PARAM_TYPE is record
+                      LO_POS    : SEQ_POS_VECTOR(0 to 4);
+                      Y         : integer;
+                      X         : integer;
+                      D         : integer;
+                      C         : integer;
+                      MAX       : integer;
+        end record;
+        function  NEW_SEQ_PARAM return  SEQ_PARAM_TYPE is
+            variable  seq_param : SEQ_PARAM_TYPE;
+            variable  seq_level : integer;
+        begin
+            seq_level := 0;
+            if (PARAM.SHAPE.Y.DATA_ELEM = TRUE) then
+                seq_level   := seq_level + 1;
+                seq_param.Y := seq_level;
+            end if;
+            if (PARAM.SHAPE.X.DATA_ELEM = TRUE) then
+                seq_level   := seq_level + 1;
+                seq_param.X := seq_level;
+            end if;
+            if (PARAM.SHAPE.D.DATA_ELEM = TRUE) then
+                seq_level   := seq_level + 1;
+                seq_param.D := seq_level;
+            end if;
+            if (PARAM.SHAPE.C.DATA_ELEM = TRUE) then
+                seq_level   := seq_level + 1;
+                seq_param.C := seq_level;
+            end if;
+            seq_param.MAX := seq_level;
+            if (PARAM.SHAPE.Y.DATA_ELEM = FALSE) then
+                seq_level   := seq_level + 1;
+                seq_param.Y := seq_level;
+            end if;
+            if (PARAM.SHAPE.X.DATA_ELEM = FALSE) then
+                seq_level   := seq_level + 1;
+                seq_param.X := seq_level;
+            end if;
+            if (PARAM.SHAPE.D.DATA_ELEM = FALSE) then
+                seq_level   := seq_level + 1;
+                seq_param.D := seq_level;
+            end if;
+            if (PARAM.SHAPE.C.DATA_ELEM = FALSE) then
+                seq_level   := seq_level + 1;
+                seq_param.C := seq_level;
+            end if;
+            seq_param.LO_POS(0) := 0;
+            seq_param.LO_POS(seq_param.Y) := PARAM.SHAPE.Y.LO;
+            seq_param.LO_POS(seq_param.X) := PARAM.SHAPE.X.LO;
+            seq_param.LO_POS(seq_param.D) := PARAM.SHAPE.D.LO;
+            seq_param.LO_POS(seq_param.C) := PARAM.SHAPE.C.LO;
+            return seq_param;
+        end function;
+        constant  SEQ_PARAM     : SEQ_PARAM_TYPE := NEW_SEQ_PARAM;
+        ---------------------------------------------------------------------------
         -- 各種変数の定義.
         ---------------------------------------------------------------------------
         file      stream        : TEXT;
@@ -548,27 +609,21 @@ begin
                       signals       : inout IMAGE_STREAM_SIGNAL_TYPE
         ) is
             variable  next_event    :       EVENT_TYPE;
-            type      SEQ_POS_VECTOR is array(integer range <>) of integer;
-            variable  seq_pos_lo    :       SEQ_POS_VECTOR(0 to 3);
-            variable  seq_pos       :       SEQ_POS_VECTOR(0 to 3);
+            variable  seq_pos       :       SEQ_POS_VECTOR(0 to 4);
             variable  seq_level     :       integer;
         begin
-            seq_pos_lo(0) := 0;
-            seq_pos_lo(1) := PARAM.SHAPE.Y.LO;
-            seq_pos_lo(2) := PARAM.SHAPE.X.LO;
-            seq_pos_lo(3) := PARAM.SHAPE.C.LO;
             seq_level     := 0;
-            seq_pos       := seq_pos_lo;
+            seq_pos       := SEQ_PARAM.LO_POS;
             SEQ_LOOP: loop
                 SEEK_EVENT(core, stream, next_event);
                 case next_event is
                     when EVENT_SEQ_BEGIN => 
                         READ_EVENT(core, stream, EVENT_SEQ_BEGIN);
-                        if (seq_level >= seq_pos'high) then
+                        if (seq_level >= SEQ_PARAM.MAX) then
                             READ_ERROR(core, proc_name, "READ_ELEM Out of Level(" & INTEGER_TO_STRING(seq_level) & ")");
                         else
                             seq_level := seq_level + 1;
-                            seq_pos(seq_level) := seq_pos_lo(seq_level);
+                            seq_pos(seq_level) := SEQ_PARAM.LO_POS(seq_level);
                         end if;
                     when EVENT_SEQ_END   =>
                         READ_EVENT(core, stream, EVENT_SEQ_END  );
@@ -577,32 +632,39 @@ begin
                             seq_pos(seq_level) := seq_pos(seq_level) + 1;
                         end if;
                     when EVENT_SCALAR    =>
-                        if    (seq_level /= 3) then
-                            READ_ERROR(core, proc_name, "READ_ELEM less level(" & INTEGER_TO_STRING(seq_level) & ")");
-                        elsif (seq_pos(1) < PARAM.SHAPE.Y.LO or seq_pos(1) > PARAM.SHAPE.Y.HI) then
-                            READ_ERROR(core, proc_name, "READ_ELEM Out of Y Range(" & INTEGER_TO_STRING(seq_pos(1)) & ")");
-                        elsif (seq_pos(2) < PARAM.SHAPE.X.LO or seq_pos(2) > PARAM.SHAPE.X.HI) then
-                            READ_ERROR(core, proc_name, "READ_ELEM Out of X Range(" & INTEGER_TO_STRING(seq_pos(2)) & ")");
-                        elsif (seq_pos(3) < PARAM.SHAPE.C.LO or seq_pos(3) > PARAM.SHAPE.C.HI) then
-                            READ_ERROR(core, proc_name, "READ_ELEM Out of C Range(" & INTEGER_TO_STRING(seq_pos(3)) & ")");
+                        if    (seq_level /= SEQ_PARAM.MAX) then
+                            READ_ERROR(core, proc_name, "READ_ELEM less level(" & INTEGER_TO_STRING(seq_level) &
+                                                              ") /= max_level(" & INTEGER_TO_STRING(SEQ_PARAM.MAX) & ")");
+                        elsif (seq_pos(SEQ_PARAM.Y) < PARAM.SHAPE.Y.LO or seq_pos(SEQ_PARAM.Y) > PARAM.SHAPE.Y.HI) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of Y Range(" & INTEGER_TO_STRING(seq_pos(SEQ_PARAM.Y)) & ")");
+                        elsif (seq_pos(SEQ_PARAM.X) < PARAM.SHAPE.X.LO or seq_pos(SEQ_PARAM.X) > PARAM.SHAPE.X.HI) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of X Range(" & INTEGER_TO_STRING(seq_pos(SEQ_PARAM.X)) & ")");
+                        elsif (seq_pos(SEQ_PARAM.D) < PARAM.SHAPE.D.LO or seq_pos(SEQ_PARAM.D) > PARAM.SHAPE.D.HI) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of D Range(" & INTEGER_TO_STRING(seq_pos(SEQ_PARAM.D)) & ")");
+                        elsif (seq_pos(SEQ_PARAM.C) < PARAM.SHAPE.C.LO or seq_pos(SEQ_PARAM.C) > PARAM.SHAPE.C.HI) then
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of C Range(" & INTEGER_TO_STRING(seq_pos(SEQ_PARAM.C)) & ")");
                         else
-                            read_value(proc_name, signals.ELEM(seq_pos(1),seq_pos(2),seq_pos(3)));
+                            read_value(proc_name, signals.ELEM(seq_pos(SEQ_PARAM.Y), seq_pos(SEQ_PARAM.X), seq_pos(SEQ_PARAM.D), seq_pos(SEQ_PARAM.C)));
                             SET_ELEMENT_TO_IMAGE_STREAM_DATA(
                                 PARAM   => PARAM,
-                                C       => seq_pos(3),
-                                D       => PARAM.SHAPE.D.LO,
-                                X       => seq_pos(2),
-                                Y       => seq_pos(1),
-                                ELEMENT => signals.ELEM(seq_pos(1), seq_pos(2), seq_pos(3)),
+                                C       => seq_pos(SEQ_PARAM.C),
+                                D       => seq_pos(SEQ_PARAM.D),
+                                X       => seq_pos(SEQ_PARAM.X),
+                                Y       => seq_pos(SEQ_PARAM.Y),
+                                ELEMENT => signals.ELEM(seq_pos(SEQ_PARAM.Y), seq_pos(SEQ_PARAM.X), seq_pos(SEQ_PARAM.D), seq_pos(SEQ_PARAM.C)),
                                 DATA    => signals.DATA
                             );
-                            -- REPORT_NOTE(core, string'("seq_pos(1)=") & INTEGER_TO_STRING(seq_pos(1)) &
-                            --                            ",seq_pos(2)="  & INTEGER_TO_STRING(seq_pos(2)) &
-                            --                            ",seq_pos(3)="  & INTEGER_TO_STRING(seq_pos(3)) &
-                            --                            ",elem="        & HEX_TO_STRING(signals.ELEM(seq_pos(1),seq_pos(2),seq_pos(3))) &
+                            -- REPORT_NOTE(core, string'(  "seq_pos(y)=") & INTEGER_TO_STRING(seq_pos(seq_y_level)) &
+                            --                            ",seq_pos(x)="  & INTEGER_TO_STRING(seq_pos(seq_x_level)) &
+                            --                            ",seq_pos(d)="  & INTEGER_TO_STRING(seq_pos(seq_d_level)) &
+                            --                            ",seq_pos(c)="  & INTEGER_TO_STRING(seq_pos(seq_c_level)) &
+                            --                            ",elem="        & HEX_TO_STRING(signals.ELEM(seq_pos(seq_y_level),
+                            --                                                                         seq_pos(seq_x_level),
+                            --                                                                         seq_pos(seq_d_level),
+                            --                                                                         seq_pos(seq_c_level))) & 
                             --                            ",data="        & HEX_TO_STRING(signals.DATA));
                         end if;
-                        seq_pos(3) := seq_pos(3) + 1;
+                        seq_pos(SEQ_PARAM.MAX) := seq_pos(SEQ_PARAM.MAX) + 1;
                     when EVENT_ERROR     =>
                         READ_ERROR(core, proc_name, "SEEK_EVENT NG");
                     when others          =>
@@ -795,16 +857,16 @@ begin
             read_value(proc_name, signals.DATA);
             for y_pos in PARAM.SHAPE.Y.LO to PARAM.SHAPE.Y.HI loop
             for x_pos in PARAM.SHAPE.X.LO to PARAM.SHAPE.X.HI loop
-            for d_pos in PARAM.SHAPE.D.LO to PARAM.SHAPE.D.LO loop -- D Channel は要素に含まれていない
+            for d_pos in PARAM.SHAPE.D.LO to PARAM.SHAPE.D.HI loop -- D Channel は要素に含まれていない
             for c_pos in PARAM.SHAPE.C.LO to PARAM.SHAPE.C.HI loop
-                signals.ELEM(y_pos, x_pos, c_pos) := GET_ELEMENT_FROM_IMAGE_STREAM_DATA(
-                                                         PARAM  => PARAM,
-                                                         C      => c_pos,
-                                                         D      => d_pos,
-                                                         X      => x_pos,
-                                                         Y      => y_pos,
-                                                         DATA   => signals.DATA
-                                                     );
+                signals.ELEM(y_pos, x_pos, d_pos, c_pos) := GET_ELEMENT_FROM_IMAGE_STREAM_DATA(
+                                                                PARAM  => PARAM,
+                                                                C      => c_pos,
+                                                                D      => d_pos,
+                                                                X      => x_pos,
+                                                                Y      => y_pos,
+                                                                DATA   => signals.DATA
+                                                            );
             end loop;
             end loop;
             end loop;
