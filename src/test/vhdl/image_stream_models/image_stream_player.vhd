@@ -474,36 +474,36 @@ begin
             variable  seq_level : integer;
         begin
             seq_level := 0;
-            if (PARAM.SHAPE.Y.DATA_ELEM = TRUE) then
+            if (PARAM.SHAPE.Y.ELEM_IN_DATA = TRUE) then
                 seq_level   := seq_level + 1;
                 seq_param.Y := seq_level;
             end if;
-            if (PARAM.SHAPE.X.DATA_ELEM = TRUE) then
+            if (PARAM.SHAPE.X.ELEM_IN_DATA = TRUE) then
                 seq_level   := seq_level + 1;
                 seq_param.X := seq_level;
             end if;
-            if (PARAM.SHAPE.D.DATA_ELEM = TRUE) then
+            if (PARAM.SHAPE.D.ELEM_IN_DATA = TRUE) then
                 seq_level   := seq_level + 1;
                 seq_param.D := seq_level;
             end if;
-            if (PARAM.SHAPE.C.DATA_ELEM = TRUE) then
+            if (PARAM.SHAPE.C.ELEM_IN_DATA = TRUE) then
                 seq_level   := seq_level + 1;
                 seq_param.C := seq_level;
             end if;
             seq_param.MAX := seq_level;
-            if (PARAM.SHAPE.Y.DATA_ELEM = FALSE) then
+            if (PARAM.SHAPE.Y.ELEM_IN_DATA = FALSE) then
                 seq_level   := seq_level + 1;
                 seq_param.Y := seq_level;
             end if;
-            if (PARAM.SHAPE.X.DATA_ELEM = FALSE) then
+            if (PARAM.SHAPE.X.ELEM_IN_DATA = FALSE) then
                 seq_level   := seq_level + 1;
                 seq_param.X := seq_level;
             end if;
-            if (PARAM.SHAPE.D.DATA_ELEM = FALSE) then
+            if (PARAM.SHAPE.D.ELEM_IN_DATA = FALSE) then
                 seq_level   := seq_level + 1;
                 seq_param.D := seq_level;
             end if;
-            if (PARAM.SHAPE.C.DATA_ELEM = FALSE) then
+            if (PARAM.SHAPE.C.ELEM_IN_DATA = FALSE) then
                 seq_level   := seq_level + 1;
                 seq_param.C := seq_level;
             end if;
