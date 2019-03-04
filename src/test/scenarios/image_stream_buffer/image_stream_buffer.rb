@@ -42,7 +42,7 @@ class ScenarioGenerater
     @i_model.output_data(@io, "  ", data)
     @io.print "  - OUT  : {GPO(0): 0}\n"
     @io.print @o_model.output_name("- ")
-    @io.print "  - OUT  : {GPO(0): 1}\n"
+    @io.print "  - OUT  : {GPO(0): 0}\n"
     @o_model.check_data(@io, "  ", data, d_size)
     @io.print "---\n"
   end
@@ -59,7 +59,7 @@ class ScenarioGenerater
     @i_model.output_data(@io, "  ", data)
     @io.print "  - OUT  : {GPO(0): 0}\n"
     @io.print @o_model.output_name("- ")
-    @io.print "  - OUT  : {GPO(0): 1}\n"
+    @io.print "  - OUT  : {GPO(0): 0}\n"
     @o_model.check_data(@io, "  ", data, d_size){rand(5)}
     @io.print "---\n"
   end

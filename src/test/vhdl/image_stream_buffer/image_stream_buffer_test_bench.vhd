@@ -97,7 +97,6 @@ architecture MODEL of IMAGE_STREAM_BUFFER_TEST_BENCH is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal    O_FEED            :  std_logic;
     signal    O_RETURN          :  std_logic;
     signal    O_DATA            :  std_logic_vector(O_PARAM.DATA.SIZE-1 downto 0);
     signal    O_VALID           :  std_logic;
@@ -143,7 +142,6 @@ begin
             I_DATA              => I_DATA          , -- In  :
             I_VALID             => I_VALID         , -- In  :
             I_READY             => I_READY         , -- Out :
-            O_FEED              => O_FEED          , -- In  :
             O_RETURN            => O_RETURN        , -- In  :
             O_DATA              => O_DATA          , -- Out :
             O_VALID             => O_VALID         , -- Out :
@@ -240,8 +238,7 @@ begin
     -- 
     -------------------------------------------------------------------------------
     I_GPI    <= (others => '0');
-    O_FEED   <= O_GPO(0);
-    O_RETURN <= O_GPO(1);
+    O_RETURN <= O_GPO(0);
     O_GPI    <= (others => '0');
     -------------------------------------------------------------------------------
     -- 
