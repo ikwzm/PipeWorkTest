@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    test_bench.vhd
 --!     @brief   Synchronous Dual Port RAM Test Bench.
---!     @version 1.7.0
---!     @date    2018/3/22
+--!     @version 1.8.0
+--!     @date    2019/3/28
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2019 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -503,6 +503,84 @@ architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH08_RD5_WD3_WE0 is
     signal FINISH : std_logic;
 begin
     TB:SDPRAM_TEST_BENCH generic map (DEPTH=>8,RWIDTH =>5,WWIDTH=>3,WEBIT=>0)port map (open);
+end MODEL;
+-----------------------------------------------------------------------------------
+-- テストベンチ
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+use     WORK.COMPONENTS.SDPRAM_TEST_BENCH;
+entity  SDPRAM_TEST_BENCH_DEPTH11_RD6_WD6_WE0 is
+end     SDPRAM_TEST_BENCH_DEPTH11_RD6_WD6_WE0;
+architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH11_RD6_WD6_WE0 is
+    signal FINISH : std_logic;
+begin
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>11,RWIDTH =>6,WWIDTH=>6,WEBIT=>0)port map (open);
+end MODEL;
+-----------------------------------------------------------------------------------
+-- テストベンチ
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+use     WORK.COMPONENTS.SDPRAM_TEST_BENCH;
+entity  SDPRAM_TEST_BENCH_DEPTH12_RD6_WD6_WE0 is
+end     SDPRAM_TEST_BENCH_DEPTH12_RD6_WD6_WE0;
+architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH12_RD6_WD6_WE0 is
+    signal FINISH : std_logic;
+begin
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>12,RWIDTH =>6,WWIDTH=>6,WEBIT=>0)port map (open);
+end MODEL;
+-----------------------------------------------------------------------------------
+-- テストベンチ
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+use     WORK.COMPONENTS.SDPRAM_TEST_BENCH;
+entity  SDPRAM_TEST_BENCH_DEPTH13_RD6_WD6_WE0 is
+end     SDPRAM_TEST_BENCH_DEPTH13_RD6_WD6_WE0;
+architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH13_RD6_WD6_WE0 is
+    signal FINISH : std_logic;
+begin
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>13,RWIDTH =>6,WWIDTH=>6,WEBIT=>0)port map (open);
+end MODEL;
+-----------------------------------------------------------------------------------
+-- テストベンチ
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+use     WORK.COMPONENTS.SDPRAM_TEST_BENCH;
+entity  SDPRAM_TEST_BENCH_DEPTH14_RD6_WD6_WE0 is
+end     SDPRAM_TEST_BENCH_DEPTH14_RD6_WD6_WE0;
+architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH14_RD6_WD6_WE0 is
+    signal FINISH : std_logic;
+begin
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>14,RWIDTH =>6,WWIDTH=>6,WEBIT=>0)port map (open);
+end MODEL;
+-----------------------------------------------------------------------------------
+-- テストベンチ
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+use     WORK.COMPONENTS.SDPRAM_TEST_BENCH;
+entity  SDPRAM_TEST_BENCH_DEPTH15_RD6_WD6_WE0 is
+end     SDPRAM_TEST_BENCH_DEPTH15_RD6_WD6_WE0;
+architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH15_RD6_WD6_WE0 is
+    signal FINISH : std_logic;
+begin
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>15,RWIDTH =>6,WWIDTH=>6,WEBIT=>0)port map (open);
+end MODEL;
+-----------------------------------------------------------------------------------
+-- テストベンチ
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+use     WORK.COMPONENTS.SDPRAM_TEST_BENCH;
+entity  SDPRAM_TEST_BENCH_DEPTH15_RD6_WD6_WE3 is
+end     SDPRAM_TEST_BENCH_DEPTH15_RD6_WD6_WE3;
+architecture    MODEL of SDPRAM_TEST_BENCH_DEPTH15_RD6_WD6_WE3 is
+    signal FINISH : std_logic;
+begin
+    TB:SDPRAM_TEST_BENCH generic map (DEPTH=>15,RWIDTH =>6,WWIDTH=>6,WEBIT=>3)port map (open);
 end MODEL;
 -----------------------------------------------------------------------------------
 -- テストベンチ

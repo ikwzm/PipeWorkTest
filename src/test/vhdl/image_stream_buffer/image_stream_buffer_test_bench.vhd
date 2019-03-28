@@ -2,7 +2,7 @@
 --!     @file    image_stream_buffer_test_bench.vhd
 --!     @brief   Image Stream Buffer Test Bench.
 --!     @version 1.8.0
---!     @date    2019/2/3
+--!     @date    2019/3/21
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

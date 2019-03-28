@@ -2,7 +2,7 @@
 --!     @file    image_stream_channel_reducer_test_bench.vhd
 --!     @brief   Image Stream Channel Reducer Test Bench.
 --!     @version 1.8.0
---!     @date    2019/1/30
+--!     @date    2019/3/21
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -302,8 +302,8 @@ entity  IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_1_2 is
     generic (
         NAME            : STRING                  := "test_0_0_1_2";
         SCENARIO_FILE   : STRING                  := "test_0_0_1_2.snr";
-        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,1,0,3,3));
-        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,2,0,3,3));
+        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS=>8,SHAPE=>NEW_IMAGE_SHAPE_CONSTANT(8,1,0,3,3));
+        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS=>8,SHAPE=>NEW_IMAGE_SHAPE_CONSTANT(8,2,0,3,3));
         C_SIZE          : integer                 := 0;
         C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
@@ -343,8 +343,8 @@ entity  IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_2_1 is
     generic (
         NAME            : STRING                  := "test_0_0_2_1";
         SCENARIO_FILE   : STRING                  := "test_0_0_2_1.snr";
-        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,2,0,3,3));
-        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,1,0,3,3));
+        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS=>8,SHAPE=>NEW_IMAGE_SHAPE_CONSTANT(8,2,0,3,3));
+        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS=>8,SHAPE=>NEW_IMAGE_SHAPE_CONSTANT(8,1,0,3,3));
         C_SIZE          : integer                 := 0;
         C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
@@ -384,8 +384,8 @@ entity  IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_4_8 is
     generic (
         NAME            : STRING                  := "test_0_0_4_8";
         SCENARIO_FILE   : STRING                  := "test_0_0_4_8.snr";
-        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,4,4,3,3));
-        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,8,4,3,3));
+        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS=>8,SHAPE=>NEW_IMAGE_SHAPE_CONSTANT(8,4,4,3,3));
+        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS=>8,SHAPE=>NEW_IMAGE_SHAPE_CONSTANT(8,8,4,3,3));
         C_SIZE          : integer                 := 0;
         C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
@@ -425,8 +425,8 @@ entity  IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_8_4 is
     generic (
         NAME            : STRING                  := "test_0_0_8_4";
         SCENARIO_FILE   : STRING                  := "test_0_0_8_4.snr";
-        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,8,4,3,3));
-        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,NEW_IMAGE_SHAPE_CONSTANT(8,4,4,3,3));
+        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS=>8,SHAPE=>NEW_IMAGE_SHAPE_CONSTANT(8,8,4,3,3));
+        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(ELEM_BITS=>8,SHAPE=>NEW_IMAGE_SHAPE_CONSTANT(8,4,4,3,3));
         C_SIZE          : integer                 := 0;
         C_DONE          : integer                 := 0;
         FINISH_ABORT    : boolean                 := FALSE
