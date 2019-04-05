@@ -3,7 +3,7 @@
 #
 
 set project_directory       [file dirname [info script]]
-set project_name            "image_stream_slice_master_controller"
+set project_name            "image_slice_master_controller"
 set device_parts            "xc7z010clg400-1"
 #
 # Create project

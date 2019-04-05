@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------------
 --!     @file    test_bench.vhd
---!     @brief   IMAGE_STREAM_SLICE_MASTER_CONTROLLER TEST BENCH :
---!              IMAGE_STREAM_SLICE_MASTER_CONTROLLER を検証するためのテストベンチ.
+--!     @brief   IMAGE_SLICE_MASTER_CONTROLLER TEST BENCH :
+--!              IMAGE_SLICE_MASTER_CONTROLLER を検証するためのテストベンチ.
 --!     @version 1.8.0
---!     @date    2019/4/1
+--!     @date    2019/4/5
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -74,7 +74,7 @@ use     ieee.numeric_std.all;
 use     std.textio.all;
 library PIPEWORK;
 use     PIPEWORK.IMAGE_TYPES.all;
-use     PIPEWORK.IMAGE_COMPONENTS.IMAGE_STREAM_SLICE_MASTER_CONTROLLER;
+use     PIPEWORK.IMAGE_COMPONENTS.IMAGE_SLICE_MASTER_CONTROLLER;
 library DUMMY_PLUG;
 use     DUMMY_PLUG.UTIL.all;
 architecture MODEL of TEST_BENCH is
@@ -126,7 +126,7 @@ begin
     -------------------------------------------------------------------------------
     --
     -------------------------------------------------------------------------------
-    DUT: IMAGE_STREAM_SLICE_MASTER_CONTROLLER
+    DUT: IMAGE_SLICE_MASTER_CONTROLLER
         generic map (
             SOURCE_SHAPE    => SOURCE_SHAPE    , -- 
             SLICE_SHAPE     => SLICE_SHAPE     , --   
