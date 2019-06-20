@@ -512,3 +512,73 @@ begin
         FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;
+-----------------------------------------------------------------------------------
+-- ELEM_BITS=2bit, CHANNEL_SIZE=0, I.C=32, I.X=1, I.Y=1, O.C=32, O.X=3, O.Y=3 D_SIZE=8
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+library PIPEWORK;
+use     PIPEWORK.IMAGE_TYPES.all;
+entity  IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3_bug1 is
+    generic (
+        NAME            : STRING                  := "test_0_2_32x1x1_32x4x3x3_bug1";
+        SCENARIO_FILE   : STRING                  := "test_0_2_32x1x1_32x4x3x3_bug1.snr";
+        I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
+                                                         ELEM_BITS => 2,
+                                                         SHAPE     => NEW_IMAGE_SHAPE(
+                                                                        ELEM_BITS => 2,
+                                                                        C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(32),
+                                                                        D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(0),
+                                                                        X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1),
+                                                                        Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(1)
+                                                                      ),
+                                                         STRIDE    => NEW_IMAGE_STREAM_STRIDE_PARAM(1,1)
+                                                     );
+        O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(
+                                                         ELEM_BITS => 2,
+                                                         SHAPE     => NEW_IMAGE_SHAPE(
+                                                                        ELEM_BITS => 2,
+                                                                        C         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(32  , TRUE , TRUE),
+                                                                        D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(4   , FALSE, TRUE),
+                                                                        X         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1, TRUE , TRUE),
+                                                                        Y         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(-1,1, TRUE , TRUE)
+                                                                      ),
+                                                         STRIDE    => NEW_IMAGE_STREAM_STRIDE_PARAM(1,1)
+                                                     );
+        O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE(
+                                                         ELEM_BITS => 8,
+                                                         C         => NEW_IMAGE_SHAPE_SIDE_AUTO    (1024),
+                                                         D         => NEW_IMAGE_SHAPE_SIDE_CONSTANT(8),
+                                                         X         => NEW_IMAGE_SHAPE_SIDE_AUTO    (1024),
+                                                         Y         => NEW_IMAGE_SHAPE_SIDE_AUTO    (1024)
+                                                     );
+        BANK_SIZE       : integer                 := 0;
+        LINE_SIZE       : integer                 := 0;
+        FINISH_ABORT    : boolean                 := FALSE
+    );
+end     IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3_bug1;
+architecture MODEL of IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3_bug1 is
+    component IMAGE_STREAM_BUFFER_TEST_BENCH is
+        generic (
+            NAME            : STRING                  := "test";
+            SCENARIO_FILE   : STRING                  := "test.snr";
+            I_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
+            O_PARAM         : IMAGE_STREAM_PARAM_TYPE := NEW_IMAGE_STREAM_PARAM(8,1,1);
+            O_SHAPE         : IMAGE_SHAPE_TYPE        := NEW_IMAGE_SHAPE_CONSTANT(8,1,1,1,1);
+            BANK_SIZE       : integer                 := 0;
+            LINE_SIZE       : integer                 := 0;
+            FINISH_ABORT    : boolean                 := FALSE
+        );
+    end component;
+begin
+    TB: IMAGE_STREAM_BUFFER_TEST_BENCH generic map (
+        NAME            => NAME         ,
+        SCENARIO_FILE   => SCENARIO_FILE,
+        I_PARAM         => I_PARAM      ,
+        O_PARAM         => O_PARAM      ,
+        O_SHAPE         => O_SHAPE      ,
+        BANK_SIZE       => BANK_SIZE    ,
+        LINE_SIZE       => LINE_SIZE    ,
+        FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
