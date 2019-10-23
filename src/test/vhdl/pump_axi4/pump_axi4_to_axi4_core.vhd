@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4_core.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4)
---!     @version 1.7.0
---!     @date    2018/3/22
+--!     @version 1.8.1
+--!     @date    2019/10/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2019 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -85,6 +85,21 @@ entity  PUMP_AXI4_TO_AXI4_CORE is
                           --! PUMP INTAKE の最大転送バイト数を２のべき乗値で指定す
                           --! る.
                           integer :=  8;
+        I_CACHE_LINE    :--! @brief PUMP INTAKE CACHE LINE SIZE :
+                          --! キャッシュのラインサイズを２のべき乗で指定する.
+                          --! * CACHE_LINE_SIZE>0 の場合、転送サイズを 
+                          --!   CACHE_LINE_SIZE 単位で転送するようにアライメントする.
+                          --! * CACHE_LINE_SIZE=0 の場合、なにもしない.
+                          --! CACHE_LINE_SIZE は Xilinx 社の ZynqMP の AXI-ACP に
+                          --! 接続する際に CACHE_LINE_SIZE=6(64byteを表す)にする.
+                          integer := 0;
+        I_ADDR_MASK     : --! @brief PUMP INTAKE ADDRESS LOW SIZE :
+                          --! アドレスの下位ビットをマスクする場合のサイズを指定する.
+                          --! * ADDR_MASK_SIZE=0の場合、マスクせずに全て出力する.
+                          --! * ADDR_MASK_SIZE=6の場合、下位6ビットをマスクして出力する.
+                          --! ZynqMP の AXI-ACP にリードアクセスする際は、アドレスの下位
+                          --! 4bit(2**4=16byte(=128bit)分)をマスクする.
+                          integer := 0;
         I_REQ_QUEUE     : --! @brief PUMP INTAKE REQUEST QUEUE SIZE :
                           --! PUMP INTAKE のリクエストキューの大きさを指定する.
                           --! 詳細は PipeWork.Components の AXI4_MASTER_READ_INTERFACE を参照.
@@ -147,6 +162,14 @@ entity  PUMP_AXI4_TO_AXI4_CORE is
                           --! PUMP OUTLET の最大転送バイト数を２のべき乗値で指定す
                           --! る.
                           integer :=  8;
+        O_CACHE_LINE    : --! @brief PUMP OUTLET CACHE LINE SIZE :
+                          --! キャッシュのラインサイズを２のべき乗で指定する.
+                          --! * CACHE_LINE_SIZE>0 の場合、転送サイズを 
+                          --!   CACHE_LINE_SIZE 単位で転送するようにアライメントする.
+                          --! * CACHE_LINE_SIZE=0 の場合、なにもしない.
+                          --! CACHE_LINE_SIZE は Xilinx 社の ZynqMP の AXI-ACP に
+                          --! 接続する際に CACHE_LINE_SIZE=6(64byteを表す)にする.
+                          integer := 0;
         O_REQ_REGS      : --! @brief  PUMP OUTLET REQUEST REGISTER USE :
                           --! ライトトランザクションの最初のデータ出力のタイミング
                           --! を指定する.
@@ -583,6 +606,8 @@ begin
             XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => I_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => I_MAX_XFER_SIZE     , -- 
+            CACHE_LINE_SIZE     => I_CACHE_LINE        , -- 
+            ADDR_MASK_SIZE      => I_ADDR_MASK         , -- 
             QUEUE_SIZE          => I_REQ_QUEUE         , --
             RDATA_REGS          => I_RDATA_REGS        , --
             ACK_REGS            => I_ACK_REGS            -- 
@@ -721,6 +746,7 @@ begin
             XFER_SIZE_BITS      => SIZE_BITS           , -- 
             XFER_MIN_SIZE       => O_MAX_XFER_SIZE     , -- 
             XFER_MAX_SIZE       => O_MAX_XFER_SIZE     , -- 
+            CACHE_LINE_SIZE     => O_CACHE_LINE        , -- 
             REQ_REGS            => O_REQ_REGS          , -- 
             ACK_REGS            => O_ACK_REGS          , -- 
             QUEUE_SIZE          => O_RES_QUEUE         , -- 

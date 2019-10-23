@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4_test_bench.vhd
 --!     @brief   Test Bench for Pump Sample Module (AXI4 to AXI4)
---!     @version 1.7.0
---!     @date    2018/3/22
+--!     @version 1.8.1
+--!     @date    2019/10/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2019 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,8 @@ entity  PUMP_AXI4_TO_AXI4_TEST_BENCH is
         I_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
         O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
         MAX_XFER_SIZE   : integer                                :=  6;
-        BUF_DEPTH       : integer                                := 12
+        BUF_DEPTH       : integer                                := 12;
+        ZYNQMP_ACP      : integer range 0 to 1                   :=  0
     );
 end     PUMP_AXI4_TO_AXI4_TEST_BENCH;
 -----------------------------------------------------------------------------------
@@ -386,6 +387,7 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH is
             M_ID_WIDTH      : integer                                := AXI4_ID_MAX_WIDTH;
             M_AUSER_WIDTH   : integer range 1 to 32                  :=  4;
             M_AXI_ID        : integer                                :=  1;
+            M_ZYNQMP_ACP    : integer range 0 to  1                  :=  0;
             I_AXI_ID        : integer                                :=  1;
             I_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             I_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
@@ -394,6 +396,7 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH is
             I_MAX_XFER_SIZE : integer                                :=  8;
             I_QUEUE_SIZE    : integer                                :=  1;
             I_PROC_VALID    : integer                                :=  1;
+            I_ZYNQMP_ACP    : integer range 0 to  1                  :=  0;
             O_AXI_ID        : integer                                :=  2;
             O_ADDR_WIDTH    : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
@@ -402,6 +405,7 @@ architecture MODEL of PUMP_AXI4_TO_AXI4_TEST_BENCH is
             O_MAX_XFER_SIZE : integer                                :=  8;
             O_QUEUE_SIZE    : integer                                :=  1;
             O_PROC_VALID    : integer                                :=  1;
+            O_ZYNQMP_ACP    : integer range 0 to  1                  :=  0;
             BUF_DEPTH       : integer                                := 12
         );
         ---------------------------------------------------------------------------
@@ -665,6 +669,7 @@ begin
             M_ID_WIDTH      => M_WIDTH.ID         ,
             M_AUSER_WIDTH   => M_WIDTH.ARUSER     ,
             M_AXI_ID        => M_AXI_ID           ,
+            M_ZYNQMP_ACP    => ZYNQMP_ACP         ,
             I_AXI_ID        => I_AXI_ID           ,
             I_ADDR_WIDTH    => I_WIDTH.ARADDR     ,
             I_DATA_WIDTH    => I_WIDTH.RDATA      ,
@@ -673,6 +678,7 @@ begin
             I_MAX_XFER_SIZE => MAX_XFER_SIZE      ,
             I_QUEUE_SIZE    => I_QUEUE_SIZE       ,
             I_PROC_VALID    => I_PROC_VALID       ,
+            I_ZYNQMP_ACP    => ZYNQMP_ACP         ,
             O_AXI_ID        => O_AXI_ID           ,
             O_ADDR_WIDTH    => O_WIDTH.AWADDR     ,
             O_DATA_WIDTH    => O_WIDTH.WDATA      ,
@@ -681,6 +687,7 @@ begin
             O_MAX_XFER_SIZE => MAX_XFER_SIZE      ,
             O_QUEUE_SIZE    => O_QUEUE_SIZE       ,
             O_PROC_VALID    => O_PROC_VALID       ,
+            O_ZYNQMP_ACP    => ZYNQMP_ACP         ,
             BUF_DEPTH       => BUF_DEPTH          
         )
         ---------------------------------------------------------------------------
