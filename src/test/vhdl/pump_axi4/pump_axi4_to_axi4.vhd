@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4.vhd
 --!     @brief   Pump Sample Module (AXI4 to AXI4)
---!     @version 1.8.1
---!     @date    2019/10/23
+--!     @version 1.7.0
+--!     @date    2018/3/22
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2019 Ichiro Kawazome
+--      Copyright (C) 2012-2018 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,6 @@ entity  PUMP_AXI4_TO_AXI4 is
         M_ID_WIDTH      : integer                 :=  8;
         M_AUSER_WIDTH   : integer                 :=  4;
         M_AXI_ID        : integer                 :=  1;
-        M_ZYNQMP_ACP    : integer range 0 to    1 :=  0;
         I_AXI_ID        : integer                 :=  1;
         I_ADDR_WIDTH    : integer range 1 to   64 := 32;
         I_DATA_WIDTH    : integer range 8 to 1024 := 32;
@@ -61,7 +60,6 @@ entity  PUMP_AXI4_TO_AXI4 is
         I_MAX_XFER_SIZE : integer                 :=  8;
         I_QUEUE_SIZE    : integer                 :=  1;
         I_PROC_VALID    : integer range 0 to    1 :=  1;
-        I_ZYNQMP_ACP    : integer range 0 to    1 :=  0;
         O_AXI_ID        : integer                 :=  2;
         O_ADDR_WIDTH    : integer range 1 to   64 := 32;
         O_DATA_WIDTH    : integer range 8 to 1024 := 32;
@@ -70,7 +68,6 @@ entity  PUMP_AXI4_TO_AXI4 is
         O_MAX_XFER_SIZE : integer                 :=  8;
         O_PROC_VALID    : integer range 0 to    1 :=  1;
         O_QUEUE_SIZE    : integer                 :=  1;
-        O_ZYNQMP_ACP    : integer range 0 to    1 :=  0;
         BUF_DEPTH       : integer                 := 12
     );
     port(
@@ -931,27 +928,6 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
         return val;
     end function;
     -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    function CALC_CACHE_LINE_SIZE(ZYNQMP_ACP: integer) return integer is begin
-        if (ZYNQMP_ACP /= 0) then return 6;  -- 2**6 = 64byte
-        else                      return 0;
-        end if;
-    end function;
-    constant M_CACHE_LINE_SIZE  : integer := CALC_CACHE_LINE_SIZE(M_ZYNQMP_ACP);
-    constant I_CACHE_LINE_SIZE  : integer := CALC_CACHE_LINE_SIZE(I_ZYNQMP_ACP);
-    constant O_CACHE_LINE_SIZE  : integer := CALC_CACHE_LINE_SIZE(O_ZYNQMP_ACP);
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    function  CALC_ADDR_MASK_SIZE(ZYNQMP_ACP: integer) return integer is begin
-        if (ZYNQMP_ACP /= 0) then return 4;  -- 2**4 = 16byte(128bit)
-        else                      return 0;
-        end if;
-    end function;
-    constant M_ADDR_MASK_SIZE   : integer := CALC_ADDR_MASK_SIZE(M_ZYNQMP_ACP);
-    constant I_ADDR_MASK_SIZE   : integer := CALC_ADDR_MASK_SIZE(I_ZYNQMP_ACP);
-    -------------------------------------------------------------------------------
     -- PUMP_AXI4_TO_AXI4_CORE のコンポーネント宣言.
     -------------------------------------------------------------------------------
     component PUMP_AXI4_TO_AXI4_CORE
@@ -968,8 +944,6 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             I_REG_MODE_BITS : integer                                := 16;
             I_REG_STAT_BITS : integer                                :=  8;
             I_MAX_XFER_SIZE : integer                                :=  8;
-            I_CACHE_LINE    : integer                                :=  0;
-            I_ADDR_MASK     : integer                                :=  0;
             I_REQ_QUEUE     : integer                                :=  1;
             I_ACK_REGS      : integer range 0 to 1                   :=  0;
             I_RDATA_REGS    : integer                                :=  0;
@@ -986,7 +960,6 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
             O_REG_MODE_BITS : integer                                := 16;
             O_REG_STAT_BITS : integer                                :=  8;
             O_MAX_XFER_SIZE : integer                                :=  1;
-            O_CACHE_LINE    : integer                                :=  0;
             O_REQ_REGS      : integer range 0 to 1                   :=  0;
             O_ACK_REGS      : integer range 0 to 1                   :=  0;
             O_RES_QUEUE     : integer                                :=  2;
@@ -1418,9 +1391,7 @@ begin
                 BUF_PTR_BITS    => MR_BUF_SIZE       , -- 
                 XFER_SIZE_BITS  => MR_SIZE_BITS      , -- 
                 XFER_MIN_SIZE   => MR_MAX_XFER_SIZE  , -- 
-                XFER_MAX_SIZE   => MR_MAX_XFER_SIZE  , --
-                CACHE_LINE_SIZE => M_CACHE_LINE_SIZE , -- 
-                ADDR_MASK_SIZE  => M_ADDR_MASK_SIZE  , -- 
+                XFER_MAX_SIZE   => MR_MAX_XFER_SIZE  , -- 
                 QUEUE_SIZE      => MR_QUEUE_SIZE     , -- 
                 RDATA_REGS      => MR_RDATA_REGS     , --
                 ACK_REGS        => MR_ACK_REGS         -- 
@@ -1545,7 +1516,6 @@ begin
                 XFER_SIZE_BITS  => MW_SIZE_BITS      , -- 
                 XFER_MIN_SIZE   => MW_MAX_XFER_SIZE  , -- 
                 XFER_MAX_SIZE   => MW_MAX_XFER_SIZE  , -- 
-                CACHE_LINE_SIZE => M_CACHE_LINE_SIZE , -- 
                 REQ_REGS        => MW_REQ_REGS       , -- 
                 ACK_REGS        => MW_ACK_REGS       , -- 
                 QUEUE_SIZE      => MW_QUEUE_SIZE     , -- 
@@ -2183,8 +2153,6 @@ begin
             I_REG_MODE_BITS => CI_MODE_REGS_BITS ,
             I_REG_STAT_BITS => CI_STAT_RESV_BITS ,
             I_MAX_XFER_SIZE => I_MAX_XFER_SIZE   ,
-            I_CACHE_LINE    => I_CACHE_LINE_SIZE ,
-            I_ADDR_MASK     => I_ADDR_MASK_SIZE  ,
             I_ACK_REGS      => I_ACK_REGS        ,
             I_REQ_QUEUE     => I_REQ_QUEUE       ,
             I_RDATA_REGS    => I_RDATA_REGS      ,
@@ -2201,7 +2169,6 @@ begin
             O_REG_MODE_BITS => CO_MODE_REGS_BITS ,
             O_REG_STAT_BITS => CO_STAT_RESV_BITS ,
             O_MAX_XFER_SIZE => O_MAX_XFER_SIZE   ,
-            O_CACHE_LINE    => O_CACHE_LINE_SIZE ,
             O_REQ_REGS      => O_REQ_REGS        ,
             O_ACK_REGS      => O_ACK_REGS        ,
             O_RES_QUEUE     => O_RES_QUEUE       ,
