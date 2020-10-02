@@ -289,7 +289,7 @@ class ScenarioGenerater
     test_num   = 0
     open_info  = 0xdead0000;
     close_info = 0xfeed0000;
-    [1,2,3,4,5,6,7,8,9,10,16,21,32,49,64,71,85,99,110,128,140,155,189,200,212,234,256].each{|size|
+    [1,2,3,4,5,6,7,8,9,10,16,21,32,49,64,71,85,99,110,128,140,155,189,200,212,234,256,0].each{|size|
       (0xFC00..0xFC03).each {|i_address|
         title = @name.to_s + ".1." + test_num.to_s
         simple_test(title, io, i_address, size, 3, 1, open_info, close_info)

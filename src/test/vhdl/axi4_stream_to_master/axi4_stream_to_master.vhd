@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_stream_to_master.vhd
 --!     @brief   Pump Core Module (AXI4-Stream to AXI4)
---!     @version 1.7.0
---!     @date    2018/7/18
+--!     @version 1.8.1
+--!     @date    2020/10/2
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2020 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -191,6 +191,7 @@ entity  AXI4_STREAM_TO_MASTER is
         I_O2I_STOP      : out std_logic;
         I_O2I_RESET     : out std_logic;
         I_O2I_ERROR     : out std_logic;
+        I_O2I_NONE      : out std_logic;
     -------------------------------------------------------------------------------
     -- Interrupt Request Signals.
     -------------------------------------------------------------------------------
@@ -261,6 +262,7 @@ architecture RTL of AXI4_STREAM_TO_MASTER is
     signal    o_req_safety          :  std_logic;
     signal    o_req_first           :  std_logic;
     signal    o_req_last            :  std_logic;
+    signal    o_req_none            :  std_logic;
     signal    o_req_ready           :  std_logic;
     signal    o_ack_valid           :  std_logic;
     signal    o_ack_size            :  std_logic_vector(BUF_DEPTH         downto 0);
@@ -897,6 +899,7 @@ begin
             O_REQ_BUF_PTR       => o_req_buf_ptr       , --  Out :
             O_REQ_FIRST         => o_req_first         , --  Out :
             O_REQ_LAST          => o_req_last          , --  Out :
+            O_REQ_NONE          => o_req_none          , --  Out :
             O_REQ_READY         => o_req_ready         , --  In  :
         ---------------------------------------------------------------------------
         -- Outlet Transaction Command Acknowledge Signals.
@@ -983,6 +986,7 @@ begin
             I_O2I_RESET         => I_O2I_RESET         , --  Out :
             I_O2I_STOP          => I_O2I_STOP          , --  Out :
             I_O2I_ERROR         => I_O2I_ERROR         , --  Out :
+            I_O2I_NONE          => I_O2I_NONE          , --  Out :
             I_O2I_OPEN_INFO     => i_o_open_info       , --  Out :
             I_O2I_OPEN_VALID    => i_o_open_valid      , --  Out :
             I_O2I_CLOSE_INFO    => i_o_close_info      , --  Out :
