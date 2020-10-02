@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_to_stream_test_bench.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4-Stream) Test Bench
---!     @version 1.7.0
---!     @date    2018/7/18
+--!     @version 1.8.1
+--!     @date    2020/10/2
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2020 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -236,6 +236,7 @@ architecture MODEL of AXI4_MASTER_TO_STREAM_TEST_BENCH is
     signal    O_I2O_STOP        :  std_logic;
     signal    O_I2O_RESET       :  std_logic;
     signal    O_I2O_ERROR       :  std_logic;
+    signal    O_I2O_NONE        :  std_logic;
     signal    O_O2I_STOP        :  std_logic;
     -------------------------------------------------------------------------------
     -- 
@@ -419,6 +420,7 @@ architecture MODEL of AXI4_MASTER_TO_STREAM_TEST_BENCH is
             O_I2O_STOP      : out std_logic;
             O_I2O_RESET     : out std_logic;
             O_I2O_ERROR     : out std_logic;
+            O_I2O_NONE      : out std_logic;
         ---------------------------------------------------------------------------
         -- Interrupt Request Signals.
         ---------------------------------------------------------------------------
@@ -577,6 +579,7 @@ begin
             O_I2O_STOP      => O_I2O_STOP          , -- Out :
             O_I2O_RESET     => O_I2O_RESET         , -- Out :
             O_I2O_ERROR     => O_I2O_ERROR         , -- Out :
+            O_I2O_NONE      => O_I2O_NONE          , -- Out :
         ---------------------------------------------------------------------------
         -- Interrupt Request Signals.
         ---------------------------------------------------------------------------
@@ -878,7 +881,8 @@ begin
     O_GPI(0) <= O_I2O_STOP;
     O_GPI(1) <= O_I2O_RESET;
     O_GPI(2) <= O_I2O_ERROR;
-    O_GPI(O_GPI'high downto 3) <= (O_GPI'high downto 3 => '0');
+    O_GPI(3) <= O_I2O_NONE;
+    O_GPI(O_GPI'high downto 4) <= (O_GPI'high downto 4 => '0');
     O_O2I_STOP <= O_GPO(0);
         
     process

@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_to_stream.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4-Stream)
---!     @version 1.7.0
---!     @date    2018/7/18
+--!     @version 1.8.1
+--!     @date    2020/10/2
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2020 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -190,6 +190,7 @@ entity  AXI4_MASTER_TO_STREAM is
         O_I2O_STOP      : out std_logic;
         O_I2O_RESET     : out std_logic;
         O_I2O_ERROR     : out std_logic;
+        O_I2O_NONE      : out std_logic;
     -------------------------------------------------------------------------------
     -- Interrupt Request Signals.
     -------------------------------------------------------------------------------
@@ -258,6 +259,7 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     signal    i_req_safety          :  std_logic;
     signal    i_req_first           :  std_logic;
     signal    i_req_last            :  std_logic;
+    signal    i_req_none            :  std_logic;
     signal    i_req_ready           :  std_logic;
     signal    i_ack_valid           :  std_logic;
     signal    i_ack_size            :  std_logic_vector(BUF_DEPTH         downto 0);
@@ -291,6 +293,7 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     signal    i_open                :  std_logic;
     signal    i_tran_busy           :  std_logic;
     signal    i_tran_done           :  std_logic;
+    signal    i_tran_none           :  std_logic;
     signal    i_tran_error          :  std_logic;
     signal    i_i_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
     signal    i_q_open_info         :  std_logic_vector(OPEN_INFO_BITS -1 downto 0);
@@ -890,6 +893,7 @@ begin
             I_REQ_BUF_PTR       => i_req_buf_ptr       , --  Out :
             I_REQ_FIRST         => i_req_first         , --  Out :
             I_REQ_LAST          => i_req_last          , --  Out :
+            I_REQ_NONE          => i_req_none          , --  Out :
             I_REQ_READY         => i_req_ready         , --  In  :
         ---------------------------------------------------------------------------
         -- Intake Transaction Command Acknowledge Signals.
@@ -935,6 +939,7 @@ begin
             I_OPEN              => i_open              , --  Out :
             I_TRAN_BUSY         => i_tran_busy         , --  Out :
             I_TRAN_DONE         => i_tran_done         , --  Out :
+            I_TRAN_NONE         => i_tran_none         , --  Out :
             I_TRAN_ERROR        => i_tran_error        , --  Out :
         ---------------------------------------------------------------------------
         -- Intake Open/Close Infomation Interface
@@ -976,6 +981,7 @@ begin
             O_I2O_RESET         => O_I2O_RESET         , --  Out :
             O_I2O_ERROR         => O_I2O_ERROR         , --  Out :
             O_I2O_STOP          => O_I2O_STOP          , --  Out :
+            O_I2O_NONE          => O_I2O_NONE          , --  Out :
             O_I2O_OPEN_INFO     => o_o_open_info       , --  Out :
             O_I2O_OPEN_VALID    => o_o_open_valid      , --  Out :
             O_I2O_CLOSE_INFO    => o_o_close_info      , --  Out :
