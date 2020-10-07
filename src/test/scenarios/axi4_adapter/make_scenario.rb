@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 #---------------------------------------------------------------------------------
 #
-#       Version     :   1.5.1
-#       Created     :   2013/7/31
+#       Version     :   1.8.2
+#       Created     :   2020/10/7
 #       File name   :   make_scneario.rb
 #       Author      :   Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 #       Description :   AXI4-Adapter用シナリオ生成スクリプト
 #
 #---------------------------------------------------------------------------------
 #
-#       Copyright (C) 2012,2013 Ichiro Kawazome
+#       Copyright (C) 2012,2020 Ichiro Kawazome
 #       All rights reserved.
 # 
 #       Redistribution and use in source and binary forms, with or without
@@ -97,25 +97,44 @@ class ScenarioGenerater
   #-------------------------------------------------------------------------------
   def gen_write(io, address, data, t_size, t_seq, m_seq)
     t_tran  = @t_model.write_transaction.clone({:Address => address, :Data => data, :DataSize => t_size})
-    m_tran  = @m_model.write_transaction.clone({:Address => address, :Data => data})
     io.print @t_model.execute(t_tran, t_seq)
-    io.print @m_model.execute(m_tran, m_seq)
+    m_addr          = address
+    m_data          = data.dup
+    m_max_xfer_size = @m_model.write_transaction.max_transaction_size
+    while not m_data.empty? do
+      x_size = m_max_xfer_size - m_addr % m_max_xfer_size
+      x_size = m_data.length if (m_data.length < x_size)
+      x_data = m_data.shift(x_size)
+      m_tran = @m_model.write_transaction.clone({:Address => m_addr, :Data => x_data})
+      io.print @m_model.execute(m_tran, m_seq)
+      m_addr = m_addr + x_size
+      m_seq  = m_seq.clone({:AddrStartEvent => :NO_WAIT, :DataStartEvent => :NO_WAIT})
+    end
   end
   #-------------------------------------------------------------------------------
   # スレーブ側とマスター側のリードトランザクションを生成するメソッド.
   #-------------------------------------------------------------------------------
   def gen_read(io, address, data, t_size, t_seq, m_seq)
     t_tran  = @t_model.read_transaction.clone({:Address => address, :Data => data, :DataSize => t_size})
+    io.print @t_model.execute(t_tran, t_seq)
     if (@t_axi4_data_width > @m_axi4_data_width) then
       t_req_size = t_tran.estimate_request_size
       m_dmy_size = t_req_size - data.size
       m_data = data + Array.new(m_dmy_size, 0xFF)
     else
-      m_data = data
+      m_data = data.dup
     end
-    m_tran  = @m_model.read_transaction.clone({:Address => address, :Data => m_data})
-    io.print @t_model.execute(t_tran, t_seq)
-    io.print @m_model.execute(m_tran, m_seq)
+    m_addr          = address
+    m_max_xfer_size = @m_model.read_transaction.max_transaction_size
+    while not m_data.empty? do
+      x_size = m_max_xfer_size - m_addr % m_max_xfer_size
+      x_size = m_data.length if (m_data.length < x_size)
+      x_data = m_data.shift(x_size)
+      m_tran = @m_model.read_transaction.clone({:Address => m_addr, :Data => x_data})
+      io.print @m_model.execute(m_tran, m_seq)
+      m_addr = m_addr + x_size
+      m_seq  = m_seq.clone({:AddrStartEvent => :NO_WAIT, :DataStartEvent => :NO_WAIT})
+    end
   end
   #-------------------------------------------------------------------------------
   # タイミングをランダムに生成するメソッド.
@@ -254,11 +273,14 @@ class ScenarioGenerater
       })
     end
     if @m_model == nil
+      m_max_xfer_size = 256*@m_axi4_data_width/8
+      m_max_xfer_size = @m_max_xfer_size if (m_max_xfer_size >= @m_max_xfer_size)
+      m_max_xfer_size = 4096             if (m_max_xfer_size >= 4096)
       @m_model = Dummy_Plug::ScenarioWriter::AXI4::Slave.new("M", {
         :ID_WIDTH      =>  4,
         :ADDR_WIDTH    => 32,
         :DATA_WIDTH    => @m_axi4_data_width,
-        :MAX_TRAN_SIZE => @m_max_xfer_size  
+        :MAX_TRAN_SIZE => m_max_xfer_size
       })
     end
     title = @name.to_s + 
