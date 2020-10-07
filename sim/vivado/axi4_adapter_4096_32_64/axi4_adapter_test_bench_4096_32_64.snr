@@ -1,0 +1,469 @@
+---
+- N : 
+  - SAY : AXI4_ADAPTER_TEST_4096_32_64 T_DATA_WIDTH=32 M_DATA_WIDTH=64 T_MAX_XFER_SIZE=4096 M_MAX_XFER_SIZE=4096
+---
+- N : 
+  - SAY : AXI4_ADAPTER_TEST_4096_32_64.3.911   READ  ADDR=0x000007DF, SIZE=120, DATA_SIZE=4
+- - T
+  - AR:
+    - VALID : 1
+    - ADDR  : 0x000007DF
+      SIZE  : 4
+      LEN   : 31
+      ID    : 0
+      BURST : INCR
+    - WAIT  : {AVALID : 1, AREADY : 1}
+    - VALID : 0
+    - ADDR  : 0x00000000
+      SIZE  : 4
+      LEN   : 1
+      ID    : 0
+      BURST : INCR
+  - R :
+    - READY : 0
+    - WAIT  : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h62------
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'hAEBFAEBA
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h742B7EBF
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h0C6D0CF1
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h6DDBC66A
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h0AB399D2
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h82DEC9A1
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h4D61A907
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h571D41DD
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h84888475
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'hBCE4FA1B
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h143591D6
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h016FEC42
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'hA7A754F3
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'hFF4562C7
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'hF0733BF5
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h65F60A9D
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h40037486
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h231E92E9
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h76871384
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h2D1F773D
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h2DB3C610
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'hD3EDE9AB
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h95640B0E
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h27112BC1
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'hAE164B3A
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h7F4566FA
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h0D27A2CA
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'hB747491C
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h79DB92A4
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 0
+    - READY : 0
+    - WAIT  : 1
+    - READY : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - CHECK :
+        DATA  : 32'h--CF7CFE
+        RESP  : OKAY
+        ID    : 0
+        LAST  : 1
+    - READY : 0
+- - M
+  - AR:
+    - READY : 0
+    - READY : 1
+    - WAIT  : {AVALID : 1, AREADY : 1}
+    - CHECK : 
+        ADDR  : 0x000007DF
+        SIZE  : 8
+        LEN   : 5
+        ID    : 0
+        BURST : INCR
+    - READY : 0
+  - R :
+    - VALID : 0
+      DATA  : 0
+      LAST  : 0
+    - WAIT  : {AVALID : 1, AREADY : 1, ON : on}
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h62FFFFFFFFFFFFFF
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h742B7EBFAEBFAEBA
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h6DDBC66A0C6D0CF1
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h82DEC9A10AB399D2
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h571D41DD4D61A907
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - DATA  : 0
+      LAST  : 0
+- - M
+  - AR:
+    - READY : 0
+    - READY : 1
+    - WAIT  : {AVALID : 1, AREADY : 1}
+    - CHECK : 
+        ADDR  : 0x00000800
+        SIZE  : 8
+        LEN   : 11
+        ID    : 0
+        BURST : INCR
+    - READY : 0
+  - R :
+    - VALID : 0
+      DATA  : 0
+      LAST  : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'hBCE4FA1B84888475
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h016FEC42143591D6
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'hFF4562C7A7A754F3
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h65F60A9DF0733BF5
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h231E92E940037486
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h2D1F773D76871384
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'hD3EDE9AB2DB3C610
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h27112BC195640B0E
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'h7F4566FAAE164B3A
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'hB747491C0D27A2CA
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 0
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - WAIT  : 2
+    - VALID : 1
+      DATA  : 64'hFFCF7CFE79DB92A4
+      RESP  : OKAY
+      ID    : 0
+      LAST  : 1
+    - WAIT  : {RVALID : 1, RREADY : 1}
+    - VALID : 0
+    - DATA  : 0
+      LAST  : 0
+---
