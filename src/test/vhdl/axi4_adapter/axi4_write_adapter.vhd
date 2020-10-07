@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_write_adapter.vhd
 --!     @brief   AXI4_WRITE_ADPATER
---!     @version 1.7.0
---!     @date    2018/3/22
+--!     @version 1.8.2
+--!     @date    2020/10/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2020 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -329,7 +329,7 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     --
     -------------------------------------------------------------------------------
     constant  t_push_buf_level  : std_logic_vector(SIZE_BITS-1 downto 0) 
-                               := std_logic_vector(to_unsigned(2**BUF_DEPTH-T_DATA_BYTES, SIZE_BITS));
+                               := std_logic_vector(to_unsigned(2**BUF_DEPTH-BUF_DATA_BYTES, SIZE_BITS));
     signal    t_push_buf_reset  : std_logic;
     signal    t_push_buf_val    : std_logic;
     signal    t_push_buf_last   : std_logic;
@@ -476,7 +476,7 @@ architecture RTL of AXI4_WRITE_ADAPTER is
     --
     -------------------------------------------------------------------------------
     constant  m_pull_buf_level  : std_logic_vector(SIZE_BITS-1 downto 0)
-                               := std_logic_vector(to_unsigned(M_DATA_BYTES, SIZE_BITS));
+                               := std_logic_vector(to_unsigned(BUF_DATA_BYTES, SIZE_BITS));
     signal    m_pull_buf_reset  : std_logic;
     signal    m_pull_buf_val    : std_logic;
     signal    m_pull_buf_last   : std_logic;
