@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_adapter_test_bench.vhd
 --!     @brief   AXI4_ADPATER TEST BENCH
---!     @version 1.7.0
---!     @date    2018/3/22
+--!     @version 1.8.2
+--!     @date    2020/10/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2020 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -42,15 +42,16 @@ use     ieee.std_logic_1164.all;
 package AXI4_ADAPTER_TEST_BENCH_COMPONENTS is
 component  AXI4_ADAPTER_TEST_BENCH
     generic (
-        NAME            : STRING;
-        SCENARIO_FILE   : STRING;
+        NAME            : STRING  := "test";
+        SCENARIO_FILE   : STRING  := "test.snr";
         T_CLK_RATE      : integer := 1;
         T_CLK_PERIOD    : time    := 10 ns;
         M_CLK_RATE      : integer := 1;
         M_CLK_PERIOD    : time    := 10 ns;
         T_DATA_WIDTH    : integer := 32;
         M_DATA_WIDTH    : integer := 32;
-        M_MAX_XFER_SIZE : integer := 12
+        M_MAX_XFER_SIZE : integer := 12;
+        FINISH_ABORT    : boolean := FALSE
     );
 end component;
 end package;
@@ -61,15 +62,16 @@ library ieee;
 use     ieee.std_logic_1164.all;
 entity  AXI4_ADAPTER_TEST_BENCH is
     generic (
-        NAME            : STRING;
-        SCENARIO_FILE   : STRING;
+        NAME            : STRING  := "test";
+        SCENARIO_FILE   : STRING  := "test.snr";
         T_CLK_RATE      : integer := 1;
         T_CLK_PERIOD    : time    := 10 ns;
         M_CLK_RATE      : integer := 1;
         M_CLK_PERIOD    : time    := 10 ns;
         T_DATA_WIDTH    : integer := 32;
         M_DATA_WIDTH    : integer := 32;
-        M_MAX_XFER_SIZE : integer := 12
+        M_MAX_XFER_SIZE : integer := 12;
+        FINISH_ABORT    : boolean := FALSE
     );
 end     AXI4_ADAPTER_TEST_BENCH;
 -----------------------------------------------------------------------------------
@@ -857,7 +859,11 @@ begin
         assert (T_REPORT.mismatch_count = 0 and
                 M_REPORT.mismatch_count = 0)
             report "Simulation complete(mismatch)." severity FAILURE;
-        assert FALSE report "Simulation complete(success)." severity NOTE;
+        if (FINISH_ABORT) then
+            assert FALSE report "Simulation complete(success)."  severity FAILURE;
+        else
+            assert FALSE report "Simulation complete(success)."  severity NOTE;
+        end if;
         wait;
     end process;
     
