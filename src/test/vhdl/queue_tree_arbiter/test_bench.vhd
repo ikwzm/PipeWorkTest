@@ -342,6 +342,110 @@ end MODEL;
 -----------------------------------------------------------------------------------
 --
 -----------------------------------------------------------------------------------
+entity  TEST_BENCH_04_4_3 is
+    generic (
+        NAME            :  STRING  := "test_04_4_3";
+        SCENARIO_FILE   :  STRING  := "test_04_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 3;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_04_4_3;
+architecture MODEL of TEST_BENCH_04_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_05_4_3 is
+    generic (
+        NAME            :  STRING  := "test_05_4_3";
+        SCENARIO_FILE   :  STRING  := "test_05_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 4;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_05_4_3;
+architecture MODEL of TEST_BENCH_05_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_06_4_3 is
+    generic (
+        NAME            :  STRING  := "test_06_4_3";
+        SCENARIO_FILE   :  STRING  := "test_06_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 5;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_06_4_3;
+architecture MODEL of TEST_BENCH_06_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_07_4_3 is
+    generic (
+        NAME            :  STRING  := "test_07_4_3";
+        SCENARIO_FILE   :  STRING  := "test_07_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 6;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_07_4_3;
+architecture MODEL of TEST_BENCH_07_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
 entity  TEST_BENCH_08_4_3 is
     generic (
         NAME            :  STRING  := "test_08_4_3";
@@ -354,6 +458,214 @@ entity  TEST_BENCH_08_4_3 is
     );
 end     TEST_BENCH_08_4_3;
 architecture MODEL of TEST_BENCH_08_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_09_4_3 is
+    generic (
+        NAME            :  STRING  := "test_09_4_3";
+        SCENARIO_FILE   :  STRING  := "test_09_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 8;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_09_4_3;
+architecture MODEL of TEST_BENCH_09_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_10_4_3 is
+    generic (
+        NAME            :  STRING  := "test_10_4_3";
+        SCENARIO_FILE   :  STRING  := "test_10_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 9;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_10_4_3;
+architecture MODEL of TEST_BENCH_10_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_11_4_3 is
+    generic (
+        NAME            :  STRING  := "test_11_4_3";
+        SCENARIO_FILE   :  STRING  := "test_11_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 10;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_11_4_3;
+architecture MODEL of TEST_BENCH_11_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_12_4_3 is
+    generic (
+        NAME            :  STRING  := "test_12_4_3";
+        SCENARIO_FILE   :  STRING  := "test_12_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 11;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_12_4_3;
+architecture MODEL of TEST_BENCH_12_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_13_4_3 is
+    generic (
+        NAME            :  STRING  := "test_13_4_3";
+        SCENARIO_FILE   :  STRING  := "test_13_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 12;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_13_4_3;
+architecture MODEL of TEST_BENCH_13_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_14_4_3 is
+    generic (
+        NAME            :  STRING  := "test_14_4_3";
+        SCENARIO_FILE   :  STRING  := "test_14_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 13;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_14_4_3;
+architecture MODEL of TEST_BENCH_14_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_15_4_3 is
+    generic (
+        NAME            :  STRING  := "test_15_4_3";
+        SCENARIO_FILE   :  STRING  := "test_15_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 14;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_15_4_3;
+architecture MODEL of TEST_BENCH_15_4_3 is
+begin
+    TB: entity WORK.TEST_BENCH generic map (
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,
+        MIN_NUM         => MIN_NUM         ,
+        MAX_NUM         => MAX_NUM         ,
+        NODE_NUM        => NODE_NUM        ,
+        PIPELINE        => PIPELINE        ,
+        FINISH_ABORT    => FINISH_ABORT    
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+entity  TEST_BENCH_16_4_3 is
+    generic (
+        NAME            :  STRING  := "test_16_4_3";
+        SCENARIO_FILE   :  STRING  := "test_16_4_3.snr";
+        MIN_NUM         :  integer := 0;
+        MAX_NUM         :  integer := 15;
+        NODE_NUM        :  integer := 4;
+        PIPELINE        :  integer := 0;
+        FINISH_ABORT    :  boolean := FALSE
+    );
+end     TEST_BENCH_16_4_3;
+architecture MODEL of TEST_BENCH_16_4_3 is
 begin
     TB: entity WORK.TEST_BENCH generic map (
         NAME            => NAME            ,

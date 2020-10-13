@@ -8,8 +8,10 @@ SRC_MAIN_PATH     = ../../../PipeWork/src/components
 SRC_TEST_PATH     = ../../../src/test/vhdl/queue_tree_arbiter
 SRC_SCENARIO_PATH = ../../../src/test/scenarios/queue_tree_arbiter
 
-TEST_BENCH = test_bench_08_4_0 \
+TEST_BENCH = test_bench_04_4_3 \
+             test_bench_08_4_0 \
              test_bench_08_4_3 \
+             test_bench_10_4_3 \
              $(END_LIST)
 
 all: $(TEST_BENCH)
@@ -21,14 +23,28 @@ test_bench_08_4_0: test_bench.o test_08_4_0.snr
 	$(GHDL) -e $(GHDLFLAGS) $@
 	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
+test_bench_04_4_3: test_bench.o test_04_4_3.snr
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
+
 test_bench_08_4_3: test_bench.o test_08_4_3.snr
+	$(GHDL) -e $(GHDLFLAGS) $@
+	$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+test_bench_10_4_3: test_bench.o test_10_4_3.snr
 	$(GHDL) -e $(GHDLFLAGS) $@
 	$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 test_08_4_0.snr : $(SRC_SCENARIO_PATH)/test_08_4.snr
 	$(CAT) $^ > $@
 
+test_04_4_3.snr : $(SRC_SCENARIO_PATH)/test_04_4.snr
+	$(CAT) $^ > $@
+
 test_08_4_3.snr : $(SRC_SCENARIO_PATH)/test_08_4.snr
+	$(CAT) $^ > $@
+
+test_10_4_3.snr : $(SRC_SCENARIO_PATH)/test_10_4.snr
 	$(CAT) $^ > $@
 
 test_bench.o: dut 

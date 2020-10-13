@@ -1,0 +1,166 @@
+---
+- MARCHAL : 
+  - SAY : TEST MIN_NUM=0 MAX_NUM=9 NODE_NUM=4
+---
+- [REQ0,REQ1,REQ2,REQ3,REQ4,REQ5,REQ6,REQ7,REQ8,REQ9] :
+  - OUT  : {GPO(0): 0}
+  - VALID: 0
+  - WAIT : {GPI(0): 1}
+  - WAIT : 10
+  - OUT  : {GPO(0): 1}
+- OUT    :
+  - READY: 0
+  - WAIT : 10
+  - OUT  : {GPO(0): 1}
+  - OUT  : {GPO(1): 1}
+---
+- MARCHAL : 
+  - SAY : TEST.1.01 REQ0=1
+---
+- [REQ0] :
+  - VALID: 1
+  - WAIT : {READY: 1}
+  - VALID: 0
+- OUT    :
+  - WAIT : {VALID: 1}
+  - CHECK: {DATA: "16'b00000000_00000001"}
+  - WAIT : 1
+  - READY: 1
+  - WAIT : 1
+  - READY: 0
+---
+- MARCHAL : 
+  - SAY : TEST.1.02 REQ1=1
+---
+- [REQ1] :
+  - VALID: 1
+  - WAIT : {READY: 1}
+  - VALID: 0
+- OUT    :
+  - WAIT : {VALID: 1}
+  - CHECK: {DATA: "16'b00000000_00000010"}
+  - WAIT : 1
+  - READY: 1
+  - WAIT : 1
+  - READY: 0
+---
+- MARCHAL : 
+  - SAY : TEST.1.03 REQ2=1
+---
+- [REQ2] :
+  - VALID: 1
+  - WAIT : {READY: 1}
+  - VALID: 0
+- OUT    :
+  - WAIT : {VALID: 1}
+  - CHECK: {DATA: "16'b00000000_00000100"}
+  - WAIT : 1
+  - READY: 1
+  - WAIT : 1
+  - READY: 0
+---
+- MARCHAL : 
+  - SAY : TEST.1.04 REQ3=1
+---
+- [REQ3] :
+  - VALID: 1
+  - WAIT : {READY: 1}
+  - VALID: 0
+- OUT    :
+  - WAIT : {VALID: 1}
+  - CHECK: {DATA: "16'b00000000_00001000"}
+  - WAIT : 1
+  - READY: 1
+  - WAIT : 1
+  - READY: 0
+---
+- MARCHAL : 
+  - SAY : TEST.1.05 REQ4=1
+---
+- [REQ4] :
+  - VALID: 1
+  - WAIT : {READY: 1}
+  - VALID: 0
+- OUT    :
+  - WAIT : {VALID: 1}
+  - CHECK: {DATA: "16'b00000000_00010000"}
+  - WAIT : 1
+  - READY: 1
+  - WAIT : 1
+  - READY: 0
+---
+- MARCHAL : 
+  - SAY : TEST.1.06 REQ5=1
+---
+- [REQ5] :
+  - VALID: 1
+  - WAIT : {READY: 1}
+  - VALID: 0
+- OUT    :
+  - WAIT : {VALID: 1}
+  - CHECK: {DATA: "16'b00000000_00100000"}
+  - WAIT : 1
+  - READY: 1
+  - WAIT : 1
+  - READY: 0
+---
+- MARCHAL : 
+  - SAY : TEST.1.07 REQ6=1
+---
+- [REQ6] :
+  - VALID: 1
+  - WAIT : {READY: 1}
+  - VALID: 0
+- OUT    :
+  - WAIT : {VALID: 1}
+  - CHECK: {DATA: "16'b00000000_01000000"}
+  - WAIT : 1
+  - READY: 1
+  - WAIT : 1
+  - READY: 0
+---
+- MARCHAL : 
+  - SAY : TEST.1.08 REQ7=1
+---
+- [REQ7] :
+  - VALID: 1
+  - WAIT : {READY: 1}
+  - VALID: 0
+- OUT    :
+  - WAIT : {VALID: 1}
+  - CHECK: {DATA: "16'b00000000_10000000"}
+  - WAIT : 1
+  - READY: 1
+  - WAIT : 1
+  - READY: 0
+---
+- MARCHAL : 
+  - SAY : TEST.1.09 REQ8=1
+---
+- [REQ8] :
+  - VALID: 1
+  - WAIT : {READY: 1}
+  - VALID: 0
+- OUT    :
+  - WAIT : {VALID: 1}
+  - CHECK: {DATA: "16'b00000001_00000000"}
+  - WAIT : 1
+  - READY: 1
+  - WAIT : 1
+  - READY: 0
+---
+- MARCHAL : 
+  - SAY : TEST.1.10 REQ9=1
+---
+- [REQ9] :
+  - VALID: 1
+  - WAIT : {READY: 1}
+  - VALID: 0
+- OUT    :
+  - WAIT : {VALID: 1}
+  - CHECK: {DATA: "16'b00000010_00000000"}
+  - WAIT : 1
+  - READY: 1
+  - WAIT : 1
+  - READY: 0
+---
