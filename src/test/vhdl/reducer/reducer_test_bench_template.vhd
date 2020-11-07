@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    test_bench_template.vhd
---!     @brief   TEST MODEL for REDUCER :
---!     @version 1.7.0
---!     @date    2018/3/22
+--!     @brief   TEST BENCH TEMPLATE for REDUCER :
+--!     @version 1.8.4
+--!     @date    2020/11/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2020 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -52,6 +52,7 @@ architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V is
     constant   O_SHIFT_MAX    : integer := O_WIDTH;
     constant   O_SHIFT_MIN    : integer := 0;
     constant   O_VAL_SIZE     : integer := %V;
+    constant   NO_VAL_SET     : integer := O_WIDTH;
     constant   NAME           : string(1 to 22) := "DWC_W%W_I%I_O%O_Q%Q_J%J_V%V";
     constant   PERIOD         : time    := 10 ns;
     constant   DELAY          : time    :=  1 ns;
@@ -64,6 +65,9 @@ architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V is
     signal     DONE           : std_logic;
     signal     FLUSH          : std_logic;
     signal     BUSY           : std_logic;
+    signal     START_DATA     : std_logic_vector(WORD_BITS-1 downto 0);
+    signal     FLUSH_DATA     : std_logic_vector(WORD_BITS-1 downto 0);
+    signal     NO_VAL_DATA    : std_logic_vector(WORD_BITS-1 downto 0);
     signal     I_ENABLE       : std_logic;
     signal     I_DATA         : std_logic_vector(I_WIDTH*(WORD_BITS  )-1 downto 0);
     signal     I_STRB         : std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
@@ -93,6 +97,7 @@ begin
             O_VAL_SIZE    => O_VAL_SIZE,
             O_SHIFT_MAX   => O_SHIFT_MAX,
             O_SHIFT_MIN   => O_SHIFT_MIN,
+            NO_VAL_SET    => NO_VAL_SET ,
             I_JUSTIFIED   => I_JUSTIFIED,
             FLUSH_ENABLE  => FLUSH_ENABLE
         )
@@ -104,6 +109,9 @@ begin
             OFFSET        => OFFSET,
             DONE          => DONE,
             FLUSH         => FLUSH,
+            START_DATA    => START_DATA ,
+            FLUSH_DATA    => FLUSH_DATA ,
+            NO_VAL_DATA   => NO_VAL_DATA,
             I_ENABLE      => I_ENABLE,
             I_DATA        => I_DATA,
             I_STRB        => I_STRB,
@@ -132,6 +140,7 @@ begin
             O_VAL_SIZE    => O_VAL_SIZE,
             O_SHIFT_MAX   => O_SHIFT_MAX,
             O_SHIFT_MIN   => O_SHIFT_MIN,
+            NO_VAL_SET    => NO_VAL_SET ,
             I_JUSTIFIED   => I_JUSTIFIED,
             FLUSH_ENABLE  => FLUSH_ENABLE
         )
@@ -143,6 +152,9 @@ begin
             CLK_ENA       => CLK_ENA   ,
             START         => START     ,
             OFFSET        => OFFSET    ,
+            START_DATA    => START_DATA ,
+            FLUSH_DATA    => FLUSH_DATA ,
+            NO_VAL_DATA   => NO_VAL_DATA,
             DONE          => DONE      ,
             FLUSH         => FLUSH     ,
             BUSY          => BUSY      ,
