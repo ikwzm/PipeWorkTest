@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    reducer_test_model.vhd
 --!     @brief   TEST MODEL for REDUCER :
---!     @version 1.7.0
---!     @date    2018/3/20
+--!     @version 1.8.4
+--!     @date    2020/11/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2020 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -148,6 +148,7 @@ entity  REDUCER_TEST_MODEL is
         O_SHIFT_MIN   : integer :=  4;
         O_SHIFT_MAX   : integer :=  4;
         I_JUSTIFIED   : integer :=  0;
+        NO_VAL_SET    : integer :=  0;
         FLUSH_ENABLE  : integer :=  0;
         DEBUG_PRINT   : boolean :=  FALSE
     );
@@ -159,6 +160,9 @@ entity  REDUCER_TEST_MODEL is
         OFFSET        : out std_logic_vector(O_WIDTH-1 downto 0);
         DONE          : out std_logic;
         FLUSH         : out std_logic;
+        START_DATA    : out std_logic_vector((WORD_BITS)-1 downto 0);
+        FLUSH_DATA    : out std_logic_vector((WORD_BITS)-1 downto 0);
+        NO_VAL_DATA   : out std_logic_vector((WORD_BITS)-1 downto 0);
         I_ENABLE      : out std_logic;
         I_DATA        : out std_logic_vector(I_WIDTH*(WORD_BITS  )-1 downto 0);
         I_STRB        : out std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
@@ -207,6 +211,7 @@ architecture MODEL of REDUCER_TEST_MODEL is
     signal     RECV_SHIFT     : integer;
     signal     i_valid        : std_logic;
     signal     o_ready        : std_logic;
+    constant   NO_VAL_BYTE    : std_logic_vector(7 downto 0) := (others => '1');
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -424,6 +429,11 @@ begin
                        i_valid  <= '0';
                        I_ENABLE <= '1';
                        O_ENABLE <= '1';
+                       for i in 0 to WORD_BITS/8-1 loop
+                           START_DATA ((i+1)*8-1 downto i*8) <= NO_VAL_BYTE;
+                           FLUSH_DATA ((i+1)*8-1 downto i*8) <= NO_VAL_BYTE;
+                           NO_VAL_DATA((i+1)*8-1 downto i*8) <= NO_VAL_BYTE;
+                       end loop;
         WAIT_CLK( 4);  RST      <= '0';
                        CLR      <= '0';
         WAIT_CLK( 4);
@@ -598,6 +608,7 @@ begin
         variable len         : integer;
         variable lo_pos      : integer;
         variable data        : std_logic_vector(O_DATA'range);
+        variable exp_data    : std_logic_vector(O_DATA'range);
         variable strb        : std_logic_vector(O_STRB'range);
         variable end_of_data : std_logic;
         variable data_ok     : boolean;
@@ -671,15 +682,23 @@ begin
                     size   := size - o_size;
                 end if;
                 assert (O_STRB = strb) report NAME & ":" & SCENARIO & " Mismatch O_STRB=" & BIN_TO_STRING(O_STRB) & " /= " & BIN_TO_STRING(strb) severity FAILURE;
-                data_ok := TRUE;
+                data_ok  := TRUE;
+                exp_data := (others => '0');
                 for i in O_STRB'range loop
                     if (O_STRB(i) = '1') then
                         if (O_DATA((i+1)*8-1 downto i*8) /= data((i+1)*8-1 downto i*8)) then
                             data_ok := FALSE;
                         end if;
+                        exp_data((i+1)*8-1 downto i*8) := data((i+1)*8-1 downto i*8);
+                    end if;
+                    if (WORD_BITS = 8 and NO_VAL_SET > i and O_STRB(i) = '0') then
+                        if (O_DATA((i+1)*8-1 downto i*8) /= NO_VAL_BYTE) then
+                            data_ok := FALSE;
+                        end if;
+                        exp_data((i+1)*8-1 downto i*8) := NO_VAL_BYTE;
                     end if;
                 end loop;
-                assert (data_ok) report NAME & ":" & SCENARIO & " Mismatch O_DATA=" & HEX_TO_STRING(O_DATA) & " /= " & HEX_TO_STRING(data) severity FAILURE;
+                assert (data_ok) report NAME & ":" & SCENARIO & " Mismatch O_DATA=" & HEX_TO_STRING(O_DATA) & " /= " & HEX_TO_STRING(exp_data) severity FAILURE;
                 if (RECV_EOD = TRUE) then
                     if (FLUSH_ENABLE > 0 and RECV_FLUSH) then
                         assert (O_FLUSH = end_of_data)
@@ -826,6 +845,7 @@ package COMPONENTS is
             O_VAL_SIZE  : integer;
             O_SHIFT_MIN : integer;
             O_SHIFT_MAX : integer;
+            NO_VAL_SET  : integer;
             I_JUSTIFIED : integer;
             FLUSH_ENABLE: integer
         );
@@ -837,6 +857,9 @@ package COMPONENTS is
             OFFSET      : out std_logic_vector(O_WIDTH-1 downto 0);
             DONE        : out std_logic;
             FLUSH       : out std_logic;
+            START_DATA  : out std_logic_vector((WORD_BITS  )-1 downto 0);
+            FLUSH_DATA  : out std_logic_vector((WORD_BITS  )-1 downto 0);
+            NO_VAL_DATA : out std_logic_vector((WORD_BITS  )-1 downto 0);
             I_ENABLE    : out std_logic;
             I_DATA      : out std_logic_vector(I_WIDTH*(WORD_BITS  )-1 downto 0);
             I_STRB      : out std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
