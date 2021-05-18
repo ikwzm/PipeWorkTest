@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4.vhd
 --!     @brief   Pump Sample Module (AXI4 to AXI4)
---!     @version 1.8.1
---!     @date    2020/10/2
+--!     @version 1.8.5
+--!     @date    2021/5/18
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2020 Ichiro Kawazome
+--      Copyright (C) 2012-2021 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -374,6 +374,7 @@ architecture RTL of PUMP_AXI4_TO_AXI4 is
     -------------------------------------------------------------------------------
     signal   regs_load          : std_logic_vector(REGS_DATA_BITS   -1 downto 0);
     signal   regs_wbit          : std_logic_vector(REGS_DATA_BITS   -1 downto 0);
+    signal   regs_rena          : std_logic_vector(REGS_DATA_BITS   -1 downto 0);
     signal   regs_rbit          : std_logic_vector(REGS_DATA_BITS   -1 downto 0);
     signal   pump_load          : std_logic_vector(CORE_DATA_BITS   -1 downto 0);
     signal   pump_wbit          : std_logic_vector(CORE_DATA_BITS   -1 downto 0);
@@ -1258,6 +1259,7 @@ begin
                 O_CKE           => sig_1             , -- In  :
                 O_WDATA         => regs_wbit         , -- Out :
                 O_WLOAD         => regs_load         , -- Out :
+                O_RENAB         => regs_rena         , -- Out :
                 O_RDATA         => regs_rbit           -- In  :
             );                                         -- 
     end block;
