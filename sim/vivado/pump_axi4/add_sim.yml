@@ -14,4 +14,13 @@
     PathList :  
         - "../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench.vhd"
         - "../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_32.vhd"
-    Top      :  ["PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32"]
+        - "../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_64.vhd"
+        - "../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_64_32.vhd"
+        - "../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_32_test_7.vhd"
+        - "../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_32_test_8.vhd"
+    Top      :
+        - "PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32"
+        - "PUMP_AXI4_TO_AXI4_TEST_BENCH_32_64"
+        - "PUMP_AXI4_TO_AXI4_TEST_BENCH_64_32"
+        - "PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32_TEST_7"
+        - "PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32_TEST_8"

@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    pump_axi4_to_axi4_test_bench.vhd
 --!     @brief   Test Bench for Pump Sample Module (AXI4 to AXI4)
---!     @version 1.7.0
---!     @date    2018/3/22
+--!     @version 1.8.6
+--!     @date    2021/5/25
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2021 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,8 @@ entity  PUMP_AXI4_TO_AXI4_TEST_BENCH is
         I_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
         O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
         MAX_XFER_SIZE   : integer                                :=  6;
-        BUF_DEPTH       : integer                                := 12
+        BUF_DEPTH       : integer                                := 12;
+        FINISH_ABORT    : boolean := FALSE
     );
 end     PUMP_AXI4_TO_AXI4_TEST_BENCH;
 -----------------------------------------------------------------------------------
@@ -1399,8 +1400,11 @@ begin
                 I_REPORT.mismatch_count = 0 and
                 O_REPORT.mismatch_count = 0)
             report "Simulation complete(mismatch)." severity FAILURE;
-        assert FALSE
-            report "Simulation complete(success)."  severity NOTE;
+        if (FINISH_ABORT) then
+            assert FALSE report "Simulation complete(success)."  severity FAILURE;
+        else
+            assert FALSE report "Simulation complete(success)."  severity NOTE;
+        end if;
         wait;
     end process;
     

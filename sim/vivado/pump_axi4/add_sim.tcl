@@ -12,3 +12,7 @@ add_vhdl_file sim_1     DUMMY_PLUG ../../../Dummy_Plug/src/main/vhdl/axi4/axi4_s
 add_vhdl_file sim_1     DUMMY_PLUG ../../../Dummy_Plug/src/main/vhdl/core/marchal.vhd
 add_vhdl_file sim_1     WORK ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench.vhd
 add_vhdl_file sim_1     WORK ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_32.vhd
+add_vhdl_file sim_1     WORK ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_32_test_7.vhd
+add_vhdl_file sim_1     WORK ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_32_test_8.vhd
+add_vhdl_file sim_1     WORK ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_64.vhd
+add_vhdl_file sim_1     WORK ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_64_32.vhd
