@@ -5,9 +5,12 @@
 set project_directory       [file dirname [info script]]
 set project_name            "pump_axi4_to_axi4"
 set device_parts            "xc7z010clg400-1"
+set test_bench              "PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32"
+set scenario_file           [file join $project_directory "pump_axi4_to_axi4_test_bench_32_32.snr" ]
 #
 # Create project
 #
+cd $project_directory
 create_project -force $project_name $project_directory
 #
 # Set project properties
@@ -78,14 +81,25 @@ add_files -fileset constrs_1 -norecurse ./timing.xdc
 # Set 'sources_1' fileset properties
 #
 set obj [get_filesets sources_1]
-set_property "top" "Add_Server"  $obj
+set_property "top" "PUMP_AXI4_TO_AXI4"  $obj
 #
 # Set 'sim_1' fileset properties
 #
+set current_vivado_version [version -short]
+if       { [string first "2019.2" $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
+} elseif { [string first "2018.3" $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
+} elseif { [string first "2017"   $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
+} else {
+   puts ""
+   puts "ERROR: This model can not run in Vivado <$current_vivado_version>"
+   return 1
+}
 set obj [get_filesets sim_1]
-set_property "top" "PUMP_AXI4_TO_AXI4_TEST_BENCH"  $obj
-set_property "generic" "NAME=PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32 SCENARIO_FILE=../../../pump_axi4_to_axi4_test_bench_32_32.snr I_DATA_WIDTH=32 O_DATA_WIDTH=32 MAX_XFER_SIZE=6" $obj
+set_property "top"     $test_bench $obj
+set_property "generic" "SCENARIO_FILE=$scenario_full_path FINISH_ABORT=true" $obj
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
-

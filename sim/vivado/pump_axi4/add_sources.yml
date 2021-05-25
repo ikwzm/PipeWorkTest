@@ -7,6 +7,9 @@
     Format   :  "add_vhdl_file sources_1 #{library_name} #{file_name}"
     PathList :  
         - "../../../PipeWork/src/"
+    Use      :
+        - "SDPRAM(XILINX_AUTO_SELECT)"
+        - "QUEUE_ARBITER(ONE_HOT_ARCH)"
 
 - Library:
     Name     :  work
