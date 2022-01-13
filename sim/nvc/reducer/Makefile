@@ -1,18 +1,8 @@
-DUMMY_PLUG_PATH      = ../../../Dummy_Plug
-DUMMY_PLUG_SRC_PATH  = $(DUMMY_PLUG_PATH)/src/main/vhdl
-DUMMY_PLUG_WORK_PATH = $(DUMMY_PLUG_PATH)/sim/nvc/lib/dummy_plug
-DUMMY_PLUG_TOOL_PATH = $(DUMMY_PLUG_PATH)/tools
-
-PIPEWORK_PATH        = ../../../PipeWork
-PIPEWORK_WORK_PATH   = $(PIPEWORK_PATH)/sim/nvc/PIPEWORK
-PIPEWORK_SRC_PATH    = $(PIPEWORK_PATH)/src
-PIPEWORK_TOOL_PATH   = $(PIPEWORK_PATH)/tools
-
-SRC_MAIN_PATH        = ../../../PipeWork/src/components
-SRC_TEST_PATH        = ../../../src/test/vhdl/reducer
+PIPEWORK_PATH = ../../../PipeWork
+SRC_TEST_PATH = ../../../src/test/vhdl/reducer
 
 NVC       = nvc
-NVCFLAGS  = --map=Dummy_Plug:$(DUMMY_PLUG_WORK_PATH) --map=PIPEWORK:$(PIPEWORK_WORK_PATH)
+NVCFLAGS  = -L ./ 
 
 TEST_BENCH = reducer_test_bench_dwc_w08_i1_o1_q0_j0_v0 \
              reducer_test_bench_dwc_w08_i1_o1_q0_j0_v1 \
@@ -53,12 +43,15 @@ TEST_BENCH = reducer_test_bench_dwc_w08_i1_o1_q0_j0_v0 \
 all: $(TEST_BENCH)
 
 clean:
-	rm -rf *.o work tmp.vhd $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
+	rm -rf *.o work DUMMY_PLUG PIPEWORK tmp.vhd analyze_libs.sh $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
 
-reducer_test_model.o : $(SRC_TEST_PATH)/reducer_test_model.vhd
-	$(NVC) $(NVCFLAGS) --work=work -a $<
+analyze_libs.sh: libs.yml
+	../../../PipeWork/tools/vhdl-archiver.rb -v --config libs.yml > analyze_libs.sh
 
-$(addsuffix .o,$(TEST_BENCH)) : reducer_test_model.o
+analyze_libs : analyze_libs.sh
+	sh analyze_libs.sh
+
+$(addsuffix .o,$(TEST_BENCH)) : analyze_libs
 %.o : %.vhd
 	$(NVC) $(NVCFLAGS) --work=work -a $<
 
