@@ -1,0 +1,27 @@
+
+- Global:
+    Print    :  true
+
+- Library:
+    Name     :  DUMMY_PLUG
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    Exclude  :  ["../../../Dummy_Plug/src/main/vhdl/core/sync_alt.vhd"]
+    PathList :  ["../../../Dummy_Plug/src/main/vhdl/"]
+
+- Library:
+    Name     :  PIPEWORK
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    Exclude  :  ["../../../PipeWork/src/components/sdpram_altera_auto_select.vhd",
+                 "../../../PipeWork/src/components/sdpram_xilinx_auto_select.vhd",
+                 "../../../PipeWork/src/components/sdpram_xilinx_ultrascale_auto_select.vhd"]
+    PathList :  ["../../../PipeWork/src/"]
+
+- Library:
+    Name     :  work
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    PathList :  ["../../../src/test/vhdl/pump_axi4/"]
+    Top      :  ["PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32",
+                 "PUMP_AXI4_TO_AXI4_TEST_BENCH_32_64",
+                 "PUMP_AXI4_TO_AXI4_TEST_BENCH_64_32",
+                 "PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32_TEST_7",
+                 "PUMP_AXI4_TO_AXI4_TEST_BENCH_32_32_TEST_8"]
