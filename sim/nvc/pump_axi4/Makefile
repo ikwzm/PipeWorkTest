@@ -2,7 +2,7 @@ PIPEWORK_PATH = ../../../PipeWork
 SRC_TEST_PATH = ../../../src/test/vhdl/pump_axi4
 
 NVC       = nvc
-NVCFLAGS  = -L ./ 
+NVCFLAGS  = -L ./ -M 32M
 
 TEST_BENCH = pump_axi4_to_axi4_test_bench_32_32        \
              pump_axi4_to_axi4_test_bench_32_64        \
