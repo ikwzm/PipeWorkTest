@@ -13,7 +13,7 @@ TEST_BENCH = axi4_adapter_test_bench_4096_32_32 \
 all: $(TEST_BENCH)
 
 clean:
-	rm -rf *.o work DUMMY_PLUG PIPEWORK analyze_libs.sh $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
+	rm -rf *.o WORK DUMMY_PLUG PIPEWORK analyze_libs.sh $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
 
 analyze_libs.sh: libs.yml
 	../../../PipeWork/tools/vhdl-archiver.rb -v --config libs.yml > analyze_libs.sh
@@ -21,13 +21,13 @@ analyze_libs.sh: libs.yml
 analyze_libs : analyze_libs.sh
 	sh analyze_libs.sh
 
-$(addsuffix .o,$(TEST_BENCH)) : analyze_libs
-%.o : %.vhd
-	$(NVC) $(NVCFLAGS) --work=work -a $<
+define TEST
+$(1): analyze_libs $(2)
+	$(NVC) $(NVCFLAGS) --work=WORK -e $(1)
+	$(NVC) $(NVCFLAGS) --work=WORK -r $(1)
+endef
 
-$(TEST_BENCH) : $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .snr,$(TEST_BENCH))
-	$(NVC) $(NVCFLAGS) --work=work -e $@
-	$(NVC) $(NVCFLAGS) --work=work -r $@
+$(foreach TB, $(TEST_BENCH), $(eval $(call TEST, $(TB), $(addsuffix .snr,$(TB)))))
 
 axi4_adapter_test_bench_4096_32_32.snr : $(SRC_SCENARIO_PATH)/make_scenario.rb
 	$< --name       AXI4_ADAPTER_TEST_4096_32_32 \

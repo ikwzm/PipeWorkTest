@@ -17,7 +17,7 @@
     PathList :  ["../../../PipeWork/src/"]
 
 - Library:
-    Name     :  work
+    Name     :  WORK
     Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
     PathList :  ["../../../src/test/vhdl/axi4_adapter/"]
     Top      :  ["AXI4_ADAPTER_TEST_BENCH_4096_32_32",
