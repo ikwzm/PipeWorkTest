@@ -56,7 +56,6 @@ nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/sdpram_model.vhd
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_core.vhd
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4.vhd
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench.vhd
-nvc -L ./ --work=WORK -a ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_zynqmp_acp.vhd
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_32.vhd
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_32_test_7.vhd
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/pump_axi4/pump_axi4_to_axi4_test_bench_32_32_test_8.vhd

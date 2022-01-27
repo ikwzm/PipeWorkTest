@@ -15,10 +15,10 @@ TEST_BENCH = pump_axi4_to_axi4_test_bench_32_32        \
 all: $(TEST_BENCH)
 
 clean:
-	rm -rf *.o work DUMMY_PLUG PIPEWORK analyze_libs.sh $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
+	rm -rf *.o work DUMMY_PLUG PIPEWORK $(TEST_BENCH) $(addsuffix .o,$(TEST_BENCH)) $(addsuffix .vhd,$(TEST_BENCH))
 
-analyze_libs.sh: libs.yml
-	../../../PipeWork/tools/vhdl-archiver.rb -v --config libs.yml > analyze_libs.sh
+# analyze_libs.sh: libs.yml
+# 	../../../PipeWork/tools/vhdl-archiver.rb -v --config libs.yml > analyze_libs.sh
 
 analyze_libs : analyze_libs.sh
 	sh analyze_libs.sh
