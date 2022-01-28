@@ -1,0 +1,28 @@
+
+- Global:
+    Print    :  true
+
+- Library:
+    Name     :  DUMMY_PLUG
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    Exclude  :  ["../../../Dummy_Plug/src/main/vhdl/core/sync_alt.vhd"]
+    PathList :  ["../../../Dummy_Plug/src/main/vhdl/"]
+
+- Library:
+    Name     :  PIPEWORK
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    Use      :  ["SDPRAM(MODEL)"]
+    PathList :  ["../../../PipeWork/src/"]
+
+- Library:
+    Name     :  WORK
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    PathList :  ["../../../src/test/vhdl/convolution_parameter_buffer/",
+                 "../../../src/test/vhdl/image_stream_models/"]
+    Top      :  ["CONVOLUTION_PARAMETER_BUFFER_TEST_BENCH_1x1x1x1",
+                 "CONVOLUTION_PARAMETER_BUFFER_TEST_BENCH_1x1x1x1_1x1x1x1",
+                 "CONVOLUTION_PARAMETER_BUFFER_TEST_BENCH_1x1x1x4",
+                 "CONVOLUTION_PARAMETER_BUFFER_TEST_BENCH_1x1x2x4",
+                 "CONVOLUTION_PARAMETER_BUFFER_TEST_BENCH_3x3x1x1",
+                 "CONVOLUTION_PARAMETER_BUFFER_TEST_BENCH_3x3x2x4"]
+                 
