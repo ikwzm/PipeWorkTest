@@ -1,0 +1,23 @@
+
+- Global:
+    Print    :  true
+
+- Library:
+    Name     :  DUMMY_PLUG
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    Exclude  :  ["../../../Dummy_Plug/src/main/vhdl/core/sync_alt.vhd"]
+    PathList :  ["../../../Dummy_Plug/src/main/vhdl/"]
+
+- Library:
+    Name     :  PIPEWORK
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    PathList :  ["../../../PipeWork/src/"]
+
+- Library:
+    Name     :  WORK
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    PathList :  ["../../../src/test/vhdl/unrolled_loop_counter/"]
+    Top      :  ["UNROLLED_LOOP_COUNTER_TEST_BENCH_32_0_1_1",
+                 "UNROLLED_LOOP_COUNTER_TEST_BENCH_32_0_2_1",
+                 "UNROLLED_LOOP_COUNTER_TEST_BENCH_32_0_1_2",
+                 "UNROLLED_LOOP_COUNTER_TEST_BENCH_32_1_1_2"]
