@@ -60,9 +60,9 @@ analyze_libs : $(call NVC_ANALIZE_FILE, $(call ENTITY $(TEST_BENCH)))
 $(foreach TB, $(TEST_BENCH), $(eval $(call NVC_ELAB, $(call ENTITY,$(TB)))))
 $(foreach TB, $(TEST_BENCH), $(eval $(call NVC_RUN , $(TB), $(call ENTITY,$(TB)), $(addsuffix .snr,$(TB)))))
 
-define GEN_SCENARIO
-$(call SCENARIO_FILE, $(1)) : $(call MAKE_SCENARIO_SCRIPT, $(1))
-	$(RUBY) $(call MAKE_SCENARIO_SCRIPT, $(1))
+define COPY_SCENARIO
+$(1): $(addprefix $(SCENARIO_PATH)/,$(1))
+	$(COPY) $(addprefix $(SCENARIO_PATH)/,$(1)) $(1)
 endef
 
-$(foreach TB, $(TEST_BENCH), $(eval $(call GEN_SCENARIO, $(TB))))
+$(foreach TB, $(TEST_BENCH), $(eval $(call COPY_SCENARIO, $(call SCENARIO_FILE, $(TB)))))
