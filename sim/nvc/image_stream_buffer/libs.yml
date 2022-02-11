@@ -1,0 +1,28 @@
+
+- Global:
+    Print    :  true
+
+- Library:
+    Name     :  DUMMY_PLUG
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    Exclude  :  ["../../../Dummy_Plug/src/main/vhdl/core/sync_alt.vhd"]
+    PathList :  ["../../../Dummy_Plug/src/main/vhdl/"]
+
+- Library:
+    Name     :  PIPEWORK
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    Exclude  :  ["../../../PipeWork/src/components/sdpram_altera_auto_select.vhd",
+                 "../../../PipeWork/src/components/sdpram_xilinx_auto_select.vhd",
+                 "../../../PipeWork/src/components/sdpram_xilinx_ultrascale_auto_select.vhd"]
+    PathList :  ["../../../PipeWork/src/"]
+
+- Library:
+    Name     :  WORK
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    PathList :  ["../../../src/test/vhdl/image_stream_buffer/",
+                 "../../../src/test/vhdl/image_stream_models/"]
+    Top      :  ["IMAGE_STREAM_BUFFER_TEST_4_8_1x1x1_1x1x1x1",
+                 "IMAGE_STREAM_BUFFER_TEST_4_8_4x1x1_4x1x1x1",
+                 "IMAGE_STREAM_BUFFER_TEST_1_8_1x4x1_1x1x5x5",
+                 "IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3",
+                 "IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3_bug1"]
