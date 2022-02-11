@@ -3,7 +3,7 @@ SRC_TEST_PATH = ../../../src/test/vhdl/$(PROJECT_NAME)
 SCENARIO_PATH = ../../../src/test/scenarios/$(PROJECT_NAME)
 
 NVC           = nvc
-NVCFLAGS      = -L ./ -M 32M
+NVCFLAGS      = -L ./ -M 64M
 COPY          = cp
 RUBY          = ruby
 
