@@ -1,0 +1,12 @@
+nvc -L ./ --work=DUMMY_PLUG -a ../../../Dummy_Plug/src/main/vhdl/core/util.vhd
+nvc -L ./ --work=DUMMY_PLUG -a ../../../Dummy_Plug/src/main/vhdl/core/reader.vhd
+nvc -L ./ --work=DUMMY_PLUG -a ../../../Dummy_Plug/src/main/vhdl/core/sync.vhd
+nvc -L ./ --work=DUMMY_PLUG -a ../../../Dummy_Plug/src/main/vhdl/core/vocal.vhd
+nvc -L ./ --work=DUMMY_PLUG -a ../../../Dummy_Plug/src/main/vhdl/core/core.vhd
+nvc -L ./ --work=DUMMY_PLUG -a ../../../Dummy_Plug/src/main/vhdl/core/marchal.vhd
+nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/image/image_types.vhd
+nvc -L ./ --work=WORK -a ../../../src/test/vhdl/image_stream_models/image_stream_player.vhd
+nvc -L ./ --work=WORK -a ../../../src/test/vhdl/image_stream_models/image_stream_master_player.vhd
+nvc -L ./ --work=WORK -a ../../../src/test/vhdl/image_stream_models/image_stream_models.vhd
+nvc -L ./ --work=WORK -a ../../../src/test/vhdl/image_stream_models/image_stream_slave_player.vhd
+nvc -L ./ --work=WORK -a ../../../src/test/vhdl/image_stream_models/image_stream_player_test_bench.vhd
