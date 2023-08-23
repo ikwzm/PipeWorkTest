@@ -17,8 +17,11 @@ TEST_BENCH    = test_8x0x0x0x0 \
 
 all: $(TEST_BENCH)
 
-clean:
+clean_all:
 	rm -rf *.o WORK DUMMY_PLUG PIPEWORK analyze_libs.sh $(addsuffix .snr,$(TEST_BENCH))
+
+clean:
+	rm -rf *.o WORK DUMMY_PLUG PIPEWORK
 
 analyze_libs.sh: libs.yml
 	../../../PipeWork/tools/vhdl-archiver.rb -v --config libs.yml > analyze_libs.sh
