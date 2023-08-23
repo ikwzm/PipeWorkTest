@@ -620,7 +620,7 @@ begin
                     when EVENT_SEQ_BEGIN => 
                         READ_EVENT(core, stream, EVENT_SEQ_BEGIN);
                         if (seq_level >= SEQ_PARAM.MAX) then
-                            READ_ERROR(core, proc_name, "READ_ELEM Out of Level(" & INTEGER_TO_STRING(seq_level) & ")");
+                            READ_ERROR(core, proc_name, "READ_ELEM Out of Level(" & INTEGER_TO_STRING(seq_level) & ") >= (" & INTEGER_TO_STRING(SEQ_PARAM.MAX) & ")");
                         else
                             seq_level := seq_level + 1;
                             seq_pos(seq_level) := SEQ_PARAM.LO_POS(seq_level);
