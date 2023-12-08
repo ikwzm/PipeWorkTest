@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    test_bench_template.vhd
 --!     @brief   TEST BENCH TEMPLATE for REDUCER :
---!     @version 1.8.4
---!     @date    2020/11/7
+--!     @version 1.9.0
+--!     @date    2023/12/8
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2020 Ichiro Kawazome
+--      Copyright (C) 2012-2023 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -39,21 +39,22 @@ use     ieee.std_logic_1164.all;
 library PIPEWORK;
 use     PIPEWORK.COMPONENTS.REDUCER;
 use     WORK.COMPONENTS.REDUCER_TEST_MODEL;
-entity  REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V is
+entity  REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_K%K_V%V is
     port(FINISH:out std_logic);
-end     REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V;
-architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V is
+end     REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_K%K_V%V;
+architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_K%K_V%V is
     constant   WORD_BITS      : integer := %W;
     constant   I_WIDTH        : integer := %I;
     constant   O_WIDTH        : integer := %O;
     constant   QUEUE_SIZE     : integer := %Q;
     constant   FLUSH_ENABLE   : integer :=  1;
     constant   I_JUSTIFIED    : integer := %J;
+    constant   I_DVAL_ENABLE  : integer := %K;
     constant   O_SHIFT_MAX    : integer := O_WIDTH;
     constant   O_SHIFT_MIN    : integer := 0;
     constant   O_VAL_SIZE     : integer := %V;
     constant   NO_VAL_SET     : integer := O_WIDTH;
-    constant   NAME           : string(1 to 22) := "DWC_W%W_I%I_O%O_Q%Q_J%J_V%V";
+    constant   NAME           : string(1 to 25) := "DWC_W%W_I%I_O%O_Q%Q_J%J_K%K_V%V";
     constant   PERIOD         : time    := 10 ns;
     constant   DELAY          : time    :=  1 ns;
     signal     CLK_ENA        : std_logic;
@@ -71,6 +72,7 @@ architecture MODEL of REDUCER_TEST_BENCH_DWC_W%W_I%I_O%O_Q%Q_J%J_V%V is
     signal     I_ENABLE       : std_logic;
     signal     I_DATA         : std_logic_vector(I_WIDTH*(WORD_BITS  )-1 downto 0);
     signal     I_STRB         : std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
+    signal     I_DVAL         : std_logic_vector(I_WIDTH              -1 downto 0);
     signal     I_DONE         : std_logic;
     signal     I_FLUSH        : std_logic;
     signal     I_VAL          : std_logic;
@@ -98,6 +100,7 @@ begin
             O_SHIFT_MAX   => O_SHIFT_MAX,
             O_SHIFT_MIN   => O_SHIFT_MIN,
             NO_VAL_SET    => NO_VAL_SET ,
+            I_DVAL_ENABLE => I_DVAL_ENABLE,
             I_JUSTIFIED   => I_JUSTIFIED,
             FLUSH_ENABLE  => FLUSH_ENABLE
         )
@@ -115,6 +118,7 @@ begin
             I_ENABLE      => I_ENABLE,
             I_DATA        => I_DATA,
             I_STRB        => I_STRB,
+            I_DVAL        => I_DVAL,
             I_FLUSH       => I_FLUSH,
             I_DONE        => I_DONE,
             I_VAL         => I_VAL,
@@ -142,6 +146,7 @@ begin
             O_SHIFT_MIN   => O_SHIFT_MIN,
             NO_VAL_SET    => NO_VAL_SET ,
             I_JUSTIFIED   => I_JUSTIFIED,
+            I_DVAL_ENABLE => I_DVAL_ENABLE,
             FLUSH_ENABLE  => FLUSH_ENABLE
         )
         port map (
@@ -161,6 +166,7 @@ begin
             I_ENABLE      => I_ENABLE  ,
             I_DATA        => I_DATA    ,
             I_STRB        => I_STRB    ,
+            I_DVAL        => I_DVAL    ,
             I_DONE        => I_DONE    ,
             I_FLUSH       => I_FLUSH   ,
             I_VAL         => I_VAL     ,
