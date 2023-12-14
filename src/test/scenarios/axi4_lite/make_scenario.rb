@@ -18,7 +18,7 @@ class ScenarioGenerater
     io.print "  - WRITE : \n"
     io.print "      ADDR : ", sprintf("0x%08X", address), "\n"
     io.print "      ID   : ", @id, "\n"
-    io.print "      DATA : [", (data.collect{ |d| sprintf("0x%02X",d)}).join(',') ,"]\n"
+    io.print "      DATA : [", (data.collect{ |d| sprintf("0x%02X",d)}).join(',') ,"]\n" if (data.length > 0)
     io.print "      RESP : ", resp, "\n"
   end
   def  gen_read(io, address, data, resp)
@@ -29,15 +29,19 @@ class ScenarioGenerater
     io.print "      RESP : ", resp, "\n"
   end
 
-  def gen(io, address, data, resp)
+  def gen_strb_null_test(io)
+    address=0x00000010
+    data_size= (@axi4_data_width > 32)? 8 : 4;
+    data=@data.slice(address, data_size)
+    resp="OKAY"
     @no += 1
     io.print "---\n"
     io.print "- - [MARCHAL]\n"
     io.print "  - SAY : \"", @name, " " , @no, "\"\n"
     io.print "- - [MASTER] \n"
     gen_write(io, address, data, resp)
-    io.print "---\n"
-    io.print "- - [MASTER] \n"
+    gen_read( io, address, data, resp)
+    gen_write(io, address, []  , resp)
     gen_read( io, address, data, resp)
   end
 
@@ -71,6 +75,7 @@ class ScenarioGenerater
         address  = address - data_len
         gen_read( io, address, @data[address..address+data_len-1], "OKAY")
     end
+    gen_strb_null_test(io)
     io.print "---\n"
     io.close
   end
