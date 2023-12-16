@@ -3414,3 +3414,34 @@
       DATA : [0xFC,0x0D,0xED,0x14,0x78,0x21,0x57,0xFB,0x0C,0xCF,0x8B,0xE1,0x7E,0xEF,0x70,0xE6,0xEE,0x28,0x6E,0xB6,0x97,0x68,0x30,0x28]
       RESP : OKAY
 ---
+- - [MARCHAL]
+  - SAY : "AXI4 REGSITER INTERFACE TEST 2"
+- - [MASTER] 
+  - WRITE : 
+      ADDR : 0x00000010
+      SIZE : 4
+      BURST: INCR
+      ID   : 10
+      DATA : [0x97,0x68,0x30,0x28]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000010
+      SIZE : 4
+      BURST: INCR
+      ID   : 10
+      DATA : [0x97,0x68,0x30,0x28]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000010
+      SIZE : 4
+      BURST: INCR
+      ID   : 10
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000010
+      SIZE : 4
+      BURST: INCR
+      ID   : 10
+      DATA : [0x97,0x68,0x30,0x28]
+      RESP : OKAY
+---

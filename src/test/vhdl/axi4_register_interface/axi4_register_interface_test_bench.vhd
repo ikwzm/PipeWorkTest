@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_register_interface_test_bench.vhd
 --!     @brief   AXI4_REGISTER_INTERFACE TEST BENCH
---!     @version 1.7.0
---!     @date    2018/3/22
+--!     @version 1.9.0
+--!     @date    2023/12/11
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2023 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,10 @@ entity  AXI4_REGISTER_INTERFACE_TEST_BENCH is
         NAME            : STRING;
         SCENARIO_FILE   : STRING;
         AXI4_DATA_WIDTH : integer := 32;
-        REGS_DATA_WIDTH : integer := 32
+        REGS_DATA_WIDTH : integer := 32;
+        PRINT_AXI4_READ : boolean := TRUE;
+        PRINT_AXI4_WRITE: boolean := TRUE;
+        FINISH_ABORT    : boolean := FALSE
     );
 end     AXI4_REGISTER_INTERFACE_TEST_BENCH;
 -----------------------------------------------------------------------------------
@@ -343,17 +346,17 @@ begin
     -------------------------------------------------------------------------------
     -- AXI4_SIGNAL_PRINTER
     -------------------------------------------------------------------------------
-    PRINT: AXI4_SIGNAL_PRINTER
-        generic map (
-            NAME            => NAME,
-            TAG             => NAME,
-            TAG_WIDTH       => 0,
-            TIME_WIDTH      => 13,
-            WIDTH           => WIDTH,
-            READ_ENABLE     => TRUE,
-            WRITE_ENABLE    => TRUE
-        )
-        port map (
+    PRINT: AXI4_SIGNAL_PRINTER                   -- 
+        generic map (                            -- 
+            NAME            => NAME            , -- 
+            TAG             => NAME            , -- 
+            TAG_WIDTH       => 0               , -- 
+            TIME_WIDTH      => 13              , -- 
+            WIDTH           => WIDTH           , -- 
+            READ_ENABLE     => PRINT_AXI4_READ , -- 
+            WRITE_ENABLE    => PRINT_AXI4_WRITE  -- 
+        )                                        -- 
+        port map (                               -- 
         ---------------------------------------------------------------------------
         -- グローバルシグナル.
         ---------------------------------------------------------------------------
@@ -635,7 +638,11 @@ begin
         WRITE(L,T);                                                   WRITELINE(OUTPUT,L);
         assert(M_REPORT.error_count    = 0) report "Simulation complete(error)."    severity FAILURE;
         assert(M_REPORT.mismatch_count = 0) report "Simulation complete(mismatch)." severity FAILURE;
-        assert(FALSE                      ) report "Simulation complete(success)."  severity NOTE;
+        if (FINISH_ABORT) then
+            assert FALSE report "Simulation complete(success)."  severity FAILURE;
+        else
+            assert FALSE report "Simulation complete(success)."  severity NOTE;
+        end if;
         wait;
     end process;
     

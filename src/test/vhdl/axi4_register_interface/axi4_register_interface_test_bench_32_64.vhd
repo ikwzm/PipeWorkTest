@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_register_interface_test_bench_32_64.vhd
 --!     @brief   AXI4_REGISTER_INTERFACE TEST BENCH(AXI4_DATA_WIDTH=32,REGS_DATA_WIDTH=64)
---!     @version 1.7.0
---!     @date    2018/3/22
+--!     @version 1.9.0
+--!     @date    2023/12/11
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2023 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -37,21 +37,23 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 entity  AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64 is
+    generic (
+        NAME            : STRING  := string'("AXI4_REGS_IF_32_64");
+        SCENARIO_FILE   : STRING  := string'("axi4_register_interface_test_bench_32_64.snr");
+        PRINT_AXI4_READ : boolean := TRUE;
+        PRINT_AXI4_WRITE: boolean := TRUE;
+        FINISH_ABORT    : boolean := FALSE
+    );
 end     AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64;
 architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64 is
-    component  AXI4_REGISTER_INTERFACE_TEST_BENCH is
-        generic (
-            NAME            : STRING;
-            SCENARIO_FILE   : STRING;
-            AXI4_DATA_WIDTH : integer;
-            REGS_DATA_WIDTH : integer
-        );
-    end component;
 begin
-    TB: AXI4_REGISTER_INTERFACE_TEST_BENCH generic map(
-            NAME            => string'("AXI4_REGS_IF_32_64"),
-            SCENARIO_FILE   => string'("axi4_register_interface_test_bench_32_64.snr"),
+    TB: entity work.AXI4_REGISTER_INTERFACE_TEST_BENCH generic map(
+            NAME            => NAME,
+            SCENARIO_FILE   => SCENARIO_FILE,
             AXI4_DATA_WIDTH => 32,
-            REGS_DATA_WIDTH => 64
+            REGS_DATA_WIDTH => 64,
+            PRINT_AXI4_READ => PRINT_AXI4_READ,
+            PRINT_AXI4_WRITE=> PRINT_AXI4_WRITE,
+            FINISH_ABORT    => FINISH_ABORT
     );
 end MODEL;

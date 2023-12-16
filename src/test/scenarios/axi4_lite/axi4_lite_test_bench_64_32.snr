@@ -14170,3 +14170,26 @@
       DATA : [0x2A]
       RESP : OKAY
 ---
+- - [MARCHAL]
+  - SAY : "AXI4 LITE TEST 2"
+- - [MASTER] 
+  - WRITE : 
+      ADDR : 0x00000010
+      ID   : 10
+      DATA : [0x4A,0xE6,0x1F,0x3E,0x90,0x93,0xAA,0x2C]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000010
+      ID   : 10
+      DATA : [0x4A,0xE6,0x1F,0x3E,0x90,0x93,0xAA,0x2C]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000010
+      ID   : 10
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000010
+      ID   : 10
+      DATA : [0x4A,0xE6,0x1F,0x3E,0x90,0x93,0xAA,0x2C]
+      RESP : OKAY
+---

@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    reducer_test_model.vhd
 --!     @brief   TEST MODEL for REDUCER :
---!     @version 1.8.4
---!     @date    2020/11/7
+--!     @version 1.9.0
+--!     @date    2023/12/8
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2020 Ichiro Kawazome
+--      Copyright (C) 2012-2023 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -148,6 +148,7 @@ entity  REDUCER_TEST_MODEL is
         O_SHIFT_MIN   : integer :=  4;
         O_SHIFT_MAX   : integer :=  4;
         I_JUSTIFIED   : integer :=  0;
+        I_DVAL_ENABLE : integer :=  0;
         NO_VAL_SET    : integer :=  0;
         FLUSH_ENABLE  : integer :=  0;
         DEBUG_PRINT   : boolean :=  FALSE
@@ -166,6 +167,7 @@ entity  REDUCER_TEST_MODEL is
         I_ENABLE      : out std_logic;
         I_DATA        : out std_logic_vector(I_WIDTH*(WORD_BITS  )-1 downto 0);
         I_STRB        : out std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
+        I_DVAL        : out std_logic_vector(I_WIDTH              -1 downto 0);
         I_FLUSH       : out std_logic;
         I_DONE        : out std_logic;
         I_VAL         : out std_logic;
@@ -293,6 +295,8 @@ begin
         procedure OUTPUT(ADDR,SIZE:integer;INITIALIZE,LAST,FLUSH:boolean) is
             variable data         : std_logic_vector(I_DATA'range);
             variable strb         : std_logic_vector(I_STRB'range);
+            variable v_strb       : std_logic_vector(I_STRB'range);
+            constant Z_STRB       : std_logic_vector(WORD_BITS/8-1 downto 0) := (others => '0');
             variable valid        : std_logic;
             variable end_of_data  : std_logic;
             variable pos          : integer;
@@ -330,15 +334,25 @@ begin
                         if (i+num > strb'high) then
                             I_DATA(8*(i+1)-1 downto 8*i) <= (others => '0');
                             I_STRB(                   i) <= '0';
+                            v_strb(                   i) := '0';
                         else
                             I_DATA(8*(i+1)-1 downto 8*i) <= data(8*(i+1+num)-1 downto 8*(i+num));
                             I_STRB(                   i) <= strb(i+num);
+                            v_strb(                   i) := strb(i+num);
                         end if;
                     end loop;
                 else
                     I_DATA <= data;
                     I_STRB <= strb;
+                    v_strb := strb;
                 end if;
+                for i in I_DVAL'range loop
+                    if (v_strb((i+1)*(WORD_BITS/8)-1 downto i*(WORD_BITS/8)) /= Z_STRB) then
+                        I_DVAL(i) <= '1';
+                    else 
+                        I_DVAL(i) <= '0';
+                    end if;
+                end loop;
                 if (LAST) then
                     I_DONE  <= end_of_data;
                 else
@@ -360,6 +374,7 @@ begin
                 I_FLUSH <= '0';
                 I_DATA  <= (others => '1');
                 I_STRB  <= (others => '1');
+                I_DVAL  <= (others => '1');
             end loop;
         end procedure;
         ---------------------------------------------------------------------------
@@ -423,6 +438,7 @@ begin
                        FLUSH    <= '0';
                        I_DATA   <= (others => '0');
                        I_STRB   <= (others => '0');
+                       I_DVAL   <= (others => '0');
                        I_FLUSH  <= '0';
                        I_DONE   <= '0';
                        I_VAL    <= '0';
@@ -837,47 +853,49 @@ use     ieee.std_logic_1164.all;
 package COMPONENTS is
     component REDUCER_TEST_MODEL is
         generic (
-            NAME        : string;
-            DELAY       : time;
-            WORD_BITS   : integer;
-            I_WIDTH     : integer;
-            O_WIDTH     : integer;
-            O_VAL_SIZE  : integer;
-            O_SHIFT_MIN : integer;
-            O_SHIFT_MAX : integer;
-            NO_VAL_SET  : integer;
-            I_JUSTIFIED : integer;
-            FLUSH_ENABLE: integer
+            NAME            : string;
+            DELAY           : time;
+            WORD_BITS       : integer;
+            I_WIDTH         : integer;
+            O_WIDTH         : integer;
+            O_VAL_SIZE      : integer;
+            O_SHIFT_MIN     : integer;
+            O_SHIFT_MAX     : integer;
+            NO_VAL_SET      : integer;
+            I_JUSTIFIED     : integer;
+            I_DVAL_ENABLE   : integer;
+            FLUSH_ENABLE    : integer
         );
         port(
-            CLK         : in  std_logic;
-            RST         : out std_logic;
-            CLR         : out std_logic;
-            START       : out std_logic;
-            OFFSET      : out std_logic_vector(O_WIDTH-1 downto 0);
-            DONE        : out std_logic;
-            FLUSH       : out std_logic;
-            START_DATA  : out std_logic_vector((WORD_BITS  )-1 downto 0);
-            FLUSH_DATA  : out std_logic_vector((WORD_BITS  )-1 downto 0);
-            NO_VAL_DATA : out std_logic_vector((WORD_BITS  )-1 downto 0);
-            I_ENABLE    : out std_logic;
-            I_DATA      : out std_logic_vector(I_WIDTH*(WORD_BITS  )-1 downto 0);
-            I_STRB      : out std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
-            I_FLUSH     : out std_logic;
-            I_DONE      : out std_logic;
-            I_VAL       : out std_logic;
-            I_RDY       : in  std_logic := '0';
-            O_ENABLE    : out std_logic;
-            O_DATA      : in  std_logic_vector(O_WIDTH*(WORD_BITS  )-1 downto 0) := (others => '0');
-            O_STRB      : in  std_logic_vector(O_WIDTH*(WORD_BITS/8)-1 downto 0) := (others => '1');
-            O_FLUSH     : in  std_logic := '0';
-            O_DONE      : in  std_logic := '0';
-            O_VAL       : in  std_logic := '0';
-            O_RDY       : out std_logic;
-            O_SHIFT     : out std_logic_vector(O_SHIFT_MAX downto O_SHIFT_MIN);
-            BUSY        : in  std_logic;
-            CLK_ENA     : out std_logic;
-            FINISH      : out std_logic
+            CLK             : in  std_logic;
+            RST             : out std_logic;
+            CLR             : out std_logic;
+            START           : out std_logic;
+            OFFSET          : out std_logic_vector(O_WIDTH-1 downto 0);
+            DONE            : out std_logic;
+            FLUSH           : out std_logic;
+            START_DATA      : out std_logic_vector((WORD_BITS  )-1 downto 0);
+            FLUSH_DATA      : out std_logic_vector((WORD_BITS  )-1 downto 0);
+            NO_VAL_DATA     : out std_logic_vector((WORD_BITS  )-1 downto 0);
+            I_ENABLE        : out std_logic;
+            I_DATA          : out std_logic_vector(I_WIDTH*(WORD_BITS  )-1 downto 0);
+            I_STRB          : out std_logic_vector(I_WIDTH*(WORD_BITS/8)-1 downto 0);
+            I_DVAL          : out std_logic_vector(I_WIDTH              -1 downto 0);
+            I_FLUSH         : out std_logic;
+            I_DONE          : out std_logic;
+            I_VAL           : out std_logic;
+            I_RDY           : in  std_logic := '0';
+            O_ENABLE        : out std_logic;
+            O_DATA          : in  std_logic_vector(O_WIDTH*(WORD_BITS  )-1 downto 0) := (others => '0');
+            O_STRB          : in  std_logic_vector(O_WIDTH*(WORD_BITS/8)-1 downto 0) := (others => '1');
+            O_FLUSH         : in  std_logic := '0';
+            O_DONE          : in  std_logic := '0';
+            O_VAL           : in  std_logic := '0';
+            O_RDY           : out std_logic;
+            O_SHIFT         : out std_logic_vector(O_SHIFT_MAX downto O_SHIFT_MIN);
+            BUSY            : in  std_logic;
+            CLK_ENA         : out std_logic;
+            FINISH          : out std_logic
         );
     end component;
 end COMPONENTS;

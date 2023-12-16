@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 #---------------------------------------------------------------------------------
 #
-#       Version     :   1.8.0
-#       Created     :   2019/1/8
+#       Version     :   1.8.9
+#       Created     :   2023/8/22
 #       File name   :   image_stream.rb
 #       Author      :   Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 #       Description :   IMAGE_STREAM用シナリオ生成モジュール
 #
 #---------------------------------------------------------------------------------
 #
-#       Copyright (C) 2019 Ichiro Kawazome
+#       Copyright (C) 2019-2023 Ichiro Kawazome
 #       All rights reserved.
 # 
 #       Redistribution and use in source and binary forms, with or without
@@ -48,12 +48,12 @@ module Dummy_Plug
         attr_reader :valid, :start, :last
         def initialize(valid, start, last)
           def to_boolan(x)
-            if    x == TRUE or x == FALSE then
+            if    x == true or x == false then
               return x
             elsif x == 1 then
-              return TRUE
+              return true
             elsif x == 0 then
-              return FALSE
+              return false
             else
               raise ArgumentError
             end
@@ -64,9 +64,9 @@ module Dummy_Plug
           @bits  = ATRB_BITS
         end
         def to_int
-          return ((@valid == TRUE) ? 1 : 0 ) |
-                 ((@start == TRUE) ? 2 : 0 ) |
-                 ((@last  == TRUE) ? 4 : 0 )
+          return ((@valid == true) ? 1 : 0 ) |
+                 ((@start == true) ? 2 : 0 ) |
+                 ((@last  == true) ? 4 : 0 )
         end
       end
 
