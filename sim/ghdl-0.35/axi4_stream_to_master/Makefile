@@ -11,7 +11,11 @@ DUT_COMPONENTS = axi4_stream_to_master \
 
 TEST_BENCH     = axi4_s2m_tb_32_32_256_sync          \
                  axi4_s2m_tb_32_64_256_sync          \
+                 axi4_s2m_tb_32_64_256_sync_1        \
+                 axi4_s2m_tb_32_64_256_sync_2        \
                  axi4_s2m_tb_64_32_256_sync          \
+                 axi4_s2m_tb_64_32_256_sync_1        \
+                 axi4_s2m_tb_64_32_256_sync_2        \
                  axi4_s2m_tb_64_64_256_sync          \
                  axi4_s2m_tb_32_32_256_100mhz_250mhz \
                  axi4_s2m_tb_32_32_256_250mhz_100mhz \
@@ -30,7 +34,23 @@ axi4_s2m_tb_32_64_256_sync          : axi4_stream_to_master_test_bench.o DUT axi
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
+axi4_s2m_tb_32_64_256_sync_1        : axi4_stream_to_master_test_bench.o DUT axi4_stream_to_master_test_bench_32_64_256.snr
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+
+axi4_s2m_tb_32_64_256_sync_2        : axi4_stream_to_master_test_bench.o DUT axi4_stream_to_master_test_bench_32_64_256.snr
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+
 axi4_s2m_tb_64_32_256_sync          : axi4_stream_to_master_test_bench.o DUT axi4_stream_to_master_test_bench_64_32_256.snr
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+
+axi4_s2m_tb_64_32_256_sync_1        : axi4_stream_to_master_test_bench.o DUT axi4_stream_to_master_test_bench_64_32_256.snr
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+
+axi4_s2m_tb_64_32_256_sync_2        : axi4_stream_to_master_test_bench.o DUT axi4_stream_to_master_test_bench_64_32_256.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
