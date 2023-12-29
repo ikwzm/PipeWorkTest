@@ -20,6 +20,10 @@
     Name     :  WORK
     Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
     PathList :  ["../../../src/test/vhdl/axi4_lite/"]
-    Top      :  ["AXI4_LITE_TEST_BENCH_32_32",
-                 "AXI4_LITE_TEST_BENCH_32_64",
-                 "AXI4_LITE_TEST_BENCH_64_32"]
+    Top      :  ["AXI4_LITE_TEST_BENCH_32_32_0",
+                 "AXI4_LITE_TEST_BENCH_32_32_1",
+                 "AXI4_LITE_TEST_BENCH_32_64_0",
+                 "AXI4_LITE_TEST_BENCH_32_64_1",
+                 "AXI4_LITE_TEST_BENCH_64_32_0",
+                 "AXI4_LITE_TEST_BENCH_64_32_1"]
+                 
