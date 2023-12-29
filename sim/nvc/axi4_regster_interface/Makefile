@@ -6,9 +6,12 @@ NVC           = nvc
 NVCFLAGS      = -L ./ -M 32M
 COPY          = cp
 
-TEST_BENCH    = axi4_register_interface_test_bench_32_32 \
-                axi4_register_interface_test_bench_32_64 \
-                axi4_register_interface_test_bench_64_32 \
+TEST_BENCH    = axi4_register_interface_test_bench_32_32_0      \
+                axi4_register_interface_test_bench_32_32_1      \
+                axi4_register_interface_test_bench_32_64_0      \
+                axi4_register_interface_test_bench_32_64_1      \
+                axi4_register_interface_test_bench_64_32_0      \
+                axi4_register_interface_test_bench_64_32_1      \
                 $(END_LIST)
 
 all: $(TEST_BENCH)
@@ -25,6 +28,10 @@ endef
 
 define NVC_EXECUTE_FILE
 $(addsuffix .elab.so,$(addprefix WORK/_WORK.,$(shell echo $(1) | tr a-z A-Z)))
+endef
+
+define SCENARIO_FILE
+$(addsuffix .snr,$(subst _0,,$(subst _1,,$(1))))
 endef
 
 define NVC_RUN
@@ -46,4 +53,5 @@ $(call NVC_ANALIZE_FILE, $(TEST_BENCH)) : analyze_libs.sh
 analyze_libs : $(call NVC_ANALIZE_FILE, $(TEST_BENCH))
 
 $(foreach TB, $(TEST_BENCH), $(eval $(call NVC_ELAB, $(TB))))
-$(foreach TB, $(TEST_BENCH), $(eval $(call NVC_RUN , $(TB), $(addsuffix .snr,$(TB)))))
+$(foreach TB, $(TEST_BENCH), $(eval $(call NVC_RUN , $(TB), $(call SCENARIO_FILE, $(TB)))))
+
