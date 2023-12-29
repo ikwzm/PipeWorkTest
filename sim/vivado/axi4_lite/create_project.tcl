@@ -5,8 +5,9 @@
 set project_directory       [file dirname [info script]]
 set project_name            "axi4_lite"
 set device_parts            "xc7z010clg400-1"
-set test_bench              "AXI4_LITE_TEST_BENCH_64_32"
-set scenario_file           [file join $project_directory "axi4_lite_test_bench_64_32.snr" ]
+set test_bench              "AXI4_LITE_TEST_BENCH_64_32_1"
+set scenario_path           [file join ".." ".." ".." "src" "test" "scenarios" "axi4_lite" ]
+set scenario_file           [file join $scenario_path "axi4_lite_test_bench_64_32.snr" ]
 #
 # Create project
 #
@@ -89,7 +90,7 @@ set_property "top" "AXI4_ADAPTER" $obj
 #
 set current_vivado_version [version -short]
 if       { [string first "2019.2" $current_vivado_version ] == 0 } {
-    set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
+    set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
 } elseif { [string first "2018.3" $current_vivado_version ] == 0 } {
     set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
 } elseif { [string first "2017"   $current_vivado_version ] == 0 } {
