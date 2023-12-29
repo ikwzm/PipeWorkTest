@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_to_stream.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4-Stream)
---!     @version 1.8.1
---!     @date    2020/10/2
+--!     @version 2.0.0
+--!     @date    2023/12/28
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2020 Ichiro Kawazome
+--      Copyright (C) 2012-2023 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -55,6 +55,9 @@ entity  AXI4_MASTER_TO_STREAM is
         I_AUSER_WIDTH   : integer                 :=  4;
         I_MAX_XFER_SIZE : integer                 :=  8;
         I_QUEUE_SIZE    : integer                 :=  2;
+        I_ACK_REGS      : integer                 :=  1;
+        I_DATA_REGS     : integer                 :=  3;
+        I_DATA_PIPELINE : integer                 :=  0;
         O_CLK_RATE      : integer                 :=  1;
         O_DATA_WIDTH    : integer                 := 32;
         BUF_WIDTH       : integer                 := 32;
@@ -239,9 +242,7 @@ architecture RTL of AXI4_MASTER_TO_STREAM is
     constant  I_REQ_ID              :  std_logic_vector(I_ID_WIDTH -1 downto 0)
                                     := std_logic_vector(to_unsigned(I_AXI_ID, I_ID_WIDTH));
     constant  I_ADDR_FIX            :  std_logic := '0';
-    constant  I_ACK_REGS            :  integer := 1;
     constant  I_REQ_QUEUE           :  integer := I_QUEUE_SIZE;
-    constant  I_RDATA_REGS          :  integer := 3;
     constant  I_REQ_SIZE_BITS       :  integer := 32;
     constant  I_XFER_MIN_SIZE       :  integer := I_MAX_XFER_SIZE;
     constant  I_XFER_MAX_SIZE       :  integer := I_MAX_XFER_SIZE;
@@ -631,8 +632,9 @@ begin
             XFER_MIN_SIZE       => I_XFER_MIN_SIZE   , --   
             XFER_MAX_SIZE       => I_XFER_MAX_SIZE   , --   
             QUEUE_SIZE          => I_REQ_QUEUE       , --   
-            RDATA_REGS          => I_RDATA_REGS      , --   
-            ACK_REGS            => I_ACK_REGS          --   
+            RDATA_REGS          => I_DATA_REGS       , --   
+            ACK_REGS            => I_ACK_REGS        , --
+            RDATA_PIPELINE      => I_DATA_PIPELINE     --
         )                                              -- 
         port map(                                      --
         ---------------------------------------------------------------------------

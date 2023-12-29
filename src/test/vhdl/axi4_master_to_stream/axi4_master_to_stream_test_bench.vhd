@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_to_stream_test_bench.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4-Stream) Test Bench
---!     @version 1.8.1
---!     @date    2020/10/2
+--!     @version 2.0.0
+--!     @date    2023/12/28
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2020 Ichiro Kawazome
+--      Copyright (C) 2012-2028 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -51,6 +51,9 @@ entity  AXI4_MASTER_TO_STREAM_TEST_BENCH is
         MAX_XFER_SIZE   : integer                                :=  6;
         BUF_WIDTH       : integer                                := 32;
         BUF_DEPTH       : integer                                := 12;
+        I_ACK_REGS      : integer                                :=  1;
+        I_DATA_REGS     : integer                                :=  3;
+        I_DATA_PIPELINE : integer                                :=  0;
         FINISH_ABORT    : boolean                                := FALSE
     );
 end     AXI4_MASTER_TO_STREAM_TEST_BENCH;
@@ -285,6 +288,9 @@ architecture MODEL of AXI4_MASTER_TO_STREAM_TEST_BENCH is
             I_AUSER_WIDTH   : integer                 :=  4;
             I_MAX_XFER_SIZE : integer                 :=  8;
             I_QUEUE_SIZE    : integer                 :=  1;
+            I_ACK_REGS      : integer                 :=  1;
+            I_DATA_REGS     : integer                 :=  3;
+            I_DATA_PIPELINE : integer                 :=  0;
             O_CLK_RATE      : integer                 :=  1;
             O_DATA_WIDTH    : integer                 := 32;
             BUF_WIDTH       : integer                 := 32;
@@ -444,10 +450,13 @@ begin
             I_AUSER_WIDTH   => I_WIDTH.ARUSER      , -- 
             I_MAX_XFER_SIZE => MAX_XFER_SIZE       , -- 
             I_QUEUE_SIZE    => I_QUEUE_SIZE        , -- 
+            I_ACK_REGS      => I_ACK_REGS          , -- 
+            I_DATA_REGS     => I_DATA_REGS         ,  --
+            I_DATA_PIPELINE => I_DATA_PIPELINE     ,  --
             O_CLK_RATE      => O_CLK_RATE          , -- 
             O_DATA_WIDTH    => O_DATA_WIDTH        , -- 
             BUF_WIDTH       => BUF_WIDTH           , -- 
-            BUF_DEPTH       => BUF_DEPTH             -- 
+            BUF_DEPTH       => BUF_DEPTH             --
         )                                            -- 
         port map (                                   -- 
         ---------------------------------------------------------------------------
@@ -981,6 +990,164 @@ begin
             MAX_XFER_SIZE   => 8               , --   
             BUF_WIDTH       => 64              , --   
             BUF_DEPTH       => 16              , --   
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_32_64_256_SYNC_1 is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_32_64_256_SYNC_1";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_32_64_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_32_64_256_SYNC_1;
+architecture MODEL of AXI4_M2S_TB_32_64_256_SYNC_1 is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 32              , --   
+            O_DATA_WIDTH    => 64              , --   
+            I_CLK_RATE      => 1               , --   
+            O_CLK_RATE      => 1               , --   
+            I_PERIOD        => 10 ns           , --   
+            O_PERIOD        => 10 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 64              , --   
+            BUF_DEPTH       => 16              , --
+            I_DATA_PIPELINE => 1               , --
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_32_64_256_SYNC_2 is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_32_64_256_SYNC_2";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_32_64_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_32_64_256_SYNC_2;
+architecture MODEL of AXI4_M2S_TB_32_64_256_SYNC_2 is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 32              , --   
+            O_DATA_WIDTH    => 64              , --   
+            I_CLK_RATE      => 1               , --   
+            O_CLK_RATE      => 1               , --   
+            I_PERIOD        => 10 ns           , --   
+            O_PERIOD        => 10 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 64              , --   
+            BUF_DEPTH       => 16              , --
+            I_DATA_PIPELINE => 2               , --
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_32_64_256_SYNC_3 is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_32_64_256_SYNC_3";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_32_64_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_32_64_256_SYNC_3;
+architecture MODEL of AXI4_M2S_TB_32_64_256_SYNC_3 is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 32              , --   
+            O_DATA_WIDTH    => 64              , --   
+            I_CLK_RATE      => 1               , --   
+            O_CLK_RATE      => 1               , --   
+            I_PERIOD        => 10 ns           , --   
+            O_PERIOD        => 10 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 64              , --   
+            BUF_DEPTH       => 16              , --
+            I_DATA_REGS     => 0               , --
+            I_DATA_PIPELINE => 0               , --
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_32_64_256_SYNC_4 is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_32_64_256_SYNC_4";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_32_64_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_32_64_256_SYNC_4;
+architecture MODEL of AXI4_M2S_TB_32_64_256_SYNC_4 is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 32              , --   
+            O_DATA_WIDTH    => 64              , --   
+            I_CLK_RATE      => 1               , --   
+            O_CLK_RATE      => 1               , --   
+            I_PERIOD        => 10 ns           , --   
+            O_PERIOD        => 10 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 64              , --   
+            BUF_DEPTH       => 16              , --
+            I_DATA_REGS     => 0               , --
+            I_DATA_PIPELINE => 1               , --
+            FINISH_ABORT    => FINISH_ABORT      --   
+        );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_M2S_TB_32_64_256_SYNC_5 is
+    generic (
+        NAME            : STRING  := "AXI4_MASTER_TO_STREAM_TEST_BENCH_32_64_256_SYNC_5";
+        SCENARIO_FILE   : STRING  := "axi4_master_to_stream_test_bench_32_64_256.snr";
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_M2S_TB_32_64_256_SYNC_5;
+architecture MODEL of AXI4_M2S_TB_32_64_256_SYNC_5 is
+begin
+    TB: entity work.AXI4_MASTER_TO_STREAM_TEST_BENCH
+        generic map (
+            NAME            => NAME            , -- 
+            SCENARIO_FILE   => SCENARIO_FILE   , --   
+            I_DATA_WIDTH    => 32              , --   
+            O_DATA_WIDTH    => 64              , --   
+            I_CLK_RATE      => 1               , --   
+            O_CLK_RATE      => 1               , --   
+            I_PERIOD        => 10 ns           , --   
+            O_PERIOD        => 10 ns           , --   
+            MAX_XFER_SIZE   => 8               , --   
+            BUF_WIDTH       => 64              , --   
+            BUF_DEPTH       => 16              , --
+            I_DATA_REGS     => 0               , --
+            I_DATA_PIPELINE => 2               , --
             FINISH_ABORT    => FINISH_ABORT      --   
         );
 end MODEL;
