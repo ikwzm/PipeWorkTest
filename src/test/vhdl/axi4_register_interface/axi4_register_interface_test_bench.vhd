@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_register_interface_test_bench.vhd
 --!     @brief   AXI4_REGISTER_INTERFACE TEST BENCH
---!     @version 1.9.0
---!     @date    2023/12/11
+--!     @version 2.0.0
+--!     @date    2023/12/28
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -63,6 +63,8 @@ entity  AXI4_REGISTER_INTERFACE_TEST_BENCH is
         REGS_DATA_WIDTH : integer := 32;
         PRINT_AXI4_READ : boolean := TRUE;
         PRINT_AXI4_WRITE: boolean := TRUE;
+        WDATA_PIPELINE  : integer := 0;
+        RDATA_PIPELINE  : integer := 0;
         FINISH_ABORT    : boolean := FALSE
     );
 end     AXI4_REGISTER_INTERFACE_TEST_BENCH;
@@ -432,7 +434,9 @@ begin
             AXI4_DATA_WIDTH => AXI4_DATA_WIDTH , 
             AXI4_ID_WIDTH   => WIDTH.ID        ,
             REGS_ADDR_WIDTH => REGS_ADDR_WIDTH ,
-            REGS_DATA_WIDTH => REGS_DATA_WIDTH 
+            REGS_DATA_WIDTH => REGS_DATA_WIDTH ,
+            WDATA_PIPELINE  => WDATA_PIPELINE  ,
+            RDATA_PIPELINE  => RDATA_PIPELINE  
         )
         port map (
         ---------------------------------------------------------------------------
@@ -650,5 +654,182 @@ begin
  -- SYNC_PRINT_1: SYNC_PRINT generic map(string'("AXI4_TEST_1:SYNC(1)")) port map (SYNC(1));
 end MODEL;
 -----------------------------------------------------------------------------------
---
+-- AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_0(AXI4_DATA_WIDTH=32,REGS_DATA_WIDTH=32,PIPELINE=0)
 -----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_0 is
+    generic (
+        NAME            : STRING  := string'("AXI4_REGS_IF_32_32_0");
+        SCENARIO_FILE   : STRING  := string'("axi4_register_interface_test_bench_32_32.snr");
+        PRINT_AXI4_READ : boolean := TRUE;
+        PRINT_AXI4_WRITE: boolean := TRUE;
+        WDATA_PIPELINE  : integer := 0;
+        RDATA_PIPELINE  : integer := 0;
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_0;
+architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_0 is
+begin
+    TB: entity work.AXI4_REGISTER_INTERFACE_TEST_BENCH generic map(
+            NAME            => NAME,
+            SCENARIO_FILE   => SCENARIO_FILE,
+            AXI4_DATA_WIDTH => 32,
+            REGS_DATA_WIDTH => 32,
+            PRINT_AXI4_READ => PRINT_AXI4_READ,
+            PRINT_AXI4_WRITE=> PRINT_AXI4_WRITE,
+            WDATA_PIPELINE  => WDATA_PIPELINE,
+            RDATA_PIPELINE  => RDATA_PIPELINE,
+            FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_1(AXI4_DATA_WIDTH=32,REGS_DATA_WIDTH=32,PIPELINE=1)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_1 is
+    generic (
+        NAME            : STRING  := string'("AXI4_REGS_IF_32_32_1");
+        SCENARIO_FILE   : STRING  := string'("axi4_register_interface_test_bench_32_32.snr");
+        PRINT_AXI4_READ : boolean := TRUE;
+        PRINT_AXI4_WRITE: boolean := TRUE;
+        WDATA_PIPELINE  : integer := 1;
+        RDATA_PIPELINE  : integer := 1;
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_1;
+architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_1 is
+begin
+    TB: entity work.AXI4_REGISTER_INTERFACE_TEST_BENCH generic map(
+            NAME            => NAME,
+            SCENARIO_FILE   => SCENARIO_FILE,
+            AXI4_DATA_WIDTH => 32,
+            REGS_DATA_WIDTH => 32,
+            PRINT_AXI4_READ => PRINT_AXI4_READ,
+            PRINT_AXI4_WRITE=> PRINT_AXI4_WRITE,
+            WDATA_PIPELINE  => WDATA_PIPELINE,
+            RDATA_PIPELINE  => RDATA_PIPELINE,
+            FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_0(AXI4_DATA_WIDTH=32,REGS_DATA_WIDTH=64,PIPELINE=0)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_0 is
+    generic (
+        NAME            : STRING  := string'("AXI4_REGS_IF_32_64_0");
+        SCENARIO_FILE   : STRING  := string'("axi4_register_interface_test_bench_32_64.snr");
+        PRINT_AXI4_READ : boolean := TRUE;
+        PRINT_AXI4_WRITE: boolean := TRUE;
+        WDATA_PIPELINE  : integer := 0;
+        RDATA_PIPELINE  : integer := 0;
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_0;
+architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_0 is
+begin
+    TB: entity work.AXI4_REGISTER_INTERFACE_TEST_BENCH generic map(
+            NAME            => NAME,
+            SCENARIO_FILE   => SCENARIO_FILE,
+            AXI4_DATA_WIDTH => 32,
+            REGS_DATA_WIDTH => 64,
+            PRINT_AXI4_READ => PRINT_AXI4_READ,
+            PRINT_AXI4_WRITE=> PRINT_AXI4_WRITE,
+            WDATA_PIPELINE  => WDATA_PIPELINE,
+            RDATA_PIPELINE  => RDATA_PIPELINE,
+            FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_1(AXI4_DATA_WIDTH=32,REGS_DATA_WIDTH=64,PIPELINE=1)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_1 is
+    generic (
+        NAME            : STRING  := string'("AXI4_REGS_IF_32_64_1");
+        SCENARIO_FILE   : STRING  := string'("axi4_register_interface_test_bench_32_64.snr");
+        PRINT_AXI4_READ : boolean := TRUE;
+        PRINT_AXI4_WRITE: boolean := TRUE;
+        WDATA_PIPELINE  : integer := 1;
+        RDATA_PIPELINE  : integer := 1;
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_1;
+architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_1 is
+begin
+    TB: entity work.AXI4_REGISTER_INTERFACE_TEST_BENCH generic map(
+            NAME            => NAME,
+            SCENARIO_FILE   => SCENARIO_FILE,
+            AXI4_DATA_WIDTH => 32,
+            REGS_DATA_WIDTH => 64,
+            PRINT_AXI4_READ => PRINT_AXI4_READ,
+            PRINT_AXI4_WRITE=> PRINT_AXI4_WRITE,
+            WDATA_PIPELINE  => WDATA_PIPELINE,
+            RDATA_PIPELINE  => RDATA_PIPELINE,
+            FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- AXI4_REGISTER_INTERFACE_TEST_BENCH_64_32_0(AXI4_DATA_WIDTH=64,REGS_DATA_WIDTH=32,PIPELINE=0)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_REGISTER_INTERFACE_TEST_BENCH_64_32_0 is
+    generic (
+        NAME            : STRING  := string'("AXI4_REGS_IF_64_32_0");
+        SCENARIO_FILE   : STRING  := string'("axi4_register_interface_test_bench_64_32.snr");
+        PRINT_AXI4_READ : boolean := TRUE;
+        PRINT_AXI4_WRITE: boolean := TRUE;
+        WDATA_PIPELINE  : integer := 0;
+        RDATA_PIPELINE  : integer := 0;
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_REGISTER_INTERFACE_TEST_BENCH_64_32_0;
+architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH_64_32_0 is
+begin
+    TB: entity work.AXI4_REGISTER_INTERFACE_TEST_BENCH generic map(
+            NAME            => NAME,
+            SCENARIO_FILE   => SCENARIO_FILE,
+            AXI4_DATA_WIDTH => 64,
+            REGS_DATA_WIDTH => 32,
+            PRINT_AXI4_READ => PRINT_AXI4_READ,
+            PRINT_AXI4_WRITE=> PRINT_AXI4_WRITE,
+            WDATA_PIPELINE  => WDATA_PIPELINE,
+            RDATA_PIPELINE  => RDATA_PIPELINE,
+            FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+-- AXI4_REGISTER_INTERFACE_TEST_BENCH_64_32_1(AXI4_DATA_WIDTH=64,REGS_DATA_WIDTH=32,PIPELINE=1)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  AXI4_REGISTER_INTERFACE_TEST_BENCH_64_32_1 is
+    generic (
+        NAME            : STRING  := string'("AXI4_REGS_IF_64_32_1");
+        SCENARIO_FILE   : STRING  := string'("axi4_register_interface_test_bench_64_32.snr");
+        PRINT_AXI4_READ : boolean := TRUE;
+        PRINT_AXI4_WRITE: boolean := TRUE;
+        WDATA_PIPELINE  : integer := 1;
+        RDATA_PIPELINE  : integer := 1;
+        FINISH_ABORT    : boolean := FALSE
+    );
+end     AXI4_REGISTER_INTERFACE_TEST_BENCH_64_32_1;
+architecture MODEL of AXI4_REGISTER_INTERFACE_TEST_BENCH_64_32_1 is
+begin
+    TB: entity work.AXI4_REGISTER_INTERFACE_TEST_BENCH generic map(
+            NAME            => NAME,
+            SCENARIO_FILE   => SCENARIO_FILE,
+            AXI4_DATA_WIDTH => 64,
+            REGS_DATA_WIDTH => 32,
+            PRINT_AXI4_READ => PRINT_AXI4_READ,
+            PRINT_AXI4_WRITE=> PRINT_AXI4_WRITE,
+            WDATA_PIPELINE  => WDATA_PIPELINE,
+            RDATA_PIPELINE  => RDATA_PIPELINE,
+            FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
