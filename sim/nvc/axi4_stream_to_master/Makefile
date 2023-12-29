@@ -8,7 +8,11 @@ COPY          = cp
 
 TEST_BENCH    = axi4_s2m_tb_32_32_256_sync          \
                 axi4_s2m_tb_32_64_256_sync          \
+                axi4_s2m_tb_32_64_256_sync_1        \
+                axi4_s2m_tb_32_64_256_sync_2        \
                 axi4_s2m_tb_64_32_256_sync          \
+                axi4_s2m_tb_64_32_256_sync_1        \
+                axi4_s2m_tb_64_32_256_sync_2        \
                 axi4_s2m_tb_64_64_256_sync          \
                 axi4_s2m_tb_32_32_256_100mhz_250mhz \
                 axi4_s2m_tb_32_32_256_250mhz_100mhz \
@@ -37,7 +41,7 @@ $(addsuffix .elab.so,$(addprefix WORK/_WORK.,$(shell echo $(1) | tr a-z A-Z)))
 endef
 
 define SCENARIO_FILE
-$(addsuffix .snr,$(subst axi4_s2m_tb,axi4_stream_to_master_test_bench,$(subst _sync,,$(subst _100mhz_250mhz,,$(subst _250mhz_100mhz,,$(1))))))
+$(addsuffix .snr,$(subst axi4_s2m_tb,axi4_stream_to_master_test_bench,$(subst _sync,,$(subst _sync_1,,$(subst _sync_2,,$(subst _100mhz_250mhz,,$(subst _250mhz_100mhz,,$(1))))))))
 endef
 
 define NVC_RUN
