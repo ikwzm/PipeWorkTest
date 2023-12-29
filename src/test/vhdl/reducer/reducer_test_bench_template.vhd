@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    test_bench_template.vhd
 --!     @brief   TEST BENCH TEMPLATE for REDUCER :
---!     @version 1.9.0
---!     @date    2023/12/8
+--!     @version 2.0.0
+--!     @date    2023/12/17
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

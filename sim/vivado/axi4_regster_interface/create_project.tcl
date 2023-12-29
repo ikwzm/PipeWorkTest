@@ -3,11 +3,11 @@
 #
 
 set project_directory       [file dirname [info script]]
-set project_name            "axi4_m2s"
+set project_name            "axi4_register_interface"
 set device_parts            "xc7z010clg400-1"
-set test_bench              "AXI4_M2S_TB_32_32_256_SYNC"
-set scenario_path           [file join ".." ".." ".." "src" "test" "scenarios" "axi4_master_to_stream" ]
-set scenario_file           [file join $scenario_path "axi4_master_to_stream_test_bench_32_32_256.snr" ]
+set test_bench              "AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_1"
+set scenario_path           [file join ".." ".." ".." "src" "test" "scenarios" "axi4_register_interface" ]
+set scenario_file           [file join $scenario_path "axi4_register_interface_test_bench_32_32.snr" ]
 #
 # Create project
 #
@@ -72,7 +72,6 @@ proc add_vhdl_file {fileset library_name file_name} {
     set_property "file_type" "VHDL"        $file_obj
     set_property "library"   $library_name $file_obj
 }
-source "add_sources.tcl"
 source "add_sim.tcl"
 #
 # Set 'constrs_1'  fileset object
@@ -82,7 +81,10 @@ add_files -fileset constrs_1 -norecurse ./timing.xdc
 # Set 'sources_1' fileset properties
 #
 set obj [get_filesets sources_1]
-set_property "top" "AXI4_MASTER_TO_STREAM" $obj
+set_property "top" "AXI4_ADAPTER" $obj
+#
+# Set 'sim_1' fileset properties
+#
 #
 # Set 'sim_1' fileset properties
 #

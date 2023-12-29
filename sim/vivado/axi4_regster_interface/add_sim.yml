@@ -20,10 +20,10 @@
     Name     :  work
     Format   :  "add_vhdl_file sim_1     #{library_name} #{file_name}"
     PathList :  
-        - "../../../src/test/vhdl/axi4_lite/"
-    Top      :  ["AXI4_LITE_TEST_BENCH_32_32_0",
-                 "AXI4_LITE_TEST_BENCH_32_32_1",
-                 "AXI4_LITE_TEST_BENCH_32_64_0",
-                 "AXI4_LITE_TEST_BENCH_32_64_1",
-                 "AXI4_LITE_TEST_BENCH_64_32_0",
-                 "AXI4_LITE_TEST_BENCH_64_32_1"]
+        - "../../../src/test/vhdl/axi4_register_interface/"
+    Top      :  ["AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_0",
+                 "AXI4_REGISTER_INTERFACE_TEST_BENCH_32_32_1",
+                 "AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_0",
+                 "AXI4_REGISTER_INTERFACE_TEST_BENCH_32_64_1",
+                 "AXI4_REGISTER_INTERFACE_TEST_BENCH_64_32_0",
+                 "AXI4_REGISTER_INTERFACE_TEST_BENCH_64_32_1"]

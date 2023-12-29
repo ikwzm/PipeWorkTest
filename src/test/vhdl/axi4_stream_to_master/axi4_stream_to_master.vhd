@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_stream_to_master.vhd
 --!     @brief   Pump Core Module (AXI4-Stream to AXI4)
---!     @version 1.8.1
---!     @date    2020/10/2
+--!     @version 2.0.0
+--!     @date    2023/12/28
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2020 Ichiro Kawazome
+--      Copyright (C) 2012-2023 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -55,8 +55,12 @@ entity  AXI4_STREAM_TO_MASTER is
         O_AUSER_WIDTH   : integer                 :=  4;
         O_MAX_XFER_SIZE : integer                 :=  8;
         O_QUEUE_SIZE    : integer                 :=  2;
+        O_DATA_PIPELINE : integer                 :=  0;
         I_CLK_RATE      : integer                 :=  1;
         I_DATA_WIDTH    : integer                 := 32;
+        I_WORD_BITS     : integer                 :=  8;
+        I_JUSTIFIED     : integer                 :=  0;
+        I_PIPELINE      : integer                 :=  0;
         BUF_WIDTH       : integer                 := 32;
         BUF_DEPTH       : integer                 := 12
     );
@@ -636,7 +640,8 @@ begin
             QUEUE_SIZE          => O_REQ_QUEUE       , --   
             REQ_REGS            => O_REQ_REGS        , --   
             ACK_REGS            => O_ACK_REGS        , --   
-            RESP_REGS           => O_RESP_REGS         --   
+            RESP_REGS           => O_RESP_REGS       , --
+            WDATA_PIPELINE      => O_DATA_PIPELINE     -- 
         )                                              -- 
         port map(                                      --
         ---------------------------------------------------------------------------
@@ -819,6 +824,9 @@ begin
             O_FIXED_POOL_OPEN   => O_FIXED_POOL_OPEN   , --
             I_CLK_RATE          => I_CLK_RATE          , --
             I_DATA_BITS         => I_DATA_WIDTH        , --
+            I_WORD_BITS         => I_WORD_BITS         , --
+            I_JUSTIFIED         => I_JUSTIFIED         , --
+            I_PIPELINE          => I_PIPELINE          , --
             BUF_DEPTH           => BUF_DEPTH           , --
             BUF_DATA_BITS       => BUF_WIDTH           , --
             O2I_OPEN_INFO_BITS  => OPEN_INFO_BITS      , --

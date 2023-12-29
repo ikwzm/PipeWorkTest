@@ -3,11 +3,11 @@
 #
 
 set project_directory       [file dirname [info script]]
-set project_name            "axi4_m2s"
+set project_name            "justifier"
 set device_parts            "xc7z010clg400-1"
-set test_bench              "AXI4_M2S_TB_32_32_256_SYNC"
-set scenario_path           [file join ".." ".." ".." "src" "test" "scenarios" "axi4_master_to_stream" ]
-set scenario_file           [file join $scenario_path "axi4_master_to_stream_test_bench_32_32_256.snr" ]
+set scenario_file           "justifier_test_bench_64_0.snr"
+set scenario_path           [file join $project_directory ".." ".." ".." "src" "test" "scenarios" "justifier"]
+set scenario_full_path      [file join $scenario_path $scenario_file ]
 #
 # Create project
 #
@@ -82,24 +82,12 @@ add_files -fileset constrs_1 -norecurse ./timing.xdc
 # Set 'sources_1' fileset properties
 #
 set obj [get_filesets sources_1]
-set_property "top" "AXI4_MASTER_TO_STREAM" $obj
+set_property "top" "JUSTIFIER" $obj
 #
 # Set 'sim_1' fileset properties
 #
-set current_vivado_version [version -short]
-if       { [string first "2019.2" $current_vivado_version ] == 0 } {
-    set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
-} elseif { [string first "2018.3" $current_vivado_version ] == 0 } {
-    set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
-} elseif { [string first "2017"   $current_vivado_version ] == 0 } {
-    set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
-} else {
-   puts ""
-   puts "ERROR: This model can not run in Vivado <$current_vivado_version>"
-   return 1
-}
 set obj [get_filesets sim_1]
-set_property "top"     $test_bench $obj
+set_property "top" "JUSTIFIER_TEST_BENCH_64_0_0"  $obj
 set_property "generic" "SCENARIO_FILE=$scenario_full_path FINISH_ABORT=true" $obj
 
 update_compile_order -fileset sources_1

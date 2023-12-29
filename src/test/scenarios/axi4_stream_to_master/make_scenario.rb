@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 #---------------------------------------------------------------------------------
 #
-#       Version     :   1.7.0
-#       Created     :   2018/6/4
+#       Version     :   2.0.0
+#       Created     :   2023/12/28
 #       File name   :   make_scneario_feature.rb
 #       Author      :   Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 #       Description :   AXI4_STREAM_TO_MASTER 用シナリオ生成スクリプト
 #
 #---------------------------------------------------------------------------------
 #
-#       Copyright (C) 2012-2014 Ichiro Kawazome
+#       Copyright (C) 2012-2023 Ichiro Kawazome
 #       All rights reserved.
 # 
 #       Redistribution and use in source and binary forms, with or without
@@ -120,18 +120,26 @@ class ScenarioGenerater
   #-------------------------------------------------------------------------------
   # 
   #-------------------------------------------------------------------------------
-  def  gen_stream_read(io, data)
+  def  gen_stream_read(io, data, pad=nil)
     pos  = 0
     last = 0
     io.print "- I: \n"
     io.print "  - OUT   : {GPO(0) : 0}\n"
     while (pos < data.length)
-      len = @i_axi4_data_width/8
+      if pad.nil? then
+        len = @i_axi4_data_width/8
+        pad = 0
+      else
+        len = rand(0..(@i_axi4_data_width/8))
+        pad = rand(0..(@i_axi4_data_width/8-len))
+      end
       if (pos + len >= data.length)
           last = 1
           len  = data.length - pos
       end
-      data_str = data.slice(pos,len).map{|d| sprintf("0x%02X", d)}.join(",")
+      data_list = Array.new(@i_axi4_data_width/8, "PAD ")
+      data_list[pad...pad+len] = data.slice(pos,len).map{|d| sprintf("0x%02X", d)}
+      data_str = data_list.join(",")
       io.print "  - XFER: {DATA: [#{data_str}], LAST: #{last}}\n"
       pos     += len
     end
@@ -191,7 +199,7 @@ class ScenarioGenerater
   #-------------------------------------------------------------------------------
   # 
   #-------------------------------------------------------------------------------
-  def simple_test(title, io, o_address, o_size, o_cache, o_auser, open_info, close_info)
+  def simple_test(title, io, o_address, o_size, o_cache, o_auser, open_info, close_info, pad=nil)
     size   = o_size
     data   = (1..size).collect{rand(256)}
     o_mode = gen_ctrl_regs([:Last,:First,:Done_Enable,:Close_Irq_Enable,:Error_Irq_Enable,:Safety], o_cache, o_auser)
@@ -238,12 +246,12 @@ class ScenarioGenerater
              })
     io.print "  - WAIT  : {GPI(0) : 0, TIMEOUT: ", @timeout.to_s, "}\n"
     gen_simple_write(io, @o_model, o_address, data, "OKAY", o_cache, o_auser)
-    gen_stream_read( io, data)
+    gen_stream_read( io, data, pad)
   end
   #-------------------------------------------------------------------------------
   # 
   #-------------------------------------------------------------------------------
-  def pipeline_test(title, io, o_address, o_size, o_cache, o_auser)
+  def pipeline_test(title, io, o_address, o_size, o_cache, o_auser, pad=nil)
     size   = o_size
     data   = (1..size).collect{rand(256)}
     o_mode = gen_ctrl_regs([:Last,:First,:Done_Enable,:Close_Irq_Enable,:Error_Irq_Enable,:Speculative], o_cache, o_auser)
@@ -282,7 +290,7 @@ class ScenarioGenerater
              })
     io.print "  - WAIT  : {GPI(0) : 0, TIMEOUT: ", @timeout.to_s, "}\n"
     gen_pipeline_write(io, @o_model, o_address, data, "OKAY", o_cache, o_auser)
-    gen_stream_read(   io, data)
+    gen_stream_read(   io, data, pad)
   end
   #-------------------------------------------------------------------------------
   # 
@@ -294,7 +302,7 @@ class ScenarioGenerater
     [0,1,2,3,4,5,6,7,8,9,10,16,21,32,49,64,71,85,99,110,128,140,155,189,200,212,234,256].each{|size|
       (0xFC00..0xFC03).each {|o_address|
         title = @name.to_s + ".1." + test_num.to_s
-        simple_test(title, io, o_address, size, 3, 1, open_info, close_info)
+        simple_test(title, io, o_address, size, 3, 1, open_info, close_info, nil)
         test_num   += 1
         open_info  += 1
         close_info += 1
@@ -309,8 +317,21 @@ class ScenarioGenerater
     [32,51,64,69,81,97,110,128,140,155,189,200,212,234,256,1523].each{|size|
       (0x7030..0x7033).each {|o_address|
         title = @name.to_s + ".2." + test_num.to_s
-        pipeline_test(title, io, o_address, size, nil, nil)
+        pipeline_test(title, io, o_address, size, nil, nil, nil)
         test_num += 1
+      }
+    }
+  end
+  #-------------------------------------------------------------------------------
+  # 
+  #-------------------------------------------------------------------------------
+  def test_3(io)
+    test_num   = 0
+    [0,1,2,3,4,5,6,7,8,9,10,16,32,64,128].each{|size|
+      (0xC100..0xC103).each {|o_address|
+        title = @name.to_s + ".3." + test_num.to_s
+        pipeline_test(title, io, o_address, size, nil, nil, true)
+        test_num   += 1
       }
     }
   end
@@ -322,7 +343,7 @@ class ScenarioGenerater
         @file_name = sprintf("axi4_stream_to_master_test_bench_%d_%d_%d.snr", @o_axi4_data_width, @i_axi4_data_width, @max_xfer_size)
     end
     if @test_items == []
-      @test_items = [1,2]
+      @test_items = [1,2,3]
     end
     puts "Scenario File: #{@file_name}"         if @verbose
     puts "O Data Width : #{@o_axi4_data_width}" if @verbose
@@ -366,6 +387,7 @@ class ScenarioGenerater
     @test_items.each {|item|
         test_1(io) if (item == 1)
         test_2(io) if (item == 2)
+        test_3(io) if (item == 3)
     }
   end
 end

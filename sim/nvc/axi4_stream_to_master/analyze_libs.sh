@@ -14,6 +14,7 @@ nvc -L ./ --work=DUMMY_PLUG -a ../../../Dummy_Plug/src/main/vhdl/axi4/axi4_strea
 nvc -L ./ --work=DUMMY_PLUG -a ../../../Dummy_Plug/src/main/vhdl/core/marchal.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/axi4/axi4_types.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/components.vhd
+nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/justifier.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/queue_register.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/reducer.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/axi4/axi4_components.vhd

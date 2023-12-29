@@ -31,4 +31,4 @@ add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/sdpram.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/queue_arbiter_integer_arch.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/queue_arbiter_one_hot_arch.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/sdpram_xilinx_auto_select.vhd
-add_vhdl_file sim_1     WORK ../../../src/test/vhdl/axi4_lite/axi4_lite_test_bench.vhd
+add_vhdl_file sim_1     WORK ../../../src/test/vhdl/axi4_register_interface/axi4_register_interface_test_bench.vhd

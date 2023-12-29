@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    reducer_test_model.vhd
 --!     @brief   TEST MODEL for REDUCER :
---!     @version 1.9.0
---!     @date    2023/12/8
+--!     @version 2.0.0
+--!     @date    2023/12/17
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -387,6 +387,34 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
+        procedure OUTPUT_NULL(LAST,FLUSH:boolean) is
+        begin
+            START  <= '0';
+            I_DATA <= (others => '0');
+            I_STRB <= (others => '0');
+            I_DVAL <= (others => '0');
+            if (LAST) then
+                I_DONE  <= '1';
+            else
+                I_DONE  <= '0';
+            end if;
+            if (FLUSH) then
+                I_FLUSH <= '1';
+            else
+                I_FLUSH <= '0';
+            end if;
+            I_VAL   <= '1';
+            i_valid <= '1';
+            wait until (CLK'event and CLK = '1' and I_RDY = '1');
+            wait for DELAY;
+            I_VAL   <= '0';
+            i_valid <= '0';
+            I_DONE  <= '0';
+            I_FLUSH <= '0';
+        end procedure;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
         variable max_addr    : integer;
         variable max_size    : integer;
         variable addr        : integer;
@@ -605,6 +633,21 @@ begin
             end loop;
         end loop;
         ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        SCENARIO <= "8.0.0";wait for 0 ns;
+        for mode in 0 to 2 loop
+            RECV_START(0,0,mode,0,FALSE,TRUE);
+            OUTPUT_NULL(TRUE,FALSE);
+            RECV_END;
+        end loop;
+        SCENARIO <= "8.1.0";wait for 0 ns;
+        for mode in 0 to 2 loop
+            RECV_START(0,0,mode,0,TRUE ,TRUE);
+            OUTPUT_NULL(FALSE,TRUE);
+            RECV_END;
+        end loop;
+        ---------------------------------------------------------------------------
         -- シミュレーション終了
         ---------------------------------------------------------------------------
         WAIT_CLK(10); 
@@ -682,7 +725,14 @@ begin
                     o_ready <= '1';
                     wait until (CLK'event and CLK = '1' and O_VAL = '1');
                 end if;
-                RANDOM_DATA_TABLE.GET(O_BYTES,lo_pos,addr,size,len,data,strb,end_of_data);
+                if (size > 0) then
+                    RANDOM_DATA_TABLE.GET(O_BYTES,lo_pos,addr,size,len,data,strb,end_of_data);
+                else
+                    len  := 0;
+                    data := (others => '0');
+                    strb := (others => '0');
+                    end_of_data := '1';
+                end if;
                 if (lo_pos >= shift_bytes) then
                     o_size := 0;
                     lo_pos := lo_pos - shift_bytes;
