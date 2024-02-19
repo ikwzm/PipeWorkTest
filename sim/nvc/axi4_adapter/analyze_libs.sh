@@ -20,6 +20,7 @@ nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/delay_adjuster.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/delay_register.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/float_intake_manifold_valve.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/float_outlet_manifold_valve.vhd
+nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/justifier.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/queue_register.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/reducer.vhd
 nvc -L ./ --work=PIPEWORK -a ../../../PipeWork/src/components/syncronizer.vhd
