@@ -4,7 +4,7 @@ SRC_TEST_PATH = ../../../src/test/vhdl/$(PROJECT_NAME)
 SCENARIO_PATH = ../../../src/test/scenarios/$(PROJECT_NAME)
 
 NVC           = nvc
-NVCFLAGS      = -L ./ -M 32M -H 32M
+NVCFLAGS      = -L ./ -M 32M -H 64M
 
 TEST_BENCH    = pump_axi4_to_axi4_test_bench_32_32        \
                 pump_axi4_to_axi4_test_bench_32_64        \
