@@ -2,12 +2,12 @@
 --!     @file    unrolled_loop_counter_test_bench.vhd
 --!     @brief   UNROLLED_LOOP_COUNTER TEST BENCH :
 --!              UNROLLED_LOOP_COUNTER MODULEを検証するためのテストベンチ.
---!     @version 1.7.1
---!     @date    2018/12/23
+--!     @version 2.1.0
+--!     @date    2024/2/28
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2018 Ichiro Kawazome
+--      Copyright (C) 2018-2024 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -68,6 +68,7 @@ component  UNROLLED_LOOP_COUNTER_FUNCTION_MODEL
         RST             : out std_logic;
         CLR             : out std_logic;
         LOOP_START      : out std_logic;
+        LOOP_ABORT      : out std_logic;
         LOOP_NEXT       : out std_logic;
         LOOP_SIZE       : out integer range 0 to MAX_LOOP_SIZE;
         LOOP_INIT       : out integer range 0 to MAX_LOOP_INIT;
@@ -98,6 +99,7 @@ entity  UNROLLED_LOOP_COUNTER_FUNCTION_MODEL is
         MAX_LOOP_SIZE   : integer := 8;
         MAX_LOOP_INIT   : integer := 0;
         VERBOSE         : boolean := FALSE;
+        DEBUG           : boolean := FALSE;
         FINISH_ABORT    : boolean := FALSE
     );
     port (
@@ -105,6 +107,7 @@ entity  UNROLLED_LOOP_COUNTER_FUNCTION_MODEL is
         RST             : out std_logic;
         CLR             : out std_logic;
         LOOP_START      : out std_logic;
+        LOOP_ABORT      : out std_logic;
         LOOP_NEXT       : out std_logic;
         LOOP_SIZE       : out integer range 0 to MAX_LOOP_SIZE;
         LOOP_INIT       : out integer range 0 to MAX_LOOP_INIT;
@@ -211,53 +214,92 @@ begin
         variable  test_number    :  integer;
         variable  test_cycle     :  integer;
         variable  test_next      :  std_logic;
+        variable  test_abort     :  std_logic;
         ---------------------------------------------------------------------------
         --
         ---------------------------------------------------------------------------
-        procedure CHECK_VALID(EXP_VALID: in std_logic_vector) is
+        procedure CHECK_VALID(EXP_VALID: in std_logic_vector; ABORT: in std_logic := '0') is
             alias    expect_valid :  std_logic_vector(LOOP_VALID'range) is EXP_VALID;
             variable mismatch     :  boolean;
         begin
+            assert (DEBUG=FALSE) report MESSAGE_TAG &
+                "CHECK_VALID(EXP_VALID="  & BIN_TO_STRING(expect_valid) &
+                            ",ABORT="  & BIN_TO_STRING(ABORT)  & ")" severity NOTE;
             mismatch := FALSE;
-            for i in LOOP_VALID'range loop
-                if (LOOP_VALID(i) /= expect_valid(i)) then
-                    mismatch := TRUE;
-                end if;
-            end loop;
+            if (ABORT = '1') then
+                for i in LOOP_VALID'range loop
+                    if (LOOP_VALID(i) /= '0') then
+                        mismatch := TRUE;
+                    end if;
+                end loop;
+            else
+                for i in LOOP_VALID'range loop
+                    if (LOOP_VALID(i) /= expect_valid(i)) then
+                        mismatch := TRUE;
+                    end if;
+                end loop;
+            end if;
             if (mismatch) then
-                assert (TRUE) report MESSAGE_TAG & "Mimatch LOOP_VALID" severity ERROR;
+                assert (FALSE) report MESSAGE_TAG & "Mismatch LOOP_VALID=" & BIN_TO_STRING(LOOP_VALID) & " EXP=" & BIN_TO_STRING(expect_valid) severity ERROR;
                 mismatch_count := mismatch_count+1;
             end if;
         end procedure;
         ---------------------------------------------------------------------------
         --
         ---------------------------------------------------------------------------
-        procedure CHECK_FIRST(CYCLE: in integer) is
+        procedure CHECK_FIRST(CYCLE,SIZE: in integer) is
             variable exp_first :  std_logic;
         begin
-            if (CYCLE = 0) then
+            assert (DEBUG=FALSE) report MESSAGE_TAG &
+                "CHECK_FIRST(CYCLE="  & INTEGER_TO_STRING(CYCLE) &
+                            ",SIZE="  & INTEGER_TO_STRING(SIZE)  & ")" severity NOTE;
+            if ((CYCLE = 0) and (SIZE > 0)) then
                 exp_first := '1';
             else
                 exp_first := '0';
             end if;
             if (LOOP_FIRST /= exp_first) then
-                assert (TRUE) report MESSAGE_TAG & "Mimatch LOOP_FIRST" severity ERROR;
+                assert (FALSE) report MESSAGE_TAG & "Mismatch LOOP_FIRST=" & BIN_TO_STRING(LOOP_FIRST) & " EXP=" & BIN_TO_STRING(exp_first) severity ERROR;
                 mismatch_count := mismatch_count+1;
             end if;
         end procedure;
         ---------------------------------------------------------------------------
         --
         ---------------------------------------------------------------------------
-        procedure CHECK_TERM(CYCLE,SIZE: in integer) is
+        procedure CHECK_TERM(CYCLE,SIZE: in integer; ABORT: in std_logic := '0') is
             variable exp_term :  std_logic;
         begin
-            if (CYCLE+(UNROLL*STRIDE) > SIZE) then
+            assert (DEBUG=FALSE) report MESSAGE_TAG &
+                "CHECK_TERM(CYCLE="  & INTEGER_TO_STRING(CYCLE) &
+                           ",SIZE="  & INTEGER_TO_STRING(SIZE)  &
+                           ",ABORT=" & BIN_TO_STRING(ABORT) & ")" severity NOTE;
+            if ((CYCLE >= SIZE) or (ABORT = '1')) then
                 exp_term := '1';
             else
                 exp_term := '0';
             end if;
             if (LOOP_TERM /= exp_term) then
-                assert (TRUE) report MESSAGE_TAG & "Mimatch LOOP_TERM" severity ERROR;
+                assert (FALSE) report MESSAGE_TAG & "Mismatch LOOP_TERM=" & BIN_TO_STRING(LOOP_TERM) & " EXP=" & BIN_TO_STRING(exp_term) severity ERROR;
+                mismatch_count := mismatch_count+1;
+            end if;
+        end procedure;
+        ---------------------------------------------------------------------------
+        --
+        ---------------------------------------------------------------------------
+        procedure CHECK_BUSY(CYCLE,SIZE: in integer; ABORT: in std_logic := '0') is
+            variable exp_busy :  std_logic;
+        begin
+            assert (DEBUG=FALSE) report MESSAGE_TAG &
+                "CHECK_BUSY(CYCLE="  & INTEGER_TO_STRING(CYCLE) &
+                           ",SIZE="  & INTEGER_TO_STRING(SIZE)  &
+                           ",ABORT=" & BIN_TO_STRING(ABORT) & ")" severity NOTE;
+            if ((CYCLE >= SIZE) or (ABORT = '1')) then
+                exp_busy := '0';
+            else
+                exp_busy := '1';
+            end if;
+            if (LOOP_BUSY /= exp_busy) then
+                assert (FALSE) report MESSAGE_TAG & "Mismatch LOOP_BUSY=" & BIN_TO_STRING(LOOP_BUSY) & " EXP=" & BIN_TO_STRING(exp_busy) severity ERROR;
                 mismatch_count := mismatch_count+1;
             end if;
         end procedure;
@@ -267,24 +309,36 @@ begin
         procedure CHECK_LAST(CYCLE,SIZE: in integer) is
             variable exp_last :  std_logic;
         begin
-            if (CYCLE+(STRIDE*UNROLL) > SIZE-1) then
+            assert (DEBUG=FALSE) report MESSAGE_TAG &
+                "CHECK_LAST(CYCLE="  & INTEGER_TO_STRING(CYCLE) &
+                           ",SIZE="  & INTEGER_TO_STRING(SIZE)  & ")" severity NOTE;
+            if (CYCLE+(STRIDE*UNROLL) >= SIZE) then
                 exp_last := '1';
             else
                 exp_last := '0';
             end if;
             if (LOOP_LAST /= exp_last) then
-                assert (TRUE) report MESSAGE_TAG & "Mimatch LOOP_LAST" severity ERROR;
+                assert (FALSE) report MESSAGE_TAG & "Mismatch LOOP_LAST=" & BIN_TO_STRING(LOOP_LAST) & " EXP=" & BIN_TO_STRING(exp_last) severity ERROR;
                 mismatch_count := mismatch_count+1;
             end if;
         end procedure;
         ---------------------------------------------------------------------------
         --
         ---------------------------------------------------------------------------
-        procedure CHECK_DONE(CYCLE,SIZE: in integer;T_NEXT:std_logic) is
+        procedure CHECK_DONE(CYCLE,SIZE:in integer; T_NEXT:in std_logic; ABORT:in std_logic := '0') is
             variable exp_done :  std_logic;
+            variable exp_busy :  boolean;
+            variable exp_last :  boolean;
         begin
+            assert (DEBUG=FALSE) report MESSAGE_TAG &
+                "CHECK_DONE(CYCLE="  & INTEGER_TO_STRING(CYCLE) &
+                           ",SIZE="  & INTEGER_TO_STRING(SIZE)  &
+                           ",NEXT="  & BIN_TO_STRING(T_NEXT)  &
+                           ",ABORT=" & BIN_TO_STRING(ABORT) & ")" severity NOTE;
             if (SIZE > 0) then
-                if (CYCLE+(STRIDE*UNROLL) = SIZE and T_NEXT = '1') then
+                exp_busy := (CYCLE < SIZE);
+                exp_last := (CYCLE+(STRIDE*UNROLL) >= SIZE);
+                if ((exp_busy and exp_last and T_NEXT = '1') or (ABORT = '1')) then
                     exp_done := '1';
                 else
                     exp_done := '0';
@@ -297,11 +351,12 @@ begin
                 end if;
             end if;
             if (LOOP_DONE /= exp_done) then
-                assert (TRUE) report MESSAGE_TAG & "Mimatch LOOP_DONE" severity ERROR;
+                assert (FALSE) report MESSAGE_TAG & "Mismatch LOOP_DONE=" & BIN_TO_STRING(LOOP_DONE) & " EXP=" & BIN_TO_STRING(exp_done) severity ERROR;
                 mismatch_count := mismatch_count+1;
             end if;
         end procedure;
     begin 
+        mismatch_count := 0;
         ---------------------------------------------------------------------------
         -- シミュレーションの開始、まずはリセットから。
         ---------------------------------------------------------------------------
@@ -311,6 +366,7 @@ begin
                               CLR          <= '1';
                               RST          <= '1';
                               LOOP_START   <= '0';
+                              LOOP_ABORT   <= '0';
                               LOOP_NEXT    <= '0';
                               LOOP_SIZE    <=  0 ;
                               LOOP_INIT    <=  0 ;
@@ -329,6 +385,7 @@ begin
                                                         ",LOOP_INIT=" & INTEGER_TO_STRING(test_loop_init) severity NOTE;
             GEN_EXPECT_VALID(expect_valid, test_loop_size, test_loop_init);
             WAIT_CLK( 1);         LOOP_START <= '1';
+                                  LOOP_ABORT <= '0'; test_abort := '0';
                                   LOOP_SIZE  <= test_loop_size;
                                   LOOP_INIT  <= test_loop_init;
             WAIT_CLK( 1);         LOOP_START <= '0';
@@ -337,11 +394,12 @@ begin
             while (test_cycle < test_loop_size+4) loop
                 wait until (clock'event and clock = '1');
                 CHECK_VALID(expect_valid(test_cycle+LOOP_VALID'length-1 downto test_cycle));
-                CHECK_FIRST(test_cycle);
+                CHECK_FIRST(test_cycle, test_loop_size);
                 CHECK_LAST (test_cycle, test_loop_size);
                 CHECK_TERM (test_cycle, test_loop_size);
+                CHECK_BUSY (test_cycle, test_loop_size);
                 CHECK_DONE (test_cycle, test_loop_size, test_next);
-                test_cycle := test_cycle + STRIDE;
+                test_cycle := test_cycle + STRIDE*UNROLL;
             end loop;
             WAIT_CLK( 1);         LOOP_NEXT  <= '0'; test_next  := '0';
             test_number := test_number + 1;
@@ -359,32 +417,83 @@ begin
                                                         ",LOOP_INIT=" & INTEGER_TO_STRING(test_loop_init) severity NOTE;
             GEN_EXPECT_VALID(expect_valid, test_loop_size, test_loop_init);
             WAIT_CLK( 1);         LOOP_START <= '1';
+                                  LOOP_ABORT <= '0'; test_abort := '0';
                                   LOOP_SIZE  <= test_loop_size;
                                   LOOP_INIT  <= test_loop_init;
+                                  LOOP_NEXT  <= '0'; test_next  := '0';
             WAIT_CLK( 1);         LOOP_START <= '0';
             test_cycle := 0;
             while (test_cycle < test_loop_size+4) loop
                 wait until (clock'event and clock = '1');
                 CHECK_VALID(expect_valid(test_cycle+LOOP_VALID'length-1 downto test_cycle));
-                CHECK_FIRST(test_cycle);
+                CHECK_FIRST(test_cycle, test_loop_size);
                 CHECK_LAST (test_cycle, test_loop_size);
                 CHECK_TERM (test_cycle, test_loop_size);
+                CHECK_BUSY (test_cycle, test_loop_size);
                 CHECK_DONE (test_cycle, test_loop_size, test_next);
                 wait for DELAY;
                 LOOP_NEXT  <= '1'; test_next  := '1';
                 wait until (clock'event and clock = '1');
                 CHECK_VALID(expect_valid(test_cycle+LOOP_VALID'length-1 downto test_cycle));
-                CHECK_FIRST(test_cycle);
+                CHECK_FIRST(test_cycle, test_loop_size);
                 CHECK_LAST (test_cycle, test_loop_size);
                 CHECK_TERM (test_cycle, test_loop_size);
-                CHECK_DONE (test_cycle, test_loop_size, test_next);
+                CHECK_BUSY (test_cycle, test_loop_size);
+                if (test_loop_size > 0) then
+                    CHECK_DONE (test_cycle, test_loop_size, test_next);
+                end if;
                 wait for DELAY;
                 LOOP_NEXT  <= '0'; test_next  := '0';
-                test_cycle := test_cycle + STRIDE;
+                test_cycle := test_cycle + STRIDE*UNROLL;
             end loop;
             WAIT_CLK( 1);         LOOP_NEXT  <= '0'; test_next  := '0';
             test_number := test_number + 1;
         end loop;
+        end loop;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        assert(VERBOSE=FALSE) report  MESSAGE_TAG & "Test 3" severity NOTE;
+        test_number := 1;
+        for test_loop_size in 1 to MAX_LOOP_SIZE loop
+            assert(VERBOSE=FALSE) report  MESSAGE_TAG & "Test 3."     & INTEGER_TO_STRING(test_number   ) &
+                                                        " LOOP_SIZE=" & INTEGER_TO_STRING(test_loop_size) severity NOTE;
+
+            GEN_EXPECT_VALID(expect_valid, test_loop_size, 0);
+            WAIT_CLK( 1);         LOOP_START <= '1';
+                                  LOOP_ABORT <= '0'; test_abort := '0';
+                                  LOOP_SIZE  <= test_loop_size;
+                                  LOOP_INIT  <=  0 ;
+                                  LOOP_NEXT  <= '0'; test_next  := '0';
+            WAIT_CLK( 1);         LOOP_START <= '0';
+            test_cycle := 0;
+            wait until (clock'event and clock = '1');
+            CHECK_VALID(expect_valid(test_cycle+LOOP_VALID'length-1 downto test_cycle),test_abort);
+            CHECK_FIRST(test_cycle, test_loop_size);
+            CHECK_LAST (test_cycle, test_loop_size);
+            CHECK_TERM (test_cycle, test_loop_size, test_abort);
+            CHECK_BUSY (test_cycle, test_loop_size, test_abort);
+            CHECK_DONE (test_cycle, test_loop_size, test_next, test_abort);
+            wait for DELAY;
+            LOOP_ABORT  <= '1';
+            wait until (clock'event and clock = '1');
+            CHECK_VALID(expect_valid(test_cycle+LOOP_VALID'length-1 downto test_cycle),test_abort);
+            CHECK_FIRST(test_cycle, test_loop_size);
+            CHECK_LAST (test_cycle, test_loop_size);
+            CHECK_TERM (test_cycle, test_loop_size, test_abort);
+            CHECK_BUSY (test_cycle, test_loop_size, test_abort);
+            CHECK_DONE (test_cycle, test_loop_size, test_next, test_abort);
+            wait until (clock'event and clock = '1');
+            test_abort := '1';
+            CHECK_VALID(expect_valid(test_cycle+LOOP_VALID'length-1 downto test_cycle),test_abort);
+            CHECK_FIRST(test_cycle, test_loop_size);
+            CHECK_LAST (test_cycle, test_loop_size);
+            CHECK_TERM (test_cycle, test_loop_size, test_abort);
+            CHECK_BUSY (test_cycle, test_loop_size, test_abort);
+            CHECK_DONE (test_cycle, test_loop_size, test_next, test_abort);
+            WAIT_CLK( 1);         LOOP_NEXT  <= '0'; test_next  := '0';
+                                  LOOP_ABORT <= '0'; test_abort := '0';
+            test_number := test_number + 1;
         end loop;
         ---------------------------------------------------------------------------
         -- シミュレーション終了
@@ -439,6 +548,7 @@ architecture MODEL of UNROLLED_LOOP_COUNTER_TEST_BENCH is
     signal    RST           :  std_logic;
     signal    CLR           :  std_logic;
     signal    LOOP_START    :  std_logic;
+    signal    LOOP_ABORT    :  std_logic;
     signal    LOOP_NEXT     :  std_logic;
     signal    LOOP_SIZE     :  integer range 0 to MAX_LOOP_SIZE;
     signal    LOOP_INIT     :  integer range 0 to MAX_LOOP_INIT;
@@ -466,6 +576,7 @@ begin
             RST             => RST             , -- In  :
             CLR             => CLR             , -- In  :
             LOOP_START      => LOOP_START      , -- In  :
+            LOOP_ABORT      => LOOP_ABORT      , -- In  :
             LOOP_NEXT       => LOOP_NEXT       , -- In  :
             LOOP_SIZE       => LOOP_SIZE       , -- In  :
             LOOP_INIT       => LOOP_INIT       , -- In  :
@@ -495,6 +606,7 @@ begin
             RST             => RST             , -- Out :
             CLR             => CLR             , -- Out :
             LOOP_START      => LOOP_START      , -- Out :
+            LOOP_ABORT      => LOOP_ABORT      , -- Out :
             LOOP_NEXT       => LOOP_NEXT       , -- Out :
             LOOP_SIZE       => LOOP_SIZE       , -- Out :
             LOOP_INIT       => LOOP_INIT       , -- Out :
