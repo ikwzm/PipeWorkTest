@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_write_adapter.vhd
 --!     @brief   AXI4_WRITE_ADPATER
---!     @version 1.8.2
---!     @date    2020/10/7
+--!     @version 2.2.0
+--!     @date    2024/4/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2020 Ichiro Kawazome
+--      Copyright (C) 2012-2024 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -875,6 +875,7 @@ begin
             REQ_SIZE_BITS       => SIZE_BITS           , -- 
             REQ_SIZE_VALID      => 0                   , -- 
             FLOW_VALID          => 1                   , -- 
+            FLOW_SIZE_VALID     => 1                   , -- 
             BUF_DATA_WIDTH      => BUF_DATA_BITS       , -- 
             BUF_PTR_BITS        => BUF_DEPTH           , -- 
             ALIGNMENT_BITS      => ALIGNMENT_BITS      , -- 
