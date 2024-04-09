@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_adapter_test_bench_4096_32_32_async.vhd
 --!     @brief   AXI4_ADPATER TEST BENCH(MAX_XFER_SIZE=4096,T_DATA_WIDTH=32,M_DATA_WIDTH=32)
---!     @version 1.7.0
---!     @date    2018/3/22
+--!     @version 2.2.0
+--!     @date    2024/4/7
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2018 Ichiro Kawazome
+--      Copyright (C) 2012-2024 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
