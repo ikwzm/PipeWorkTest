@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi_traffic_checker.vhd
 --!     @brief   AXI Traffic Checker Module
---!     @version 0.3.0
---!     @date    2024/4/9
+--!     @version 0.4.0
+--!     @date    2024/4/11
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -59,11 +59,13 @@ entity  AXI_TRAFFIC_CHECKER is
         MW_ACK_REGS     : integer                 :=  1;
         MW_RESP_REGS    : integer                 :=  1;
         MW_DATA_PIPELINE: integer                 :=  0;
+        MW_MONITOR_BITS : integer range 32 to 64  := 32;
         MR_MAX_XFER_SIZE: integer                 := 12;
         MR_QUEUE_SIZE   : integer                 :=  1;
         MR_ACK_REGS     : integer                 :=  1;
         MR_DATA_REGS    : integer                 :=  1;
-        MR_DATA_PIPELINE: integer                 :=  0
+        MR_DATA_PIPELINE: integer                 :=  0;
+        MR_MONITOR_BITS : integer range 32 to 64  := 32
     );
     port(
     -------------------------------------------------------------------------------
@@ -216,7 +218,7 @@ architecture RTL of AXI_TRAFFIC_CHECKER is
     -------------------------------------------------------------------------------
     -- レジスタアクセスインターフェースのアドレスのビット数.
     -------------------------------------------------------------------------------
-    constant  REGS_ADDR_WIDTH       :  integer := 6;
+    constant  REGS_ADDR_WIDTH       :  integer := 8;
     -------------------------------------------------------------------------------
     -- 全レジスタのビット数.
     -------------------------------------------------------------------------------
@@ -246,7 +248,7 @@ architecture RTL of AXI_TRAFFIC_CHECKER is
     constant  VERSION_REGS_LO       :  integer := 8*VERSION_REGS_ADDR;
     constant  VERSION_REGS_HI       :  integer := 8*VERSION_REGS_ADDR + VERSION_REGS_BITS- 1;
     constant  VERSION_MAJOR         :  integer range 0 to 15 := 0;
-    constant  VERSION_MINOR         :  integer range 0 to 15 := 3;
+    constant  VERSION_MINOR         :  integer range 0 to 15 := 4;
     constant  VERSION_REGS_DATA     :  std_logic_vector(VERSION_REGS_BITS-1 downto 0)
                                     := std_logic_vector(to_unsigned(VERSION_MAJOR          , 4)) &
                                        std_logic_vector(to_unsigned(VERSION_MINOR          , 4)) &
@@ -489,19 +491,161 @@ architecture RTL of AXI_TRAFFIC_CHECKER is
     --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     -- Addr=0x30 |                                                               |
     --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    -- Addr=0x34 |                                                               |
+    -- Addr=0x34 |                              :                                |
+    --           :                              :                                :
+    -- Addr=0x78 |                              :                                |
     --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    -- Addr=0x38 |                                                               |
-    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    -- Addr=0x3C |                                                               |
+    -- Addr=0x7C |                                                               |
     --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     -------------------------------------------------------------------------------
     constant  RESERVED_REGS_ADDR    :  integer := 16#30#;
-    constant  RESERVED_REGS_BITS    :  integer := 128;
+    constant  RESERVED_REGS_BITS    :  integer := 8*80;
     constant  RESERVED_REGS_LO      :  integer := 8*RESERVED_REGS_ADDR;
     constant  RESERVED_REGS_HI      :  integer := 8*RESERVED_REGS_ADDR + RESERVED_REGS_BITS- 1;
     constant  RESERVED_REGS_DATA    :  std_logic_vector(RESERVED_REGS_BITS-1 downto 0)
                                     := (others => '0');
+    -------------------------------------------------------------------------------
+    -- Master Read Monitor Registers
+    -------------------------------------------------------------------------------
+    --           31            24              16               8               0
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0x80 |                     MR_MONITOR_CTRL[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0x84 |                     MR_MONITOR_CTRL[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0x88 |                     MR_MONITOR_COUNT[31:00]                   |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0x8C |                     MR_MONITOR_COUNT[63:32]                   |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0x90 |                     MR_MONITOR_ADDR[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0x94 |                     MR_MONITOR_ADDR[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0x98 |                     MR_MONITOR_AVAL[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0x9C |                     MR_MONITOR_AVAL[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xA0 |                     MR_MONITOR_ARDY[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xA4 |                     MR_MONITOR_ARDY[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xA8 |                     MR_MONITOR_DATA[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xAC |                     MR_MONITOR_DATA[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xB0 |                     MR_MONITOR_DVAL[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xB4 |                     MR_MONITOR_DVAL[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xB8 |                     MR_MONITOR_DRDY[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xBC |                     MR_MONITOR_DRDY[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -------------------------------------------------------------------------------
+    constant  MR_MONITOR_CTRL_ADDR       :  integer := 16#80#;
+    constant  MR_MONITOR_CTRL_BITS       :  integer := 64;
+    constant  MR_MONITOR_CTRL_LO         :  integer := 8*MR_MONITOR_CTRL_ADDR;
+    constant  MR_MONITOR_CTRL_HI         :  integer := 8*MR_MONITOR_CTRL_ADDR  + MR_MONITOR_CTRL_BITS -1;
+    constant  MR_MONITOR_RESET_POS       :  integer := 8*MR_MONITOR_CTRL_ADDR  + 63;
+    constant  MR_MONITOR_COUNT_ADDR      :  integer := 16#88#;
+    constant  MR_MONITOR_COUNT_BITS      :  integer := 64;
+    constant  MR_MONITOR_COUNT_LO        :  integer := 8*MR_MONITOR_COUNT_ADDR;
+    constant  MR_MONITOR_COUNT_HI        :  integer := 8*MR_MONITOR_COUNT_ADDR + MR_MONITOR_COUNT_BITS-1;
+    constant  MR_MONITOR_ADDR_ADDR       :  integer := 16#90#;
+    constant  MR_MONITOR_ADDR_BITS       :  integer := 64;
+    constant  MR_MONITOR_ADDR_LO         :  integer := 8*MR_MONITOR_ADDR_ADDR;
+    constant  MR_MONITOR_ADDR_HI         :  integer := 8*MR_MONITOR_ADDR_ADDR  + MR_MONITOR_ADDR_BITS -1;
+    constant  MR_MONITOR_AVAL_ADDR       :  integer := 16#98#;
+    constant  MR_MONITOR_AVAL_BITS       :  integer := 64;
+    constant  MR_MONITOR_AVAL_LO         :  integer := 8*MR_MONITOR_AVAL_ADDR;
+    constant  MR_MONITOR_AVAL_HI         :  integer := 8*MR_MONITOR_AVAL_ADDR  + MR_MONITOR_AVAL_BITS -1;
+    constant  MR_MONITOR_ARDY_ADDR       :  integer := 16#A0#;
+    constant  MR_MONITOR_ARDY_BITS       :  integer := 64;
+    constant  MR_MONITOR_ARDY_LO         :  integer := 8*MR_MONITOR_ARDY_ADDR;
+    constant  MR_MONITOR_ARDY_HI         :  integer := 8*MR_MONITOR_ARDY_ADDR  + MR_MONITOR_ARDY_BITS -1;
+    constant  MR_MONITOR_DATA_ADDR       :  integer := 16#A8#;
+    constant  MR_MONITOR_DATA_BITS       :  integer := 64;
+    constant  MR_MONITOR_DATA_LO         :  integer := 8*MR_MONITOR_DATA_ADDR;
+    constant  MR_MONITOR_DATA_HI         :  integer := 8*MR_MONITOR_DATA_ADDR  + MR_MONITOR_DATA_BITS -1;
+    constant  MR_MONITOR_DVAL_ADDR       :  integer := 16#B0#;
+    constant  MR_MONITOR_DVAL_BITS       :  integer := 64;
+    constant  MR_MONITOR_DVAL_LO         :  integer := 8*MR_MONITOR_DVAL_ADDR;
+    constant  MR_MONITOR_DVAL_HI         :  integer := 8*MR_MONITOR_DVAL_ADDR  + MR_MONITOR_DVAL_BITS -1;
+    constant  MR_MONITOR_DRDY_ADDR       :  integer := 16#B8#;
+    constant  MR_MONITOR_DRDY_BITS       :  integer := 64;
+    constant  MR_MONITOR_DRDY_LO         :  integer := 8*MR_MONITOR_DRDY_ADDR;
+    constant  MR_MONITOR_DRDY_HI         :  integer := 8*MR_MONITOR_DRDY_ADDR  + MR_MONITOR_DRDY_BITS -1;
+    -------------------------------------------------------------------------------
+    -- Master Write Monitor Registers
+    -------------------------------------------------------------------------------
+    --           31            24              16               8               0
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xC0 |                     MW_MONITOR_CTRL[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xC4 |                     MW_MONITOR_CTRL[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xC8 |                     MW_MONITOR_COUNT[31:00]                   |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xCC |                     MW_MONITOR_COUNT[63:32]                   |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xD0 |                     MW_MONITOR_ADDR[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xD4 |                     MW_MONITOR_ADDR[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xD8 |                     MW_MONITOR_AVAL[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xDC |                     MW_MONITOR_AVAL[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xE0 |                     MW_MONITOR_ARDY[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xE4 |                     MW_MONITOR_ARDY[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xE8 |                     MW_MONITOR_DATA[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xEC |                     MW_MONITOR_DATA[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xF0 |                     MW_MONITOR_DVAL[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xF4 |                     MW_MONITOR_DVAL[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xF8 |                     MW_MONITOR_DRDY[31:00]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -- Addr=0xFC |                     MW_MONITOR_DRDY[63:32]                    |
+    --           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    -------------------------------------------------------------------------------
+    constant  MW_MONITOR_CTRL_ADDR       :  integer := 16#C0#;
+    constant  MW_MONITOR_CTRL_BITS       :  integer := 64;
+    constant  MW_MONITOR_CTRL_LO         :  integer := 8*MW_MONITOR_CTRL_ADDR;
+    constant  MW_MONITOR_CTRL_HI         :  integer := 8*MW_MONITOR_CTRL_ADDR  + MW_MONITOR_CTRL_BITS -1;
+    constant  MW_MONITOR_RESET_POS       :  integer := 8*MW_MONITOR_CTRL_ADDR  + 63;
+    constant  MW_MONITOR_COUNT_ADDR      :  integer := 16#C8#;
+    constant  MW_MONITOR_COUNT_BITS      :  integer := 64;
+    constant  MW_MONITOR_COUNT_LO        :  integer := 8*MW_MONITOR_COUNT_ADDR;
+    constant  MW_MONITOR_COUNT_HI        :  integer := 8*MW_MONITOR_COUNT_ADDR + MW_MONITOR_COUNT_BITS-1;
+    constant  MW_MONITOR_ADDR_ADDR       :  integer := 16#D0#;
+    constant  MW_MONITOR_ADDR_BITS       :  integer := 64;
+    constant  MW_MONITOR_ADDR_LO         :  integer := 8*MW_MONITOR_ADDR_ADDR;
+    constant  MW_MONITOR_ADDR_HI         :  integer := 8*MW_MONITOR_ADDR_ADDR  + MW_MONITOR_ADDR_BITS -1;
+    constant  MW_MONITOR_AVAL_ADDR       :  integer := 16#D8#;
+    constant  MW_MONITOR_AVAL_BITS       :  integer := 64;
+    constant  MW_MONITOR_AVAL_LO         :  integer := 8*MW_MONITOR_AVAL_ADDR;
+    constant  MW_MONITOR_AVAL_HI         :  integer := 8*MW_MONITOR_AVAL_ADDR  + MW_MONITOR_AVAL_BITS -1;
+    constant  MW_MONITOR_ARDY_ADDR       :  integer := 16#E0#;
+    constant  MW_MONITOR_ARDY_BITS       :  integer := 64;
+    constant  MW_MONITOR_ARDY_LO         :  integer := 8*MW_MONITOR_ARDY_ADDR;
+    constant  MW_MONITOR_ARDY_HI         :  integer := 8*MW_MONITOR_ARDY_ADDR  + MW_MONITOR_ARDY_BITS -1;
+    constant  MW_MONITOR_DATA_ADDR       :  integer := 16#E8#;
+    constant  MW_MONITOR_DATA_BITS       :  integer := 64;
+    constant  MW_MONITOR_DATA_LO         :  integer := 8*MW_MONITOR_DATA_ADDR;
+    constant  MW_MONITOR_DATA_HI         :  integer := 8*MW_MONITOR_DATA_ADDR  + MW_MONITOR_DATA_BITS -1;
+    constant  MW_MONITOR_DVAL_ADDR       :  integer := 16#F0#;
+    constant  MW_MONITOR_DVAL_BITS       :  integer := 64;
+    constant  MW_MONITOR_DVAL_LO         :  integer := 8*MW_MONITOR_DVAL_ADDR;
+    constant  MW_MONITOR_DVAL_HI         :  integer := 8*MW_MONITOR_DVAL_ADDR  + MW_MONITOR_DVAL_BITS -1;
+    constant  MW_MONITOR_DRDY_ADDR       :  integer := 16#F8#;
+    constant  MW_MONITOR_DRDY_BITS       :  integer := 64;
+    constant  MW_MONITOR_DRDY_LO         :  integer := 8*MW_MONITOR_DRDY_ADDR;
+    constant  MW_MONITOR_DRDY_HI         :  integer := 8*MW_MONITOR_DRDY_ADDR  + MW_MONITOR_DRDY_BITS -1;
 begin
     -------------------------------------------------------------------------------
     -- 
@@ -658,6 +802,10 @@ begin
                                     := std_logic_vector(to_unsigned(2**MW_MAX_XFER_SIZE, BUF_DEPTH+1));
         constant  BUF_READY_LEVEL   :  std_logic_vector(BUF_DEPTH downto 0)
                                     := std_logic_vector(to_unsigned(2*M_DATA_WIDTH     , BUF_DEPTH+1));
+        signal    i_awvalid         :  std_logic;
+        signal    i_awready         :  std_logic;
+        signal    i_wvalid          :  std_logic;
+        signal    i_wready          :  std_logic;
         signal    req_valid         :  std_logic;
         signal    req_addr          :  std_logic_vector(REQ_ADDR_BITS-1 downto 0);
         signal    req_size          :  std_logic_vector(REQ_SIZE_BITS-1 downto 0);
@@ -745,8 +893,8 @@ begin
                 AWPROT              => M_AWPROT          , -- Out :
                 AWQOS               => M_AWQOS           , -- Out :
                 AWREGION            => M_AWREGION        , -- Out :
-                AWVALID             => M_AWVALID         , -- Out :
-                AWREADY             => M_AWREADY         , -- In  :
+                AWVALID             => i_awvalid         , -- Out :
+                AWREADY             => i_awready         , -- In  :
             -----------------------------------------------------------------------
             -- AXI4 Write Data Channel Signals.
             -----------------------------------------------------------------------
@@ -754,8 +902,8 @@ begin
                 WDATA               => M_WDATA           , -- Out :
                 WSTRB               => M_WSTRB           , -- Out :
                 WLAST               => M_WLAST           , -- Out :
-                WVALID              => M_WVALID          , -- Out :
-                WREADY              => M_WREADY          , -- In  :
+                WVALID              => i_wvalid          , -- Out :
+                WREADY              => i_wready          , -- In  :
             -----------------------------------------------------------------------
             -- AXI4 Write Response Channel Signals.
             -----------------------------------------------------------------------
@@ -828,6 +976,10 @@ begin
                 BUF_DATA            => buf_rdata         , -- In  :
                 BUF_PTR             => buf_rptr            -- Out :
             );                                             --
+        M_AWVALID <= i_awvalid;
+        i_awready <= M_AWREADY;
+        M_WVALID  <= i_wvalid;
+        i_wready  <= M_WREADY;
         ---------------------------------------------------------------------------
         -- Master Write Controller
         ---------------------------------------------------------------------------
@@ -975,7 +1127,7 @@ begin
         ---------------------------------------------------------------------------
         regs_rbit(MW_CTRL_RESV_POS) <= '0';
         ---------------------------------------------------------------------------
-        -- buf_rdata (BUF_WIDTH=WORD_BITS)
+        -- buf_rdata
         ---------------------------------------------------------------------------
         DATA: block
             constant  WORD_BYTES  :  integer := WORD_BITS/8;
@@ -1021,6 +1173,111 @@ begin
                 end if;
             end process;
         end block;
+        ---------------------------------------------------------------------------
+        -- MONITOR
+        ---------------------------------------------------------------------------
+        MONITOR: block
+            signal    q_awvalid   :  std_logic;
+            signal    q_awready   :  std_logic;
+            signal    q_wvalid    :  std_logic;
+            signal    q_wready    :  std_logic;
+            constant  ctrl_regs   :  std_logic_vector(MW_MONITOR_CTRL_BITS-1 downto 0)
+                                  := (others => '0');
+            constant  limit_count :  unsigned(MW_MONITOR_BITS-1 downto 0)
+                                  := (others => '1');
+            signal    total_count :  unsigned(MW_MONITOR_BITS-1 downto 0);
+            signal    addr_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
+            signal    aval_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
+            signal    ardy_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
+            signal    data_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
+            signal    dval_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
+            signal    drdy_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
+            function  to_regs(count: unsigned; BITS: integer) return std_logic_vector is
+                variable regs : std_logic_vector(BITS-1 downto 0);
+            begin
+                for i in regs'range loop
+                    if (count'low <= i and i <= count'high) then
+                        regs(i) := count(i);
+                    else
+                        regs(i) := '0';
+                    end if;
+                end loop;
+                return regs;
+            end function;
+        begin
+            process (ACLK, RST) begin 
+                if (RST = '1') then
+                        q_awvalid   <= '0';
+                        q_awready   <= '0';
+                        q_wvalid    <= '0';
+                        q_wready    <= '0';
+                elsif (ACLK'event and ACLK = '1') then
+                    if (CLR = '1') then
+                        q_awvalid   <= '0';
+                        q_awready   <= '0';
+                        q_wvalid    <= '0';
+                        q_wready    <= '0';
+                    else
+                        q_awvalid   <= i_awvalid;
+                        q_awready   <= i_awready;
+                        q_wvalid    <= i_wvalid;
+                        q_wready    <= i_wready;
+                    end if;
+                end if;
+            end process;
+            process (ACLK, RST) begin 
+                if (RST = '1') then
+                        total_count <= (others => '0');
+                        addr_count  <= (others => '0');
+                        aval_count  <= (others => '0');
+                        ardy_count  <= (others => '0');
+                        data_count  <= (others => '0');
+                        dval_count  <= (others => '0');
+                        drdy_count  <= (others => '0');
+                elsif (ACLK'event and ACLK = '1') then
+                    if    (CLR = '1') or
+                          (regs_rbit(MW_CTRL_RESET_POS) = '1') or
+                          (regs_wbit(MW_MONITOR_RESET_POS) = '1' and regs_load(MW_MONITOR_RESET_POS) = '1') then
+                        total_count <= (others => '0');
+                        addr_count  <= (others => '0');
+                        aval_count  <= (others => '0');
+                        ardy_count  <= (others => '0');
+                        data_count  <= (others => '0');
+                        dval_count  <= (others => '0');
+                        drdy_count  <= (others => '0');
+                    elsif (valve_open = '1') and
+                          (total_count < limit_count) then
+                        total_count <= total_count + 1;
+                        if (q_awvalid = '1' and q_awready = '1') then
+                            addr_count <= addr_count + 1;
+                        end if;
+                        if (q_awvalid = '1') then
+                            aval_count <= aval_count + 1;
+                        end if;
+                        if (q_awready = '1') then
+                            ardy_count <= ardy_count + 1;
+                        end if;
+                        if (q_wvalid = '1' and q_wready = '1') then
+                            data_count <= data_count + 1;
+                        end if;
+                        if (q_wvalid = '1') then
+                            dval_count <= dval_count + 1;
+                        end if;
+                        if (q_wready = '1') then
+                            drdy_count <= drdy_count + 1;
+                        end if;
+                    end if;
+                end if;
+            end process;
+            regs_rbit(MW_MONITOR_CTRL_HI  downto MW_MONITOR_CTRL_LO ) <= ctrl_regs;
+            regs_rbit(MW_MONITOR_COUNT_HI downto MW_MONITOR_COUNT_LO) <= to_regs(total_count, MW_MONITOR_COUNT_BITS);
+            regs_rbit(MW_MONITOR_ADDR_HI  downto MW_MONITOR_ADDR_LO ) <= to_regs(addr_count , MW_MONITOR_ADDR_BITS );
+            regs_rbit(MW_MONITOR_AVAL_HI  downto MW_MONITOR_AVAL_LO ) <= to_regs(aval_count , MW_MONITOR_AVAL_BITS );
+            regs_rbit(MW_MONITOR_ARDY_HI  downto MW_MONITOR_ARDY_LO ) <= to_regs(ardy_count , MW_MONITOR_ARDY_BITS );
+            regs_rbit(MW_MONITOR_DATA_HI  downto MW_MONITOR_DATA_LO ) <= to_regs(data_count , MW_MONITOR_DATA_BITS );
+            regs_rbit(MW_MONITOR_DVAL_HI  downto MW_MONITOR_DVAL_LO ) <= to_regs(dval_count , MW_MONITOR_DVAL_BITS );
+            regs_rbit(MW_MONITOR_DRDY_HI  downto MW_MONITOR_DRDY_LO ) <= to_regs(drdy_count , MW_MONITOR_DRDY_BITS );
+        end block;
     end block;
     -------------------------------------------------------------------------------
     -- Master Read Block
@@ -1041,6 +1298,10 @@ begin
                                     := std_logic_vector(to_unsigned(2**MR_MAX_XFER_SIZE, BUF_DEPTH+1));
         constant  BUF_READY_LEVEL   :  std_logic_vector(BUF_DEPTH downto 0)
                                     := std_logic_vector(to_unsigned(2*M_DATA_WIDTH     , BUF_DEPTH+1));
+        signal    i_arvalid         :  std_logic;
+        signal    i_arready         :  std_logic;
+        signal    i_rvalid          :  std_logic;
+        signal    i_rready          :  std_logic;
         signal    req_valid         :  std_logic;
         signal    req_addr          :  std_logic_vector(REQ_ADDR_BITS-1 downto 0);
         signal    req_size          :  std_logic_vector(REQ_SIZE_BITS-1 downto 0);
@@ -1128,8 +1389,8 @@ begin
                 ARPROT              => M_ARPROT          , -- Out :
                 ARQOS               => M_ARQOS           , -- Out :
                 ARREGION            => M_ARREGION        , -- Out :
-                ARVALID             => M_ARVALID         , -- Out :
-                ARREADY             => M_ARREADY         , -- In  :
+                ARVALID             => i_arvalid         , -- Out :
+                ARREADY             => i_arready         , -- In  :
             -----------------------------------------------------------------------
             -- AXI4 Read Data Channel Signals.
             -----------------------------------------------------------------------
@@ -1137,8 +1398,8 @@ begin
                 RDATA               => M_RDATA           , -- In  :
                 RRESP               => M_RRESP           , -- In  :
                 RLAST               => M_RLAST           , -- In  :
-                RVALID              => M_RVALID          , -- In  :
-                RREADY              => M_RREADY          , -- Out :
+                RVALID              => i_rvalid          , -- In  :
+                RREADY              => i_rready          , -- Out :
             -----------------------------------------------------------------------
             -- Command Request Signals.
             -----------------------------------------------------------------------
@@ -1205,6 +1466,10 @@ begin
                 BUF_DATA            => buf_wdata         , -- Out :
                 BUF_PTR             => buf_wptr            -- Out :
             );
+        M_ARVALID <= i_arvalid;
+        i_arready <= M_ARREADY;
+        i_rvalid  <= M_RVALID;
+        M_RREADY  <= i_rready;
         ---------------------------------------------------------------------------
         -- Master Read Controller
         ---------------------------------------------------------------------------
@@ -1351,6 +1616,111 @@ begin
         -- regs_rbit
         ---------------------------------------------------------------------------
         regs_rbit(MR_CTRL_RESV_POS) <= '0';
+        ---------------------------------------------------------------------------
+        -- MONITOR
+        ---------------------------------------------------------------------------
+        MONITOR: block
+            signal    q_arvalid   :  std_logic;
+            signal    q_arready   :  std_logic;
+            signal    q_rvalid    :  std_logic;
+            signal    q_rready    :  std_logic;
+            constant  ctrl_regs   :  std_logic_vector(MR_MONITOR_CTRL_BITS-1 downto 0)
+                                  := (others => '0');
+            constant  limit_count :  unsigned(MR_MONITOR_BITS-1 downto 0)
+                                  := (others => '1');
+            signal    total_count :  unsigned(MR_MONITOR_BITS-1 downto 0);
+            signal    addr_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
+            signal    aval_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
+            signal    ardy_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
+            signal    data_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
+            signal    dval_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
+            signal    drdy_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
+            function  to_regs(count: unsigned; BITS: integer) return std_logic_vector is
+                variable regs : std_logic_vector(BITS-1 downto 0);
+            begin
+                for i in regs'range loop
+                    if (count'low <= i and i <= count'high) then
+                        regs(i) := count(i);
+                    else
+                        regs(i) := '0';
+                    end if;
+                end loop;
+                return regs;
+            end function;
+        begin
+            process (ACLK, RST) begin 
+                if (RST = '1') then
+                        q_arvalid   <= '0';
+                        q_arready   <= '0';
+                        q_rvalid    <= '0';
+                        q_rready    <= '0';
+                elsif (ACLK'event and ACLK = '1') then
+                    if (CLR = '1') then
+                        q_arvalid   <= '0';
+                        q_arready   <= '0';
+                        q_rvalid    <= '0';
+                        q_rready    <= '0';
+                    else
+                        q_arvalid   <= i_arvalid;
+                        q_arready   <= i_arready;
+                        q_rvalid    <= i_rvalid;
+                        q_rready    <= i_rready;
+                    end if;
+                end if;
+            end process;
+            process (ACLK, RST) begin 
+                if (RST = '1') then
+                        total_count <= (others => '0');
+                        addr_count  <= (others => '0');
+                        aval_count  <= (others => '0');
+                        ardy_count  <= (others => '0');
+                        data_count  <= (others => '0');
+                        dval_count  <= (others => '0');
+                        drdy_count  <= (others => '0');
+                elsif (ACLK'event and ACLK = '1') then
+                    if    (CLR = '1') or
+                          (regs_rbit(MR_CTRL_RESET_POS) = '1') or
+                          (regs_wbit(MR_MONITOR_RESET_POS) = '1' and regs_load(MR_MONITOR_RESET_POS) = '1') then
+                        total_count <= (others => '0');
+                        addr_count  <= (others => '0');
+                        aval_count  <= (others => '0');
+                        ardy_count  <= (others => '0');
+                        data_count  <= (others => '0');
+                        dval_count  <= (others => '0');
+                        drdy_count  <= (others => '0');
+                    elsif (valve_open = '1') and
+                          (total_count < limit_count) then
+                        total_count <= total_count + 1;
+                        if (q_arvalid = '1' and q_arready = '1') then
+                            addr_count <= addr_count + 1;
+                        end if;
+                        if (q_arvalid = '1') then
+                            aval_count <= aval_count + 1;
+                        end if;
+                        if (q_arready = '1') then
+                            ardy_count <= ardy_count + 1;
+                        end if;
+                        if (q_rvalid = '1' and q_rready = '1') then
+                            data_count <= data_count + 1;
+                        end if;
+                        if (q_rvalid = '1') then
+                            dval_count <= dval_count + 1;
+                        end if;
+                        if (q_rready = '1') then
+                            drdy_count <= drdy_count + 1;
+                        end if;
+                    end if;
+                end if;
+            end process;
+            regs_rbit(MR_MONITOR_CTRL_HI  downto MR_MONITOR_CTRL_LO ) <= ctrl_regs;
+            regs_rbit(MR_MONITOR_COUNT_HI downto MR_MONITOR_COUNT_LO) <= to_regs(total_count, MR_MONITOR_COUNT_BITS);
+            regs_rbit(MR_MONITOR_ADDR_HI  downto MR_MONITOR_ADDR_LO ) <= to_regs(addr_count , MR_MONITOR_ADDR_BITS );
+            regs_rbit(MR_MONITOR_AVAL_HI  downto MR_MONITOR_AVAL_LO ) <= to_regs(aval_count , MR_MONITOR_AVAL_BITS );
+            regs_rbit(MR_MONITOR_ARDY_HI  downto MR_MONITOR_ARDY_LO ) <= to_regs(ardy_count , MR_MONITOR_ARDY_BITS );
+            regs_rbit(MR_MONITOR_DATA_HI  downto MR_MONITOR_DATA_LO ) <= to_regs(data_count , MR_MONITOR_DATA_BITS );
+            regs_rbit(MR_MONITOR_DVAL_HI  downto MR_MONITOR_DVAL_LO ) <= to_regs(dval_count , MR_MONITOR_DVAL_BITS );
+            regs_rbit(MR_MONITOR_DRDY_HI  downto MR_MONITOR_DRDY_LO ) <= to_regs(drdy_count , MR_MONITOR_DRDY_BITS );
+        end block;
     end block;
     -------------------------------------------------------------------------------
     -- Interrupt Request Signal
