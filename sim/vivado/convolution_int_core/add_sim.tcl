@@ -19,10 +19,11 @@ add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/convolution/convolution_i
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/convolution/convolution_int_adder_tree.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/convolution/convolution_int_multiplier.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/image/image_stream_buffer.vhd
+add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/convolution/convolution_int_core.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/sdpram_altera_auto_select.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/sdpram_model.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/sdpram_xilinx_auto_select.vhd
-add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/convolution/convolution_int_core.vhd
+add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/sdpram_xilinx_ultrascale_auto_select.vhd
 add_vhdl_file sim_1     DUMMY_PLUG ../../../Dummy_Plug/src/main/vhdl/core/util.vhd
 add_vhdl_file sim_1     DUMMY_PLUG ../../../Dummy_Plug/src/main/vhdl/core/reader.vhd
 add_vhdl_file sim_1     DUMMY_PLUG ../../../Dummy_Plug/src/main/vhdl/core/sync.vhd
