@@ -4,7 +4,9 @@ SRC_TEST_PATH = ../../../src/test/vhdl/$(PROJECT_NAME)
 SCENARIO_PATH = ../../../src/test/scenarios/$(PROJECT_NAME)
 
 NVC           = nvc
-NVCFLAGS      = -L ./ -M 32M -H 64M
+NVC_G_FLAGS   = -L ./ -M 32M -H 256M
+NVC_E_FLAGS   = --jit -O3
+NVC_R_FLAGS   =
 
 TEST_BENCH    = pump_axi4_to_axi4_test_bench_32_32        \
                 pump_axi4_to_axi4_test_bench_32_64        \
@@ -31,12 +33,12 @@ endef
 
 define NVC_RUN
 $(1): $(call NVC_EXECUTE_FILE,$(1)) $(2)
-	$(NVC) $(NVCFLAGS) --work=WORK -r $(1)
+	$(NVC) $(NVC_G_FLAGS) --work=WORK -r $(NVC_R_FLAGS) $(1)
 endef
 
 define NVC_ELAB
 $(call NVC_EXECUTE_FILE,$(1)): $(call NVC_ANALIZE_FILE,$(1))
-	$(NVC) $(NVCFLAGS) --work=WORK -e $(1)
+	$(NVC) $(NVC_G_FLAGS) --work=WORK -e $(NVC_E_FLAGS) $(1)
 endef
 
 $(call NVC_ANALIZE_FILE, $(TEST_BENCH)) : analyze_libs.sh

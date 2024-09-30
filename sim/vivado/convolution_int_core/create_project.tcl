@@ -5,6 +5,9 @@
 set project_directory       [file dirname [info script]]
 set project_name            "conv_int_core"
 set device_parts            "xc7z010clg400-1"
+set test_bench              "CONV_INT_CORE_TEST_BENCH_3x3_8_8x12x12_4x10x10_1111"
+set scenario_path           [file join ".." ".." ".." "src" "test" "scenarios" "convolution_int_core" ]
+set scenario_file           [file join $scenario_path "test_3x3_8_8x12x12_4x10x10_1111.snr"]
 #
 # Create project
 #
@@ -73,14 +76,21 @@ source "add_sim.tcl"
 #
 # Set 'sim_1' fileset properties
 #
+set current_vivado_version [version -short]
+if       { [string first "2019.2" $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
+} elseif { [string first "2018.3" $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
+} elseif { [string first "2017"   $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
+} else {
+   puts ""
+   puts "ERROR: This model can not run in Vivado <$current_vivado_version>"
+   return 1
+}
 set obj [get_filesets sim_1]
-# set_property "top" "CONVOLUTION_INT_CORE_TEST_0_2_32x1x1_32x4x3x3"  $obj
-# set_property "generic" "SCENARIO_FILE=../../../../../../sim/ghdl-0.35/convolution_int_core/test_0_2_32x1x1_32x4x3x3.snr FINISH_ABORT=true" $obj
-# set_property "top" "CONVOLUTION_INT_CORE_TEST_4_8_4x1x1_4x1x1x1"  $obj
-# set_property "generic" "SCENARIO_FILE=../../../../../../sim/ghdl-0.35/convolution_int_core/test_4_8_4x1x1_4x1x1x1.snr FINISH_ABORT=true" $obj
-
-set_property "top" "CONV_INT_CORE_TEST_BENCH_3x3_8_8x12x12_4x10x10_1111" $obj
-set_property "generic" "SCENARIO_FILE=../../../../../../src/test/scenarios/convolution_int_core/test_3x3_8_8x12x12_4x10x10_1111.snr FINISH_ABORT=true" $obj
+set_property "top"     $test_bench $obj
+set_property "generic" "SCENARIO_FILE=$scenario_full_path FINISH_ABORT=true" $obj
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
