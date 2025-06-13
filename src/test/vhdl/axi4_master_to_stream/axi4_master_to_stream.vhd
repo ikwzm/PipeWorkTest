@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_to_stream.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4-Stream)
---!     @version 2.0.0
---!     @date    2023/12/28
+--!     @version 2.4.0
+--!     @date    2025/6/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2023 Ichiro Kawazome
+--      Copyright (C) 2012-2025 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -48,6 +48,7 @@ entity  AXI4_MASTER_TO_STREAM is
         C_DATA_WIDTH    : integer range 8 to 1024 := 32;
         C_ID_WIDTH      : integer                 :=  8;
         I_CLK_RATE      : integer                 :=  1;
+        I_CLK_FLOP      : integer range 0 to   31 :=  2;
         I_AXI_ID        : integer                 :=  1;
         I_ADDR_WIDTH    : integer range 1 to   64 := 32;
         I_DATA_WIDTH    : integer range 8 to 1024 := 32;
@@ -59,6 +60,7 @@ entity  AXI4_MASTER_TO_STREAM is
         I_DATA_REGS     : integer                 :=  3;
         I_DATA_PIPELINE : integer                 :=  0;
         O_CLK_RATE      : integer                 :=  1;
+        O_CLK_FLOP      : integer range 0 to   31 :=  2;
         O_DATA_WIDTH    : integer                 := 32;
         BUF_WIDTH       : integer                 := 32;
         BUF_DEPTH       : integer                 := 12
@@ -802,6 +804,7 @@ begin
     CTRL: PUMP_STREAM_INTAKE_CONTROLLER
         generic map (
             I_CLK_RATE          => I_CLK_RATE          , --
+            I_CLK_FLOP          => I_CLK_FLOP          , --
             I_REQ_ADDR_VALID    => I_REQ_ADDR_VALID    , --
             I_REQ_ADDR_BITS     => I_ADDR_WIDTH        , --
             I_REG_ADDR_BITS     => I_ADDR_REGS_BITS    , --
@@ -814,6 +817,7 @@ begin
             I_FIXED_FLOW_OPEN   => I_FIXED_FLOW_OPEN   , --
             I_FIXED_POOL_OPEN   => I_FIXED_POOL_OPEN   , --
             O_CLK_RATE          => O_CLK_RATE          , --
+            O_CLK_FLOP          => O_CLK_FLOP          , --
             O_DATA_BITS         => O_DATA_WIDTH        , --
             BUF_DEPTH           => BUF_DEPTH           , --
             BUF_DATA_BITS       => BUF_WIDTH           , --
