@@ -6,9 +6,10 @@ SCENARIO_PATH = ../../../src/test/scenarios/$(PROJECT_NAME)
 NVC           = nvc
 NVCFLAGS      = -L ./ -M 32M
 
-TEST_BENCH    = axi4_adapter_test_bench_4096_32_32 \
-                axi4_adapter_test_bench_4096_32_64 \
-                axi4_adapter_test_bench_4096_64_32 \
+TEST_BENCH    = axi4_adapter_test_bench_4096_32_32       \
+                axi4_adapter_test_bench_4096_32_64       \
+                axi4_adapter_test_bench_4096_64_32       \
+                axi4_adapter_test_bench_4096_32_32_async \
                 $(END_LIST)
 
 all: $(TEST_BENCH)
@@ -65,3 +66,11 @@ axi4_adapter_test_bench_4096_64_32.snr : $(SCENARIO_PATH)/make_scenario.rb
              --m_width    32 \
              --m_max_size 4096 \
              --output     axi4_adapter_test_bench_4096_64_32.snr
+
+axi4_adapter_test_bench_4096_32_32_async.snr : $(SCENARIO_PATH)/make_scenario.rb
+	$<   --name       AXI4_ADAPTER_TEST_4096_32_32_ASYNC \
+             --t_width    32 \
+             --m_width    32 \
+             --m_max_size 4096 \
+             --output     axi4_adapter_test_bench_4096_32_32_async.snr
+
