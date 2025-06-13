@@ -52,5 +52,6 @@ nvc -L ./ --work=WORK -a ../../../src/test/vhdl/axi4_adapter/axi4_write_adapter.
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/axi4_adapter/axi4_adapter.vhd
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench.vhd
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench_4096_32_32.vhd
+nvc -L ./ --work=WORK -a ../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench_4096_32_32_async.vhd
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench_4096_32_64.vhd
 nvc -L ./ --work=WORK -a ../../../src/test/vhdl/axi4_adapter/axi4_adapter_test_bench_4096_64_32.vhd

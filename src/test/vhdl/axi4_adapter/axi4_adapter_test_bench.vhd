@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_adapter_test_bench.vhd
 --!     @brief   AXI4_ADPATER TEST BENCH
---!     @version 2.2.0
---!     @date    2024/4/7
+--!     @version 2.4.0
+--!     @date    2025/6/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2024 Ichiro Kawazome
+--      Copyright (C) 2012-2025 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -45,8 +45,10 @@ component  AXI4_ADAPTER_TEST_BENCH
         NAME            : STRING  := "test";
         SCENARIO_FILE   : STRING  := "test.snr";
         T_CLK_RATE      : integer := 1;
+        T_CLK_FLOP      : integer := 2;
         T_CLK_PERIOD    : time    := 10 ns;
         M_CLK_RATE      : integer := 1;
+        M_CLK_FLOP      : integer := 2;
         M_CLK_PERIOD    : time    := 10 ns;
         T_DATA_WIDTH    : integer := 32;
         M_DATA_WIDTH    : integer := 32;
@@ -65,9 +67,11 @@ entity  AXI4_ADAPTER_TEST_BENCH is
         NAME            : STRING  := "test";
         SCENARIO_FILE   : STRING  := "test.snr";
         T_CLK_RATE      : integer := 1;
+        T_CLK_FLOP      : integer := 2;
         T_CLK_PERIOD    : time    := 10 ns;
         M_CLK_RATE      : integer := 1;
         M_CLK_PERIOD    : time    := 10 ns;
+        M_CLK_FLOP      : integer := 2;
         T_DATA_WIDTH    : integer := 32;
         M_DATA_WIDTH    : integer := 32;
         M_MAX_XFER_SIZE : integer := 12;
@@ -292,8 +296,10 @@ architecture MODEL of AXI4_ADAPTER_TEST_BENCH is
             AXI4_AUSER_WIDTH    : integer := 1;
             AXI4_ADDR_WIDTH     : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             T_CLK_RATE          : integer :=  1;
+            T_CLK_FLOP          : integer range 0 to 31 := 2;
             T_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             M_CLK_RATE          : integer :=  1;
+            M_CLK_FLOP          : integer range 0 to 31 := 2;
             M_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             M_MAX_XFER_SIZE     : integer := 12;
             BUF_DEPTH           : integer := 12;
@@ -620,8 +626,10 @@ begin
             AXI4_AUSER_WIDTH    => AXI4_AUSER_WIDTH    ,
             AXI4_ADDR_WIDTH     => AXI4_ADDR_WIDTH     ,
             T_CLK_RATE          => T_CLK_RATE          ,
+            T_CLK_FLOP          => T_CLK_FLOP          ,
             T_DATA_WIDTH        => T_DATA_WIDTH        ,
             M_CLK_RATE          => M_CLK_RATE          ,
+            M_CLK_FLOP          => M_CLK_FLOP          ,
             M_DATA_WIDTH        => M_DATA_WIDTH        ,
             M_MAX_XFER_SIZE     => M_MAX_XFER_SIZE     ,
             BUF_DEPTH           => 12                  ,

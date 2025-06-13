@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_stream_to_master.vhd
 --!     @brief   Pump Core Module (AXI4-Stream to AXI4)
---!     @version 2.0.0
---!     @date    2023/12/28
+--!     @version 2.4.0
+--!     @date    2025/6/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2023 Ichiro Kawazome
+--      Copyright (C) 2012-2025 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -48,6 +48,7 @@ entity  AXI4_STREAM_TO_MASTER is
         C_DATA_WIDTH    : integer range 8 to 1024 := 32;
         C_ID_WIDTH      : integer                 :=  8;
         O_CLK_RATE      : integer                 :=  1;
+        O_CLK_FLOP      : integer range 0 to   31 :=  2;
         O_AXI_ID        : integer                 :=  1;
         O_ADDR_WIDTH    : integer range 1 to   64 := 32;
         O_DATA_WIDTH    : integer range 8 to 1024 := 32;
@@ -57,6 +58,7 @@ entity  AXI4_STREAM_TO_MASTER is
         O_QUEUE_SIZE    : integer                 :=  2;
         O_DATA_PIPELINE : integer                 :=  0;
         I_CLK_RATE      : integer                 :=  1;
+        I_CLK_FLOP      : integer range 0 to   31 :=  2;
         I_DATA_WIDTH    : integer                 := 32;
         I_WORD_BITS     : integer                 :=  8;
         I_JUSTIFIED     : integer                 :=  0;
@@ -811,6 +813,7 @@ begin
     CTRL: PUMP_STREAM_OUTLET_CONTROLLER
         generic map (
             O_CLK_RATE          => O_CLK_RATE          , --
+            O_CLK_FLOP          => O_CLK_FLOP          , --
             O_REQ_ADDR_VALID    => O_REQ_ADDR_VALID    , --
             O_REQ_ADDR_BITS     => O_ADDR_WIDTH        , --
             O_REG_ADDR_BITS     => O_ADDR_REGS_BITS    , --
@@ -823,6 +826,7 @@ begin
             O_FIXED_FLOW_OPEN   => O_FIXED_FLOW_OPEN   , --
             O_FIXED_POOL_OPEN   => O_FIXED_POOL_OPEN   , --
             I_CLK_RATE          => I_CLK_RATE          , --
+            I_CLK_FLOP          => I_CLK_FLOP          , --
             I_DATA_BITS         => I_DATA_WIDTH        , --
             I_WORD_BITS         => I_WORD_BITS         , --
             I_JUSTIFIED         => I_JUSTIFIED         , --

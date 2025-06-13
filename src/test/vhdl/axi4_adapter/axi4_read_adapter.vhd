@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_read_adapter.vhd
 --!     @brief   AXI4_READ_ADPATER
---!     @version 2.2.0
---!     @date    2024/4/7
+--!     @version 2.4.0
+--!     @date    2025/6/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2024 Ichiro Kawazome
+--      Copyright (C) 2012-2025 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -62,6 +62,12 @@ entity  AXI4_READ_ADAPTER is
                               --! リクエスト側のクロック(M_CLK)との関係を指定する.
                               --! 詳細は PipeWork.Components の SYNCRONIZER を参照.
                               integer :=  1;
+        T_CLK_FLOP          : --! @brief RESPONDER CLOCK FLOPPING :
+                              --! レスポンダ側のクロック(T_CLK)とリクエスト側のクロック
+                              --! (M_CLK)が非同期の場合に、リクエスト側のFFからの制御信
+                              --! 号をレスポンダ側のFFで叩く段数を指定する.
+                              --! 詳細は PipeWork.Components の SYNCRONIZER を参照.
+                              integer range 0 to 31 := 2;
         T_DATA_WIDTH        : --! @brief RESPONDER AXI4 WRITE DATA CHANNEL DATA WIDTH :
                               --! AXI4 ライトデータチャネルのWDATA信号のビット幅.
                               integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
@@ -70,6 +76,12 @@ entity  AXI4_READ_ADAPTER is
                               --! リクエスト側のクロック(M_CLK)との関係を指定する.
                               --! 詳細は PipeWork.Components の SYNCRONIZER を参照.
                               integer :=  1;
+        M_CLK_FLOP          : --! @brief REQUESTER CLOCK FLOPPING :
+                              --! レスポンダ側のクロック(T_CLK)とリクエスト側のクロック
+                              --! (M_CLK)が非同期の場合に、レスポンダ側のFFからの制御信
+                              --! 号をリクエスト側のFFで叩く段数を指定する.
+                              --! 詳細は PipeWork.Components の SYNCRONIZER を参照.
+                              integer range 0 to 31 := 2;
         M_DATA_WIDTH        : --! @brief REQUESTER AXI4 WRITE DATA CHANNEL DATA WIDTH :
                               --! AXI4 ライトデータチャネルのWDATA信号のビット幅.
                               integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
@@ -613,7 +625,9 @@ begin
     PIPE: PIPE_CONTROLLER                                -- 
         generic map (                                    -- 
             T_CLK_RATE          => T_CLK_RATE          , --
+            T_CLK_FLOP          => T_CLK_FLOP          , --
             M_CLK_RATE          => M_CLK_RATE          , --
+            M_CLK_FLOP          => M_CLK_FLOP          , --
             ADDR_BITS           => AXI4_ADDR_WIDTH     , --
             ADDR_VALID          => 1                   , --
             SIZE_BITS           => SIZE_BITS           , --

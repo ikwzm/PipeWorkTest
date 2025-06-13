@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi4_master_to_stream_test_bench.vhd
 --!     @brief   Pump Core Module (AXI4 to AXI4-Stream) Test Bench
---!     @version 2.0.0
---!     @date    2023/12/28
+--!     @version 2.4.0
+--!     @date    2025/6/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2028 Ichiro Kawazome
+--      Copyright (C) 2012-2025 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,9 @@ entity  AXI4_MASTER_TO_STREAM_TEST_BENCH is
         I_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
         O_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
         I_CLK_RATE      : integer                                :=  1;
+        I_CLK_FLOP      : integer range 0 to 31                  :=  2;
         O_CLK_RATE      : integer                                :=  1;
+        O_CLK_FLOP      : integer range 0 to 31                  :=  2;
         I_PERIOD        : time                                   := 10 ns;
         O_PERIOD        : time                                   := 10 ns;
         MAX_XFER_SIZE   : integer                                :=  6;
@@ -281,6 +283,7 @@ architecture MODEL of AXI4_MASTER_TO_STREAM_TEST_BENCH is
             C_DATA_WIDTH    : integer range 8 to 1024 := 32;
             C_ID_WIDTH      : integer                 :=  8;
             I_CLK_RATE      : integer                 :=  1;
+            I_CLK_FLOP      : integer range 0 to   31 :=  2;
             I_AXI_ID        : integer                 :=  1;
             I_ADDR_WIDTH    : integer range 1 to   64 := 32;
             I_DATA_WIDTH    : integer range 8 to 1024 := 32;
@@ -292,6 +295,7 @@ architecture MODEL of AXI4_MASTER_TO_STREAM_TEST_BENCH is
             I_DATA_REGS     : integer                 :=  3;
             I_DATA_PIPELINE : integer                 :=  0;
             O_CLK_RATE      : integer                 :=  1;
+            O_CLK_FLOP      : integer range 0 to   31 :=  2;
             O_DATA_WIDTH    : integer                 := 32;
             BUF_WIDTH       : integer                 := 32;
             BUF_DEPTH       : integer                 := 12
@@ -443,6 +447,7 @@ begin
             C_DATA_WIDTH    => C_WIDTH.WDATA       , -- 
             C_ID_WIDTH      => C_WIDTH.ID          , -- 
             I_CLK_RATE      => I_CLK_RATE          , -- 
+            I_CLK_FLOP      => I_CLK_FLOP          , -- 
             I_AXI_ID        => I_AXI_ID            , -- 
             I_ADDR_WIDTH    => I_WIDTH.ARADDR      , -- 
             I_DATA_WIDTH    => I_WIDTH.RDATA       , -- 
@@ -454,6 +459,7 @@ begin
             I_DATA_REGS     => I_DATA_REGS         ,  --
             I_DATA_PIPELINE => I_DATA_PIPELINE     ,  --
             O_CLK_RATE      => O_CLK_RATE          , -- 
+            O_CLK_FLOP      => O_CLK_FLOP          , -- 
             O_DATA_WIDTH    => O_DATA_WIDTH        , -- 
             BUF_WIDTH       => BUF_WIDTH           , -- 
             BUF_DEPTH       => BUF_DEPTH             --
@@ -1235,6 +1241,8 @@ begin
             O_CLK_RATE      => 0               , --   
             I_PERIOD        => 10 ns           , --   
             O_PERIOD        =>  4 ns           , --   
+            I_CLK_FLOP      => 0               , --   
+            O_CLK_FLOP      => 2               , --   
             MAX_XFER_SIZE   => 8               , --   
             BUF_WIDTH       => 32              , --   
             BUF_DEPTH       => 16              , --   
@@ -1265,6 +1273,8 @@ begin
             O_CLK_RATE      => 0               , --   
             I_PERIOD        =>  4 ns           , --   
             O_PERIOD        => 10 ns           , --   
+            I_CLK_FLOP      => 3               , --   
+            O_CLK_FLOP      => 1               , --   
             MAX_XFER_SIZE   => 8               , --   
             BUF_WIDTH       => 32              , --   
             BUF_DEPTH       => 16              , --   

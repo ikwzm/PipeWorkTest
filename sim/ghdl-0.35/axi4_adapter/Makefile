@@ -22,6 +22,7 @@ PIPEWORK_COMPONENTS = axi4_adapter       \
 TEST_BENCH = axi4_adapter_test_bench_4096_32_32 \
              axi4_adapter_test_bench_4096_32_64 \
              axi4_adapter_test_bench_4096_64_32 \
+             axi4_adapter_test_bench_4096_32_32_async \
              $(END_LIST)
 
 all: DUT $(TEST_BENCH)
@@ -51,6 +52,9 @@ axi4_adapter_test_bench_4096_32_64.o : $(SRC_TEST_PATH)/axi4_adapter_test_bench_
 	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_adapter_test_bench_4096_64_32.o : $(SRC_TEST_PATH)/axi4_adapter_test_bench_4096_64_32.vhd axi4_adapter_test_bench.o
+	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
+
+axi4_adapter_test_bench_4096_32_32_async.o : $(SRC_TEST_PATH)/axi4_adapter_test_bench_4096_32_32_async.vhd axi4_adapter_test_bench.o
 	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 axi4_adapter_test_bench.o            : $(SRC_TEST_PATH)/axi4_adapter_test_bench.vhd
@@ -89,3 +93,12 @@ axi4_adapter_test_bench_4096_64_32.snr : $(SRC_PATH)/test/scenarios/axi4_adapter
              --m_width    32 \
              --m_max_size 4096 \
              --output     axi4_adapter_test_bench_4096_64_32.snr
+
+axi4_adapter_test_bench_4096_32_32_async.snr : $(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb
+	$(SRC_PATH)/test/scenarios/axi4_adapter/make_scenario.rb \
+             --name       AXI4_ADAPTER_TEST_4096_32_32_ASYNC \
+             --t_width    32 \
+             --m_width    32 \
+             --m_max_size 4096 \
+             --output     axi4_adapter_test_bench_4096_32_32_async.snr
+

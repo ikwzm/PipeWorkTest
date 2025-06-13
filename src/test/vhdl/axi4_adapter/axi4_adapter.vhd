@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    aix4_adapter.vhd
 --!     @brief   AXI4_ADPATER
---!     @version 2.2.0
---!     @date    2024/4/7
+--!     @version 2.4.0
+--!     @date    2025/6/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2012-2022 Ichiro Kawazome
+--      Copyright (C) 2012-2025 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -62,6 +62,12 @@ entity  AXI4_ADAPTER is
                               --! リクエスト側のクロック(M_CLK)との関係を指定する.
                               --! 詳細は PipeWork.Components の SYNCRONIZER を参照.
                               integer :=  1;
+        T_CLK_FLOP          : --! @brief RESPONDER CLOCK FLOPPING :
+                              --! レスポンダ側のクロック(T_CLK)とリクエスト側のクロック
+                              --! (M_CLK)が非同期の場合に、リクエスト側のFFからの制御信
+                              --! 号をレスポンダ側のFFで叩く段数を指定する.
+                              --! 詳細は PipeWork.Components の SYNCRONIZER を参照.
+                              integer range 0 to 31 := 2;
         T_DATA_WIDTH        : --! @brief RESPONDER AXI4 WRITE DATA CHANNEL DATA WIDTH :
                               --! AXI4 ライトデータチャネルのWDATA信号のビット幅.
                               integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
@@ -70,6 +76,12 @@ entity  AXI4_ADAPTER is
                               --! リクエスト側のクロック(M_CLK)との関係を指定する.
                               --! 詳細は PipeWork.Components の SYNCRONIZER を参照.
                               integer :=  1;
+        M_CLK_FLOP          : --! @brief REQUESTER CLOCK FLOPPING :
+                              --! レスポンダ側のクロック(T_CLK)とリクエスト側のクロック
+                              --! (M_CLK)が非同期の場合に、レスポンダ側のFFからの制御信
+                              --! 号をリクエスト側のFFで叩く段数を指定する.
+                              --! 詳細は PipeWork.Components の SYNCRONIZER を参照.
+                              integer range 0 to 31 := 2;
         M_DATA_WIDTH        : --! @brief REQUESTER AXI4 WRITE DATA CHANNEL DATA WIDTH :
                               --! AXI4 ライトデータチャネルのWDATA信号のビット幅.
                               integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
@@ -210,8 +222,10 @@ architecture RTL of AXI4_ADAPTER is
             AXI4_AUSER_WIDTH    : integer := 1;
             AXI4_ADDR_WIDTH     : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             T_CLK_RATE          : integer :=  1;
+            T_CLK_FLOP          : integer range 0 to 31 := 2;
             T_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             M_CLK_RATE          : integer :=  1;
+            M_CLK_FLOP          : integer range 0 to 31 := 2;
             M_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             M_MAX_XFER_SIZE     : integer := 12;
             BUF_DEPTH           : integer := 12;
@@ -281,8 +295,10 @@ architecture RTL of AXI4_ADAPTER is
             AXI4_AUSER_WIDTH    : integer := 1;
             AXI4_ADDR_WIDTH     : integer range 1 to AXI4_ADDR_MAX_WIDTH := 32;
             T_CLK_RATE          : integer :=  1;
+            T_CLK_FLOP          : integer range 0 to 31 := 2;
             T_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             M_CLK_RATE          : integer :=  1;
+            M_CLK_FLOP          : integer range 0 to 31 := 2;
             M_DATA_WIDTH        : integer range 8 to AXI4_DATA_MAX_WIDTH := 32;
             M_MAX_XFER_SIZE     : integer := 12;
             BUF_DEPTH           : integer := 12;
@@ -343,8 +359,10 @@ begin
             AXI4_AUSER_WIDTH    => AXI4_AUSER_WIDTH    , -- 
             AXI4_ADDR_WIDTH     => AXI4_ADDR_WIDTH     , --
             T_CLK_RATE          => T_CLK_RATE          , --
+            T_CLK_FLOP          => T_CLK_FLOP          , --
             T_DATA_WIDTH        => T_DATA_WIDTH        , --
             M_CLK_RATE          => M_CLK_RATE          , --
+            M_CLK_FLOP          => M_CLK_FLOP          , --
             M_DATA_WIDTH        => M_DATA_WIDTH        , --
             M_MAX_XFER_SIZE     => M_MAX_XFER_SIZE     , --
             BUF_DEPTH           => BUF_DEPTH           , --
@@ -410,8 +428,10 @@ begin
             AXI4_AUSER_WIDTH    => AXI4_AUSER_WIDTH    , -- 
             AXI4_ADDR_WIDTH     => AXI4_ADDR_WIDTH     , -- 
             T_CLK_RATE          => T_CLK_RATE          , -- 
+            T_CLK_FLOP          => T_CLK_FLOP          , -- 
             T_DATA_WIDTH        => T_DATA_WIDTH        , -- 
             M_CLK_RATE          => M_CLK_RATE          , -- 
+            M_CLK_FLOP          => M_CLK_FLOP          , -- 
             M_DATA_WIDTH        => M_DATA_WIDTH        , -- 
             M_MAX_XFER_SIZE     => M_MAX_XFER_SIZE     , -- 
             BUF_DEPTH           => BUF_DEPTH           , --
