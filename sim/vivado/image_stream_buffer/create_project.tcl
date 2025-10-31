@@ -79,8 +79,10 @@ source "add_sim.tcl"
 # set scenario_file [file join ".." ".." ".." "sim" "ghdl-0.35" "image_stream_buffer" "test_4_8_4x1x1_4x1x1x1.snr" ]
 set test_bench    "IMAGE_STREAM_BUFFER_TEST_0_2_32x1x1_32x4x3x3_bug1"
 set scenario_file [file join ".." ".." ".." "src" "test" "scenarios" "image_stream_buffer" "test_0_2_32x1x1_32x4x3x3_bug1.snr" ]
-if       { [string first "2019.2" $current_vivado_version ] == 0 } {
+if       { [string first "2025.1" $current_vivado_version ] == 0 } {
     set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
+} elseif { [string first "2019.2" $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
 } elseif { [string first "2018.3" $current_vivado_version ] == 0 } {
     set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
 } elseif { [string first "2017"   $current_vivado_version ] == 0 } {
