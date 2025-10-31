@@ -73,9 +73,22 @@ source "add_sim.tcl"
 #
 # Set 'sim_1' fileset properties
 #
+set test_bench    "IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_4_8"
+set scenario_file [file join ".." ".." ".." "src" "test" "scenarios" "image_stream_channel_reducer" "test_0_0_4_8.snr" ]
+if       { [string first "2019.2" $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
+} elseif { [string first "2018.3" $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
+} elseif { [string first "2017"   $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
+} else {
+   puts ""
+   puts "ERROR: This model can not run in Vivado <$current_vivado_version>"
+   return 1
+}
 set obj [get_filesets sim_1]
-set_property "top" "IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_4_8"  $obj
-set_property "generic" "SCENARIO_FILE=../../../../../../src/test/scenarios/image_stream_channel_reducer/test_0_0_4_8.snr FINISH_ABORT=true" $obj
+set_property "top"     $test_bench $obj
+set_property "generic" "SCENARIO_FILE=$scenario_full_path FINISH_ABORT=true" $obj
 
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
