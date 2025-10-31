@@ -75,8 +75,10 @@ source "add_sim.tcl"
 #
 set test_bench    "IMAGE_STREAM_CHANNEL_REDUCER_TEST_0_0_4_8"
 set scenario_file [file join ".." ".." ".." "src" "test" "scenarios" "image_stream_channel_reducer" "test_0_0_4_8.snr" ]
-if       { [string first "2019.2" $current_vivado_version ] == 0 } {
+if       { [string first "2025.1" $current_vivado_version ] == 0 } {
     set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
+} elseif { [string first "2019.2" $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
 } elseif { [string first "2018.3" $current_vivado_version ] == 0 } {
     set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
 } elseif { [string first "2017"   $current_vivado_version ] == 0 } {
