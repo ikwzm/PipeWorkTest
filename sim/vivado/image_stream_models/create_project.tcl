@@ -75,8 +75,10 @@ source "add_sim.tcl"
 #
 set test_bench    "IMAGE_STREAM_PLAYER_TEST_8x0x0x0x0"
 set scenario_file [file join ".." ".." ".." "src" "test" "scenarios" "image_stream_models" "test_8x0x0x0x0.snr" ]
-if       { [string first "2019.2" $current_vivado_version ] == 0 } {
+if       { [string first "2025.1" $current_vivado_version ] == 0 } {
     set scenario_full_path [file join ".." ".." ".." ".." $scenario_file ]
+} elseif { [string first "2019.2" $current_vivado_version ] == 0 } {
+    set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
 } elseif { [string first "2018.3" $current_vivado_version ] == 0 } {
     set scenario_full_path [file join ".." ".." ".."      $scenario_file ]
 } elseif { [string first "2017"   $current_vivado_version ] == 0 } {
