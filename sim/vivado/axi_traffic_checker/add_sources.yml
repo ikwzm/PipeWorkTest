@@ -1,9 +1,6 @@
-
-- Global:
-    Print    :  true
-
 - Library:
     Name     :  pipework
+    Print    :  true
     Format   :  "add_vhdl_file sources_1 #{library_name} #{file_name}"
     PathList :  
         - "../../../PipeWork/src/"
@@ -12,6 +9,7 @@
 
 - Library:
     Name     :  work
+    Print    :  true
     Format   :  "add_vhdl_file sources_1 #{library_name} #{file_name}"
     PathList :  
         - "../../../src/test/vhdl/axi_traffic_checker"

@@ -30,6 +30,7 @@ add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/pump/pump_control_registe
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/axi4/axi4_master_read_interface.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/axi4/axi4_master_write_interface.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/axi4/axi4_register_interface.vhd
+add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/axi4/axi4_traffic_monitor.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/components/register_access_adapter.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/pump/pump_controller_intake_side.vhd
 add_vhdl_file sources_1 PIPEWORK ../../../PipeWork/src/pump/pump_controller_outlet_side.vhd

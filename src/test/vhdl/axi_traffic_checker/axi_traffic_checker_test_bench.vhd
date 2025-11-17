@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi_traffic_checker_test_bench.vhd
 --!     @brief   AXI Traffic Checker Test Bench
---!     @version 0.1.0
---!     @date    2024/3/8
+--!     @version 0.6.0
+--!     @date    2025/11/17
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2024 Ichiro Kawazome
+--      Copyright (C) 2024-2025 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -696,6 +696,32 @@ entity  AXI_TRAFFIC_CHECKER_TEST_BENCH_64_64 is
     );
 end     AXI_TRAFFIC_CHECKER_TEST_BENCH_64_64;
 architecture MODEL of AXI_TRAFFIC_CHECKER_TEST_BENCH_64_64 is
+begin
+    TB: entity work.AXI_TRAFFIC_CHECKER_TEST_BENCH generic map(
+        NAME            => NAME            ,
+        SCENARIO_FILE   => SCENARIO_FILE   ,   
+        M_DATA_WIDTH    => M_DATA_WIDTH    ,
+        M_MAX_XFER_SIZE => M_MAX_XFER_SIZE ,
+        FINISH_ABORT    => FINISH_ABORT
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+library DUMMY_PLUG;
+use     DUMMY_PLUG.AXI4_TYPES.all;
+entity  AXI_TRAFFIC_CHECKER_TEST_BENCH_128_64 is
+    generic (
+        NAME            : STRING                                 := "test_128_64";
+        SCENARIO_FILE   : STRING                                 := "test_128_64.snr";
+        M_DATA_WIDTH    : integer range 8 to AXI4_DATA_MAX_WIDTH := 128;
+        M_MAX_XFER_SIZE : integer                                :=  6;
+        FINISH_ABORT    : boolean                                := FALSE
+    );
+end     AXI_TRAFFIC_CHECKER_TEST_BENCH_128_64;
+architecture MODEL of AXI_TRAFFIC_CHECKER_TEST_BENCH_128_64 is
 begin
     TB: entity work.AXI_TRAFFIC_CHECKER_TEST_BENCH generic map(
         NAME            => NAME            ,
