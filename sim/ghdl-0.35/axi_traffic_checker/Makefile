@@ -12,6 +12,7 @@ DUT_COMPONENTS = axi_traffic_checker \
 
 TEST_BENCH     = axi_traffic_checker_test_bench_32_64  \
                  axi_traffic_checker_test_bench_64_64  \
+                 axi_traffic_checker_test_bench_128_64 \
                  $(END_LIST)
 
 all: DUT $(TEST_BENCH)
@@ -19,25 +20,32 @@ all: DUT $(TEST_BENCH)
 clean:
 	rm -f *.o *.cf $(TEST_BENCH)
 
-axi_traffic_checker_test_bench_32_64           : axi_traffic_checker_test_bench.o DUT test_32_64.snr
+axi_traffic_checker_test_bench_32_64   : axi_traffic_checker_test_bench.o DUT test_32_64.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
-axi_traffic_checker_test_bench_64_64           : axi_traffic_checker_test_bench.o DUT test_64_64.snr
+axi_traffic_checker_test_bench_64_64   : axi_traffic_checker_test_bench.o DUT test_64_64.snr
+	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
+	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
+
+axi_traffic_checker_test_bench_128_64  : axi_traffic_checker_test_bench.o DUT test_128_64.snr
 	$(GHDL) -e $(GHDLFLAGS) --work=WORK $@
 	$(GHDL) -r $(GHDLFLAGS) --work=WORK $@
 
 DUT : $(addsuffix .o,$(DUT_COMPONENTS))
 
-axi_traffic_checker.o                          : $(SRC_PATH)/axi_traffic_checker.vhd 
+axi_traffic_checker.o                  : $(SRC_PATH)/axi_traffic_checker.vhd 
 	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
-axi_traffic_checker_test_bench.o               : $(SRC_PATH)/axi_traffic_checker_test_bench.vhd 
+axi_traffic_checker_test_bench.o       : $(SRC_PATH)/axi_traffic_checker_test_bench.vhd 
 	$(GHDL) -a $(GHDLFLAGS) --work=WORK $<
 
 test_32_64.snr : $(SCENARIO_PATH)/test_32_64.snr
 	cp $< $@
 
 test_64_64.snr : $(SCENARIO_PATH)/test_64_64.snr
+	cp $< $@
+
+test_128_64.snr: $(SCENARIO_PATH)/test_128_64.snr
 	cp $< $@
 
