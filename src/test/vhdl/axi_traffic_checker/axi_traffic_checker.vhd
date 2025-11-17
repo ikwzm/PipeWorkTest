@@ -1133,9 +1133,10 @@ begin
         DATA: block
             constant  WORD_BYTES  :  integer := WORD_BITS/8;
             constant  WORDS       :  integer := BUF_WIDTH/WORD_BITS;
-            constant  WORD_LO     :  std_logic_vector(CALC_BITS(WORDS)-1 downto 0)
+            constant  WORD_LO_LEN :  integer := CALC_BITS(WORDS);
+            constant  WORD_LO     :  std_logic_vector(WORD_LO_LEN-1 downto 0)
                                   := (others => '0');
-            constant  WORD_HI     :  std_logic_vector(WORD_BITS-1 downto WORD_LO'high+1)
+            constant  WORD_HI     :  std_logic_vector(WORD_BITS  -1 downto WORD_LO_LEN)
                                   := (others => '0');
             signal    curr_word   :  unsigned(WORD_BITS-1 downto 0);
         begin
