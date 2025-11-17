@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------------
 --!     @file    axi_traffic_checker.vhd
 --!     @brief   AXI Traffic Checker Module
---!     @version 0.4.0
---!     @date    2024/4/11
+--!     @version 0.6.0
+--!     @date    2025/11/17
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
---      Copyright (C) 2024 Ichiro Kawazome
+--      Copyright (C) 2024-2025 Ichiro Kawazome
 --      All rights reserved.
 --
 --      Redistribution and use in source and binary forms, with or without
@@ -194,6 +194,7 @@ use     PIPEWORK.AXI4_TYPES.all;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_READ_INTERFACE;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_MASTER_WRITE_INTERFACE;
 use     PIPEWORK.AXI4_COMPONENTS.AXI4_REGISTER_INTERFACE;
+use     PIPEWORK.AXI4_COMPONENTS.AXI4_TRAFFIC_MONITOR;
 use     PIPEWORK.COMPONENTS.REGISTER_ACCESS_ADAPTER;
 use     PIPEWORK.PUMP_COMPONENTS.PUMP_CONTROLLER_OUTLET_SIDE;
 use     PIPEWORK.PUMP_COMPONENTS.PUMP_CONTROLLER_INTAKE_SIDE;
@@ -248,7 +249,7 @@ architecture RTL of AXI_TRAFFIC_CHECKER is
     constant  VERSION_REGS_LO       :  integer := 8*VERSION_REGS_ADDR;
     constant  VERSION_REGS_HI       :  integer := 8*VERSION_REGS_ADDR + VERSION_REGS_BITS- 1;
     constant  VERSION_MAJOR         :  integer range 0 to 15 := 0;
-    constant  VERSION_MINOR         :  integer range 0 to 15 := 4;
+    constant  VERSION_MINOR         :  integer range 0 to 15 := 6;
     constant  VERSION_REGS_DATA     :  std_logic_vector(VERSION_REGS_BITS-1 downto 0)
                                     := std_logic_vector(to_unsigned(VERSION_MAJOR          , 4)) &
                                        std_logic_vector(to_unsigned(VERSION_MINOR          , 4)) &
@@ -1177,106 +1178,93 @@ begin
         -- MONITOR
         ---------------------------------------------------------------------------
         MONITOR: block
-            signal    q_awvalid   :  std_logic;
-            signal    q_awready   :  std_logic;
-            signal    q_wvalid    :  std_logic;
-            signal    q_wready    :  std_logic;
             constant  ctrl_regs   :  std_logic_vector(MW_MONITOR_CTRL_BITS-1 downto 0)
                                   := (others => '0');
-            constant  limit_count :  unsigned(MW_MONITOR_BITS-1 downto 0)
-                                  := (others => '1');
-            signal    total_count :  unsigned(MW_MONITOR_BITS-1 downto 0);
-            signal    addr_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
-            signal    aval_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
-            signal    ardy_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
-            signal    data_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
-            signal    dval_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
-            signal    drdy_count  :  unsigned(MW_MONITOR_BITS-1 downto 0);
-            function  to_regs(count: unsigned; BITS: integer) return std_logic_vector is
-                variable regs : std_logic_vector(BITS-1 downto 0);
-            begin
-                for i in regs'range loop
-                    if (count'low <= i and i <= count'high) then
-                        regs(i) := count(i);
-                    else
-                        regs(i) := '0';
-                    end if;
-                end loop;
-                return regs;
-            end function;
+            constant  reset_data  :  std_logic := '1';
+            signal    reset_load  :  std_logic;
+            constant  start_data  :  std_logic := '1';
+            signal    start_load  :  std_logic;
+            constant  stop_data   :  std_logic := '1';
+            signal    stop_load   :  std_logic;
+            constant  pause_data  :  std_logic := '0';
+            constant  pause_load  :  std_logic := '0';
+            signal    valve_regs  :  std_logic;
         begin
+            ----------------------------------------------------------------------------
+            -- 
+            ----------------------------------------------------------------------------
+            reset_load <= '1' when (regs_rbit(MW_CTRL_RESET_POS) = '1') or
+                                   (regs_wbit(MW_MONITOR_RESET_POS) = '1' and
+                                    regs_load(MW_MONITOR_RESET_POS) = '1' ) else '0';
+            ----------------------------------------------------------------------------
+            -- 
+            ----------------------------------------------------------------------------
             process (ACLK, RST) begin 
                 if (RST = '1') then
-                        q_awvalid   <= '0';
-                        q_awready   <= '0';
-                        q_wvalid    <= '0';
-                        q_wready    <= '0';
+                        valve_regs <= '0';
                 elsif (ACLK'event and ACLK = '1') then
                     if (CLR = '1') then
-                        q_awvalid   <= '0';
-                        q_awready   <= '0';
-                        q_wvalid    <= '0';
-                        q_wready    <= '0';
+                        valve_regs <= '0';
                     else
-                        q_awvalid   <= i_awvalid;
-                        q_awready   <= i_awready;
-                        q_wvalid    <= i_wvalid;
-                        q_wready    <= i_wready;
+                        valve_regs <= valve_open;
                     end if;
                 end if;
             end process;
-            process (ACLK, RST) begin 
-                if (RST = '1') then
-                        total_count <= (others => '0');
-                        addr_count  <= (others => '0');
-                        aval_count  <= (others => '0');
-                        ardy_count  <= (others => '0');
-                        data_count  <= (others => '0');
-                        dval_count  <= (others => '0');
-                        drdy_count  <= (others => '0');
-                elsif (ACLK'event and ACLK = '1') then
-                    if    (CLR = '1') or
-                          (regs_rbit(MW_CTRL_RESET_POS) = '1') or
-                          (regs_wbit(MW_MONITOR_RESET_POS) = '1' and regs_load(MW_MONITOR_RESET_POS) = '1') then
-                        total_count <= (others => '0');
-                        addr_count  <= (others => '0');
-                        aval_count  <= (others => '0');
-                        ardy_count  <= (others => '0');
-                        data_count  <= (others => '0');
-                        dval_count  <= (others => '0');
-                        drdy_count  <= (others => '0');
-                    elsif (valve_open = '1') and
-                          (total_count < limit_count) then
-                        total_count <= total_count + 1;
-                        if (q_awvalid = '1' and q_awready = '1') then
-                            addr_count <= addr_count + 1;
-                        end if;
-                        if (q_awvalid = '1') then
-                            aval_count <= aval_count + 1;
-                        end if;
-                        if (q_awready = '1') then
-                            ardy_count <= ardy_count + 1;
-                        end if;
-                        if (q_wvalid = '1' and q_wready = '1') then
-                            data_count <= data_count + 1;
-                        end if;
-                        if (q_wvalid = '1') then
-                            dval_count <= dval_count + 1;
-                        end if;
-                        if (q_wready = '1') then
-                            drdy_count <= drdy_count + 1;
-                        end if;
-                    end if;
-                end if;
-            end process;
+            start_load <= '1' when (valve_regs = '0' and valve_open = '1') else '0';
+            stop_load  <= '1' when (valve_regs = '1' and valve_open = '0') else '0';
+            ----------------------------------------------------------------------------
+            -- 
+            ----------------------------------------------------------------------------
+            U: AXI4_TRAFFIC_MONITOR                        --
+                generic map (                              --
+                    ENABLE      => 1                     , --
+                    COUNT_BITS  => 64                    , --
+                    REGS_BITS   => 64                      --
+                )                                          --
+                port map (                                 --
+                -----------------------------------------------------------------------
+                -- Clock/Reset Signals.
+                -----------------------------------------------------------------------
+                    CLK         => ACLK                  , -- In  :
+                    RST         => RST                   , -- In  :
+                    CLR         => CLR                   , -- In  :
+                -----------------------------------------------------------------------
+                -- Control Signals.
+                -----------------------------------------------------------------------
+                    RESET_L     => reset_load            , -- In
+                    RESET_D     => reset_data            , -- In
+                    RESET_Q     => open                  , -- Out
+                    START_L     => start_load            , -- In
+                    START_D     => start_data            , -- In
+                    START_Q     => open                  , -- Out
+                    STOP_L      => stop_load             , -- In
+                    STOP_D      => stop_data             , -- In
+                    STOP_Q      => open                  , -- Out
+                    PAUSE_L     => pause_load            , -- In
+                    PAUSE_D     => pause_data            , -- In
+                    PAUSE_Q     => open                  , -- Out
+                ----------------------------------------------------------------------
+                -- AXI4 Address Channel Signals.
+                ----------------------------------------------------------------------
+                    AVALID      => i_awvalid             , -- In
+                    AREADY      => i_awready             , -- In
+                ----------------------------------------------------------------------
+                -- AXI4 Data Channel Signals.
+                ----------------------------------------------------------------------
+                    DVALID      => i_wvalid              , -- In
+                    DREADY      => i_wready              , -- In
+                ----------------------------------------------------------------------
+                -- Monitor Output Registers.
+                ----------------------------------------------------------------------
+                    TOTAL_REGS  => regs_rbit(MW_MONITOR_COUNT_HI downto MW_MONITOR_COUNT_LO), 
+                    ADDR_REGS   => regs_rbit(MW_MONITOR_ADDR_HI  downto MW_MONITOR_ADDR_LO ), 
+                    AVALID_REGS => regs_rbit(MW_MONITOR_AVAL_HI  downto MW_MONITOR_AVAL_LO ), 
+                    AREADY_REGS => regs_rbit(MW_MONITOR_ARDY_HI  downto MW_MONITOR_ARDY_LO ), 
+                    DATA_REGS   => regs_rbit(MW_MONITOR_DATA_HI  downto MW_MONITOR_DATA_LO ), 
+                    DVALID_REGS => regs_rbit(MW_MONITOR_DVAL_HI  downto MW_MONITOR_DVAL_LO ), 
+                    DREADY_REGS => regs_rbit(MW_MONITOR_DRDY_HI  downto MW_MONITOR_DRDY_LO )
+                );
             regs_rbit(MW_MONITOR_CTRL_HI  downto MW_MONITOR_CTRL_LO ) <= ctrl_regs;
-            regs_rbit(MW_MONITOR_COUNT_HI downto MW_MONITOR_COUNT_LO) <= to_regs(total_count, MW_MONITOR_COUNT_BITS);
-            regs_rbit(MW_MONITOR_ADDR_HI  downto MW_MONITOR_ADDR_LO ) <= to_regs(addr_count , MW_MONITOR_ADDR_BITS );
-            regs_rbit(MW_MONITOR_AVAL_HI  downto MW_MONITOR_AVAL_LO ) <= to_regs(aval_count , MW_MONITOR_AVAL_BITS );
-            regs_rbit(MW_MONITOR_ARDY_HI  downto MW_MONITOR_ARDY_LO ) <= to_regs(ardy_count , MW_MONITOR_ARDY_BITS );
-            regs_rbit(MW_MONITOR_DATA_HI  downto MW_MONITOR_DATA_LO ) <= to_regs(data_count , MW_MONITOR_DATA_BITS );
-            regs_rbit(MW_MONITOR_DVAL_HI  downto MW_MONITOR_DVAL_LO ) <= to_regs(dval_count , MW_MONITOR_DVAL_BITS );
-            regs_rbit(MW_MONITOR_DRDY_HI  downto MW_MONITOR_DRDY_LO ) <= to_regs(drdy_count , MW_MONITOR_DRDY_BITS );
         end block;
     end block;
     -------------------------------------------------------------------------------
@@ -1620,106 +1608,93 @@ begin
         -- MONITOR
         ---------------------------------------------------------------------------
         MONITOR: block
-            signal    q_arvalid   :  std_logic;
-            signal    q_arready   :  std_logic;
-            signal    q_rvalid    :  std_logic;
-            signal    q_rready    :  std_logic;
             constant  ctrl_regs   :  std_logic_vector(MR_MONITOR_CTRL_BITS-1 downto 0)
                                   := (others => '0');
-            constant  limit_count :  unsigned(MR_MONITOR_BITS-1 downto 0)
-                                  := (others => '1');
-            signal    total_count :  unsigned(MR_MONITOR_BITS-1 downto 0);
-            signal    addr_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
-            signal    aval_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
-            signal    ardy_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
-            signal    data_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
-            signal    dval_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
-            signal    drdy_count  :  unsigned(MR_MONITOR_BITS-1 downto 0);
-            function  to_regs(count: unsigned; BITS: integer) return std_logic_vector is
-                variable regs : std_logic_vector(BITS-1 downto 0);
-            begin
-                for i in regs'range loop
-                    if (count'low <= i and i <= count'high) then
-                        regs(i) := count(i);
-                    else
-                        regs(i) := '0';
-                    end if;
-                end loop;
-                return regs;
-            end function;
+            constant  reset_data  :  std_logic := '1';
+            signal    reset_load  :  std_logic;
+            constant  start_data  :  std_logic := '1';
+            signal    start_load  :  std_logic;
+            constant  stop_data   :  std_logic := '1';
+            signal    stop_load   :  std_logic;
+            constant  pause_data  :  std_logic := '0';
+            constant  pause_load  :  std_logic := '0';
+            signal    valve_regs  :  std_logic;
         begin
+            ----------------------------------------------------------------------------
+            -- 
+            ----------------------------------------------------------------------------
+            reset_load <= '1' when (regs_rbit(MR_CTRL_RESET_POS) = '1') or
+                                   (regs_wbit(MR_MONITOR_RESET_POS) = '1' and
+                                    regs_load(MR_MONITOR_RESET_POS) = '1' ) else '0';
+            ----------------------------------------------------------------------------
+            -- 
+            ----------------------------------------------------------------------------
             process (ACLK, RST) begin 
                 if (RST = '1') then
-                        q_arvalid   <= '0';
-                        q_arready   <= '0';
-                        q_rvalid    <= '0';
-                        q_rready    <= '0';
+                        valve_regs <= '0';
                 elsif (ACLK'event and ACLK = '1') then
                     if (CLR = '1') then
-                        q_arvalid   <= '0';
-                        q_arready   <= '0';
-                        q_rvalid    <= '0';
-                        q_rready    <= '0';
+                        valve_regs <= '0';
                     else
-                        q_arvalid   <= i_arvalid;
-                        q_arready   <= i_arready;
-                        q_rvalid    <= i_rvalid;
-                        q_rready    <= i_rready;
+                        valve_regs <= valve_open;
                     end if;
                 end if;
             end process;
-            process (ACLK, RST) begin 
-                if (RST = '1') then
-                        total_count <= (others => '0');
-                        addr_count  <= (others => '0');
-                        aval_count  <= (others => '0');
-                        ardy_count  <= (others => '0');
-                        data_count  <= (others => '0');
-                        dval_count  <= (others => '0');
-                        drdy_count  <= (others => '0');
-                elsif (ACLK'event and ACLK = '1') then
-                    if    (CLR = '1') or
-                          (regs_rbit(MR_CTRL_RESET_POS) = '1') or
-                          (regs_wbit(MR_MONITOR_RESET_POS) = '1' and regs_load(MR_MONITOR_RESET_POS) = '1') then
-                        total_count <= (others => '0');
-                        addr_count  <= (others => '0');
-                        aval_count  <= (others => '0');
-                        ardy_count  <= (others => '0');
-                        data_count  <= (others => '0');
-                        dval_count  <= (others => '0');
-                        drdy_count  <= (others => '0');
-                    elsif (valve_open = '1') and
-                          (total_count < limit_count) then
-                        total_count <= total_count + 1;
-                        if (q_arvalid = '1' and q_arready = '1') then
-                            addr_count <= addr_count + 1;
-                        end if;
-                        if (q_arvalid = '1') then
-                            aval_count <= aval_count + 1;
-                        end if;
-                        if (q_arready = '1') then
-                            ardy_count <= ardy_count + 1;
-                        end if;
-                        if (q_rvalid = '1' and q_rready = '1') then
-                            data_count <= data_count + 1;
-                        end if;
-                        if (q_rvalid = '1') then
-                            dval_count <= dval_count + 1;
-                        end if;
-                        if (q_rready = '1') then
-                            drdy_count <= drdy_count + 1;
-                        end if;
-                    end if;
-                end if;
-            end process;
+            start_load <= '1' when (valve_regs = '0' and valve_open = '1') else '0';
+            stop_load  <= '1' when (valve_regs = '1' and valve_open = '0') else '0';
+            ----------------------------------------------------------------------------
+            -- 
+            ----------------------------------------------------------------------------
+            U: AXI4_TRAFFIC_MONITOR                        --
+                generic map (                              --
+                    ENABLE      => 1                     , --
+                    COUNT_BITS  => 64                    , --
+                    REGS_BITS   => 64                      --
+                )                                          --
+                port map (                                 --
+                -----------------------------------------------------------------------
+                -- Clock/Reset Signals.
+                -----------------------------------------------------------------------
+                    CLK         => ACLK                  , -- In  :
+                    RST         => RST                   , -- In  :
+                    CLR         => CLR                   , -- In  :
+                -----------------------------------------------------------------------
+                -- Control Signals.
+                -----------------------------------------------------------------------
+                    RESET_L     => reset_load            , -- In
+                    RESET_D     => reset_data            , -- In
+                    RESET_Q     => open                  , -- Out
+                    START_L     => start_load            , -- In
+                    START_D     => start_data            , -- In
+                    START_Q     => open                  , -- Out
+                    STOP_L      => stop_load             , -- In
+                    STOP_D      => stop_data             , -- In
+                    STOP_Q      => open                  , -- Out
+                    PAUSE_L     => pause_load            , -- In
+                    PAUSE_D     => pause_data            , -- In
+                    PAUSE_Q     => open                  , -- Out
+                ----------------------------------------------------------------------
+                -- AXI4 Address Channel Signals.
+                ----------------------------------------------------------------------
+                    AVALID      => i_arvalid             , -- In
+                    AREADY      => i_arready             , -- In
+                ----------------------------------------------------------------------
+                -- AXI4 Data Channel Signals.
+                ----------------------------------------------------------------------
+                    DVALID      => i_rvalid              , -- In
+                    DREADY      => i_rready              , -- In
+                ----------------------------------------------------------------------
+                -- Monitor Output Registers.
+                ----------------------------------------------------------------------
+                    TOTAL_REGS  => regs_rbit(MR_MONITOR_COUNT_HI downto MR_MONITOR_COUNT_LO), 
+                    ADDR_REGS   => regs_rbit(MR_MONITOR_ADDR_HI  downto MR_MONITOR_ADDR_LO ), 
+                    AVALID_REGS => regs_rbit(MR_MONITOR_AVAL_HI  downto MR_MONITOR_AVAL_LO ), 
+                    AREADY_REGS => regs_rbit(MR_MONITOR_ARDY_HI  downto MR_MONITOR_ARDY_LO ), 
+                    DATA_REGS   => regs_rbit(MR_MONITOR_DATA_HI  downto MR_MONITOR_DATA_LO ), 
+                    DVALID_REGS => regs_rbit(MR_MONITOR_DVAL_HI  downto MR_MONITOR_DVAL_LO ), 
+                    DREADY_REGS => regs_rbit(MR_MONITOR_DRDY_HI  downto MR_MONITOR_DRDY_LO )
+                );
             regs_rbit(MR_MONITOR_CTRL_HI  downto MR_MONITOR_CTRL_LO ) <= ctrl_regs;
-            regs_rbit(MR_MONITOR_COUNT_HI downto MR_MONITOR_COUNT_LO) <= to_regs(total_count, MR_MONITOR_COUNT_BITS);
-            regs_rbit(MR_MONITOR_ADDR_HI  downto MR_MONITOR_ADDR_LO ) <= to_regs(addr_count , MR_MONITOR_ADDR_BITS );
-            regs_rbit(MR_MONITOR_AVAL_HI  downto MR_MONITOR_AVAL_LO ) <= to_regs(aval_count , MR_MONITOR_AVAL_BITS );
-            regs_rbit(MR_MONITOR_ARDY_HI  downto MR_MONITOR_ARDY_LO ) <= to_regs(ardy_count , MR_MONITOR_ARDY_BITS );
-            regs_rbit(MR_MONITOR_DATA_HI  downto MR_MONITOR_DATA_LO ) <= to_regs(data_count , MR_MONITOR_DATA_BITS );
-            regs_rbit(MR_MONITOR_DVAL_HI  downto MR_MONITOR_DVAL_LO ) <= to_regs(dval_count , MR_MONITOR_DVAL_BITS );
-            regs_rbit(MR_MONITOR_DRDY_HI  downto MR_MONITOR_DRDY_LO ) <= to_regs(drdy_count , MR_MONITOR_DRDY_BITS );
         end block;
     end block;
     -------------------------------------------------------------------------------
