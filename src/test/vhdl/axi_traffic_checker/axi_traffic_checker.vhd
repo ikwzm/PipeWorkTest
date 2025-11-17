@@ -802,7 +802,7 @@ begin
         constant  FLOW_READY_LEVEL  :  std_logic_vector(BUF_DEPTH downto 0)
                                     := std_logic_vector(to_unsigned(2**MW_MAX_XFER_SIZE, BUF_DEPTH+1));
         constant  BUF_READY_LEVEL   :  std_logic_vector(BUF_DEPTH downto 0)
-                                    := std_logic_vector(to_unsigned(2*M_DATA_WIDTH     , BUF_DEPTH+1));
+                                    := std_logic_vector(to_unsigned(2*(M_DATA_WIDTH/8) , BUF_DEPTH+1));
         signal    i_awvalid         :  std_logic;
         signal    i_awready         :  std_logic;
         signal    i_wvalid          :  std_logic;
@@ -1285,7 +1285,7 @@ begin
         constant  FLOW_READY_LEVEL  :  std_logic_vector(BUF_DEPTH downto 0)
                                     := std_logic_vector(to_unsigned(2**MR_MAX_XFER_SIZE, BUF_DEPTH+1));
         constant  BUF_READY_LEVEL   :  std_logic_vector(BUF_DEPTH downto 0)
-                                    := std_logic_vector(to_unsigned(2*M_DATA_WIDTH     , BUF_DEPTH+1));
+                                    := std_logic_vector(to_unsigned(2*(M_DATA_WIDTH/8) , BUF_DEPTH+1));
         signal    i_arvalid         :  std_logic;
         signal    i_arready         :  std_logic;
         signal    i_rvalid          :  std_logic;
