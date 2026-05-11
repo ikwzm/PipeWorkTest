@@ -1,0 +1,1823 @@
+---
+- - [MARCHAL]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 1"
+- - [MASTER] 
+  - WRITE : 
+      ADDR : 0x000000FD
+      ID   : 10
+      DATA : [0x56,0x86,0xB1]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000FC
+      ID   : 10
+      DATA : [0x64]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000FA
+      ID   : 10
+      DATA : [0x3D,0xD6]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000F8
+      ID   : 10
+      DATA : [0x56,0x40]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000F4
+      ID   : 10
+      DATA : [0x96,0x25,0x8D,0xAD]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000F2
+      ID   : 10
+      DATA : [0x27,0xC2]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000F0
+      ID   : 10
+      DATA : [0x89,0x42]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000ED
+      ID   : 10
+      DATA : [0x04,0x9A,0x90]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000EC
+      ID   : 10
+      DATA : [0x71]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000E8
+      ID   : 10
+      DATA : [0x74,0xDF,0xA3,0x96]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000E4
+      ID   : 10
+      DATA : [0x9F,0x74,0xF2,0x36]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000E0
+      ID   : 10
+      DATA : [0x92,0xA6,0xC2,0x7A]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000DF
+      ID   : 10
+      DATA : [0x7D]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000DC
+      ID   : 10
+      DATA : [0x45,0x50,0x09]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000D8
+      ID   : 10
+      DATA : [0xA5,0x7F,0x36,0xE4]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000D4
+      ID   : 10
+      DATA : [0x7D,0xB8,0x0B,0x48]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000D2
+      ID   : 10
+      DATA : [0xE5,0x4D]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000D0
+      ID   : 10
+      DATA : [0x0D,0xF1]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000CE
+      ID   : 10
+      DATA : [0x42,0x07]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000CD
+      ID   : 10
+      DATA : [0x4F]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000CC
+      ID   : 10
+      DATA : [0x49]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000C9
+      ID   : 10
+      DATA : [0x40,0x8E,0xAE]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000C8
+      ID   : 10
+      DATA : [0xD5]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000C6
+      ID   : 10
+      DATA : [0xCF,0x30]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000C5
+      ID   : 10
+      DATA : [0xA5]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000C4
+      ID   : 10
+      DATA : [0x69]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000C1
+      ID   : 10
+      DATA : [0x48,0x2F,0x37]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000C0
+      ID   : 10
+      DATA : [0x78]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000BD
+      ID   : 10
+      DATA : [0xA4,0xDE,0x8E]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000BC
+      ID   : 10
+      DATA : [0x93]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000B8
+      ID   : 10
+      DATA : [0xC2,0x35,0x73,0x2F]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000B6
+      ID   : 10
+      DATA : [0xF9,0x2D]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000B5
+      ID   : 10
+      DATA : [0xD7]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000B4
+      ID   : 10
+      DATA : [0x5B]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000B1
+      ID   : 10
+      DATA : [0x42,0x77,0xA4]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000B0
+      ID   : 10
+      DATA : [0x88]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000AD
+      ID   : 10
+      DATA : [0xBF,0xB2,0x59]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000AC
+      ID   : 10
+      DATA : [0x0A]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000AB
+      ID   : 10
+      DATA : [0x3A]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000AA
+      ID   : 10
+      DATA : [0x4F]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000A8
+      ID   : 10
+      DATA : [0xA6,0x21]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000A5
+      ID   : 10
+      DATA : [0x64,0x01,0x67]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000A4
+      ID   : 10
+      DATA : [0xF0]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000A3
+      ID   : 10
+      DATA : [0x65]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x000000A0
+      ID   : 10
+      DATA : [0x8F,0x17,0x26]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000009F
+      ID   : 10
+      DATA : [0xB4]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000009C
+      ID   : 10
+      DATA : [0x82,0x10,0xCB]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000098
+      ID   : 10
+      DATA : [0x5C,0xCA,0xAF,0xC1]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000095
+      ID   : 10
+      DATA : [0xE6,0xFE,0x93]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000094
+      ID   : 10
+      DATA : [0x04]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000092
+      ID   : 10
+      DATA : [0x4A,0x14]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000090
+      ID   : 10
+      DATA : [0x4F,0x7D]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000008C
+      ID   : 10
+      DATA : [0xBE,0xF0,0x1C,0x5C]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000089
+      ID   : 10
+      DATA : [0x94,0x02,0x1E]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000088
+      ID   : 10
+      DATA : [0x48]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000087
+      ID   : 10
+      DATA : [0xB7]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000085
+      ID   : 10
+      DATA : [0xDE,0xED]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000084
+      ID   : 10
+      DATA : [0x4B]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000083
+      ID   : 10
+      DATA : [0x90]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000082
+      ID   : 10
+      DATA : [0xBD]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000081
+      ID   : 10
+      DATA : [0x81]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000080
+      ID   : 10
+      DATA : [0xDA]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000007C
+      ID   : 10
+      DATA : [0x86,0x5F,0x79,0x60]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000007B
+      ID   : 10
+      DATA : [0xBB]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000079
+      ID   : 10
+      DATA : [0xAF,0x2C]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000078
+      ID   : 10
+      DATA : [0x7F]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000074
+      ID   : 10
+      DATA : [0x5A,0x6C,0x9A,0x35]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000070
+      ID   : 10
+      DATA : [0x81,0x5B,0xAA,0x83]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000006E
+      ID   : 10
+      DATA : [0x15,0x20]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000006C
+      ID   : 10
+      DATA : [0xEC,0x1A]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000069
+      ID   : 10
+      DATA : [0x4B,0xE3,0x95]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000068
+      ID   : 10
+      DATA : [0xFD]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000066
+      ID   : 10
+      DATA : [0xE7,0x41]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000065
+      ID   : 10
+      DATA : [0x02]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000064
+      ID   : 10
+      DATA : [0x4F]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000060
+      ID   : 10
+      DATA : [0x48,0x22,0xAF,0x5E]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000005F
+      ID   : 10
+      DATA : [0xA6]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000005C
+      ID   : 10
+      DATA : [0xA3,0x67,0x91]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000058
+      ID   : 10
+      DATA : [0xDE,0x2B,0x8D,0xDC]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000056
+      ID   : 10
+      DATA : [0x94,0x08]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000054
+      ID   : 10
+      DATA : [0xA2,0xC2]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000053
+      ID   : 10
+      DATA : [0x57]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000050
+      ID   : 10
+      DATA : [0x89,0xCF,0x29]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000004E
+      ID   : 10
+      DATA : [0xEE,0x2A]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000004D
+      ID   : 10
+      DATA : [0xA4]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000004C
+      ID   : 10
+      DATA : [0x4F]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000004A
+      ID   : 10
+      DATA : [0x27,0xFF]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000049
+      ID   : 10
+      DATA : [0x71]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000048
+      ID   : 10
+      DATA : [0xE6]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000044
+      ID   : 10
+      DATA : [0xDE,0x18,0xD6,0x0C]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000041
+      ID   : 10
+      DATA : [0x86,0xF2,0x5F]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000040
+      ID   : 10
+      DATA : [0x96]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000003F
+      ID   : 10
+      DATA : [0x78]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000003D
+      ID   : 10
+      DATA : [0x31,0x7A]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000003C
+      ID   : 10
+      DATA : [0x27]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000039
+      ID   : 10
+      DATA : [0x5E,0xFC,0x3E]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000038
+      ID   : 10
+      DATA : [0x32]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000036
+      ID   : 10
+      DATA : [0xFC,0x41]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000035
+      ID   : 10
+      DATA : [0xBF]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000034
+      ID   : 10
+      DATA : [0x96]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000030
+      ID   : 10
+      DATA : [0x2F,0xF9,0x1E,0x0B]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000002E
+      ID   : 10
+      DATA : [0x44,0xA8]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000002D
+      ID   : 10
+      DATA : [0xA8]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000002C
+      ID   : 10
+      DATA : [0x66]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000002B
+      ID   : 10
+      DATA : [0xA3]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000029
+      ID   : 10
+      DATA : [0x29,0x13]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000028
+      ID   : 10
+      DATA : [0xBE]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000024
+      ID   : 10
+      DATA : [0xC6,0xAF,0xB0,0x16]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000021
+      ID   : 10
+      DATA : [0xB9,0xDB,0xF1]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000020
+      ID   : 10
+      DATA : [0x5C]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000001C
+      ID   : 10
+      DATA : [0x3F,0xBB,0xB5,0x4B]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000001A
+      ID   : 10
+      DATA : [0x90,0xE7]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000019
+      ID   : 10
+      DATA : [0x0D]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000018
+      ID   : 10
+      DATA : [0xBC]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000014
+      ID   : 10
+      DATA : [0x9A,0x5A,0xD3,0xAB]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000013
+      ID   : 10
+      DATA : [0x24]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000012
+      ID   : 10
+      DATA : [0xB6]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000011
+      ID   : 10
+      DATA : [0x00]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000010
+      ID   : 10
+      DATA : [0xC4]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000000E
+      ID   : 10
+      DATA : [0xBA,0xA1]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000000C
+      ID   : 10
+      DATA : [0x72,0xBE]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000009
+      ID   : 10
+      DATA : [0x53,0xA2,0x2F]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000008
+      ID   : 10
+      DATA : [0x07]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000005
+      ID   : 10
+      DATA : [0xD1,0xD5,0xC7]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000004
+      ID   : 10
+      DATA : [0xE6]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000000
+      ID   : 10
+      DATA : [0x92,0x08,0x22,0x55]
+      RESP : OKAY
+---
+- - [MASTER] 
+  - READ : 
+      ADDR : 0x000000FF
+      ID   : 10
+      DATA : [0xB1]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000FC
+      ID   : 10
+      DATA : [0x64,0x56,0x86]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000FB
+      ID   : 10
+      DATA : [0xD6]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000F8
+      ID   : 10
+      DATA : [0x56,0x40,0x3D]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000F6
+      ID   : 10
+      DATA : [0x8D,0xAD]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000F4
+      ID   : 10
+      DATA : [0x96,0x25]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000F3
+      ID   : 10
+      DATA : [0xC2]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000F0
+      ID   : 10
+      DATA : [0x89,0x42,0x27]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000ED
+      ID   : 10
+      DATA : [0x04,0x9A,0x90]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000EC
+      ID   : 10
+      DATA : [0x71]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000EA
+      ID   : 10
+      DATA : [0xA3,0x96]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000E8
+      ID   : 10
+      DATA : [0x74,0xDF]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000E6
+      ID   : 10
+      DATA : [0xF2,0x36]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000E5
+      ID   : 10
+      DATA : [0x74]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000E4
+      ID   : 10
+      DATA : [0x9F]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000E2
+      ID   : 10
+      DATA : [0xC2,0x7A]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000E1
+      ID   : 10
+      DATA : [0xA6]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000E0
+      ID   : 10
+      DATA : [0x92]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000DD
+      ID   : 10
+      DATA : [0x50,0x09,0x7D]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000DC
+      ID   : 10
+      DATA : [0x45]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000D8
+      ID   : 10
+      DATA : [0xA5,0x7F,0x36,0xE4]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000D4
+      ID   : 10
+      DATA : [0x7D,0xB8,0x0B,0x48]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000D1
+      ID   : 10
+      DATA : [0xF1,0xE5,0x4D]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000D0
+      ID   : 10
+      DATA : [0x0D]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000CE
+      ID   : 10
+      DATA : [0x42,0x07]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000CC
+      ID   : 10
+      DATA : [0x49,0x4F]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000CA
+      ID   : 10
+      DATA : [0x8E,0xAE]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000C9
+      ID   : 10
+      DATA : [0x40]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000C8
+      ID   : 10
+      DATA : [0xD5]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000C7
+      ID   : 10
+      DATA : [0x30]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000C4
+      ID   : 10
+      DATA : [0x69,0xA5,0xCF]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000C2
+      ID   : 10
+      DATA : [0x2F,0x37]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000C1
+      ID   : 10
+      DATA : [0x48]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000C0
+      ID   : 10
+      DATA : [0x78]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000BF
+      ID   : 10
+      DATA : [0x8E]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000BC
+      ID   : 10
+      DATA : [0x93,0xA4,0xDE]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000B9
+      ID   : 10
+      DATA : [0x35,0x73,0x2F]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000B8
+      ID   : 10
+      DATA : [0xC2]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000B7
+      ID   : 10
+      DATA : [0x2D]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000B4
+      ID   : 10
+      DATA : [0x5B,0xD7,0xF9]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000B0
+      ID   : 10
+      DATA : [0x88,0x42,0x77,0xA4]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000AD
+      ID   : 10
+      DATA : [0xBF,0xB2,0x59]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000AC
+      ID   : 10
+      DATA : [0x0A]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000A9
+      ID   : 10
+      DATA : [0x21,0x4F,0x3A]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000A8
+      ID   : 10
+      DATA : [0xA6]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000A7
+      ID   : 10
+      DATA : [0x67]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000A6
+      ID   : 10
+      DATA : [0x01]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000A5
+      ID   : 10
+      DATA : [0x64]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000A4
+      ID   : 10
+      DATA : [0xF0]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x000000A0
+      ID   : 10
+      DATA : [0x8F,0x17,0x26,0x65]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000009E
+      ID   : 10
+      DATA : [0xCB,0xB4]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000009D
+      ID   : 10
+      DATA : [0x10]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000009C
+      ID   : 10
+      DATA : [0x82]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000009A
+      ID   : 10
+      DATA : [0xAF,0xC1]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000098
+      ID   : 10
+      DATA : [0x5C,0xCA]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000096
+      ID   : 10
+      DATA : [0xFE,0x93]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000095
+      ID   : 10
+      DATA : [0xE6]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000094
+      ID   : 10
+      DATA : [0x04]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000093
+      ID   : 10
+      DATA : [0x14]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000092
+      ID   : 10
+      DATA : [0x4A]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000091
+      ID   : 10
+      DATA : [0x7D]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000090
+      ID   : 10
+      DATA : [0x4F]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000008C
+      ID   : 10
+      DATA : [0xBE,0xF0,0x1C,0x5C]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000008A
+      ID   : 10
+      DATA : [0x02,0x1E]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000089
+      ID   : 10
+      DATA : [0x94]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000088
+      ID   : 10
+      DATA : [0x48]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000085
+      ID   : 10
+      DATA : [0xDE,0xED,0xB7]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000084
+      ID   : 10
+      DATA : [0x4B]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000081
+      ID   : 10
+      DATA : [0x81,0xBD,0x90]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000080
+      ID   : 10
+      DATA : [0xDA]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000007F
+      ID   : 10
+      DATA : [0x60]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000007D
+      ID   : 10
+      DATA : [0x5F,0x79]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000007C
+      ID   : 10
+      DATA : [0x86]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000078
+      ID   : 10
+      DATA : [0x7F,0xAF,0x2C,0xBB]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000074
+      ID   : 10
+      DATA : [0x5A,0x6C,0x9A,0x35]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000071
+      ID   : 10
+      DATA : [0x5B,0xAA,0x83]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000070
+      ID   : 10
+      DATA : [0x81]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000006D
+      ID   : 10
+      DATA : [0x1A,0x15,0x20]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000006C
+      ID   : 10
+      DATA : [0xEC]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000068
+      ID   : 10
+      DATA : [0xFD,0x4B,0xE3,0x95]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000064
+      ID   : 10
+      DATA : [0x4F,0x02,0xE7,0x41]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000060
+      ID   : 10
+      DATA : [0x48,0x22,0xAF,0x5E]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000005F
+      ID   : 10
+      DATA : [0xA6]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000005C
+      ID   : 10
+      DATA : [0xA3,0x67,0x91]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000058
+      ID   : 10
+      DATA : [0xDE,0x2B,0x8D,0xDC]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000054
+      ID   : 10
+      DATA : [0xA2,0xC2,0x94,0x08]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000052
+      ID   : 10
+      DATA : [0x29,0x57]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000051
+      ID   : 10
+      DATA : [0xCF]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000050
+      ID   : 10
+      DATA : [0x89]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000004F
+      ID   : 10
+      DATA : [0x2A]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000004D
+      ID   : 10
+      DATA : [0xA4,0xEE]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000004C
+      ID   : 10
+      DATA : [0x4F]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000049
+      ID   : 10
+      DATA : [0x71,0x27,0xFF]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000048
+      ID   : 10
+      DATA : [0xE6]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000046
+      ID   : 10
+      DATA : [0xD6,0x0C]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000045
+      ID   : 10
+      DATA : [0x18]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000044
+      ID   : 10
+      DATA : [0xDE]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000042
+      ID   : 10
+      DATA : [0xF2,0x5F]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000041
+      ID   : 10
+      DATA : [0x86]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000040
+      ID   : 10
+      DATA : [0x96]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000003C
+      ID   : 10
+      DATA : [0x27,0x31,0x7A,0x78]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000039
+      ID   : 10
+      DATA : [0x5E,0xFC,0x3E]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000038
+      ID   : 10
+      DATA : [0x32]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000034
+      ID   : 10
+      DATA : [0x96,0xBF,0xFC,0x41]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000032
+      ID   : 10
+      DATA : [0x1E,0x0B]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000031
+      ID   : 10
+      DATA : [0xF9]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000030
+      ID   : 10
+      DATA : [0x2F]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000002F
+      ID   : 10
+      DATA : [0xA8]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000002C
+      ID   : 10
+      DATA : [0x66,0xA8,0x44]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000002A
+      ID   : 10
+      DATA : [0x13,0xA3]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000028
+      ID   : 10
+      DATA : [0xBE,0x29]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000026
+      ID   : 10
+      DATA : [0xB0,0x16]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000024
+      ID   : 10
+      DATA : [0xC6,0xAF]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000022
+      ID   : 10
+      DATA : [0xDB,0xF1]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000020
+      ID   : 10
+      DATA : [0x5C,0xB9]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000001D
+      ID   : 10
+      DATA : [0xBB,0xB5,0x4B]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000001C
+      ID   : 10
+      DATA : [0x3F]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000001B
+      ID   : 10
+      DATA : [0xE7]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000019
+      ID   : 10
+      DATA : [0x0D,0x90]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000018
+      ID   : 10
+      DATA : [0xBC]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000015
+      ID   : 10
+      DATA : [0x5A,0xD3,0xAB]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000014
+      ID   : 10
+      DATA : [0x9A]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000012
+      ID   : 10
+      DATA : [0xB6,0x24]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000011
+      ID   : 10
+      DATA : [0x00]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000010
+      ID   : 10
+      DATA : [0xC4]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000000C
+      ID   : 10
+      DATA : [0x72,0xBE,0xBA,0xA1]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000008
+      ID   : 10
+      DATA : [0x07,0x53,0xA2,0x2F]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000005
+      ID   : 10
+      DATA : [0xD1,0xD5,0xC7]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000004
+      ID   : 10
+      DATA : [0xE6]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000001
+      ID   : 10
+      DATA : [0x08,0x22,0x55]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000000
+      ID   : 10
+      DATA : [0x92]
+      RESP : OKAY
+---
+- - [MARCHAL]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 2"
+- - [MASTER] 
+  - WRITE : 
+      ADDR : 0x00000010
+      ID   : 10
+      DATA : [0xC4,0x00,0xB6,0x24]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000010
+      ID   : 10
+      DATA : [0xC4,0x00,0xB6,0x24]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000010
+      ID   : 10
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000010
+      ID   : 10
+      DATA : [0xC4,0x00,0xB6,0x24]
+      RESP : OKAY
+---
+- - [MARCHAL]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 3"
+- - [MASTER] 
+  - WRITE : 
+      ADDR : 0x00000000
+      ID   : 10
+      DATA : [0x00,0x01,0x02,0x03]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000004
+      ID   : 10
+      DATA : [0x04,0x05,0x06,0x07]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x00000008
+      ID   : 10
+      DATA : [0x08,0x09,0x0A,0x0B]
+      RESP : OKAY
+  - WRITE : 
+      ADDR : 0x0000000C
+      ID   : 10
+      DATA : [0x0C,0x0D,0x0E,0x0F]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000000
+      ID   : 10
+      DATA : [0x00,0x01,0x02,0x03]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000004
+      ID   : 10
+      DATA : [0x04,0x05,0x06,0x07]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x00000008
+      ID   : 10
+      DATA : [0x08,0x09,0x0A,0x0B]
+      RESP : OKAY
+  - READ : 
+      ADDR : 0x0000000C
+      ID   : 10
+      DATA : [0x0C,0x0D,0x0E,0x0F]
+      RESP : OKAY
+---
+- - [MASTER]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 3.1"
+  - AW:                                   # Write Address Channel Action.
+    - VALID  : 0                          # AWVALID <= 0
+    - WAIT   : 10                         # wait 10 clock
+      ADDR   : 0x00000000                 # AWADDR  <= 0x00000000
+      SIZE   : 2                          # AWSIZE  <= 2
+      LEN    : 1                          # AWLEN   <= 8'h00
+      VALID  : 1                          # AWVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until AWVALID = 1 and AWREADY = 1
+    - VALID  : 0                          # AWVALID <= 0
+  - W:                                    # Write Data Channel Action.
+    - DATA   : 0                          # WDATA  <= "32'h00000000"
+      STRB   : 0                          # WSTRB  <= "4'b0000"
+      LAST   : 0                          # WLAST  <= 0
+      VALID  : 0                          # WVALID <= 0
+    - WAIT   : {AWVALID: 1, ON: on}       # wait until AWVALID = 1 
+    - DATA   : "32'h00000010"             # WDATA  <= "32'h00000010"
+      STRB   : "4'b0001"                  # WSTRB  <= "4'b0001"
+      LAST   : 1                          # WLAST  <= 1
+      VALID  : 1                          # WVALID <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until WVALID = 1 and WREADY = 1
+    - WVALID : 0                          # WVALID <= 0
+  - B:                                    # Write Responce Channel Action.
+    - READY  : 0                          # BREADY <= 0
+    - WAIT   : {AWVALID: 1, AWREADY: 1}   # wait until AWVALID = 1 and AWREADY = 1
+    - READY  : 1                          # BREADY <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until BVALID = 1 and BREADY = 1
+    - CHECK  :                            # CHECK 
+        RESP : OKAY                       #   RESP=OKAY
+    - READY  : 0                          # BREADY <= 0
+  - AR:                                   # Read Address Channel Action.
+    - VALID  : 0                          # ARVALID <= 0
+    - WAIT   : 10                         # wait 10 clock
+      ADDR   : 0x00000000                 # ARADDR  <= 0x00000000
+      SIZE   : 2                          # ARSIZE  <= 2
+      LEN    : 1                          # ARLEN   <= 8'h00
+      VALID  : 1                          # ARVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until ARVALID = 1 and ARREADY = 1
+    - VALID  : 0                          # ARVALID <= 0
+  - R:
+    - RREADY : 0                          # RREADY <= 0
+    - WAIT   : {ARVALID: 1, ON: on}       # wait until ARVALID = 1 
+    - RREADY : 1                          # RREADY <= 1
+    - WAIT   : {RVALID: 1, RREADY: 1}     # wait until RVALID = 1 and RREADY = 1
+    - CHECK  :                            # CHECK 
+        RDATA   : "32'h03020100"          #  RDATA="32'h03020100"
+        RLAST   : 1                       #  RLAST=1
+        RRESP   : OKAY                    #  RESP=OKAY
+    - RREADY : 0                          # RREADY <= 0
+---
+- - [MASTER]
+  - READ : 
+      ADDR : 0x00000000
+      ID   : 10
+      DATA : [0x10,0x01,0x02,0x03]
+      RESP : OKAY
+---
+- - [MASTER]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 3.2"
+  - AW:                                   # Write Address Channel Action.
+    - VALID  : 0                          # AWVALID <= 0
+    - WAIT   : 12                         # wait 12 clock
+      ADDR   : 0x00000001                 # AWADDR  <= 0x00000001
+      SIZE   : 2                          # AWSIZE  <= 2
+      LEN    : 1                          # AWLEN   <= 8'h00
+      VALID  : 1                          # AWVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until AWVALID = 1 and AWREADY = 1
+    - VALID  : 0                          # AWVALID <= 0
+  - W:                                    # Write Data Channel Action.
+    - DATA   : 0                          # WDATA  <= "32'h00000000"
+      STRB   : 0                          # WSTRB  <= "4'b0000"
+      LAST   : 0                          # WLAST  <= 0
+      VALID  : 0                          # WVALID <= 0
+    - WAIT   : {AWVALID: 1, ON: on}       # wait until AWVALID = 1 
+    - DATA   : "32'h00001100"             # WDATA  <= "32'h00001100"
+      STRB   : "4'b0010"                  # WSTRB  <= "4'b0010"
+      LAST   : 1                          # WLAST  <= 1
+      VALID  : 1                          # WVALID <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until WVALID = 1 and WREADY = 1
+    - WVALID : 0                          # WVALID <= 0
+  - B:                                    # Write Responce Channel Action.
+    - READY  : 0                          # BREADY <= 0
+    - WAIT   : {AWVALID: 1, AWREADY: 1}   # wait until AWVALID = 1 and AWREADY = 1
+    - READY  : 1                          # BREADY <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until BVALID = 1 and BREADY = 1
+    - CHECK  :                            # CHECK 
+        RESP : OKAY                       #   RESP=OKAY
+    - READY  : 0                          # BREADY <= 0
+  - AR:                                   # Read Address Channel Action.
+    - VALID  : 0                          # ARVALID <= 0
+    - WAIT   : 10                         # wait 10 clock
+      ADDR   : 0x00000000                 # ARADDR  <= 0x00000000
+      SIZE   : 2                          # ARSIZE  <= 2
+      LEN    : 1                          # ARLEN   <= 8'h00
+      VALID  : 1                          # ARVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until ARVALID = 1 and ARREADY = 1
+    - VALID  : 0                          # ARVALID <= 0
+  - R:
+    - RREADY : 0                          # RREADY <= 0
+    - WAIT   : {ARVALID: 1, ON: on}       # wait until ARVALID = 1 
+    - RREADY : 1                          # RREADY <= 1
+    - WAIT   : {RVALID: 1, RREADY: 1}     # wait until RVALID = 1 and RREADY = 1
+    - CHECK  :                            # CHECK 
+        RDATA   : "32'h03020110"          #  RDATA="32'h03020110"
+        RLAST   : 1                       #  RLAST=1
+        RRESP   : OKAY                    #  RESP=OKAY
+    - RREADY : 0                          # RREADY <= 0
+---
+- - [MASTER]
+  - READ : 
+      ADDR : 0x00000000
+      ID   : 10
+      DATA : [0x10,0x11,0x02,0x03]
+      RESP : OKAY
+---
+- - [MASTER]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 3.3"
+  - AW:                                   # Write Address Channel Action.
+    - VALID  : 0                          # AWVALID <= 0
+    - WAIT   : 14                         # wait 14 clock
+      ADDR   : 0x00000002                 # AWADDR  <= 0x00000002
+      SIZE   : 2                          # AWSIZE  <= 2
+      LEN    : 1                          # AWLEN   <= 8'h00
+      VALID  : 1                          # AWVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until AWVALID = 1 and AWREADY = 1
+    - VALID  : 0                          # AWVALID <= 0
+  - W:                                    # Write Data Channel Action.
+    - DATA   : 0                          # WDATA  <= "32'h00000000"
+      STRB   : 0                          # WSTRB  <= "4'b0000"
+      LAST   : 0                          # WLAST  <= 0
+      VALID  : 0                          # WVALID <= 0
+    - WAIT   : {AWVALID: 1, ON: on}       # wait until AWVALID = 1 
+    - DATA   : "32'h00120000"             # WDATA  <= "32'h00120000"
+      STRB   : "4'b0100"                  # WSTRB  <= "4'b0100"
+      LAST   : 1                          # WLAST  <= 1
+      VALID  : 1                          # WVALID <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until WVALID = 1 and WREADY = 1
+    - WVALID : 0                          # WVALID <= 0
+  - B:                                    # Write Responce Channel Action.
+    - READY  : 0                          # BREADY <= 0
+    - WAIT   : {AWVALID: 1, AWREADY: 1}   # wait until AWVALID = 1 and AWREADY = 1
+    - READY  : 1                          # BREADY <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until BVALID = 1 and BREADY = 1
+    - CHECK  :                            # CHECK 
+        RESP : OKAY                       #   RESP=OKAY
+    - READY  : 0                          # BREADY <= 0
+  - AR:                                   # Read Address Channel Action.
+    - VALID  : 0                          # ARVALID <= 0
+    - WAIT   : 10                         # wait 10 clock
+      ADDR   : 0x00000000                 # ARADDR  <= 0x00000000
+      SIZE   : 2                          # ARSIZE  <= 2
+      LEN    : 1                          # ARLEN   <= 8'h00
+      VALID  : 1                          # ARVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until ARVALID = 1 and ARREADY = 1
+    - VALID  : 0                          # ARVALID <= 0
+  - R:
+    - RREADY : 0                          # RREADY <= 0
+    - WAIT   : {ARVALID: 1, ON: on}       # wait until ARVALID = 1 
+    - RREADY : 1                          # RREADY <= 1
+    - WAIT   : {RVALID: 1, RREADY: 1}     # wait until RVALID = 1 and RREADY = 1
+    - CHECK  :                            # CHECK 
+        RDATA   : "32'h03021110"          #  RDATA="32'h03021110"
+        RLAST   : 1                       #  RLAST=1
+        RRESP   : OKAY                    #  RESP=OKAY
+    - RREADY : 0                          # RREADY <= 0
+---
+- - [MASTER]
+  - READ : 
+      ADDR : 0x00000000
+      ID   : 10
+      DATA : [0x10,0x11,0x12,0x03]
+      RESP : OKAY
+---
+- - [MASTER]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 3.4"
+  - AW:                                   # Write Address Channel Action.
+    - VALID  : 0                          # AWVALID <= 0
+    - WAIT   : 16                         # wait 16 clock
+      ADDR   : 0x00000003                 # AWADDR  <= 0x00000003
+      SIZE   : 2                          # AWSIZE  <= 2
+      LEN    : 1                          # AWLEN   <= 8'h00
+      VALID  : 1                          # AWVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until AWVALID = 1 and AWREADY = 1
+    - VALID  : 0                          # AWVALID <= 0
+  - W:                                    # Write Data Channel Action.
+    - DATA   : 0                          # WDATA  <= "32'h00000000"
+      STRB   : 0                          # WSTRB  <= "4'b0000"
+      LAST   : 0                          # WLAST  <= 0
+      VALID  : 0                          # WVALID <= 0
+    - WAIT   : {AWVALID: 1, ON: on}       # wait until AWVALID = 1 
+    - DATA   : "32'h13000000"             # WDATA  <= "32'h13000000"
+      STRB   : "4'b1000"                  # WSTRB  <= "4'b1000"
+      LAST   : 1                          # WLAST  <= 1
+      VALID  : 1                          # WVALID <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until WVALID = 1 and WREADY = 1
+    - WVALID : 0                          # WVALID <= 0
+  - B:                                    # Write Responce Channel Action.
+    - READY  : 0                          # BREADY <= 0
+    - WAIT   : {AWVALID: 1, AWREADY: 1}   # wait until AWVALID = 1 and AWREADY = 1
+    - READY  : 1                          # BREADY <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until BVALID = 1 and BREADY = 1
+    - CHECK  :                            # CHECK 
+        RESP : OKAY                       #   RESP=OKAY
+    - READY  : 0                          # BREADY <= 0
+  - AR:                                   # Read Address Channel Action.
+    - VALID  : 0                          # ARVALID <= 0
+    - WAIT   : 10                         # wait 10 clock
+      ADDR   : 0x00000000                 # ARADDR  <= 0x00000000
+      SIZE   : 2                          # ARSIZE  <= 2
+      LEN    : 1                          # ARLEN   <= 8'h00
+      VALID  : 1                          # ARVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until ARVALID = 1 and ARREADY = 1
+    - VALID  : 0                          # ARVALID <= 0
+  - R:
+    - RREADY : 0                          # RREADY <= 0
+    - WAIT   : {ARVALID: 1, ON: on}       # wait until ARVALID = 1 
+    - RREADY : 1                          # RREADY <= 1
+    - WAIT   : {RVALID: 1, RREADY: 1}     # wait until RVALID = 1 and RREADY = 1
+    - CHECK  :                            # CHECK 
+        RDATA   : "32'h03121110"          #  RDATA="32'h03121110"
+        RLAST   : 1                       #  RLAST=1
+        RRESP   : OKAY                    #  RESP=OKAY
+    - RREADY : 0                          # RREADY <= 0
+---
+- - [MASTER]
+  - READ : 
+      ADDR : 0x00000000
+      ID   : 10
+      DATA : [0x10,0x11,0x12,0x13]
+      RESP : OKAY
+---
+- - [MASTER]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 3.5"
+  - AW:                                   # Write Address Channel Action.
+    - VALID  : 0                          # AWVALID <= 0
+    - WAIT   : 10                         # wait 10 clock
+      ADDR   : 0x00000004                 # AWADDR  <= 0x00000004
+      SIZE   : 2                          # AWSIZE  <= 2
+      LEN    : 1                          # AWLEN   <= 8'h00
+      VALID  : 1                          # AWVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until AWVALID = 1 and AWREADY = 1
+    - VALID  : 0                          # AWVALID <= 0
+  - W:                                    # Write Data Channel Action.
+    - DATA   : 0                          # WDATA  <= "32'h00000000"
+      STRB   : 0                          # WSTRB  <= "4'b0000"
+      LAST   : 0                          # WLAST  <= 0
+      VALID  : 0                          # WVALID <= 0
+    - WAIT   : {AWVALID: 1, ON: on}       # wait until AWVALID = 1 
+    - DATA   : "32'h00000014"             # WDATA  <= "32'h00000014"
+      STRB   : "4'b0001"                  # WSTRB  <= "4'b0001"
+      LAST   : 1                          # WLAST  <= 1
+      VALID  : 1                          # WVALID <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until WVALID = 1 and WREADY = 1
+    - WVALID : 0                          # WVALID <= 0
+  - B:                                    # Write Responce Channel Action.
+    - READY  : 0                          # BREADY <= 0
+    - WAIT   : {AWVALID: 1, AWREADY: 1}   # wait until AWVALID = 1 and AWREADY = 1
+    - READY  : 1                          # BREADY <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until BVALID = 1 and BREADY = 1
+    - CHECK  :                            # CHECK 
+        RESP : OKAY                       #   RESP=OKAY
+    - READY  : 0                          # BREADY <= 0
+  - AR:                                   # Read Address Channel Action.
+    - VALID  : 0                          # ARVALID <= 0
+    - WAIT   : 10                         # wait 10 clock
+      ADDR   : 0x00000004                 # ARADDR  <= 0x00000004
+      SIZE   : 2                          # ARSIZE  <= 2
+      LEN    : 1                          # ARLEN   <= 8'h00
+      VALID  : 1                          # ARVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until ARVALID = 1 and ARREADY = 1
+    - VALID  : 0                          # ARVALID <= 0
+  - R:
+    - RREADY : 0                          # RREADY <= 0
+    - WAIT   : {ARVALID: 1, ON: on}       # wait until ARVALID = 1 
+    - RREADY : 1                          # RREADY <= 1
+    - WAIT   : {RVALID: 1, RREADY: 1}     # wait until RVALID = 1 and RREADY = 1
+    - CHECK  :                            # CHECK 
+        RDATA   : "32'h07060504"          #  RDATA="32'h07060504"
+        RLAST   : 1                       #  RLAST=1
+        RRESP   : OKAY                    #  RESP=OKAY
+    - RREADY : 0                          # RREADY <= 0
+---
+- - [MASTER]
+  - READ : 
+      ADDR : 0x00000004
+      ID   : 10
+      DATA : [0x14,0x05,0x06,0x07]
+      RESP : OKAY
+---
+- - [MASTER]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 3.6"
+  - AW:                                   # Write Address Channel Action.
+    - VALID  : 0                          # AWVALID <= 0
+    - WAIT   : 12                         # wait 12 clock
+      ADDR   : 0x00000005                 # AWADDR  <= 0x00000005
+      SIZE   : 2                          # AWSIZE  <= 2
+      LEN    : 1                          # AWLEN   <= 8'h00
+      VALID  : 1                          # AWVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until AWVALID = 1 and AWREADY = 1
+    - VALID  : 0                          # AWVALID <= 0
+  - W:                                    # Write Data Channel Action.
+    - DATA   : 0                          # WDATA  <= "32'h00000000"
+      STRB   : 0                          # WSTRB  <= "4'b0000"
+      LAST   : 0                          # WLAST  <= 0
+      VALID  : 0                          # WVALID <= 0
+    - WAIT   : {AWVALID: 1, ON: on}       # wait until AWVALID = 1 
+    - DATA   : "32'h00001500"             # WDATA  <= "32'h00001500"
+      STRB   : "4'b0010"                  # WSTRB  <= "4'b0010"
+      LAST   : 1                          # WLAST  <= 1
+      VALID  : 1                          # WVALID <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until WVALID = 1 and WREADY = 1
+    - WVALID : 0                          # WVALID <= 0
+  - B:                                    # Write Responce Channel Action.
+    - READY  : 0                          # BREADY <= 0
+    - WAIT   : {AWVALID: 1, AWREADY: 1}   # wait until AWVALID = 1 and AWREADY = 1
+    - READY  : 1                          # BREADY <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until BVALID = 1 and BREADY = 1
+    - CHECK  :                            # CHECK 
+        RESP : OKAY                       #   RESP=OKAY
+    - READY  : 0                          # BREADY <= 0
+  - AR:                                   # Read Address Channel Action.
+    - VALID  : 0                          # ARVALID <= 0
+    - WAIT   : 10                         # wait 10 clock
+      ADDR   : 0x00000004                 # ARADDR  <= 0x00000004
+      SIZE   : 2                          # ARSIZE  <= 2
+      LEN    : 1                          # ARLEN   <= 8'h00
+      VALID  : 1                          # ARVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until ARVALID = 1 and ARREADY = 1
+    - VALID  : 0                          # ARVALID <= 0
+  - R:
+    - RREADY : 0                          # RREADY <= 0
+    - WAIT   : {ARVALID: 1, ON: on}       # wait until ARVALID = 1 
+    - RREADY : 1                          # RREADY <= 1
+    - WAIT   : {RVALID: 1, RREADY: 1}     # wait until RVALID = 1 and RREADY = 1
+    - CHECK  :                            # CHECK 
+        RDATA   : "32'h07060514"          #  RDATA="32'h07060514"
+        RLAST   : 1                       #  RLAST=1
+        RRESP   : OKAY                    #  RESP=OKAY
+    - RREADY : 0                          # RREADY <= 0
+---
+- - [MASTER]
+  - READ : 
+      ADDR : 0x00000004
+      ID   : 10
+      DATA : [0x14,0x15,0x06,0x07]
+      RESP : OKAY
+---
+- - [MASTER]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 3.7"
+  - AW:                                   # Write Address Channel Action.
+    - VALID  : 0                          # AWVALID <= 0
+    - WAIT   : 14                         # wait 14 clock
+      ADDR   : 0x00000006                 # AWADDR  <= 0x00000006
+      SIZE   : 2                          # AWSIZE  <= 2
+      LEN    : 1                          # AWLEN   <= 8'h00
+      VALID  : 1                          # AWVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until AWVALID = 1 and AWREADY = 1
+    - VALID  : 0                          # AWVALID <= 0
+  - W:                                    # Write Data Channel Action.
+    - DATA   : 0                          # WDATA  <= "32'h00000000"
+      STRB   : 0                          # WSTRB  <= "4'b0000"
+      LAST   : 0                          # WLAST  <= 0
+      VALID  : 0                          # WVALID <= 0
+    - WAIT   : {AWVALID: 1, ON: on}       # wait until AWVALID = 1 
+    - DATA   : "32'h00160000"             # WDATA  <= "32'h00160000"
+      STRB   : "4'b0100"                  # WSTRB  <= "4'b0100"
+      LAST   : 1                          # WLAST  <= 1
+      VALID  : 1                          # WVALID <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until WVALID = 1 and WREADY = 1
+    - WVALID : 0                          # WVALID <= 0
+  - B:                                    # Write Responce Channel Action.
+    - READY  : 0                          # BREADY <= 0
+    - WAIT   : {AWVALID: 1, AWREADY: 1}   # wait until AWVALID = 1 and AWREADY = 1
+    - READY  : 1                          # BREADY <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until BVALID = 1 and BREADY = 1
+    - CHECK  :                            # CHECK 
+        RESP : OKAY                       #   RESP=OKAY
+    - READY  : 0                          # BREADY <= 0
+  - AR:                                   # Read Address Channel Action.
+    - VALID  : 0                          # ARVALID <= 0
+    - WAIT   : 10                         # wait 10 clock
+      ADDR   : 0x00000004                 # ARADDR  <= 0x00000004
+      SIZE   : 2                          # ARSIZE  <= 2
+      LEN    : 1                          # ARLEN   <= 8'h00
+      VALID  : 1                          # ARVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until ARVALID = 1 and ARREADY = 1
+    - VALID  : 0                          # ARVALID <= 0
+  - R:
+    - RREADY : 0                          # RREADY <= 0
+    - WAIT   : {ARVALID: 1, ON: on}       # wait until ARVALID = 1 
+    - RREADY : 1                          # RREADY <= 1
+    - WAIT   : {RVALID: 1, RREADY: 1}     # wait until RVALID = 1 and RREADY = 1
+    - CHECK  :                            # CHECK 
+        RDATA   : "32'h07061514"          #  RDATA="32'h07061514"
+        RLAST   : 1                       #  RLAST=1
+        RRESP   : OKAY                    #  RESP=OKAY
+    - RREADY : 0                          # RREADY <= 0
+---
+- - [MASTER]
+  - READ : 
+      ADDR : 0x00000004
+      ID   : 10
+      DATA : [0x14,0x15,0x16,0x07]
+      RESP : OKAY
+---
+- - [MASTER]
+  - SAY : "AXI4 USPRAM 64x32 R1W4RF TEST BENCH 3.8"
+  - AW:                                   # Write Address Channel Action.
+    - VALID  : 0                          # AWVALID <= 0
+    - WAIT   : 16                         # wait 16 clock
+      ADDR   : 0x00000007                 # AWADDR  <= 0x00000007
+      SIZE   : 2                          # AWSIZE  <= 2
+      LEN    : 1                          # AWLEN   <= 8'h00
+      VALID  : 1                          # AWVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until AWVALID = 1 and AWREADY = 1
+    - VALID  : 0                          # AWVALID <= 0
+  - W:                                    # Write Data Channel Action.
+    - DATA   : 0                          # WDATA  <= "32'h00000000"
+      STRB   : 0                          # WSTRB  <= "4'b0000"
+      LAST   : 0                          # WLAST  <= 0
+      VALID  : 0                          # WVALID <= 0
+    - WAIT   : {AWVALID: 1, ON: on}       # wait until AWVALID = 1 
+    - DATA   : "32'h17000000"             # WDATA  <= "32'h17000000"
+      STRB   : "4'b1000"                  # WSTRB  <= "4'b1000"
+      LAST   : 1                          # WLAST  <= 1
+      VALID  : 1                          # WVALID <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until WVALID = 1 and WREADY = 1
+    - WVALID : 0                          # WVALID <= 0
+  - B:                                    # Write Responce Channel Action.
+    - READY  : 0                          # BREADY <= 0
+    - WAIT   : {AWVALID: 1, AWREADY: 1}   # wait until AWVALID = 1 and AWREADY = 1
+    - READY  : 1                          # BREADY <= 1
+    - WAIT   : {VALID: 1, READY: 1}       # wait until BVALID = 1 and BREADY = 1
+    - CHECK  :                            # CHECK 
+        RESP : OKAY                       #   RESP=OKAY
+    - READY  : 0                          # BREADY <= 0
+  - AR:                                   # Read Address Channel Action.
+    - VALID  : 0                          # ARVALID <= 0
+    - WAIT   : 10                         # wait 10 clock
+      ADDR   : 0x00000004                 # ARADDR  <= 0x00000004
+      SIZE   : 2                          # ARSIZE  <= 2
+      LEN    : 1                          # ARLEN   <= 8'h00
+      VALID  : 1                          # ARVALID <= 1
+    - WAIT   : {VALID : 1, READY : 1}     # wait until ARVALID = 1 and ARREADY = 1
+    - VALID  : 0                          # ARVALID <= 0
+  - R:
+    - RREADY : 0                          # RREADY <= 0
+    - WAIT   : {ARVALID: 1, ON: on}       # wait until ARVALID = 1 
+    - RREADY : 1                          # RREADY <= 1
+    - WAIT   : {RVALID: 1, RREADY: 1}     # wait until RVALID = 1 and RREADY = 1
+    - CHECK  :                            # CHECK 
+        RDATA   : "32'h07161514"          #  RDATA="32'h07161514"
+        RLAST   : 1                       #  RLAST=1
+        RRESP   : OKAY                    #  RESP=OKAY
+    - RREADY : 0                          # RREADY <= 0
+---
+- - [MASTER]
+  - READ : 
+      ADDR : 0x00000004
+      ID   : 10
+      DATA : [0x14,0x15,0x16,0x17]
+      RESP : OKAY
+---

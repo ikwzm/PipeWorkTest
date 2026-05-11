@@ -1,0 +1,34 @@
+
+- Global:
+    Print    :  true
+
+- Library:
+    Name     :  DUMMY_PLUG
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    Exclude  :  ["../../../Dummy_Plug/src/main/vhdl/core/sync_alt.vhd"]
+    PathList :  ["../../../Dummy_Plug/src/main/vhdl/"]
+
+- Library:
+    Name     :  PIPEWORK
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    PathList :  ["../../../PipeWork/src/"]
+
+- Library:
+    Name     :  WORK
+    Format   :  "nvc -L ./ --work=#{library_name} -a #{file_name}"
+    PathList :  ["../../../src/test/vhdl/axi4_udpram" ]
+    Top      :  ["AXI4_UDPRAM_64x32_R4W4RF_TEST_BENCH", 
+                 "AXI4_UDPRAM_64x32_R4W4WF_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R4W4NC_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R8W4RF_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R8W4WF_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R8W4NC_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R4W8RF_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R4W8WF_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R4W8NC_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R1W4RF_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R1W4WF_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R1W4NC_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R4W1RF_TEST_BENCH",
+                 "AXI4_UDPRAM_64x32_R4W1WF_TEST_BENCH", 
+                 "AXI4_UDPRAM_64x32_R4W1NC_TEST_BENCH"] 
